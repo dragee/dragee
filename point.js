@@ -231,12 +231,13 @@
 			return new Point(width, height);
 		},
 		getOffset:function(element,parent,isConsiderTranslate){
-			var offset = new Point(0,0),matrix,node=element,matrixValues;
+			var offset = new Point(0,0),matrix,node=element,matrixValues,offsetParent=element;
 			while(node && node!==parent){
-				if(node.offsetLeft || node.offsetTop){
+				if(offsetParent === node){
 					offset = offset.add(new Point(node.offsetLeft||0,node.offsetTop||0));
+					offsetParent = node.offsetParent;
 				}
-				node = node.offsetParent;
+				node = node.parentNode;
 			}
 			if(isConsiderTranslate){
 				node=element;
