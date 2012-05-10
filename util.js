@@ -1,6 +1,6 @@
 (function (global, MultiDrag){
 	//'use strict';
-	var Util = {
+	var util = {
 		addClass:function (el, className){
 			if(!this.hasClass(el, className)){
 				el.className = (el.className + ' ' + className).replace(/\s+/g, ' ').replace(/(^ | $)/g, ' ');
@@ -150,10 +150,43 @@
 			}else{
 				el.style.cssText = cssText;
 			}
+		},
+		triggerFactory:function(opts){
+			var funcs=[],i,
+			options={
+				isReverse:false,
+				isStopOnTrue:false,
+				context:window
+			};
+			for(i in opts){
+				options[i]=opts[i];
+			};
+			return {
+				fire:function(){
+					var args = [].slice.call(arguments),i,retValue,
+						fs = options.isReverse?funcs.slice().reverse():funcs;
+					for(i=0;i<fs.length;i++){
+						retValue = fs[i].apply(options.context,args);
+						if(options.isStopOnTrue && retValue){
+							return true;
+						}
+					}
+					return !options.isStopOnTrue;
+				},
+				add:function(f){
+					funcs.push(f);
+				},
+				remove:function(f){
+					var index = funcs.indexOf(f);
+					if(index !== -1){
+						funcs.splice(index,1)
+					}
+				}
+			}
 		}
 	};
 
 	MultiDrag = MultiDrag || {};
-	MultiDrag.Util = Util;
+	MultiDrag.util = util;
 	global.MultiDrag = MultiDrag;
 })(window, window.MultiDrag );

@@ -1,17 +1,18 @@
 (function (global, MultiDrag){
 	'use strict';
-	var ListSwitcher = function (objs, options){
+	var listSwitcherFactory,
+	ListSwitcher = function (objs, options){
 		options = options || {};
 		options.stepOn = options.stepOn || new Point(-50, 0);
 		MultiDrag.List.call(this, objs, options);
 	}
-	MultiDrag.Util.extend(ListSwitcher, MultiDrag.List);
+	MultiDrag.util.extend(ListSwitcher, MultiDrag.List);
 
 	ListSwitcher.prototype.init = function (){
 		var that = this;
 		this.objs.forEach(function (obj){
 			obj.isOn = false;
-			obj.addOnEnd(function (){
+			obj.onEnd.add(function (){
 				that.onEnd(this);
 				return true;
 			});
@@ -56,7 +57,36 @@
 			return obj.isOn ? obj.fixPosition.sub(this.options.stepOn) : obj.fixPosition.clone();
 		}, this);
 	}
+
+
+	ListSwitcher.prototype.getSortedObjs = function(){
+		return this.objs.map(function(obj){
+			return 	obj.initPosition;
+		}).map(function(position){
+			return this.objs.filter(function(obj){
+				return obj.fixPosition.compare(position) || obj.fixPosition.compare(position.add(this.options.stepOn));
+			})[0];
+		},this);
+	}
+
+	listSwitcherFactory = function(el,objsElements,options){
+		var objs,objOptions,listOptions;
+		options = options || {};
+		objOptions = options.obj || {};
+		listOptions = options.list || {};
+		objOptions.parent = objOptions.parent || el;
+		objsElements=Array.prototype.slice.call(objsElements);
+
+		objs = objsElements.map(function(el){
+			return new MultiDrag.Obj(el,objOptions);
+		});
+
+		return new ListSwitcher(objs,listOptions);
+	}
+
+
 	MultiDrag = MultiDrag || {};
-	MultiDrag.ListSwitcher = ListSwitcher;
+	MultiDrag = MultiDrag || {};
+	MultiDrag.listSwitcherFactory = listSwitcherFactory;
 	global.MultiDrag = MultiDrag;
 })(window, window.MultiDrag);

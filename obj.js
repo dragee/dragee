@@ -5,32 +5,48 @@
 		start:'mousedown',
 		move:'mousemove',
 		end:'mouseup'
-	}, touchEvents = {
+	},
+	touchEvents = {
 		start:'touchstart',
 		move:'touchmove',
 		end:'touchend'
-	}, events = isTouch ? touchEvents : mouseEvents, objs = [],
+	},
+	events = isTouch ? touchEvents : mouseEvents,
+	objs = [],
 
-		Obj = function (el, options){
-			options = options || {};
-			var i, parent = options.parent || MultiDrag.Util.getDafaultParent(el);
-			this.options = {
-				parent:parent,
-				bound:MultiDrag.BoundFactory(MultiDrag.boundType.element)(parent, parent),
-				isReCalculatePosition:false,
-				isReCalculateSize:false,
-				isContentBoxSize:false,
-				position:false
-			}
-			for(i in options){
-				this.options[i] = options[i];
-			}
-			this.onMoves = options && options.onMove ? [options.onMove] : [];
-			this.onEnds = options && options.onEnd ? [options.onEnd] : [];
-			this.el = el;
-			objs.push(this);
-			this.init();
+	Obj = function (el, options){
+		options = options || {};
+		var i, parent = options.parent || MultiDrag.util.getDafaultParent(el);
+		this.options = {
+			parent:parent,
+			bound:MultiDrag.BoundFactory(MultiDrag.boundType.element)(parent, parent),
+			isReCalculatePosition:false,
+			isReCalculateSize:false,
+			isContentBoxSize:false,
+			position:false
 		}
+		for(i in options){
+			this.options[i] = options[i];
+		}
+		this.onEnd = MultiDrag.util.triggerFactory({context:this,isReverse:true,isStopOnTrue:true});
+		this.onMove = MultiDrag.util.triggerFactory({context:this});
+
+		this.onEnd.add(function(){
+			this.move(this.position, 0, true);
+		});
+
+		if( this.options.onEnd){
+			this.onEnd.add(this.options.onEnd);
+		}
+
+		if( this.options.onMove){
+			this.onMove.add(this.options.onMove);
+		}
+
+		this.el = el;
+		objs.push(this);
+		this.init();
+	};
 
 	Obj.prototype.init = function (){
 		this.offset = mathPoint.getOffset(this.el, this.options.parent, true);
@@ -42,9 +58,9 @@
 		}else{
 			this.initPosition = this.offset;
 		}
-		this.el.addEventListener(events.start, MultiDrag.Util.bind(this.MultiDragStart, this));
-		this._MultiDragMove = MultiDrag.Util.bind(this.MultiDragMove, this);
-		this._MultiDragEnd = MultiDrag.Util.bind(this.MultiDragEnd, this);
+		this.el.addEventListener(events.start, MultiDrag.util.bind(this.MultiDragStart, this));
+		this._MultiDragMove = MultiDrag.util.bind(this.MultiDragMove, this);
+		this._MultiDragEnd = MultiDrag.util.bind(this.MultiDragEnd, this);
 	};
 
 	Obj.prototype.getSize = function (){
@@ -52,18 +68,18 @@
 			this._size = mathPoint.getSizeOfElement(this.el, this.options.isContentBoxSize);
 		}
 		return this._size;
-	}
+	};
 
 	Obj.prototype.getPosition = function (){
 		if(!this.position || this.options.isReCalculatePosition){
 			this.position = this.offset.add(this._transformPosition || new Point(0, 0));
 		}
 		return this.position;
-	}
+	};
 
 	Obj.prototype.getCenter = function (){
 		return this.position.add(this.getSize().mult(0.5));
-	}
+	};
 
 	Obj.prototype._setTranslate = function (point){
 		this._transformPosition = point;
@@ -83,7 +99,7 @@
 		this.position = point;
 		this.el.style.webkitTransitionDuration = time + "ms";
 		this._setTranslate(point.sub(this.offset));
-		isSilent || this.onMove();
+		isSilent || this.onMove.fire();
 	};
 
 	Obj.prototype.MultiDragStart = function (e){
@@ -97,14 +113,14 @@
 		document.addEventListener(events.move, this._MultiDragMove);
 		document.addEventListener(events.end, this._MultiDragEnd);
 		this.isMultiDrag = true;
-		MultiDrag.Util.addClass(this.el, "active");
-		this.onMove();
-	}
+		MultiDrag.util.addClass(this.el, "active");
+		this.onMove.fire();
+	};
 
 	Obj.prototype.MultiDragMove = function (e){
 		var touch, touchPoint, point;
 		if(isTouch){
-			if(!(touch = MultiDrag.Util.getTouchByID(e, this._touchId))){
+			if(!(touch = MultiDrag.util.getTouchByID(e, this._touchId))){
 				return;
 			}
 		}
@@ -114,23 +130,23 @@
 		point = this._startPosition.add(touchPoint.sub(this._startTouchPoint));
 		point = this.options.bound(point, this.getSize());
 		this.move(point, 0);
-	}
+	};
 
 	Obj.prototype.MultiDragEnd = function (e){
 		var touch;
 		if(isTouch){
-			if(!(touch = MultiDrag.Util.getTouchByID(e, this._touchId))){
+			if(!(touch = MultiDrag.util.getTouchByID(e, this._touchId))){
 				return;
 			}
 		}
 		e.stopPropagation();
 		e.preventDefault();
-		this.onEnd();
+		this.onEnd.fire();
 		document.removeEventListener(events.move, this._MultiDragMove);
 		document.removeEventListener(events.end, this._MultiDragEnd);
 		this.isMultiDrag = false;
-		MultiDrag.Util.removeClass(this.el, "active");
-	}
+		MultiDrag.util.removeClass(this.el, "active");
+	};
 
 	Obj.prototype.changeHtmlParent = function (el){
 		if(!this._initialParent){
@@ -140,52 +156,16 @@
 			return;
 		}
 		el.appendChild(this.el);
-		MultiDrag.Util.waitCall(function (){
+		MultiDrag.util.waitCall(function (){
 			this.offset = mathPoint.getOffset(this.el, this.options.parent, true).sub(this._transformPosition);
 			this.move(this.position, 0, false, true);
 		}, this)();
-	}
+	};
 
 
 	Obj.prototype.getRectangle = function (func){
 		return new Rectangle(this.position, this.getSize());
-	}
-
-	Obj.prototype.addOnEnd = function (func){
-		this.onEnds.push(func);
-	}
-
-	Obj.prototype.removeOnEnd = function (func){
-		MultiDrag.Util.remove(this.onEnds, func);
-	}
-
-	Obj.prototype.addOnMove = function (func){
-		this.onMoves.push(func);
-	}
-
-	Obj.prototype.removeOnMove = function (func){
-		MultiDrag.Util.remove(this.onMoves, func);
-	}
-
-	Obj.prototype.onEnd = function (){
-		var i, isStop = false;
-		for(i = this.onEnds.length - 1; i >= 0; i--){
-			isStop = this.onEnds[i].call(this);
-			if(isStop){
-				break;
-			}
-		}
-		if(!isStop){
-			this.move(this.position, 0, true);
-		}
-	}
-
-	Obj.prototype.onMove = function (){
-		var i;
-		for(i = this.onMoves.length - 1; i >= 0; i--){
-			this.onMoves[i].call(this);
-		}
-	}
+	};
 
 	Obj.prototype.refresh = function (){
 		this.offset = mathPoint.getOffset(this.el, this.options.parent, true).sub(this._transformPosition);

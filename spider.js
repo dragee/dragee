@@ -47,14 +47,14 @@
 		this.canvas = document.createElement("canvas");
 		this.canvas.setAttribute("width", this.areaRectangle.size.x + "px");
 		this.canvas.setAttribute("height", this.areaRectangle.size.y + "px");
-		MultiDrag.Util.setStyle(this.canvas, {
+		MultiDrag.util.setStyle(this.canvas, {
 			position:"absolute",
 			top:"0",
 			left:"0",
 			width:this.areaRectangle.size.x + "px",
 			height:this.areaRectangle.size.y + "px"
 		});
-		MultiDrag.Util.appendFirstChild(this.area, this.canvas);
+		MultiDrag.util.appendFirstChild(this.area, this.canvas);
 		this.context = this.canvas.getContext("2d");
 	}
 

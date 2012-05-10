@@ -3,7 +3,8 @@
 
 	var targets =[],
 	Target = function(el,objs,options){
-		var i,parent = (options && options.parent) || MultiDrag.Util.getDafaultParent(el);
+		options = options || {};
+		var i,parent = options.parent || MultiDrag.util.getDafaultParent(el);
 		this.options = {
 			timeEnd:200,
 			timeExcange:400,
@@ -11,16 +12,20 @@
 			parent:parent,
 			isChangeHtmlParent:false,
 			sorting: MultiDrag.SortingFactory(MultiDrag.positionType.floatLeft)(80,mathPoint.getLength({x:1,y:4,IsTransformationSpace:true})),
-			positioning : MultiDrag.PositionFactory(MultiDrag.positionType.floatLeft)(MultiDrag.Util.bind(this.getRectangle,this),{isRemove:false})
-		}
+			positioning : MultiDrag.positionFactory(MultiDrag.positionType.floatLeft)(MultiDrag.util.bind(this.getRectangle,this),{isRemove:true})
+		};
 		for (i in options){
 			this.options[i] = options[i];
 		}
 		targets.push(this);
-		this.el=el;
-		this.objs=objs;
+		this.el = el;
+		this.objs = objs;
+		this.onAdd = MultiDrag.util.triggerFactory({context:this});
+		this.onRemove = MultiDrag.util.triggerFactory({context:this});
+		options.onRemove && this.onRemove.add(options.onRemove);
+		options.onAdd && this.onRemove.add(options.onAdd);
 		this.init();
-	}
+	};
 
 
 	Target.prototype.getRectangle = function(){
@@ -28,11 +33,11 @@
 			this._rectangle = mathPoint.createRectangleFromElement(this.el,this.options.parent,this.options.isContentBoxSize,true);
 		}
 		return this._rectangle;
-	}
+	};
 
 	Target.prototype.init = function(){
 		var objsRectagles,indexesOfNew;
-		this.objOnMoveDictionary = MultiDrag.Util.dictionFactory();
+		this.objOnMoveDictionary = MultiDrag.util.dictionFactory();
 		this.innerObjs = this.objs.filter(function(obj){
 			var el = obj.el.parentNode;
 			while( el ){
@@ -43,7 +48,7 @@
 			}
 			return false;
 		},this);
-		indexesOfNew = MultiDrag.Util.range(this.innerObjs.length);
+		indexesOfNew = MultiDrag.util.range(this.innerObjs.length);
 		objsRectagles = this.options.positioning(this.innerObjs.map(function(obj){
 			return obj.getRectangle();
 		}),indexesOfNew);
@@ -51,14 +56,14 @@
 		this.innerObjs.forEach(function(obj){
 			this.onAdd(obj);
 		},this);
-	}
+	};
 
 	Target.prototype.refresh = function(){
 		var objsRectagles = this.options.positioning(this.innerObjs.map(function(obj){
 			return obj.getRectangle();
 		}),[]);
 		this.setPosition(objsRectagles,[]);
-	}
+	};
 
 	Target.prototype.onEnd = function(obj){
 		var newObjsIndex=[],objsRectagles,isOn = this.getRectangle().isOn(obj.getCenter());
@@ -71,9 +76,9 @@
 		}),newObjsIndex);
 
 		this.setPosition(objsRectagles,newObjsIndex);
-		this.onAdd(obj);
+		this.add(obj);
 		return true;
-	}
+	};
 
 	Target.prototype.setPosition = function(rectangles,indexesOfNew,time){
 		this.innerObjs.slice(0).forEach(function(obj,i){
@@ -84,7 +89,7 @@
 							this.options.timeExcange;
 			if(rect.isRemove){
 				obj.move(obj.initPosition,timeEnd,true,true);
-				MultiDrag.Util.remove(this.innerObjs,obj);
+				MultiDrag.util.remove(this.innerObjs,obj);
 				this.options.isChangeHtmlParent && obj._initialParent && setTimeout(function(){
 					obj.changeHtmlParent(obj._initialParent);
 				},time+10);
@@ -95,20 +100,21 @@
 				},time+10);
 			}
 		},this);
-	}
+	};
 
-	Target.prototype.onAdd = function(obj){
+	Target.prototype.add = function(obj){
 		var that = this;
-		obj.addOnMove(
+		obj.onMove.add(
 			this.objOnMoveDictionary.setValue(obj,function(){
-				return that.onRemove(this);
+				return that.remove(this);
 			})
 		);
-	}
+		this.onAdd.fire(obj);
+	};
 
-	Target.prototype.onRemove = function(obj){
+	Target.prototype.remove = function(obj){
 		var index,objsRectagles;
-		obj.removeOnMove(this.objOnMoveDictionary.remove(obj));
+		obj.onMove.remove(this.objOnMoveDictionary.remove(obj));
 		index = this.innerObjs.indexOf(obj);
 		if( index === -1){
 			return;
@@ -118,6 +124,11 @@
 			return obj.getRectangle();
 		}),[]);
 		this.setPosition(objsRectagles,[]);
+		this.onRemove.fire(obj);
+	};
+
+	Target.prototype.getSortedObjs = function(){
+		this.innerObjs.slice();
 	}
 
 	MultiDrag = MultiDrag || {};

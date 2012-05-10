@@ -6,12 +6,12 @@
 		floatRight:2
 	},
 
-	PositionFactory = function (type){
+	positionFactory = function (type){
 		switch(type){
 			case positionType.notCrossing:
 				return function (rectangle){
 					return function (rectangleList, indexesOfNews){
-						var staticRectangleIndexes = MultiDrag.Util.range(rectangleList).filter(function (index){
+						var staticRectangleIndexes = MultiDrag.util.range(rectangleList).filter(function (index){
 							return indexesOfNews.indexOf(index) === -1;
 						});
 						indexesOfNews.forEach(function (index){
@@ -142,6 +142,6 @@
 	MultiDrag = MultiDrag || {};
 	MultiDrag.positionType = positionType;
 	MultiDrag.SortingFactory = SortingFactory;
-	MultiDrag.PositionFactory = PositionFactory;
+	MultiDrag.positionFactory = positionFactory;
 	window.MultiDrag = MultiDrag;
 })(window, window.MultiDrag);

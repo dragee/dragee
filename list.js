@@ -1,6 +1,6 @@
 (function (global, MultiDrag){
 	'use strict';
-	var lists = [], List = function (objs, options){
+	var lists = [],listFactory, List = function (objs, options){
 		var i;
 		this.options = {
 			timeEnd:200,
@@ -18,7 +18,7 @@
 	List.prototype.init = function (){
 		var that = this;
 		this.objs.forEach(function (obj){
-			obj.addOnEnd(function (){
+			obj.onEnd.add(function (){
 				that.onEnd(this);
 				return true;
 			});
@@ -48,8 +48,35 @@
 		});
 	}
 
+	List.prototype.getSortedObjs = function(){
+		return this.objs.map(function(obj){
+			return 	obj.initPosition;
+		}).map(function(position){
+			return this.objs.filter(function(obj){
+				return obj.fixPosition.compare(position);
+			})[0];
+		},this);
+	}
+
+	listFactory = function(el,objsElements,options){
+		var objs,objOptions,listOptions;
+		options = options || {};
+		objOptions = options.obj || {};
+		listOptions = options.list || {};
+		objOptions.parent = objOptions.parent || el;
+		objsElements=Array.prototype.slice.call(objsElements);
+
+		objs = objsElements.map(function(el){
+			return new MultiDrag.Obj(el,objOptions);
+		});
+
+		return new List(objs,listOptions);
+	}
+
+
 	MultiDrag = MultiDrag || {};
 	MultiDrag.lists = lists;
 	MultiDrag.List = List;
+	MultiDrag.listFactory = listFactory;
 	global.MultiDrag = MultiDrag;
 })(window, MultiDrag);

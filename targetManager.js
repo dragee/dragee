@@ -1,60 +1,41 @@
 (function (global, MultiDrag){
 	'use strict';
-	var targetManagers =[],
-	TargetManager = function(el,objElements,targetElements,options){
+	var targetManagers =[],targetManagerFactory,
+	TargetManager = function(el,objs,targets,options){
 		var i;
 		this.el=el;
+		this.objs = objs;
+		this.targets = targets;
 		targetManagers.push(this);
 		this.options = {
-			isParenTarget:false,
-			isChangeHtmlParent:true,
+			isChangeHtmlParent:false,
 			timeEnd : 400,
 			timeWaitForRefresh : 500
 		}
 		for(i in options){ this.options[i] = options[i]; }
-		this.init(objElements,targetElements);
-	}
+		this.init();
+	};
 
-	TargetManager.prototype.init = function(objElements,targetElements){
+	TargetManager.prototype.init = function(){
 		var that = this;
-		this.objs = objElements.map(function(el){
-			var obj = new MultiDrag.Obj(el,{
-				parent:this.el,
-				isReCalculatePosition:true,
-				onEnd:function(){
-					return that.onEnd(this);
-				},
-				onMove:function(){
-					return that.onMove(this);
-				}
-			},this);
-			return obj;
-		},this);
-		this.targets = targetElements.map(function(el){
-			var target = new MultiDrag.Target(el,this.objs,{
-				parent:this.el,
-				isReCalculateRectangle:true,
-				isChangeHtmlParent:this.options.isChangeHtmlParent
+		this.objs.forEach(function(obj){
+			obj.onEnd.add(function(){
+				return that.onEnd(this);
 			});
-			return target;
-		},this);
-		this.options.isParenTarget && this.targets.push(new MultiDrag.Target(this.el,this.objs,{
-			parent:this.el,
-			isChangeHtmlParent:this.options.isChangeHtmlParent
-		}));
-		this.MultiDraggedNowObjs=[];
-		this._maxTouchCount=0;
-	}
+			obj.onMove.add(function(){
+				return that.onMove(this);
+			});
+		});
+	};
 
 	TargetManager.prototype.onMove = function(obj){
-		if(this.MultiDraggedNowObjs.indexOf(obj) === -1){
-			this.MultiDraggedNowObjs.push(obj);
-			this._maxTouchCount = Math.max(this._maxTouchCount,this.MultiDraggedNowObjs.length);
-		}
-	}
+
+	};
 
 	TargetManager.prototype.onEnd = function(obj){
-		var shotTargets = this.targets.filter(function(target,index){
+		var shotTargets = this.targets.filter(function(target){
+			return target.objs.indexOf(obj) !== -1;
+		}).filter(function(target){
 			var targetRectangle = target.getRectangle(),
 			objSquare = obj.getRectangle().getSquare();
 			return  objSquare < targetRectangle.getSquare() && targetRectangle.isOn(obj.getCenter());
@@ -69,22 +50,8 @@
 				obj.changeHtmlParent(obj._initialParent);
 			},this.options.timeEnd+10);
 		}
-		this.onEndMultiDrag(obj);
 		return true;
-	}
-
-	TargetManager.prototype.onEndMultiDrag = function(obj){
-		var that = this;
-		MultiDrag.Util.remove(this.MultiDraggedNowObjs,obj);
-		if(!this.MultiDraggedNowObjs.length){
-			if(this._maxTouchCount > 1){
-				setTimeout(function(){
-					that.refresh();
-				},this.options.timeWaitForRefresh);
-			}
-			this._maxTouchCount = 0;
-		}
-	}
+	};
 
 
 	TargetManager.prototype.refresh = function(){
@@ -94,10 +61,34 @@
 		this.targets.forEach(function(target){
 			target.refresh();
 		});
+	};
+
+
+	targetManagerFactory = function(el,objsElements,targetElements,options){
+		var objs,targets,objOptions,targetOptions,managerOptions;
+		options = options || {};
+		objOptions = options.obj || {};
+		targetOptions = options.target || {};
+		managerOptions = options.manager || {};
+		objOptions.parent = objOptions.parent || el;
+		targetOptions.parent = targetOptions.parent || el;
+		objsElements=Array.prototype.slice.call(objsElements);
+		targetElements=Array.prototype.slice.call(targetElements);
+
+		objs = objsElements.map(function(el){
+			return new MultiDrag.Obj(el,objOptions);
+		});
+
+		targets = targetElements.map(function(el){
+			return new MultiDrag.Target(el,objs,targetOptions);
+		});
+		return new TargetManager(el,objs,targets,managerOptions);
 	}
+
 
 	MultiDrag = MultiDrag || {};
 	MultiDrag.targetManagers = targetManagers;
 	MultiDrag.TargetManager = TargetManager;
+	MultiDrag.targetManagerFactory = targetManagerFactory;
 	global.MultiDrag = MultiDrag;
 })(window, window.MultiDrag);
