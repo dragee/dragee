@@ -13,6 +13,16 @@
 	},
 	events = isTouch ? touchEvents : mouseEvents,
 	objs = [],
+	onCreateObj = function(obj){
+		var message = "for this element MultiDrag.Obj is already exist, don't create it twice ";
+		if(objs.some(function(dObj){
+			return obj.el === dObj.el;
+		})){
+			alert(message);
+			throw message;
+		}
+		objs.push(obj);
+	},
 
 	Obj = function (el, options){
 		options = options || {};
@@ -44,8 +54,8 @@
 		}
 
 		this.el = el;
-		objs.push(this);
 		this.init();
+		onCreateObj(this);
 	};
 
 	Obj.prototype.init = function (){
