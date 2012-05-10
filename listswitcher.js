@@ -87,6 +87,7 @@
 
 	MultiDrag = MultiDrag || {};
 	MultiDrag = MultiDrag || {};
+	MultiDrag.ListSwitcher = ListSwitcher;
 	MultiDrag.listSwitcherFactory = listSwitcherFactory;
 	global.MultiDrag = MultiDrag;
 })(window, window.MultiDrag);
