@@ -8,11 +8,11 @@
 		line:3,
 		unificationOfRectangle:4
 	},
-	BoundFactory = function (type){
+	boundFactory = function (type){
 		switch(type){
 			case boundType.element:
 				return function (element, parent){
-					return BoundFactory(boundType.rectangle)(mathPoint.createRectangleFromElement(element, parent));
+					return boundFactory(boundType.rectangle)(mathPoint.createRectangleFromElement(element, parent));
 				};
 			case boundType.rectangle:
 				return function (rectangle){
@@ -71,6 +71,6 @@
 	};
 	MultiDrag = MultiDrag || {};
 	MultiDrag.boundType = boundType;
-	MultiDrag.BoundFactory = BoundFactory;
+	MultiDrag.boundFactory = boundFactory;
 	global.MultiDrag = MultiDrag;
 })(window, MultiDrag);

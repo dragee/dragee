@@ -30,7 +30,7 @@
 				halfSize = mathPoint.getSizeOfElement(element).mult(0.5),
 				start = mathPoint.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize),
 				end = mathPoint.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize),
-				bound = MultiDrag.BoundFactory(MultiDrag.boundType.line)(start, end);
+				bound = MultiDrag.boundFactory(MultiDrag.boundType.line)(start, end);
 			return new MultiDrag.Obj(element, {parent:this.area, bound:bound, position:start, onMove:function (){
 				that.draw();
 				return true;

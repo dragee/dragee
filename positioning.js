@@ -102,7 +102,7 @@
 		}
 	},
 
-	SortingFactory = function (type){
+	sortingFactory = function (type){
 		switch(type){
 			case positionType.notCrossing:
 				return function (){
@@ -141,7 +141,7 @@
 
 	MultiDrag = MultiDrag || {};
 	MultiDrag.positionType = positionType;
-	MultiDrag.SortingFactory = SortingFactory;
+	MultiDrag.sortingFactory = sortingFactory;
 	MultiDrag.positionFactory = positionFactory;
 	window.MultiDrag = MultiDrag;
 })(window, window.MultiDrag);

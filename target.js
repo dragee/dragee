@@ -11,7 +11,7 @@
 			isReCalculateRectangle:false,
 			parent:parent,
 			isChangeHtmlParent:false,
-			sorting: MultiDrag.SortingFactory(MultiDrag.positionType.floatLeft)(80,mathPoint.getLength({x:1,y:4,IsTransformationSpace:true})),
+			sorting: MultiDrag.sortingFactory(MultiDrag.positionType.floatLeft)(80,mathPoint.getLength({x:1,y:4,IsTransformationSpace:true})),
 			positioning : MultiDrag.positionFactory(MultiDrag.positionType.floatLeft)(MultiDrag.util.bind(this.getRectangle,this),{isRemove:true})
 		};
 		for (i in options){

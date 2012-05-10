@@ -29,7 +29,7 @@
 		var i, parent = options.parent || MultiDrag.util.getDafaultParent(el);
 		this.options = {
 			parent:parent,
-			bound:MultiDrag.BoundFactory(MultiDrag.boundType.element)(parent, parent),
+			bound:MultiDrag.boundFactory(MultiDrag.boundType.element)(parent, parent),
 			isReCalculatePosition:false,
 			isReCalculateSize:false,
 			isContentBoxSize:false,
