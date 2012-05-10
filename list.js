@@ -54,7 +54,7 @@
 		}).map(function(position){
 			return this.objs.filter(function(obj){
 				return obj.fixPosition.compare(position);
-			})[0];
+			},this)[0];
 		},this);
 	}
 

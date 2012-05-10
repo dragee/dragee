@@ -238,6 +238,9 @@
 					offsetParent = node.offsetParent;
 				}
 				node = node.parentNode;
+				if(node === parent){
+					offset.sub(	new Point(parseInt(window.getComputedStyle(node)["marginLeft"]),parseInt(window.getComputedStyle(node)["marginTop"])))
+				}
 			}
 			if(isConsiderTranslate){
 				node=element;

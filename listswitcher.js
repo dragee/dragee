@@ -65,7 +65,7 @@
 		}).map(function(position){
 			return this.objs.filter(function(obj){
 				return obj.fixPosition.compare(position) || obj.fixPosition.compare(position.add(this.options.stepOn));
-			})[0];
+			},this)[0];
 		},this);
 	}
 
