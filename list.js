@@ -1,17 +1,21 @@
 (function (global, MultiDrag){
 	'use strict';
-	var lists = [],listFactory, List = function (objs, options){
+	var lists = [],listFactory,
+	List = function (objs, options){
 		var i;
 		this.options = {
 			timeEnd:200,
 			timeExcange:400,
-			radius:30
+			radius:30,
+			getLength:mathPoint.getLength()
 		};
 		for(i in options){
 			this.options[i] = options[i];
 		}
 		this.objs = objs
 		lists.push(this);
+		this.onChange = MultiDrag.util.triggerFactory({context:this});
+		options.onChange && this.onChange.add(options.onChange);
 		this.init();
 	}
 
@@ -28,7 +32,7 @@
 	List.prototype.onEnd = function (obj){
 		var fixPositions = this.getCurrentFixPosition(), currentIndex, excangeIndex;
 		currentIndex = this.objs.indexOf(obj);
-		excangeIndex = mathPoint.indexOfNearPoint(fixPositions, obj.position, this.options.radius);
+		excangeIndex = mathPoint.indexOfNearPoint(fixPositions, obj.position, this.options.radius,this.options.getLength);
 		if(excangeIndex == -1 || excangeIndex === currentIndex){
 			obj.move(obj.fixPosition, this.options.timeEnd, true);
 		}else{
@@ -38,6 +42,7 @@
 				this.objs[excangeIndex].move(fixPositions[currentIndex], this.options.timeExcange, true);
 			}
 			this.objs[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true);
+			this.onChange.fire();
 		}
 		return true;
 	}

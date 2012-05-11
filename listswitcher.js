@@ -32,6 +32,7 @@
 				this.moveObjToOff(excangeIndex, fixPositions[currentIndex], this.options.timeExcange);
 			}
 			this.moveObj(currentIndex, obj.position, fixPositions[excangeIndex], this.options.timeEnd);
+			this.onChange.fire();
 		}
 		return true;
 	};

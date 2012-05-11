@@ -13,6 +13,8 @@
 			timeWaitForRefresh : 500
 		}
 		for(i in options){ this.options[i] = options[i]; }
+		this.onChange = MultiDrag.util.triggerFactory({context:this});
+		options.onChange && this.onChange.add(options.onChange);
 		this.init();
 	};
 
@@ -29,7 +31,7 @@
 	};
 
 	TargetManager.prototype.onMove = function(obj){
-		
+
 	};
 
 	TargetManager.prototype.onEnd = function(obj){
@@ -50,6 +52,7 @@
 				obj.changeHtmlParent(obj._initialParent);
 			},this.options.timeEnd+10);
 		}
+		this.onChange.fire();
 		return true;
 	};
 

@@ -165,13 +165,17 @@
 				fire:function(){
 					var args = [].slice.call(arguments),i,retValue,
 						fs = options.isReverse?funcs.slice().reverse():funcs;
-					for(i=0;i<fs.length;i++){
-						retValue = fs[i].apply(options.context,args);
-						if(options.isStopOnTrue && retValue){
-							return true;
+					try{
+						for(i=0;i<fs.length;i++){
+							retValue = fs[i].apply(options.context,args);
+							if(options.isStopOnTrue && retValue){
+								return true;
+							}
 						}
+						return !options.isStopOnTrue;
+					}catch(e){
+						alert(e.message);
 					}
-					return !options.isStopOnTrue;
 				},
 				add:function(f){
 					funcs.push(f);
