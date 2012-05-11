@@ -58,7 +58,6 @@
 		}, this);
 	}
 
-
 	ListSwitcher.prototype.getSortedObjs = function(){
 		return this.objs.map(function(obj){
 			return 	obj.initPosition;
@@ -68,6 +67,28 @@
 			},this)[0];
 		},this);
 	}
+
+	ListSwitcher.prototype.__defineGetter__("positions", function() {
+		return this.objs.map(function(obj){
+			var position =  obj.fixPosition.clone();
+			position.isOn = obj.isOn;
+			return position;
+		});
+	});
+
+	ListSwitcher.prototype.__defineSetter__("positions", function(positions) {
+		var message = "wrong array length";
+		if(positions.length === this.objs.length){
+			positions.forEach(function(point,i){
+				this.objs[i].isOn = point.isOn;
+				this.objs[i].move(point,0,true,true);
+			},this);
+		}else{
+			alert(message);
+			throw message;
+		}
+	});
+
 
 	listSwitcherFactory = function(el,objsElements,options){
 		var objs,objOptions,listOptions;

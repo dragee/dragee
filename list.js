@@ -58,6 +58,25 @@
 		},this);
 	}
 
+	List.prototype.__defineGetter__("positions", function() {
+		return this.objs.map(function(obj){
+			return obj.fixPosition.clone();
+		});
+	});
+
+	List.prototype.__defineSetter__("positions", function(positions) {
+		var message = "wrong array length";
+		if(positions.length === this.objs.length){
+			positions.forEach(function(point,i){
+				this.objs[i].move(point,0,true,true);
+			},this);
+		}else{
+			alert(message);
+			throw message;
+		}
+	});
+
+
 	listFactory = function(el,objsElements,options){
 		var objs,objOptions,listOptions;
 		options = options || {};

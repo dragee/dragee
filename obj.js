@@ -59,6 +59,7 @@
 	};
 
 	Obj.prototype.init = function (){
+		this._enable = true;
 		this.offset = mathPoint.getOffset(this.el, this.options.parent, true);
 		this.fixPosition = this.offset;
 		this.position = this.offset;
@@ -113,6 +114,9 @@
 	};
 
 	Obj.prototype.MultiDragStart = function (e){
+		if(!this._enable){
+			return ;
+		}
 		this._startTouchPoint = new Point(isTouch ? e.changedTouches[0].pageX : e.clientX, isTouch ? e.changedTouches[0].pageY : e.clientY);
 		this._startPosition = this.getPosition();
 		if(isTouch){
@@ -181,6 +185,14 @@
 		this.offset = mathPoint.getOffset(this.el, this.options.parent, true).sub(this._transformPosition);
 		//this.move(this.position,0,false,true);
 	}
+
+	Obj.prototype.__defineGetter__("enable", function() {
+		return this._enable;
+	});
+
+	Obj.prototype.__defineSetter__("enable", function(enable) {
+		return this._enable = enable;
+	});
 
 	MultiDrag = MultiDrag || {};
 	MultiDrag.objs = objs;
