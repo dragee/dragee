@@ -5,7 +5,7 @@
 		options = options || {};
 		options.stepOn = options.stepOn || new Point(-50, 0);
 		MultiDrag.List.call(this, objs, options);
-	}
+	};
 	MultiDrag.util.extend(ListSwitcher, MultiDrag.List);
 
 	ListSwitcher.prototype.init = function (){
@@ -17,7 +17,7 @@
 				return true;
 			});
 		});
-	}
+	};
 
 	ListSwitcher.prototype.onEnd = function (obj){
 		var fixPositions = this.getCurrentFixPositionWithOff(), currentIndex, excangeIndex;
@@ -34,29 +34,29 @@
 			this.moveObj(currentIndex, obj.position, fixPositions[excangeIndex], this.options.timeEnd);
 		}
 		return true;
-	}
+	};
 
 	ListSwitcher.prototype.moveObj = function (index, position, fixOffPosition, time){
 		var positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)], isOn = mathPoint.indexOfNearPoint(positions, position, -1, mathPoint.getLength({x:true}));
 		this.objs[index].isOn = !!isOn;
 		this.objs[index].move(positions[isOn], time, true);
-	}
+	};
 
 	ListSwitcher.prototype.fixToOff = function (index, fixOffPosition){
 		this.objs[index].isOn = false;
 		this.objs[index].fixPosition = fixOffPosition;
-	}
+	};
 
 	ListSwitcher.prototype.moveObjToOff = function (index, fixOffPosition, time){
 		this.objs[index].isOn = false;
 		this.objs[index].move(fixOffPosition, time, true);
-	}
+	};
 
 	ListSwitcher.prototype.getCurrentFixPositionWithOff = function (){
 		return this.objs.map(function (obj){
 			return obj.isOn ? obj.fixPosition.sub(this.options.stepOn) : obj.fixPosition.clone();
 		}, this);
-	}
+	};
 
 	ListSwitcher.prototype.getSortedObjs = function(){
 		return this.objs.map(function(obj){
@@ -66,7 +66,14 @@
 				return obj.fixPosition.compare(position) || obj.fixPosition.compare(position.add(this.options.stepOn));
 			},this)[0];
 		},this);
-	}
+	};
+
+	ListSwitcher.prototype.reset = function(){
+		this.objs.forEach(function(obj){
+			obj.move(obj.initPosition,0,true,false);
+			obj.isOn = false;
+		});
+	};
 
 	ListSwitcher.prototype.__defineGetter__("positions", function() {
 		return this.objs.map(function(obj){
@@ -101,7 +108,6 @@
 		objs = objsElements.map(function(el){
 			return new MultiDrag.Obj(el,objOptions);
 		});
-
 		return new ListSwitcher(objs,listOptions);
 	}
 

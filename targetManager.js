@@ -29,7 +29,7 @@
 	};
 
 	TargetManager.prototype.onMove = function(obj){
-
+		
 	};
 
 	TargetManager.prototype.onEnd = function(obj){
@@ -53,6 +53,11 @@
 		return true;
 	};
 
+	TargetManager.prototype.reset = function(){
+		this.targets.forEach(function(target){
+			target.reset();
+		});
+	}
 
 	TargetManager.prototype.refresh = function(){
 		this.objs.forEach(function(obj){

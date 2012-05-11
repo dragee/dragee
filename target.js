@@ -127,6 +127,14 @@
 		this.onRemove.fire(obj);
 	};
 
+	Target.prototype.reset = function(){
+		this.innerObjs.forEach(function(obj){
+			obj.move(obj.initPosition,0,true,true);
+			this.onRemove.fire(obj);
+		},this);
+		this.innerObjs=[];
+	}
+
 	Target.prototype.getSortedObjs = function(){
 		this.innerObjs.slice();
 	}

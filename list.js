@@ -58,6 +58,12 @@
 		},this);
 	}
 
+	List.prototype.reset = function(){
+		this.objs.forEach(function(obj){
+			obj.move(obj.initPosition,0,true,false);
+		});
+	}
+
 	List.prototype.__defineGetter__("positions", function() {
 		return this.objs.map(function(obj){
 			return obj.fixPosition.clone();
