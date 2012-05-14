@@ -39,7 +39,10 @@
 
 	ListSwitcher.prototype.moveObj = function (index, position, fixOffPosition, time){
 		var positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)], isOn = mathPoint.indexOfNearPoint(positions, position, -1, mathPoint.getLength({x:true}));
-		this.objs[index].isOn = !!isOn;
+		if(this.objs[index].isOn !== !!isOn){
+			this.objs[index].isOn = !!isOn;
+			this.onChange.fire();
+		}
 		this.objs[index].move(positions[isOn], time, true);
 	};
 
