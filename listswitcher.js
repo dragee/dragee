@@ -22,7 +22,7 @@
 	ListSwitcher.prototype.onEnd = function (obj){
 		var fixPositions = this.getCurrentFixPositionWithOff(), currentIndex, excangeIndex;
 		currentIndex = this.objs.indexOf(obj);
-		excangeIndex = mathPoint.indexOfNearPoint(fixPositions, obj.position, this.options.radius, mathPoint.getLength({y:true}));
+		excangeIndex = mathPoint.indexOfNearPoint(fixPositions, obj.position, this.options.radius, this.options.getLength);
 		if(excangeIndex == -1 || excangeIndex === currentIndex){
 			this.moveObj(currentIndex, obj.position, fixPositions[currentIndex], this.options.timeEnd);
 		}else{
