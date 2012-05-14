@@ -83,9 +83,7 @@
 		var message = "wrong array length";
 		if(positions.length === this.targets.length){
 			this.targets.forEach(function(target){
-				target.innerObjs.forEach(function(obj){
-					target.remove(obj);
-				});
+				target.reset();
 			},this);
 			positions.forEach(function(tIndexes,i){
 				tIndexes.forEach(function(index){
