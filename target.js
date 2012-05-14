@@ -102,13 +102,13 @@
 		},this);
 	};
 
-	Target.prototype.add = function(obj){
+	Target.prototype.add = function(obj,time){
 		var objsRectagles,newObjsIndex=this.innerObjs.length;
 		this.innerObjs.push(obj);
 		objsRectagles = this.options.positioning(this.innerObjs.map(function(obj){
 			return obj.getRectangle();
 		}),newObjsIndex);
-		this.setPosition(objsRectagles,newObjsIndex);
+		this.setPosition(objsRectagles,[newObjsIndex],time||0);
 		this.innerObjs.indexOf(obj) !== -1 && this.addRemoveOnMOve(obj);
 	};
 
