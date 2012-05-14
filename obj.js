@@ -182,7 +182,7 @@
 	};
 
 	Obj.prototype.refresh = function (){
-		this.offset = mathPoint.getOffset(this.el, this.options.parent, true).sub(this._transformPosition);
+		this.offset = mathPoint.getOffset(this.el, this.options.parent, true).sub(this._transformPosition || new Point(0,0) );
 		//this.move(this.position,0,false,true);
 	}
 

@@ -89,7 +89,7 @@
 			},this);
 			positions.forEach(function(tIndexes,i){
 				tIndexes.forEach(function(index){
-					this.targets.add(this.objs[index]);
+					this.targets[i].add(this.objs[index]);
 				},this);
 			},this);
 		}else{

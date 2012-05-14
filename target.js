@@ -76,7 +76,7 @@
 		}),newObjsIndex);
 
 		this.setPosition(objsRectagles,newObjsIndex);
-		this.add(obj);
+		this.addRemoveOnMOve(obj);
 		return true;
 	};
 
@@ -103,6 +103,16 @@
 	};
 
 	Target.prototype.add = function(obj){
+		var objsRectagles,newObjsIndex=this.innerObjs.length;
+		this.innerObjs.push(obj);
+		objsRectagles = this.options.positioning(this.innerObjs.map(function(obj){
+			return obj.getRectangle();
+		}),newObjsIndex);
+		this.setPosition(objsRectagles,newObjsIndex);
+		this.innerObjs.indexOf(obj) !== -1 && this.addRemoveOnMOve(obj);
+	};
+
+	Target.prototype.addRemoveOnMOve = function(obj){
 		var that = this;
 		obj.onMove.add(
 			this.objOnMoveDictionary.setValue(obj,function(){
