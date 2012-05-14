@@ -71,6 +71,33 @@
 		});
 	};
 
+	TargetManager.prototype.__defineGetter__("positions", function() {
+		return this.targets.map(function(target){
+			return target.innerObjs.map(function(obj){
+				return this.objs.indexOf(obj);
+			},this);
+		},this);
+	});
+
+	TargetManager.prototype.__defineSetter__("positions", function(positions) {
+		var message = "wrong array length";
+		if(positions.length === this.targets.length){
+			this.targets.forEach(function(target){
+				target.innerObjs.forEach(function(obj){
+					target.remove(obj);
+				});
+			},this);
+			positions.forEach(function(tIndexes,i){
+				tIndexes.forEach(function(index){
+					this.targets.add(this.objs[index]);
+				},this);
+			},this);
+		}else{
+			alert(message);
+			throw message;
+		}
+	});
+
 
 	targetManagerFactory = function(el,objsElements,targetElements,options){
 		var objs,targets,objOptions,targetOptions,managerOptions;
