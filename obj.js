@@ -45,13 +45,8 @@
 			this.move(this.position, 0, true);
 		});
 
-		if( this.options.onEnd){
-			this.onEnd.add(this.options.onEnd);
-		}
-
-		if( this.options.onMove){
-			this.onMove.add(this.options.onMove);
-		}
+		options.onEnd && this.onEnd.add(options.onEnd);
+		options.onMove && this.onMove.add(options.onMove);
 
 		this.el = el;
 		this.init();

@@ -76,7 +76,7 @@
 		}),newObjsIndex);
 
 		this.setPosition(objsRectagles,newObjsIndex);
-		this.addRemoveOnMOve(obj);
+		this.innerObjs.indexOf(obj) !== -1 && this.addRemoveOnMOve(obj);
 		return true;
 	};
 
@@ -93,6 +93,7 @@
 				this.options.isChangeHtmlParent && obj._initialParent && setTimeout(function(){
 					obj.changeHtmlParent(obj._initialParent);
 				},time+10);
+				this.onRemove.fire(obj);
 			}else{
 				obj.move(rect.position,timeEnd,true,true);
 				this.options.isChangeHtmlParent && setTimeout(function(){
