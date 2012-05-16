@@ -23,7 +23,7 @@
 		this.onAdd = MultiDrag.util.triggerFactory({context:this});
 		this.onRemove = MultiDrag.util.triggerFactory({context:this});
 		options.onRemove && this.onRemove.add(options.onRemove);
-		options.onAdd && this.onRemove.add(options.onAdd);
+		options.onAdd && this.onAdd.add(options.onAdd);
 		this.init();
 	};
 
