@@ -14,7 +14,7 @@
 		}
 		for(i in options){ this.options[i] = options[i]; }
 		this.onChange = MultiDrag.util.triggerFactory({context:this});
-		options.onChange && this.onChange.add(options.onChange);
+		options && options.onChange && this.onChange.add(options.onChange);
 		this.init();
 	};
 

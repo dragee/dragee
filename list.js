@@ -70,9 +70,7 @@
 	}
 
 	List.prototype.__defineGetter__("positions", function() {
-		return this.objs.map(function(obj){
-			return obj.fixPosition.clone();
-		});
+		return this.getCurrentFixPosition();
 	});
 
 	List.prototype.__defineSetter__("positions", function(positions) {

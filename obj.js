@@ -172,7 +172,7 @@
 	};
 
 
-	Obj.prototype.getRectangle = function (func){
+	Obj.prototype.getRectangle = function (){
 		return new Rectangle(this.position, this.getSize());
 	};
 

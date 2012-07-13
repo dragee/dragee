@@ -48,14 +48,16 @@
 			}
 			return false;
 		},this);
-		indexesOfNew = MultiDrag.util.range(this.innerObjs.length);
-		objsRectagles = this.options.positioning(this.innerObjs.map(function(obj){
-			return obj.getRectangle();
-		}),indexesOfNew);
-		this.setPosition(objsRectagles,indexesOfNew);
-		this.innerObjs.forEach(function(obj){
-			this.onAdd(obj);
-		},this);
+		if(this.innerObjs.length){
+			indexesOfNew = MultiDrag.util.range(this.innerObjs.length);
+			objsRectagles = this.options.positioning(this.innerObjs.map(function(obj){
+				return obj.getRectangle();
+			}),indexesOfNew);
+			this.setPosition(objsRectagles,indexesOfNew);
+			this.innerObjs.forEach(function(obj){
+				this.onAdd.fire(obj);
+			},this);
+		}
 	};
 
 	Target.prototype.refresh = function(){
