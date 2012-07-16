@@ -22,8 +22,8 @@
 		negative:function (){
 			return new Point(-this.x, -this.y);
 		},
-		compare:function (obj){
-			return (this.x == obj.x && this.y == obj.y);
+		compare:function (p){
+			return (this.x == p.x && this.y == p.y);
 		},
 		clone:function (){
 			return new Point(this.x, this.y);
@@ -124,12 +124,12 @@
 				}, new Point(0, 0)).mult(1 / arg.length);
 		},
 		getLength : function (options){
-			if(!options || (options.x && options.y && !options.IsTransformationSpace)){
+			if(!options || (options.x && options.y && !options.isTransformationSpace)){
 				return function (p1, p2){
 					var dx = p1.x - p2.x, dy = p1.y - p2.y;
 					return Math.sqrt(dx * dx + dy * dy);
 				};
-			}else if(options.x && options.y && options.IsTransformationSpace){
+			}else if(options.x && options.y && options.isTransformationSpace){
 				return function (p1, p2){
 					return Math.sqrt(Math.pow(options.x * Math.abs(p1.x - p2.x), 2) + Math.pow(options.y * Math.abs(p1.y - p2.y), 2));
 				};

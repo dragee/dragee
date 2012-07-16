@@ -22,8 +22,12 @@
 		this.objs = objs;
 		this.onAdd = MultiDrag.util.triggerFactory({context:this});
 		this.onRemove = MultiDrag.util.triggerFactory({context:this});
-		options.onRemove && this.onRemove.add(options.onRemove);
-		options.onAdd && this.onAdd.add(options.onAdd);
+		if(options.onRemove){
+			this.onRemove.add(options.onRemove);
+		}
+		if(options.onAdd){
+			this.onAdd.add(options.onAdd);
+		}
 		this.init();
 	};
 
@@ -78,7 +82,9 @@
 		}),newObjsIndex);
 
 		this.setPosition(objsRectagles,newObjsIndex);
-		this.innerObjs.indexOf(obj) !== -1 && this.addRemoveOnMOve(obj);
+		if(this.innerObjs.indexOf(obj) !== -1){
+			this.addRemoveOnMOve(obj);
+		}
 		return true;
 	};
 
@@ -92,15 +98,19 @@
 			if(rect.isRemove){
 				obj.move(obj.initPosition,timeEnd,true,true);
 				MultiDrag.util.remove(this.innerObjs,obj);
-				this.options.isChangeHtmlParent && obj._initialParent && setTimeout(function(){
-					obj.changeHtmlParent(obj._initialParent);
-				},time+10);
+				if(this.options.isChangeHtmlParent && obj._initialParent){
+					setTimeout(function (){
+						obj.changeHtmlParent(obj._initialParent);
+					}, time + 10);
+				}
 				this.onRemove.fire(obj);
 			}else{
 				obj.move(rect.position,timeEnd,true,true);
-				this.options.isChangeHtmlParent && setTimeout(function(){
-					obj.changeHtmlParent(that.el);
-				},time+10);
+				if(this.options.isChangeHtmlParent){
+					setTimeout(function(){
+						obj.changeHtmlParent(that.el);
+					},time+10);
+				}
 			}
 		},this);
 	};
@@ -112,7 +122,9 @@
 			return obj.getRectangle();
 		}),newObjsIndex);
 		this.setPosition(objsRectagles,[newObjsIndex],time||0);
-		this.innerObjs.indexOf(obj) !== -1 && this.addRemoveOnMOve(obj);
+		if(this.innerObjs.indexOf(obj) !== -1){
+			this.addRemoveOnMOve(obj);
+		}
 	};
 
 	Target.prototype.addRemoveOnMOve = function(obj){

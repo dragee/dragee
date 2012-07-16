@@ -18,10 +18,18 @@
 				return function (rectangle){
 					return function (point, size){
 						var calcPoint = point.clone(), rectP2 = rectangle.getP3();
-						rectangle.position.x > calcPoint.x && (calcPoint.x = rectangle.position.x);
-						rectangle.position.y > calcPoint.y && (calcPoint.y = rectangle.position.y);
-						rectP2.x < calcPoint.x + size.x && (calcPoint.x = rectP2.x - size.x);
-						rectP2.y < calcPoint.y + size.y && (calcPoint.y = rectP2.y - size.y);
+						if(rectangle.position.x > calcPoint.x){
+							(calcPoint.x = rectangle.position.x);
+						}
+						if(rectangle.position.y > calcPoint.y){
+							calcPoint.y = rectangle.position.y;
+						}
+						if(rectP2.x < calcPoint.x + size.x){
+							calcPoint.x = rectP2.x - size.x
+						};
+						if(rectP2.y < calcPoint.y + size.y){
+							calcPoint.y = rectP2.y - size.y
+						};
 						return calcPoint;
 					};
 				};
@@ -30,8 +38,12 @@
 					return function (point, size){
 						var calcPoint = point.clone();
 						calcPoint.x = x;
-						startY > calcPoint.y && (calcPoint.y = startY);
-						endY < calcPoint.y + size.y && (calcPoint.y = endY - size.y);
+						if(startY > calcPoint.y){
+							calcPoint.y = startY
+						};
+						if(endY < calcPoint.y + size.y){
+							calcPoint.y = endY - size.y
+						}
 						return calcPoint;
 					};
 				};
@@ -40,8 +52,12 @@
 					return function (point, size){
 						var calcPoint = point.clone();
 						calcPoint.y = y;
-						startX > calcPoint.x && (calcPoint.x = startX);
-						endX < calcPoint.x + size.x && (calcPoint.x = endX - size.x);
+						if(startX > calcPoint.x){
+							calcPoint.x = startX
+						}
+						if(endX < calcPoint.x + size.x){
+							calcPoint.x = endX - size.x
+						}
 						return calcPoint;
 					};
 				};

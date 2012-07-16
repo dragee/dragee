@@ -15,7 +15,9 @@
 		this.objs = objs
 		lists.push(this);
 		this.onChange = MultiDrag.util.triggerFactory({context:this});
-		options.onChange && this.onChange.add(options.onChange);
+		if(options && options.onChange){
+			this.onChange.add(options.onChange);
+		}
 		this.init();
 	}
 

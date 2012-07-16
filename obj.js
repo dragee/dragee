@@ -45,8 +45,12 @@
 			this.move(this.position, 0, true);
 		});
 
-		options.onEnd && this.onEnd.add(options.onEnd);
-		options.onMove && this.onMove.add(options.onMove);
+		if(options.onEnd){
+			this.onEnd.add(options.onEnd);
+		}
+		if(options.onMove){
+			this.onMove.add(options.onMove);
+		}
 
 		this.el = el;
 		this.init();
@@ -64,9 +68,9 @@
 		}else{
 			this.initPosition = this.offset;
 		}
-		this.el.addEventListener(events.start, MultiDrag.util.bind(this.MultiDragStart, this));
-		this._MultiDragMove = MultiDrag.util.bind(this.MultiDragMove, this);
-		this._MultiDragEnd = MultiDrag.util.bind(this.MultiDragEnd, this);
+		this.el.addEventListener(events.start, MultiDrag.util.bind(this.multiDragStart, this));
+		this._MultiDragMove = MultiDrag.util.bind(this.multiDragMove, this);
+		this._MultiDragEnd = MultiDrag.util.bind(this.multiDragEnd, this);
 	};
 
 	Obj.prototype.getSize = function (){
@@ -101,14 +105,16 @@
 	Obj.prototype.move = function (point, time, isFix, isSilent){
 		time = time || 0;
 		point = point.clone();
-		isFix && (this.fixPosition = point);
+		if(isFix){
+			this.fixPosition = point;
+		}
 		this.position = point;
 		this.el.style.webkitTransitionDuration = time + "ms";
 		this._setTranslate(point.sub(this.offset));
 		isSilent || this.onMove.fire();
 	};
 
-	Obj.prototype.MultiDragStart = function (e){
+	Obj.prototype.multiDragStart = function (e){
 		if(!this._enable){
 			return ;
 		}
@@ -126,7 +132,7 @@
 		this.onMove.fire();
 	};
 
-	Obj.prototype.MultiDragMove = function (e){
+	Obj.prototype.multiDragMove = function (e){
 		var touch, touchPoint, point;
 		if(isTouch){
 			if(!(touch = MultiDrag.util.getTouchByID(e, this._touchId))){
@@ -141,7 +147,7 @@
 		this.move(point, 0);
 	};
 
-	Obj.prototype.MultiDragEnd = function (e){
+	Obj.prototype.multiDragEnd = function (e){
 		var touch;
 		if(isTouch){
 			if(!(touch = MultiDrag.util.getTouchByID(e, this._touchId))){

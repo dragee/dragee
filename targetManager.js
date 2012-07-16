@@ -14,7 +14,9 @@
 		}
 		for(i in options){ this.options[i] = options[i]; }
 		this.onChange = MultiDrag.util.triggerFactory({context:this});
-		options && options.onChange && this.onChange.add(options.onChange);
+		if(options && options.onChange){
+			this.onChange.add(options.onChange);
+		}
 		this.init();
 	};
 
@@ -48,9 +50,11 @@
 			shotTargets[0].onEnd(obj);
 		}else{
 			obj.move(obj.initPosition,this.options.timeEnd,true,true);
-			this.options.isChangeHtmlParent && obj._initialParent && setTimeout(function(){
-				obj.changeHtmlParent(obj._initialParent);
-			},this.options.timeEnd+10);
+			if(this.options.isChangeHtmlParent && obj._initialParent){
+				setTimeout(function(){
+					obj.changeHtmlParent(obj._initialParent);
+				},this.options.timeEnd+10);
+			}
 		}
 		this.onChange.fire();
 		return true;

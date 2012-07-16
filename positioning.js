@@ -9,11 +9,21 @@
 	positionFactory = function (type){
 		switch(type){
 			case positionType.notCrossing:
-				return function (rectangle){
+				return function (rectangle,options){
+					var i,opts={
+						isRemove:true
+					}
+					for (i in options){
+						opts[i] = options[i];
+					}
 					return function (rectangleList, indexesOfNews){
-						var staticRectangleIndexes = MultiDrag.util.range(rectangleList).filter(function (index){
-							return indexesOfNews.indexOf(index) === -1;
-						});
+						var boundRect = typeof rectangle === "function" ? rectangle() : rectangle,
+							staticRectangleIndexes = rectangleList.reduce(function (indexes,rect,index){
+							if( indexesOfNews.indexOf(index) === -1){
+								indexes.push(index);
+							}
+							return indexes;
+						},[]);
 						indexesOfNews.forEach(function (index){
 							var rect = rectangleList[index], isRemove = false;
 							staticRectangleIndexes.forEach(function (indexOfStatic){
@@ -23,7 +33,7 @@
 							isRemove = staticRectangleIndexes.some(function (indexOfStatic){
 								var staticRect = rectangleList[indexOfStatic];
 								return  !!staticRect.and(rect);
-							});
+							}) || rect.and(boundRect).getSquare() !== rect.getSquare();
 							if(isRemove){
 								rect.isRemove = true;
 							}else{
@@ -107,8 +117,11 @@
 			case positionType.notCrossing:
 				return function (){
 					return function (oldObjsList,newObjs,indexOfNews ){
-						return oldObjsList.concat(newObjs);
-						utils.range(oldObjsList.length,newObjs.length)
+						var objsList = oldObjsList.concat(newObjs);
+						newObjs.forEach(function(obj){
+							indexOfNews.push(objsList.indexOf(obj));
+						});
+						return objsList;
 					};
 				};
 			case positionType.floatLeft:
