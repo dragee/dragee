@@ -69,8 +69,8 @@
 			this.initPosition = this.offset;
 		}
 		this.el.addEventListener(events.start, MultiDrag.util.bind(this.multiDragStart, this));
-		this._MultiDragMove = MultiDrag.util.bind(this.multiDragMove, this);
-		this._MultiDragEnd = MultiDrag.util.bind(this.multiDragEnd, this);
+		this._multiDragMove = MultiDrag.util.bind(this.multiDragMove, this);
+		this._multiDragEnd = MultiDrag.util.bind(this.multiDragEnd, this);
 	};
 
 	Obj.prototype.getSize = function (){
@@ -125,8 +125,8 @@
 		}
 		e.stopPropagation();
 		e.preventDefault();
-		document.addEventListener(events.move, this._MultiDragMove);
-		document.addEventListener(events.end, this._MultiDragEnd);
+		document.addEventListener(events.move, this._multiDragMove);
+		document.addEventListener(events.end, this._multiDragEnd);
 		this.isMultiDrag = true;
 		MultiDrag.util.addClass(this.el, "active");
 		this.onMove.fire();
@@ -157,8 +157,8 @@
 		e.stopPropagation();
 		e.preventDefault();
 		this.onEnd.fire();
-		document.removeEventListener(events.move, this._MultiDragMove);
-		document.removeEventListener(events.end, this._MultiDragEnd);
+		document.removeEventListener(events.move, this._multiDragMove);
+		document.removeEventListener(events.end, this._multiDragEnd);
 		this.isMultiDrag = false;
 		MultiDrag.util.removeClass(this.el, "active");
 	};
