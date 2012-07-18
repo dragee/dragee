@@ -124,7 +124,9 @@
 			this._touchId = e.changedTouches[0].identifier;
 		}
 		e.stopPropagation();
-		e.preventDefault();
+		if(!(e.target instanceof HTMLInputElement || e.target instanceof HTMLInputElement)  ){
+			e.preventDefault();
+		}
 		document.addEventListener(events.move, this._multiDragMove);
 		document.addEventListener(events.end, this._multiDragEnd);
 		this.isMultiDrag = true;
