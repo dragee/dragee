@@ -26,10 +26,13 @@
 
 	Obj = function (el, options){
 		options = options || {};
-		var i, parent = options.parent || MultiDrag.util.getDafaultParent(el);
+		var i, that = this, displayListener,
+			parent = options.parent || MultiDrag.util.getDafaultParent(el);
 		this.options = {
 			parent:parent,
-			bound:MultiDrag.boundFactory(MultiDrag.boundType.element)(parent, parent),
+			bound: function(){
+				return MultiDrag.boundFactory(MultiDrag.boundType.element)(parent, parent);
+			},
 			isReCalculatePosition:false,
 			isReCalculateSize:false,
 			isContentBoxSize:false,
@@ -51,10 +54,12 @@
 		if(options.onMove){
 			this.onMove.add(options.onMove);
 		}
-
 		this.el = el;
-		this.init();
 		onCreateObj(this);
+		MultiDrag.util.displayHelper.add(this.options.parent,displayListener = function(){
+			that.init();
+			MultiDrag.util.displayHelper.remove(that.options.parent,displayListener);
+		});
 	};
 
 	Obj.prototype.init = function (){
@@ -71,10 +76,11 @@
 		this.el.addEventListener(events.start, MultiDrag.util.bind(this.multiDragStart, this));
 		this._multiDragMove = MultiDrag.util.bind(this.multiDragMove, this);
 		this._multiDragEnd = MultiDrag.util.bind(this.multiDragEnd, this);
+		this.bound = this.options.bound();
 	};
 
-	Obj.prototype.getSize = function (){
-		if(!this._size || this.options.isReCalculateSize){
+	Obj.prototype.getSize = function (recalulate){
+		if(!this._size || this.options.isReCalculateSize || recalulate){
 			this._size = mathPoint.getSizeOfElement(this.el, this.options.isContentBoxSize);
 		}
 		return this._size;
@@ -126,6 +132,8 @@
 		e.stopPropagation();
 		if(!(e.target instanceof HTMLInputElement || e.target instanceof HTMLInputElement)  ){
 			e.preventDefault();
+		}else{
+			e.target.focus();
 		}
 		document.addEventListener(events.move, this._multiDragMove);
 		document.addEventListener(events.end, this._multiDragEnd);
@@ -145,7 +153,7 @@
 		e.preventDefault();
 		touchPoint = new Point(isTouch ? touch.pageX : e.clientX, isTouch ? touch.pageY : e.clientY);
 		point = this._startPosition.add(touchPoint.sub(this._startTouchPoint));
-		point = this.options.bound(point, this.getSize());
+		point = this.bound(point, this.getSize());
 		this.move(point, 0);
 	};
 
@@ -185,7 +193,11 @@
 	};
 
 	Obj.prototype.refresh = function (){
-		this.offset = mathPoint.getOffset(this.el, this.options.parent, true).sub(this._transformPosition || new Point(0,0) );
+		this.getSize(true);
+		this.offset = mathPoint.getOffset(this.el, this.options.parent, true);
+		this.bound = this.options.bound();
+		console.log("refresh offset",this.offset);
+		//this.offset = mathPoint.getOffset(this.el, this.options.parent, true).sub(this._transformPosition || new Point(0,0) );
 		//this.move(this.position,0,false,true);
 	}
 

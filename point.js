@@ -231,35 +231,9 @@
 			return new Point(width, height);
 		},
 		getOffset:function(element,parent,isConsiderTranslate){
-			var offset = new Point(0,0),matrix,node=element,matrixValues,offsetParent=element;
-			while(node && node!==parent){
-				if(offsetParent === node){
-					offset = offset.add(new Point(node.offsetLeft||0,node.offsetTop||0));
-					offsetParent = node.offsetParent;
-				}
-				node = node.parentNode;
-				if(node === parent){
-					offset.sub(	new Point(parseInt(window.getComputedStyle(node)["marginLeft"]),parseInt(window.getComputedStyle(node)["marginTop"])))
-				}
-			}
-			if(isConsiderTranslate){
-				node=element;
-				while(node && node !== parent){
-					matrix = window.getComputedStyle(node)["webkitTransform"];
-					if(matrix && matrix !== "none" ){
-						matrixValues = matrix.match(/\-?\d+(\.\d+)?/gi);
-						if(matrixValues.length === 6){//matrix(...)
-							offset = offset.add(new Point(parseInt(matrixValues[4]),parseInt(matrixValues[5])));
-						}else if(matrixValues.length === 17){//matrix3d(...)
-							offset = offset.add(new Point(parseInt(matrixValues[13]),parseInt(matrixValues[14])));
-						}else{
-							throw "transform matrix has unrecognized format";
-						}
-					}
-					node = node.parentNode;
-				}
-			}
-			return offset;
+			var elRect = element.getBoundingClientRect(),
+				parentRect = parent.getBoundingClientRect();
+			return new Point(elRect.left-parentRect.left,elRect.top-parentRect.top);
 		},
 		getPointFromRadialSystem:function(angle,length,center){
 			center = center || new Point(0,0);

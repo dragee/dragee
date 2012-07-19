@@ -71,6 +71,12 @@
 		});
 	}
 
+	List.prototype.refresh = function(){
+		this.objs.forEach(function(obj){
+			obj.refresh();
+		});
+	}
+
 	List.prototype.__defineGetter__("positions", function() {
 		return this.getCurrentFixPosition();
 	});

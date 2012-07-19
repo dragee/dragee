@@ -1,5 +1,74 @@
 (function (global, MultiDrag){
 	//'use strict';
+	var DisplayHelper = function(){
+		this.init();
+	};
+	DisplayHelper.prototype.init = function(){
+		var that = this;
+		this.isListen = false;
+		this.elListeners=[];//{el:HTMLElement, listetners:[function(){},....]}
+		this.domListener = util.throttle(function(){
+			that.check();
+		},100);
+	};
+	DisplayHelper.prototype.check = function(){
+		console.log("check");
+		var calls = [];
+		this.elListeners.forEach(function(item){
+			var wasDisplay = item.isDisplay,i,
+				isDisplay = util.isDisplayed(item.el);
+			item.isDisplay = isDisplay;
+			if(!wasDisplay && isDisplay){
+				calls = calls.concat(item.listetners);
+			}
+		});
+		setTimeout(function(){
+			calls.forEach(function(call){
+				call();
+			});
+		},0);
+	};
+	DisplayHelper.prototype.addListener = function(){
+		document.addEventListener("DOMSubtreeModified",this.domListener);
+		this.isListen = true;
+	};
+	DisplayHelper.prototype.removeListener = function(){
+		document.removeEventListener("DOMSubtreeModified",this.domListener);
+		this.isListen = false;
+	}
+	DisplayHelper.prototype.add = function(element,callback){
+		var isDisplay = util.isDisplayed(element),
+			item = this.elListeners.filter(function(listItem){
+				return listItem.el === element;
+			})[0];
+		if(item){
+			item.listetners.push(callback);
+		}else{
+			item = {el:element, listetners:[callback], isDisplay: isDisplay };
+			this.elListeners.push(item);
+			if(!this.isListen){
+				this.addListener();
+			}
+		};
+		if(isDisplay){
+			callback();
+		}
+	};
+	DisplayHelper.prototype.remove = function(element,callback){
+		var index,item = this.elListeners.filter(function(item){
+			return item.el === element;
+		})[0];
+		if(item){
+			util.remove(item.listetners,callback);
+			if(!item.listetners.length){
+				util.remove(this.elListeners,item);
+				if(!this.elListeners.length){
+					this.removeListener();
+				}
+			}
+		}
+	};
+
 	var util = {
 		addClass:function (el, className){
 			if(!this.hasClass(el, className)){
@@ -187,8 +256,23 @@
 					}
 				}
 			}
+		},
+		throttle:function(callback,time){
+			var timerId;
+			return function(){
+				var arg = [].slice.call(arguments);
+				timerId && clearTimeout(timerId);
+				timerId = setTimeout(function(){
+					callback(arg);
+				},time);
+			}
+		},
+		isDisplayed:function(el){
+			return !!el.offsetParent;
 		}
 	};
+
+	util.displayHelper =  new DisplayHelper();
 
 	MultiDrag = MultiDrag || {};
 	MultiDrag.util = util;
