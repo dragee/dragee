@@ -1,18 +1,21 @@
-(function (global, MultiDrag){
-	//'use strict';
-	var boundType = {
-		element:-1,
-		rectangle:0,
-		lineX:1,
-		lineY:2,
-		line:3,
-		unificationOfRectangle:4
-	},
-	boundFactory = function (type){
+(function(){
+	'use strict';
+	var MultiDrag = window.MultiDrag || {},
+		boundType = {
+			element: -1,
+			rectangle: 0,
+			lineX: 1,
+			lineY: 2,
+			line: 3,
+			unificationOfRectangle: 4,
+			circle:5,
+			arc:6
+		};
+	function boundFactory(type){
 		switch(type){
 			case boundType.element:
-				return function (element, parent){
-					return boundFactory(boundType.rectangle)(mathPoint.createRectangleFromElement(element, parent));
+				return function(el, parent){
+					return boundFactory(boundType.rectangle)(mathPoint.createRectangleFromElement(el, parent));
 				};
 			case boundType.rectangle:
 				return function (rectangle){
@@ -40,7 +43,7 @@
 						calcPoint.x = x;
 						if(startY > calcPoint.y){
 							calcPoint.y = startY
-						};
+						}
 						if(endY < calcPoint.y + size.y){
 							calcPoint.y = endY - size.y
 						}
@@ -83,10 +86,28 @@
 						return	 point.clone();
 					};
 				};
+			case boundType.circle:
+				return function(center,radius){
+					return function (point, size){
+						var boundedPoint = mathPoint.getPointInLineByLenght(center,point,radius);
+						console.log(point.toString(),boundedPoint.toString());
+						return boundedPoint;
+					};
+				};
+			case boundType.arc:
+				return function(center,radius,startAgle,endAngle){
+					return function (point, size){
+						var boundStartAngle = typeof startAgle === "function" ? startAgle() : startAgle,
+							boundEndtAngle = typeof startAgle === "function" ? endAngle() : endAngle,
+							angle = mathPoint.getAngle(center,point);
+						angle = mathPoint.normalizeAngle(angle);
+						angle = mathPoint.boundAngle(boundStartAngle,boundEndtAngle,angle);
+						return mathPoint.getPointFromRadialSystem(angle,radius,center);
+					};
+				};
 		}
 	};
-	MultiDrag = MultiDrag || {};
 	MultiDrag.boundType = boundType;
 	MultiDrag.boundFactory = boundFactory;
-	global.MultiDrag = MultiDrag;
-})(window, MultiDrag);
+	window.MultiDrag = MultiDrag;
+})();

@@ -1,61 +1,49 @@
-(function (global, MultiDrag){
+(function(){
 	'use strict';
-	var spiders = [],
-		Spider = function (area, elements, options){
-			var i, areaRectangle = mathPoint.createRectangleFromElement(area, area);
-			this.options = {
-				angle:0,
-				dAngle:2 * Math.PI / elements.length,
-				center:areaRectangle.getCenter(),
-				startRadius:50,
-				endRadius:areaRectangle.getMinSide() / 2,
-				lineWidth:2,
-				strokeStyle:"#ff5577",
-				fillStyle:"rgba(150,255,50,0.8)"
-			};
-			for(i in options){
+	var MultiDrag = window.MultiDrag || {},spiders = [];
+
+	function Spider(area, elements, options){
+		var i, areaRectangle = mathPoint.createRectangleFromElement(area, area);
+		this.options = {
+			angle: 0,
+			dAngle: 2 * Math.PI / elements.length,
+			center: areaRectangle.getCenter(),
+			startRadius: 50,
+			endRadius: areaRectangle.getMinSide() / 2,
+			lineWidth: 2,
+			strokeStyle: "#ff5577",
+			fillStyle: "rgba(150,255,50,0.8)"
+		};
+		for(i in options){
+			if(options.hasOwnProperty(i)){
 				this.options[i] = options[i];
 			}
-			spiders.push(this);
-			this.area = area;
-			this.areaRectangle = areaRectangle;
-			this.init(elements);
 		}
+		spiders.push(this);
+		this.area = area;
+		this.areaRectangle = areaRectangle;
+		this.init(elements);
+	}
 
-	Spider.prototype.init = function (elements){
+	Spider.prototype.init = function(elements){
 		var that = this;
-		this.createCanvas();
-		this.objs = elements.map(function (element, i){
+		this.canvas = MultiDrag.util.createCanvas(this.area,this.areaRectangle);
+		this.context = this.canvas.getContext("2d");
+		this.objs = elements.map(function (el, i){
 			var angle = this.options.angle + i * this.options.dAngle,
-				halfSize = mathPoint.getSizeOfElement(element).mult(0.5),
+				halfSize = mathPoint.getSizeOfElement(el).mult(0.5),
 				start = mathPoint.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize),
 				end = mathPoint.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize),
-				bound = MultiDrag.boundFactory(MultiDrag.boundType.line)(start, end);
-			return new MultiDrag.Obj(element, {parent:this.area, bound:bound, position:start, onMove:function (){
+				bound = function(){
+					return MultiDrag.boundFactory(MultiDrag.boundType.line)(start, end);
+				};
+			return new MultiDrag.Obj(el, {parent:this.area, bound:bound, position:start, onMove:function (){
 				that.draw();
 				return true;
 			}});
 		}, this);
 		this.isInit = true;
 		this.draw();
-	}
-
-	Spider.prototype.createCanvas = function (){
-		if(window.getComputedStyle(this.area)["position"] === "static"){
-			this.area.style.position = "relative";
-		}
-		this.canvas = document.createElement("canvas");
-		this.canvas.setAttribute("width", this.areaRectangle.size.x + "px");
-		this.canvas.setAttribute("height", this.areaRectangle.size.y + "px");
-		MultiDrag.util.setStyle(this.canvas, {
-			position:"absolute",
-			top:"0",
-			left:"0",
-			width:this.areaRectangle.size.x + "px",
-			height:this.areaRectangle.size.y + "px"
-		});
-		MultiDrag.util.appendFirstChild(this.area, this.canvas);
-		this.context = this.canvas.getContext("2d");
 	}
 
 	Spider.prototype.draw = function (){
@@ -79,8 +67,7 @@
 		this.context.fill();
 	}
 
-	MultiDrag = MultiDrag || {};
 	MultiDrag.spiders = spiders;
 	MultiDrag.Spider = Spider;
-	global.MultiDrag = MultiDrag;
-})(window, window.MultiDrag);
+	window.MultiDrag = MultiDrag;
+})();
