@@ -131,7 +131,7 @@
 	};
 
 	List.prototype.clear = function(){
-		this.remove(this.objs);
+		this.remove(this.objs.slice());
 	};
 
 	List.prototype.destroy = function(){
