@@ -15,7 +15,15 @@
 		switch(type){
 			case boundType.element:
 				return function(el, parent){
-					return boundFactory(boundType.rectangle)(mathPoint.createRectangleFromElement(el, parent));
+					var bound,
+						retFunc = function(){
+							return bound.apply(this,arguments);
+						};
+					retFunc.refresh = function(){
+						bound = boundFactory(boundType.rectangle)(mathPoint.createRectangleFromElement(el, parent));
+					};
+					retFunc.refresh();
+					return retFunc;
 				};
 			case boundType.rectangle:
 				return function (rectangle){

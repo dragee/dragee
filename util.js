@@ -232,8 +232,7 @@
 				if(opts.hasOwnProperty(i)){
 					options[i] = opts[i];
 				}
-			}
-			;
+			};
 			return {
 				fire: function(){
 					var args = [].slice.call(arguments), i, retValue, fs = options.isReverse ? funcs.slice().reverse() : funcs;
@@ -258,6 +257,9 @@
 					if(index !== -1){
 						funcs.splice(index, 1)
 					}
+				},
+				reset:function(){
+					funcs = [];
 				}
 			}
 		},

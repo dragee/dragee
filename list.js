@@ -15,7 +15,7 @@
 				this.options[i] = options[i];
 			}
 		}
-		this.objs = objs
+		this.objs = objs;
 		lists.push(this);
 		this.onChange = MultiDrag.util.triggerFactory({context: this});
 		if(options && options.onChange){
@@ -26,13 +26,14 @@
 
 	List.prototype.init = function(){
 		var that = this;
+		this._enable = true;
 		this.objs.forEach(function(obj){
 			obj.onEnd.add(function(){
 				that.onEnd(this);
 				return true;
 			});
 		});
-	}
+	};
 
 	List.prototype.onEnd = function(obj){
 		var fixPositions = this.getCurrentFixPosition(), currentIndex, excangeIndex;
@@ -50,13 +51,13 @@
 			this.onChange.fire();
 		}
 		return true;
-	}
+	};
 
 	List.prototype.getCurrentFixPosition = function(){
 		return this.objs.map(function(obj){
 			return obj.fixPosition.clone();
 		});
-	}
+	};
 
 	List.prototype.getSortedObjs = function(){
 		return this.objs.map(function(obj){
@@ -66,19 +67,78 @@
 				return obj.fixPosition.compare(position);
 			},this)[0];
 		},this);
-	}
+	};
 
 	List.prototype.reset = function(){
 		this.objs.forEach(function(obj){
 			obj.move(obj.initPosition, 0, true, false);
 		});
-	}
+	};
+
+	List.prototype.resetInitPosition = function(){
+		this.objs.forEach(function(obj){
+			obj.move(obj.initPosition, 0, true, false);
+		});
+	};
 
 	List.prototype.refresh = function(){
 		this.objs.forEach(function(obj){
 			obj.refresh();
 		});
-	}
+	};
+
+	List.prototype.add = function(objs){
+		var that = this;
+		if(!(objs instanceof Array)){
+			objs = [objs];
+		}
+		objs.forEach(function(obj){
+			obj.enable = this._enable;
+			obj.onEnd.add(function(){
+				that.onEnd(this);
+				return true;
+			});
+			this.objs.push(obj);
+		},this);
+	};
+
+	List.prototype.remove = function(objs){
+		var j, initPositions = this.objs.map(function(obj){
+				return 	obj.initPosition;
+			}),
+			list = [],
+			sortedObj = this.getSortedObjs();
+		if(!(objs instanceof Array)){
+			objs = [objs];
+
+		}
+		objs.forEach(function(obj){
+			obj.onEnd.reset();
+			MultiDrag.util.remove(this.objs,obj);
+		}, this);
+		j = 0;
+		sortedObj.forEach(function(obj, i){
+			if(this.objs.indexOf(obj) !== -1){
+				if(obj.fixPosition !== initPositions[j]){
+					obj.move(initPositions[j], this.options.timeExcange, true);
+				}
+				obj.initPosition = initPositions[j];
+				j++;
+				list.push(obj);
+			}
+		}, this);
+		this.objs = list;
+	};
+
+	List.prototype.clear = function(){
+		this.remove(this.objs);
+	};
+
+	List.prototype.destroy = function(){
+		this.objs.forEach(function(obj){
+			obj.destroy();
+		});
+	};
 
 	List.prototype.__defineGetter__("positions", function(){
 		return this.getCurrentFixPosition();
@@ -94,6 +154,17 @@
 			alert(message);
 			throw message;
 		}
+	});
+
+	List.prototype.__defineGetter__("enable", function(){
+		return this._enable;
+	});
+
+	List.prototype.__defineSetter__("enable", function(value){
+		this._enable = value;
+		this.objs.forEach(function(obj){
+			obj.enable = value;
+		});
 	});
 
 

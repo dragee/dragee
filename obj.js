@@ -27,9 +27,8 @@
 				var i, that = this, displayListener, parent = options.parent || MultiDrag.util.getDafaultParent(el);
 				this.options = {
 					parent: parent,
-					bound: function(){
-						return MultiDrag.boundFactory(MultiDrag.boundType.element)(parent, parent);
-					},
+					bound: MultiDrag.boundFactory(MultiDrag.boundType.element)(parent, parent),
+					startFilter: false,
 					isReCalculatePosition: false,
 					isReCalculateSize: false,
 					isContentBoxSize: false,
@@ -54,6 +53,7 @@
 					this.onMove.add(options.onMove);
 				}
 				this.el = el;
+				this.bound = this.options.bound;
 				onCreateObj(this);
 				MultiDrag.util.displayHelper.add(this.options.parent, displayListener = function(){
 					that.init();
@@ -68,14 +68,15 @@
 		this.position = this.offset;
 		if(this.options.position){
 			this.initPosition = this.options.position;
-			this.move(this.initPosition);
+			this.move(this.initPosition,0,true,true);
 		}else{
 			this.initPosition = this.offset;
 		}
-		this.el.addEventListener(events.start, MultiDrag.util.bind(this.multiDragStart, this));
-		this._multiDragMove = MultiDrag.util.bind(this.multiDragMove, this);
-		this._multiDragEnd = MultiDrag.util.bind(this.multiDragEnd, this);
-		this.bound = this.options.bound();
+		this._dragStart = MultiDrag.util.bind(this.dragStart, this);
+		this._dragMove = MultiDrag.util.bind(this.dragMove, this);
+		this._dragEnd = MultiDrag.util.bind(this.dragEnd, this);
+		this.el.addEventListener(events.start, this._dragStart);
+		this.bound.refresh && this.bound.refresh();
 	};
 
 	Obj.prototype.getSize = function(recalulate){
@@ -119,8 +120,8 @@
 		isSilent || this.onMove.fire();
 	};
 
-	Obj.prototype.multiDragStart = function(event){
-		if(!this._enable){
+	Obj.prototype.dragStart = function(event){
+		if(!this._enable || ( this.options.startFilter && !this.options.startFilter(event))){
 			return;
 		}
 		this._startTouchPoint = new Point(isTouch ? event.changedTouches[0].pageX : event.clientX, isTouch ? event.changedTouches[0].pageY : event.clientY);
@@ -134,14 +135,14 @@
 		}else{
 			event.target.focus();
 		}
-		document.addEventListener(events.move, this._multiDragMove);
-		document.addEventListener(events.end, this._multiDragEnd);
+		document.addEventListener(events.move, this._dragMove);
+		document.addEventListener(events.end, this._dragEnd);
 		this.isMultiDrag = true;
 		MultiDrag.util.addClass(this.el, "active");
 		this.onMove.fire();
 	};
 
-	Obj.prototype.multiDragMove = function(event){
+	Obj.prototype.dragMove = function(event){
 		var touch, touchPoint, point;
 		if(isTouch){
 			if(!(touch = MultiDrag.util.getTouchByID(event, this._touchId))){
@@ -156,7 +157,7 @@
 		this.move(point, 0);
 	};
 
-	Obj.prototype.multiDragEnd = function(event){
+	Obj.prototype.dragEnd = function(event){
 		var touch;
 		if(isTouch){
 			if(!(touch = MultiDrag.util.getTouchByID(event, this._touchId))){
@@ -166,8 +167,8 @@
 		event.stopPropagation();
 		event.preventDefault();
 		this.onEnd.fire();
-		document.removeEventListener(events.move, this._multiDragMove);
-		document.removeEventListener(events.end, this._multiDragEnd);
+		document.removeEventListener(events.move, this._dragMove);
+		document.removeEventListener(events.end, this._dragEnd);
 		this.isMultiDrag = false;
 		MultiDrag.util.removeClass(this.el, "active");
 	};
@@ -193,12 +194,18 @@
 
 	Obj.prototype.refresh = function(){
 		this.getSize(true);
-		this.offset = mathPoint.getOffset(this.el, this.options.parent, true);
-		this.bound = this.options.bound();
-		console.log("refresh offset", this.offset);
+//		this.offset = mathPoint.getOffset(this.el, this.options.parent, true);
+		this.bound.refresh && this.bound.refresh();
+//		console.log("refresh offset", this.offset);
 		//this.offset = mathPoint.getOffset(this.el, this.options.parent, true).sub(this._transformPosition || new Point(0,0) );
 		//this.move(this.position,0,false,true);
 	}
+
+	Obj.prototype.destroy = function(){
+		this.el.removeEventListener(events.start, this._dragStart);
+		this.onEnd.reset();
+		this.onMove.reset();
+	};
 
 	Obj.prototype.__defineGetter__("enable", function(){
 		return this._enable;
