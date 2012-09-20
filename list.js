@@ -8,7 +8,8 @@
 			timeEnd: 200,
 			timeExcange: 400,
 			radius: 30,
-			getLength: mathPoint.getLength()
+			getLength: mathPoint.getLength(),
+			isDisplacement:false
 		};
 		for(i in options){
 			if(options.hasOwnProperty(i)){
@@ -25,14 +26,41 @@
 	}
 
 	List.prototype.init = function(){
-		var that = this;
 		this._enable = true;
-		this.objs.forEach(function(obj){
+		this.objs.forEach(this.initObj,this);
+	};
+
+	List.prototype.initObj = function(obj){
+		var moveHandler,that = this;
+		obj.enable = this._enable;
+		if(this.options.isDisplacement){
+			moveHandler = function(){
+				if(this.isMultiDrag){
+					that.onStart(this);
+					obj.onMove.remove(moveHandler);
+					return true;
+				}
+			}
+			obj.onEnd.add(function(){
+				that.onEndDisplaycement(this);
+				obj.onMove.add(moveHandler);
+				return true;
+			});
+			obj.onMove.add(moveHandler);
+		}else{
 			obj.onEnd.add(function(){
 				that.onEnd(this);
 				return true;
 			});
-		});
+		}
+	};
+
+	List.prototype.moveOrSave = function(obj,position,time){
+		if(obj.isMultiDrag){
+			obj.fixPosition = position;
+		}else{
+			obj.move(position, time, true);
+		}
 	};
 
 	List.prototype.onEnd = function(obj){
@@ -42,16 +70,51 @@
 		if(excangeIndex === -1 || excangeIndex === currentIndex){
 			obj.move(obj.fixPosition, this.options.timeEnd, true);
 		}else{
-			if(this.objs[excangeIndex].isMultiDrag){
-				this.objs[excangeIndex].fixPosition = fixPositions[currentIndex];
-			}else{
-				this.objs[excangeIndex].move(fixPositions[currentIndex], this.options.timeExcange, true);
-			}
+			this.moveOrSave(this.objs[excangeIndex],fixPositions[currentIndex],this.options.timeExcange);
 			this.objs[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true);
 			this.onChange.fire();
 		}
 		return true;
 	};
+
+	List.prototype.onEndDisplaycement = function(obj){
+		var currentIndex,i,targetIndex,
+			sortedObjs = this.getSortedObjs(),
+			fixPositions = sortedObjs.map(function(obj){
+				return obj.fixPosition;
+			});
+		currentIndex = sortedObjs.indexOf(obj);
+		targetIndex = mathPoint.indexOfNearPoint(fixPositions, obj.position, this.options.radius, this.options.getLength);
+		if(targetIndex !==-1){
+			if(targetIndex < currentIndex){
+				for(i = targetIndex ; i < currentIndex; i++){
+					this.moveOrSave(sortedObjs[i],fixPositions[i+1],this.options.timeExcange);
+				}
+			}else{
+				for(i = currentIndex; i < targetIndex; i++){
+					this.moveOrSave(sortedObjs[i+1],fixPositions[i],this.options.timeExcange);
+				}
+			}
+			obj.move(fixPositions[targetIndex],this.options.timeEnd, true);
+		}else{
+			obj.move(obj.fixPosition,this.options.timeEnd, true);
+		}
+	};
+
+	List.prototype.onStart = function(obj){
+		var currentIndex,i,
+			sortedObjs = this.getSortedObjs(),
+			fixPositions = sortedObjs.map(function(obj){
+				return obj.fixPosition;
+			});
+		currentIndex = sortedObjs.indexOf(obj);
+		for(i = currentIndex + 1; i < sortedObjs.length; i++){
+			this.moveOrSave(sortedObjs[i],fixPositions[i-1],this.options.timeExcange);
+		}
+		sortedObjs[currentIndex].fixPosition = fixPositions[i-1];
+	};
+
+
 
 	List.prototype.getCurrentFixPosition = function(){
 		return this.objs.map(function(obj){
@@ -60,22 +123,19 @@
 	};
 
 	List.prototype.getSortedObjs = function(){
-		return this.objs.map(function(obj){
-			return 	obj.initPosition;
-		}).map(function(position){
+		var sortedObjs,
+			initPositions = this.objs.map(function(obj){
+				return 	obj.initPosition;
+			});
+		sortedObjs = initPositions.map(function(position){
 			return this.objs.filter(function(obj){
 				return obj.fixPosition.compare(position);
 			},this)[0];
 		},this);
+		return sortedObjs;
 	};
 
 	List.prototype.reset = function(){
-		this.objs.forEach(function(obj){
-			obj.move(obj.initPosition, 0, true, false);
-		});
-	};
-
-	List.prototype.resetInitPosition = function(){
 		this.objs.forEach(function(obj){
 			obj.move(obj.initPosition, 0, true, false);
 		});
@@ -92,14 +152,8 @@
 		if(!(objs instanceof Array)){
 			objs = [objs];
 		}
-		objs.forEach(function(obj){
-			obj.enable = this._enable;
-			obj.onEnd.add(function(){
-				that.onEnd(this);
-				return true;
-			});
-			this.objs.push(obj);
-		},this);
+		objs.forEach(this.initObj,this);
+		this.objs = this.objs.concat(objs);
 	};
 
 	List.prototype.remove = function(objs){
@@ -114,6 +168,7 @@
 		}
 		objs.forEach(function(obj){
 			obj.onEnd.reset();
+			obj.onMove.reset();//todo remove reset in future
 			MultiDrag.util.remove(this.objs,obj);
 		}, this);
 		j = 0;
