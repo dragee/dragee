@@ -24,7 +24,7 @@
 
 	function Obj(el, options){
 				options = options || {};
-				var i, that = this, displayListener, parent = options.parent || MultiDrag.util.getDafaultParent(el);
+				var i, that = this, displayListener, parent = options.parent || MultiDrag.util.getDefaultParent(el);
 				this.options = {
 					parent: parent,
 					bound: MultiDrag.boundFactory(MultiDrag.boundType.element)(parent, parent),

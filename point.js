@@ -265,6 +265,17 @@
 				}
 			}
 		},
+		getNearestAngle:function(arr,angle){
+			var i,temp,diff = Math.PI * 2 ,value;
+			for(i = 0; i < arr.length;i++){
+				temp = mathPoint.getAngleDiff(arr[i],angle);
+				if(diff < temp){
+					diff = temp;
+					value = arr[i];
+				}
+			}
+			return value;
+		},
 		getAngleDiff:function(alpha,beta){
 			var minAngle = Math.min(alpha,beta),
 				maxAngle =  Math.max(alpha,beta);

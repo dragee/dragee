@@ -5,7 +5,7 @@
 
 	function Target(el, objs, options){
 		options = options || {};
-		var i, parent = options.parent || MultiDrag.util.getDafaultParent(el);
+		var i, parent = options.parent || MultiDrag.util.getDefaultParent(el);
 		this.options = {
 			timeEnd: 200,
 			timeExcange: 400,

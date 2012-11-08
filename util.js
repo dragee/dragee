@@ -84,10 +84,10 @@
 			return classExist.test(el.className);
 		},
 		toggleClass:function(el, className, isOn){
-			var isAdd = arguments.length > 2 ? isOn : this.hasClass(el,className);
+			var isAdd = arguments.length > 2 ? isOn : !this.hasClass(el,className);
 			this[isAdd ? "addClass" : "removeClass"](el, className);
 		},
-		getDafaultParent:function (el){
+		getDefaultParent:function (el){
 			var parent = el.parentNode;
 			while(parent.parentNode && window.getComputedStyle(parent)["position"] === "static"){
 				parent = parent.parentNode;
