@@ -38,6 +38,7 @@
 			}),
 			onDraw:function(){},
 			limitImg:null,
+			limitImgOffset: new Point(0,0),
 			isSelectable:false
 		};
 		for(i in options){
@@ -60,9 +61,7 @@
 			var angle = this.options.initAngles[i],
 				halfSize = mathPoint.getSizeOfElement(el).mult(0.5),
 				position = mathPoint.getPointFromRadialSystem(angle, this.options.touchRadius, this.options.center.sub(halfSize)),
-				bound = function(){
-					return MultiDrag.boundFactory(MultiDrag.boundType.arc)(that.options.center.sub(halfSize),that.options.touchRadius,that.getBoundAngle(i,false),that.getBoundAngle(i,true));
-				};
+				bound = MultiDrag.boundFactory(MultiDrag.boundType.arc)(that.options.center.sub(halfSize),that.options.touchRadius,that.getBoundAngle(i,false),that.getBoundAngle(i,true));
 			return new MultiDrag.Obj(el, {parent:this.area, bound:bound, position:position, onMove:function (){
 				that.draw();
 				return true;
@@ -163,10 +162,17 @@
 		return cloneObj;
 	};
 
+	Chart.prototype.getFillStyle = function(index){
+		if(typeof this.options.fillStyles[index] === "function"){
+			this.options.fillStyles[index] = this.options.fillStyles[index].call(this);
+		}
+		return this.options.fillStyles[index];
+	};
+
 	Chart.prototype.drawArc = function(context,center,radius,index){
 		var startAngle = this.angles[index],
 			endAngle = this.angles[(index+1)%this.angles.length],
-			color = this.options.fillStyles[index];
+			color = this.getFillStyle(index);
 		context.beginPath();
 		context.moveTo(center.x, center.y);
 		context.arc(center.x, center.y, radius, startAngle, endAngle, false);
@@ -177,15 +183,19 @@
 	};
 
 	Chart.prototype.drawLimitImg = function(index){
-		var angle,point,img = this.options.limitImg;
+		var angle,point,img;
+		if(this.options.limitImg){
+			img = this.options.limitImg instanceof Array ? this.options.limitImg[index] : this.options.limitImg;
+		}
 		if(!img){
 			return ;
 		}
 		angle = mathPoint.normalizeAngle(this.angles[index]);
 		point = new Point(0,-img.height/2);
+		point = point.add(this.options.limitImgOffset);
 		this.context.translate(this.areaRectangle.size.x / 2, this.areaRectangle.size.y / 2);
 		this.context.rotate(angle);
-		this.context.drawImage(this.options.limitImg, point.x, point.y);
+		this.context.drawImage(img, point.x, point.y);
 		this.context.setTransform(1, 0, 0, 1, 0, 0);
 	};
 
@@ -233,6 +243,17 @@
 			j += this.angles.length;
 		}
 		return j;
+	};
+
+	Chart.prototype.setAngles = function(angles){
+		this.angles = angles;
+		this.objs.forEach(function (obj, i){
+			var angle = this.angles[i],
+				halfSize = obj.getSize().mult(0.5),
+				position = mathPoint.getPointFromRadialSystem(angle, this.options.touchRadius, this.options.center.sub(halfSize));
+			obj.move(position,0,true,true);
+		}, this);
+		this.draw();
 	};
 
 	Chart.prototype.setActiveArc = function(index){

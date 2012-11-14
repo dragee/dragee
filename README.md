@@ -31,3 +31,4 @@ include library in index.html
 	<script src="modules/multidrag/listswitcher.js" type="text/javascript" charset="utf-8"></script>
 	<script src="modules/multidrag/arcslider.js" type="text/javascript" charset="utf-8"></script>
 	<script src="modules/multidrag/spider.js" type="text/javascript" charset="utf-8"></script>
+	<script src="modules/multidrag/chart.js" type="text/javascript" charset="utf-8"></script>
