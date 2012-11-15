@@ -58,7 +58,7 @@
 		this.angle = mathPoint.normalizeAngle(angle,position);
 		var position = mathPoint.getPointFromRadialSystem(this.angle, this.options.radius, this.shiftedCenter);
 		this.obj.move(position,time||0,true,true);
-		this.onChange();
+		this.onChange(this.angle);
 	};
 
 
