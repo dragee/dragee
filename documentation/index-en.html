@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>MultiDrag library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0">
+
+    <!-- Le styles -->
+    <link href="style.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+
+</head>
+
+<body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="#">MultiDrag Documentation</a>
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <a href="#" class="btn"> Download MultiDrag <small>(v0.0.1)</small></a>
+                <a href="#" class="btn btn-primary" >View project on GitHub</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <header class="jumbotron subhead" id="overview">
+        <h1>MultiDrag</h1>
+        <p class="lead">MultiDrag is a webkit drag and drop library</p>
+
+        <div class="subnav">
+            <ul class="nav nav-pills">
+                <li><a href="#Features">Features</a></li>
+                <li><a href="#Obj">Obj</a></li>
+                <li><a href="#List">List</a></li>
+                <li><a href="#Target">Target</a></li>
+                <li><a href="#Spider">Spider</a></li>
+                <li><a href="#MathPoint">mathPoint</a></li>
+                <li><a href="#bound">bound</a></li>
+                <li><a href="#position">position</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section id="Features">
+        <div class="page-header">
+            <h1>
+                The most important features
+            </h1>
+        </div>
+        <div class="row">
+            <div class="span12">
+                <ul>
+                    <li>
+                        It is framework, not just a draggable objects.
+                    </li>
+                    <li>
+                        It was design for mobile devices.
+                    </li>
+                    <li>
+                        It support multitouch, you can move few objects with your fingers.
+                    </li>
+                    <li>
+                        Combining "target", "bound" and "position" API you will be able to create complex solutions easy.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="Obj">
+        <div class="page-header">
+            <h1>
+                MultiDrag.Obj
+                <small>basic library element </small>
+            </h1>
+        </div>
+        <h2>Description</h2>
+        <div class="row">
+            <div class="span6">
+                <p>
+                    Є базовим елементом для візуального переміщення HTMLElement-ів на якому будуеться решта бібліотеки,
+                    проте можливе використування незалежно від інших модулів.
+                </p>
+                <h5>Особливості</h5>
+                <p>
+                    Ініціалізувати об'ект потрібно тоді коли <code>HTMLElement</code> для якого створюеться обект буде присутній в DOM-і та
+                    буде відображений  документі (не використовувати <code>display:none</code> під час ініціалізації).
+                    Ініціалізація різних <code>MultiDrag.Obj</code> на основі одного <code>HTMLElement</code>-а заборонена і призведе до помилки (<code>Exception</code>).
+                    В момент "drag"-а обекту <code>HTMLElement</code>-y додається класс "active". Різні <code>MultiDrag.Obj</code>-и переміщуються незалежно <br/><br/>
+                </p>
+                <h3>constructor / initialize</h3>
+                <p>
+                    <code>MultiDrag.Obj(el[,options])</code> Конструктор включає 2 параметра :<br/>
+                    <code>el</code> - HTMLElement який буде переміщатися,<br/>
+                    <code>options</code> - необов'язковий аргумент, який включає властовості що по замовчуванню визначені.
+                </p>
+                <h5>Опис властивостей</h5>
+                <p>
+                    <code>parent</code> HTMLElement який визначае декартову систему координат що буде використовуватия в обекті <code>MultiDrag.Obj</code>,
+                    його верхній лівий кут буде визначений як точка <code>new Point (0,0)</code>.
+                    Для білььшості випадків <code>parent</code> element включає в собі <code>el</code>.<br/><br/>
+
+                    <code>bound</code> функция яка буде викликається при ініціалізації вона повертає функцію, яка описує граничні обмеження для переміщення обекта.
+                    В модулі <code>bound.js</code> є <code>MultiDrag.boundFactory</code>фабрика для побудови базових граничних обмеженнь,
+                    її використання не є необхідним, можливо передавати користувацьку функцию.<br/><br/>
+
+                    <code>position</code> координата на яку повинен переміститися обект <code>MultiDrag.Obj</code> при ініціалізації роботи,
+                    якщо <code>position</code> - не заданий або рівний <code>false</code> обєкт залишаеться на своему місці (визнаценому версткою).<br/><br/>
+
+                    <code>isReCalculateSize</code> прапор перерахунку розміру обекта, якщо розміри об'екта змінюються потрібно задати <code>true</code><br/><br/>
+
+                    <code>isContentBoxSize</code> прапор який задає яким чином буде виначатися розмір обекта: <code>true</code> - з урахуванням padding-у та border-а, <code>false</code> - без.
+                    <br/><br/>
+
+                    <code>onEnd</code> - функція обробщик повідомлення про завершення руху обєкта, якщо при виклиці методу <code>move</code> задати прапор <code>move</code> isSilent <br/><br/>
+                    <code>onMove</code> - функція обробщик повідомлення про рух обєкта<br/><br/>
+                    <br/><br/>
+
+                </p>
+            </div>
+            <div class="span6">
+                <h5>Значення по замовчуванню:</h5>
+                <pre class="prettyprint linenums">
+parent: parent = MultiDrag.util.getDafaultParent(el),
+bound: function(){ return MultiDrag.boundFactory(MultiDrag.boundType.element)(parent, parent);} ,
+isReCalculatePosition: false,
+isReCalculateSize: false,
+isContentBoxSize: false,
+position: false,
+onEnd: function(){},
+onMove: function(){}
+                </pre>
+                <h3>Metods</h3>
+                <p>
+                    <code>getSize()</code> - повертає розміри обєкта.<br/>
+                    <code>getCenter()</code> - повертає координати центра обєкта.<br/>
+                    <code>getRectangle()</code> - повертає прямокутник який представляє обєкт.<br/>
+                    <code>move(point, time, isFix, isSilent)</code> - переміщує обект в <code>point</code> за <code>time</code> час,
+                        <code>isFix</code> - прапор фіксування позиції(збереження стану) використовуеться в інших модулях,
+                        <code>isSilent</code> - прапор заборони розсилки повідомлень про рух обекта.<br/>
+                    <code>refresh()</code> - оновлює внутрішні змінні, необхідно при зміщенні обекта зовнішними чинниками
+                </p>
+                <h3>Properties</h3>
+                <p>
+                    <code>enable = [true|false]</code>- забороняє/дозволяє рух(drag) обекта.<br/>
+                    <code>onEnd = {add:function(callback),remove:function(callback)}</code> - надає можливість прикріпляти та відкріпляти слухачів повідомлень про зупинку drag-а,
+                    для <code>onEnd</code> відправка повідомлень до слухачів відбувається в зворотньому порядку відносно їх додавання(тобто останньо-доданий слухач отримає повідомлення першим),
+                    якщо слухач поверне <code>true</code> - це означатиме що він обробив повідомлення і розсилка повідомлень припинеться.<br/>
+                    <code>onMove = {add:function(callback),remove:function(callback)}</code> - надає можливість прикріпляти та відкріпляти слухачів повідомлень про drag обєкта,
+                    для <code>onEnd</code> відправка повідомлень до слухачів відбувається в порядку їх додавання(тобто слухач якого додали першим отримає повідомлення першим),
+                    далі розсилка відбуваеться для всіх слухачів.<br/>
+                </p>
+                <h3>TODO</h3>
+                <ul>
+                    <li>створити (перевірити) метод <code>changeHtmlParent</code> </li>
+                    <li>написати демо в якому буде перебудовуватися <code>DOM-model</code></li>
+                    <li>більш щільніше попрацювати з динамічною зміною обєктів (розмірів, позиції)</li>
+                </ul>
+            </div>
+        </div>
+        <h2>Demonstration</h2>
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoObj" class="demo-html">
+                    <div class="area">
+                        <div class="area">
+                            <div class="obj obj-a">
+                                <i class="icon-move"></i> A
+                            </div>
+                        </div>
+                        <div class="area">
+                            <div class="obj obj-b">
+                                <i class="icon-move"></i> B
+                            </div>
+                            <div class="obj obj-c">
+                                <i class="icon-move"></i> C
+                            </div>
+                        </div>
+                        <div class="obj obj-d">
+                            <i class="icon-move"></i> D
+                        </div>
+                    </div>
+                </div>
+                <style>
+
+                    #DemoObj .area{
+                        position: relative;
+                        overflow: hidden;
+                        padding: 10%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                    }
+
+                    #DemoObj .area > .area{
+                        float: left;
+                        width: 45%;
+                        padding: 0;
+                    }
+
+                    #DemoObj .area > .area:first-child{
+                        margin-right: 8%;
+                    }
+
+                    #DemoObj .area .obj{
+                        margin: 20px;
+                        display: inline-block;
+                        padding: 9px 14px;
+                        font-size: 15px;
+                        color: #333;
+                        cursor: move;
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        background: #f5f5f5;
+                        position: relative;
+                    }
+
+                    #DemoObj .area .obj.active{
+                        z-index: 2;
+                    }
+
+                    #DemoObj .area .obj.obj-b.active{
+                        background-color: rgb(75, 75, 75);
+                        color: #fff;
+                    }
+
+                    #DemoObj .area .obj.obj-b.active [class*="icon-"]{
+                        background-image: url("bootstrap/img/glyphicons-halflings-white.png");
+                    }
+
+                    #DemoObj .area .obj.obj-c.active{
+                        background-color: #ffc40d;
+                    }
+
+                </style>
+                <script>
+                    window.addEventListener("load",function(){
+                        var objA,objB,objC,objD,
+                            root = document.getElementById("DemoObj"),
+                            objAEl = root.getElementsByClassName("obj-a")[0],
+                            objBEl = root.getElementsByClassName("obj-b")[0],
+                            objCEl = root.getElementsByClassName("obj-c")[0],
+                            objDEl = root.getElementsByClassName("obj-d")[0];
+
+                        objA = new MultiDrag.Obj(objAEl);
+                        objB = new MultiDrag.Obj(objBEl);
+                        objC = new MultiDrag.Obj(objCEl);
+                        objD = new MultiDrag.Obj(objDEl);
+                    });
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+        </div>
+    </section>
+    
+    <section id="List">
+        <div class="page-header">
+            <h1>MultiDrag.List <small>basic library element </small></h1>
+        </div>
+        <h2>Description</h2>
+        <div class="row">
+            <div class="span6">
+                <p>
+                    Створений для візуального сортування елементів, при чому базове розміщення елементів не обовязково має бути  списком. Використовує <code>MultiDrag.Obj</code>,
+                    для справної роботи у всіх  <code>MultiDrag.Obj</code>-ів з якими працює список має бути обрана одна система координат(тобто обраний спільний <code>parent</code>).
+                </p>
+                <h3>constructor / initialize</h3>
+                <p>
+                    <code>MultiDrag.List(objs[,options])</code> Конструктор включає 2 параметра :<br/>
+                    <code>objs</code> - масив <code>MultiDrag.Obj</code>-ів, <br/>
+                    <code>options</code> - необов'язковий аргумент, який включає властовості що по замовчуванню визначені.
+                </p>
+                <h5>Опис властивостей</h5>
+                <p>
+                    <code>timeEnd</code> час переміщення <code>MultiDrag.Obj</code> в цільову точку.<br/>
+                    <code>timeExcange</code> час переміщення <code>MultiDrag.Obj</code> з одніеї точки в іншу.<br/>
+                    <code>getLength</code> функція яка визначає яким чином буде визначатися відстань між 2 точками в декартовій системі координат(метрика простору), необхідна для визначення "влучення в ціль".
+                    в <code>mathPoint</code> є фабрика <code>getLength(options)</code> для побудови базових метрик.<br/>
+                    <code>radius</code> радіус перевірки на влучення.<br/>
+                    <code>onChange</code> - функция слухач, яка отримує повідомлення при змініпорядку елементів.
+                </p>
+                <h5>Значення по замовчуванню:</h5>
+                <pre class="prettyprint linenums">
+timeEnd:200,
+timeExcange:400,
+radius:30,
+getLength:mathPoint.getLength()
+                </pre>
+            </div>
+            <div class="span6">
+                <h3>Metods</h3>
+                <p>
+                    <code>getSortedObjs()</code> - метод який повертає впорядкований список обэктів<br/>
+                    <code>reset()</code> - відновлення початкових позицій елементів<br/>
+                </p>
+                <h3>Properties</h3>
+                <p>
+                    <code>positions</code> - позиції елементів, зручно використовувати для збереження та відновлення стану<br/>
+                </p>
+                <h3>Factory</h3>
+                <p>
+                    Для спрощення ініціалізації списка існує фабика <code>MultiDrag.listFactory(el,objsElements,options)</code>. Де <code>el</code> - HTMLElement <code>parent</code>,
+                    <code>objsElements</code> - масив HTMLElement-ів які будуть сортуватися. <code>options</code> включає опциї для списка <code>list</code> та <code>obj</code> опциї обєктів.<br/>
+                    <code>options = { obj : {...} , list : {...} }</code>
+                </p>
+                <h3>TODO</h3>
+                <ul>
+                    <li>ввести властивість <code>enable</code> для блокування списка</li>
+                    <li>допрацювати можливість блокування окремих елементів </li>
+                    <li>більш щільніше попрацювати з динамічною зміною обєктів (розмірів, позиції)</li>
+                </ul>
+            </div>
+        </div>
+        <h2>Demonstration</h2>
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoList" class="demo-html">
+                    <ul class="list list-a">
+                        <li><i class=" icon-resize-vertical"></i> A</li>
+                        <li><i class=" icon-resize-vertical"></i> B</li>
+                        <li><i class=" icon-resize-vertical"></i> C</li>
+                        <li><i class=" icon-resize-vertical"></i> D</li>
+                        <li><i class=" icon-resize-vertical"></i> E</li>
+                        <li><i class=" icon-resize-vertical"></i> F</li>
+                    </ul>
+                    <ul class="list list-b">
+                        <li><i class=" icon-move"></i> 1</li>
+                        <li><i class=" icon-move"></i> 2</li>
+                        <li><i class=" icon-move"></i> 3</li>
+                        <li><i class=" icon-move"></i> 4</li>
+                        <li><i class=" icon-move"></i> 5</li>
+                        <li><i class=" icon-move"></i> 6</li>
+                        <li><i class=" icon-move"></i> 7</li>
+                        <li><i class=" icon-move"></i> 8</li>
+                        <li><i class=" icon-move"></i> 9</li>
+                    </ul>
+                </div>
+                <style>
+                    #DemoList{
+                        padding: 2%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        overflow: hidden;
+                    }
+
+                    #DemoList ul.list{
+                        position: relative;
+                        margin-bottom: 30px;
+                        padding: 5%;
+                        margin: 2%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        float: left;
+                    }
+
+                    #DemoList ul.list li{
+                        list-style: none;
+                        margin: 4px;
+                        padding: 9px 14px;
+                        font-size: 15px;
+                        color: #333;
+                        cursor: move;
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        background: #f5f5f5;
+                        position: relative;
+                    }
+                    #DemoList ul.list li.active{
+                        z-index: 2;
+                    }
+
+                    #DemoList ul.list.list-a{
+                        width: 26%;
+                    }
+                    #DemoList ul.list.list-b{
+                        width: 44%;
+                    }
+
+                    #DemoList ul.list.list-b li{
+                        display: inline-block;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load",function(){
+                        var listA,listB,
+                            root = document.getElementById("DemoList"),
+                            listAEl = root.getElementsByClassName("list-a")[0],
+                            objAEls = listAEl.getElementsByTagName("li"),
+                            listBEl = root.getElementsByClassName("list-b")[0],
+                            objBEls = listBEl.getElementsByTagName("li");
+
+                        listA = new MultiDrag.listFactory(listAEl,objAEls);
+                        listB = new MultiDrag.listFactory(listBEl,objBEls);
+                    });
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+        </div>
+    </section>
+
+    <section id="Target">
+        <div class="page-header">
+            <h1>MultiDrag.Target <small>basic library element </small></h1>
+        </div>
+
+        <h2>Description</h2>
+        <h3>MultiDrag.Target</h3>
+        <div class="row">
+            <div class="span6">
+                <p>
+                    "Кошик" в який можна додати елементи та сортувати їх. Використовує <code>MultiDrag.Obj</code>,
+                    для справної роботи у всіх  <code>MultiDrag.Obj</code>-ів з якими працює <code>MultiDrag.Target</code> має бути обрана одна система координат(тобто обраний спільний <code>parent</code>).
+                    Самостійне використанняне не передбачене, використовується спільно з <code>MultiDrag.TargetManager</code>.
+                </p>
+                <h3>constructor / initialize</h3>
+                <p>
+                    <code>Target(el,objs[,options])</code> Конструктор включає 3 параметра :<br/>
+                    <code>el</code> - HTMLElement "кошика" який визначає розміри та позицію "DropZonе"-и <br/>
+                    <code>objs</code> - масив <code>MultiDrag.Obj</code>-ів, які можуть переміщуватися в цей "кошик"
+                    <code>options</code> - необов'язковий аргумент, який включає властовості що по замовчуванню визначені.
+                </p>
+                <h5>Опис властивостей</h5>
+                <p>
+                    <code>timeEnd</code> час переміщення <code>MultiDrag.Obj</code> в цільову точку.<br/>
+                    <code>timeExcange</code> час переміщення <code>MultiDrag.Obj</code> з одніеї точки в іншу.<br/>
+                    <code>isReCalculateRectangle</code> прапор, який відповідає за перерахунок позиції та розміру "кошика", необхідний при динамічній зміні позиції чи розміру "кошика" <br/>
+                    <code>parent</code> HTMLElement який визначае декартову систему координат що буде використовуватия в обекті <code>MultiDrag.Target</code><br/>
+                    <code>sorting</code> - функція яка визначає, яким чином мають впорядковуватися обєкти в "кошику", в модулі <code>position.js</code> визначена фабрика для базових функций <code>sortingFactory(type)</code><br/>
+                    <code>positioning</code> - функція яка визначає, яким чином мають розташовуватися обєкти в "кошику", в модулі <code>position.js</code> визначена фабрика для базових функций <code>positionFactory(type)</code>
+                    <code>onAdd</code> - функція, яка викликаеться при додаванні обекта в "кошик".
+                    <code>onRemove</code> - функція, яка викликаеться при видаленні обекта з "кошика".
+                </p>
+            </div>
+            <div class="span6">
+                <h5>Значення по замовчуванню:</h5>
+                <pre class="prettyprint linenums">
+timeEnd:200,
+timeExcange:400,
+isReCalculateRectangle:false,
+parent:parent,
+isChangeHtmlParent:false,
+sorting: MultiDrag.sortingFactory(MultiDrag.positionType.floatLeft)(80,mathPoint.getLength({x:1,y:4,IsTransformationSpace:true})),
+positioning : MultiDrag.positionFactory(MultiDrag.positionType.floatLeft)(MultiDrag.util.bind(this.getRectangle,this),{isRemove:true})
+                </pre>
+                <h3>Metods</h3>
+                <p>
+                    <code>getSortedObjs()</code> - метод який повертає впорядкований список обєктів<br/>
+                    <code>reset()</code> - відновлення початкових позицій елементів (видалення з "кошика")<br/>
+                </p>
+
+            </div>
+        </div>
+        <h3>MultiDrag.TargetManager</h3>
+        <div class="row">
+            <div class="span6">
+                <p>
+                    Менеджер роботи групи "кошиків".
+                </p>
+                <h3>constructor / initialize</h3>
+                <p>
+                    <code>TargetManager(el,objs,targets,options)</code> Конструктор включає 4 параметра :<br/>
+                    <code>el</code> - HTMLElement який визначає робочу область <br/>
+                    <code>objs</code> - масив <code>MultiDrag.Obj</code>-ів, з якими працює менеджер<br/>
+                    <code>targets</code> -  масив <code>MultiDrag.Target</code>-ів, з якими працює менеджер<br/>
+                    <code>options</code> - необов'язковий аргумент, який включає властовості що по замовчуванню визначені.
+                </p>
+                <h5>Опис властивостей</h5>
+                <p>
+                    <code>onChange</code> функція слухач яка виликаеться при переміщення елемента (з "кошика" чи в "кошик").<br/>
+                    <code>timeEnd</code> час переміщення <code>MultiDrag.Obj</code> з одніеї точки в іншу.<br/>
+                    <code>isChangeHtmlParent</code> прапор, який визначає чи буде переміщений HTMLElement в DOM-дереві<br/>
+                </p>
+                <h5>Значення по замовчуванню:</h5>
+                <pre class="prettyprint linenums">
+isChangeHtmlParent:false,
+timeEnd : 400,
+timeWaitForRefresh : 500
+                </pre>
+
+            </div>
+            <div class="span6">
+                <h3>Metods</h3>
+                <p>
+                    <code>reset()</code> - відновлення початкових позицій елементів (видалення з "кошиків")<br/>
+                </p>
+                <h3>Properties</h3>
+                <p>
+                    <code>positions</code> - позиції "елементів в кошиках", зручно використовувати для збереження та відновлення стану<br/>
+                </p>
+                <h3>Factory</h3>
+                <p>
+                    Для спрощення ініціалізації списка існує фабика <code>MultiDrag.targetManagerFactory(el,objsElements,targetElements,options)</code>. Де <code>el</code> - HTMLElement <code>parent</code>,
+                    <code>objsElements</code> - масив HTMLElement-ів які будуть переміщуватия. <code>options</code> включає опциї для "кошиків" <code>target</code>, обєктів <code>obj</code> та менеджера  <code>manager</code>.<br>
+                    <code>options = { obj : {...} , target : {...}, manager : {...} }</code>
+                </p>
+                <h3>TODO</h3>
+                <ul>
+                    <li>допрацювати можливість блокування окремих елементів, "кошиків" </li>
+                    <li>написати демо зі зміною DOM-дерева</li>
+                    <li>більш щільніше попрацювати з динамічною зміною обєктів (розмірів, позиції)</li>
+                </ul>
+            </div>
+        </div>
+        <h2>Demonstration</h2>
+
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoTargetA" class="demo-html">
+                    <div class="area area-a">
+                        <div class="target target-a">
+                            dropzone A
+                        </div>
+                        <div class="target target-b">
+                            dropzone B
+                        </div>
+                        <div class="target target-c">
+                            dropzone C
+                        </div>
+                        <ul class="obj-holder">
+                            <li class="obj obj-a">
+                                <i class=" icon-move"></i>
+                                A<small>(origin)</small>
+                            </li>
+                            <li class="obj obj-b">
+                                <i class=" icon-move"></i>
+                                B<small>(clone)</small>
+                            </li>
+                            <li class="obj obj-b">
+                                <i class=" icon-move"></i>
+                                B<small>(clone)</small>
+                            </li>
+                            <li class="obj obj-b">
+                                <i class=" icon-move"></i>
+                                B<small>(clone)</small>
+                            </li>
+                            <li class="obj obj-b">
+                                <i class=" icon-move"></i>
+                                B<small>(clone)</small>
+                            </li>
+                            <li class="obj obj-c">
+                                <i class=" icon-move"></i>
+                                C<small>(origin)</small>
+                            </li>
+                            <li class="obj obj-d">
+                                <i class=" icon-move"></i>
+                                D<small>(origin)</small>
+                            </li>
+                            <li class="obj obj-e">
+                                <i class=" icon-move"></i>
+                                E<small>(origin)</small>
+                            </li>
+                            <li class="obj obj-e">
+                                <i class=" icon-move"></i>
+                                F<small>(origin)</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <style>
+                    #DemoTargetB{
+                        padding: 2%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        overflow: hidden;
+                    }
+
+                    #DemoTargetB small{
+                        color: #999999;
+                        font-size: 11px;
+                        line-height: 11px;
+                    }
+
+                    #DemoTargetA .area{
+                        position: relative;
+                        padding: 3%;
+                        margin: 2%;
+                        width: 88%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        float: left;
+                    }
+
+                    #DemoTargetA .area .target{
+                        width: 26%;
+                        margin: 1%;
+                        padding: 2%;
+                        padding-top: 20px;
+                        padding-bottom: 20px;
+
+                        float: left;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                    }
+
+
+                    #DemoTargetA ul.obj-holder{
+                        list-style: none;
+                        clear: both;
+                        margin: 4%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        float: left;
+                    }
+
+                    #DemoTargetA ul.obj-holder .obj{
+                        width: 24%;
+                        margin: 1% 4%;
+                        padding: 9px 0;
+                        font-size: 15px;
+                        color: #333;
+                        cursor: move;
+                        text-align: center;
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        background: #f5f5f5;
+                        position: relative;
+                        float: left;
+                    }
+
+                    #DemoTargetA ul.obj-holder .obj.active{
+                        z-index: 2;
+                        background: #ffc40d;
+                    }
+
+                    #DemoTargetA .area .target.target-b{
+                        padding-top: 40px;
+                        padding-bottom: 40px;
+                    }
+
+                    #DemoTargetA .area .target.target-c{
+                        padding-top: 60px;
+                        padding-bottom: 60px;
+                    }
+
+                    #DemoTargetA ul.obj-holder .obj.obj-b + .obj-b{
+                        margin-left: -28%;
+                    }
+
+                    #DemoTargetA ul.obj-holder .obj.obj-c{
+                        margin-left: 3%;
+                    }
+
+                    #DemoTargetA ul.obj-holder .obj.green{
+                        background: #62c462;
+                    }
+
+                    #DemoTargetA ul.obj-holder .obj.red{
+                        background: #ee5f5b;
+                    }
+
+                    #DemoTargetA ul.obj-holder .obj.blue{
+                        background: #049cdb;
+                    }
+
+
+                </style>
+                <script>
+                    window.addEventListener("load",function(){
+                        var targetManger,objs,targets,
+                            root = document.getElementById("DemoTargetA"),
+                            targetAreaEl = root.getElementsByClassName("area-a")[0],
+                            targetEls = targetAreaEl.getElementsByClassName("target"),
+                            objEls = targetAreaEl.getElementsByClassName("obj"),
+                            classForTargets=["green","red","blue"];
+
+                            objs = Array.prototype.slice.call(objEls).map(function(el,i){
+                                return new MultiDrag.Obj(el,{parent:targetAreaEl});
+                            });
+
+                            targets = Array.prototype.slice.call(targetEls).map(function(el,i){
+                                return new MultiDrag.Target(el,objs,{
+                                    parent:targetAreaEl,
+                                    onAdd:function(obj){
+                                        MultiDrag.util.addClass(obj.el,classForTargets[i]);
+                                    },
+                                    onRemove:function(obj){
+                                        MultiDrag.util.removeClass(obj.el,classForTargets[i]);
+                                    }
+                                });
+                            });
+                            targetManger = new MultiDrag.TargetManager(targetAreaEl,objs,targets);
+                    });
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+        </div>
+
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoTargetB" class="demo-html">
+                    <div class="area area-a">
+                        <div class="target target-a">
+                            dropzone A
+                        </div>
+                        <ul class="obj-holder">
+                            <li class="obj obj-a">
+                                <i class=" icon-move"></i>
+                                A<small>(origin)</small>
+                            </li>
+                            <li class="obj obj-b">
+                                <i class=" icon-move"></i>
+                                B<small>(clone)</small>
+                            </li>
+                            <li class="obj obj-b">
+                                <i class=" icon-move"></i>
+                                B<small>(clone)</small>
+                            </li>
+                            <li class="obj obj-b">
+                                <i class=" icon-move"></i>
+                                B<small>(clone)</small>
+                            </li>
+                            <li class="obj obj-b">
+                                <i class=" icon-move"></i>
+                                B<small>(clone)</small>
+                            </li>
+                            <li class="obj obj-c">
+                                <i class=" icon-move"></i>
+                                C<small>(origin)</small>
+                            </li>
+                            <li class="obj obj-d">
+                                <i class=" icon-move"></i>
+                                D<small>(origin)</small>
+                            </li>
+                            <li class="obj obj-e">
+                                <i class=" icon-move"></i><br/>
+                                E<small>(origin)</small>
+                            </li>
+                            <li class="obj obj-f">
+                                <i class=" icon-move"></i><br/>
+                                F<small>(origin)</small>
+                            </li>
+                            <li class="obj obj-h">
+                                <i class=" icon-move"></i><br/>
+                                H<small>(origin)</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <style>
+                    #DemoTargetB{
+                        padding: 2%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        overflow: hidden;
+                    }
+
+                    #DemoTargetB small{
+                        color: #999999;
+                        font-size: 11px;
+                        line-height: 11px;
+                    }
+
+                    #DemoTargetB .area{
+                        position: relative;
+                        padding: 3%;
+                        margin: 2%;
+                        width: 88%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        float: left;
+                    }
+
+                    #DemoTargetB .area .target{
+                        margin: 1%;
+                        padding: 2%;
+                        padding-top: 80px;
+                        padding-bottom: 80px;
+                        border: 1px dashed #333;
+                        text-align: center;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                    }
+
+
+                    #DemoTargetB ul.obj-holder{
+                        list-style: none;
+                        clear: both;
+                        margin: 4%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        float: left;
+                    }
+
+                    #DemoTargetB ul.obj-holder .obj{
+                        width: 24%;
+                        margin: 1% 4%;
+                        padding: 9px 0;
+                        font-size: 15px;
+                        color: #333;
+                        cursor: move;
+                        text-align: center;
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        background: #f5f5f5;
+                        position: relative;
+                        float: left;
+                    }
+
+                    #DemoTargetB ul.obj-holder .obj.active{
+                        z-index: 2;
+                        background: #ffc40d;
+                    }
+
+                    #DemoTargetB ul.obj-holder .obj.obj-b + .obj-b{
+                        margin-left: -28%;
+                    }
+
+                    #DemoTargetB ul.obj-holder .obj.obj-a{
+                        width: 18%;
+                    }
+                    #DemoTargetB ul.obj-holder .obj.obj-c{
+                        width: 20%;
+                    }
+                    #DemoTargetB ul.obj-holder .obj.obj-d{
+                        width: 28%;
+                    }
+                    #DemoTargetB ul.obj-holder .obj.obj-e{
+                        width: 16%;
+                    }
+                    #DemoTargetB ul.obj-holder .obj.obj-f{
+                        width: 16%;
+                        padding: 18px 0;
+                    }
+
+                    #DemoTargetB ul.obj-holder .obj.obj-h{
+                        width: 16%;
+                        padding: 24px 0;
+                    }
+
+                    #DemoTargetB ul.obj-holder .obj.ontarget{
+                        background: #ee5f5b;
+                    }
+
+                </style>
+                <script>
+                    window.addEventListener("load",function(){
+                        var targetManger,objs,targets,
+                            root = document.getElementById("DemoTargetB"),
+                            targetAreaEl = root.getElementsByClassName("area-a")[0],
+                            targetEls = targetAreaEl.getElementsByClassName("target"),
+                            objEls = targetAreaEl.getElementsByClassName("obj");
+
+                            objs = Array.prototype.slice.call(objEls).map(function(el,i){
+                                return new MultiDrag.Obj(el,{parent:targetAreaEl});
+                            });
+
+                            targets = Array.prototype.slice.call(targetEls).map(function(el,i){
+                                var target = new MultiDrag.Target(el,objs,{
+                                    parent:targetAreaEl,
+                                    positioning:MultiDrag.positionFactory(MultiDrag.positionType.notCrossing)(function(){
+                                        return target.getRectangle();
+                                    }),
+                                    sorting:MultiDrag.sortingFactory(MultiDrag.positionType.notCrossing)(),
+                                    onAdd:function(obj){
+                                        MultiDrag.util.addClass(obj.el,"ontarget");
+                                    },
+                                    onRemove:function(obj){
+                                        MultiDrag.util.removeClass(obj.el,"ontarget");
+                                    }
+                                });
+                                return target;
+                            });
+                            targetManger = new MultiDrag.TargetManager(targetAreaEl,objs,targets);
+                    });
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+        </div>
+
+
+    </section>
+
+    <section id="Spider">
+        <div class="page-header">
+            <h1>MultiDrag.Spider <small>basic library element </small></h1>
+        </div>
+        <h2>Description</h2>
+        <div class="row">
+            <div class="span6">
+                <p>
+                    "Сітка" - використовуеться для задання вектору вибору, вона складаеться з променів по яких рухаються повзунки.
+                    Позиціонувати елементи не потрібно їх позиції задасть <code>MultiDrag.Spider</code> при ініціалізації.
+                </p>
+                <h3>constructor / initialize</h3>
+                <p>
+                    <code>Spider(area, elements, options)</code> Конструктор включає 3 параметра :<br/>
+                    <code>area</code> - HTMLElement який визначає робочу область <br/>
+                    <code>elements</code> - масив HTMLElement-ів, які будуть задавати вектори<br/>
+                    <code>targets</code> -  масив <code>MultiDrag.Target</code>-ів, з якими працює менеджер<br/>
+                    <code>options</code> - необов'язковий аргумент, який включає властовості що по замовчуванню визначені.
+                </p>
+                <h5>Опис властивостей</h5>
+                <p>
+                    <code>angle</code> початковий кут від якого будуть відкладатися кути інших "променів"<br/>
+                    <code>dAngle</code> кут між 2 "променями"<br/>
+                    <code>center</code> центр від якого відходять "промені" <br/>
+                    <code>startRadius</code> нижне обмеження повзунка <br/>
+                    <code>endRadius</code> верхне обмеження повзунка <br/>
+                    <code>lineWidth,strokeStyle,fillStyle</code> стилізація "path" який буде відображуватися на бекграунді "сітки" <br/>
+                </p>
+            </div>
+            <div class="span6">
+                <h5>Значення по замовчуванню:</h5>
+                <pre class="prettyprint linenums">
+angle:0,
+dAngle:2 * Math.PI / elements.length,
+center:areaRectangle.getCenter(),
+startRadius:50,
+endRadius:mathPoint.createRectangleFromElement(area, area).getMinSide() / 2,
+lineWidth:2,
+strokeStyle:"#ff5577",
+fillStyle:"rgba(150,255,50,0.8)"
+                </pre>
+                <h3>TODO</h3>
+                <ul>
+                    <li>додати можливість моніторингу значень </li>
+                    <li>позбити сітку на фіксовані величини</li>
+                </ul>
+            </div>
+        </div>
+        <h2>Demonstration</h2>
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoSpider" class="demo-html">
+                        <ul class="spider">
+                            <li>A</li>
+                            <li>B</li>
+                            <li>C</li>
+                            <li>D</li>
+                            <li>E</li>
+                            <li>F</li>
+                            <li>H</li>
+                        </ul>
+                </div>
+                <style>
+
+
+                    #DemoSpider{
+                        padding: 5%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        overflow: hidden;
+                        position: relative;
+                    }
+
+                    #DemoSpider ul.spider{
+                        height: 400px;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                        overflow: hidden;
+                        list-style: none;
+                    }
+
+                    #DemoSpider ul.spider li{
+                        margin: 20px;
+                        display: block;
+                        float: left;
+                        padding: 9px 14px;
+                        font-size: 15px;
+                        color: #333;
+                        cursor: move;
+                        border: 1px solid #333;
+                        border-radius: 25px;
+                        background: #f5f5f5;
+                        position: relative;
+                    }
+
+                    #DemoSpider ul.spider li.active{
+                        z-index: 2;
+                        background: #ffc40d;
+                    }
+
+
+                </style>
+                <script>
+                    window.addEventListener("load",function(){
+                        var spider,
+                            root = document.getElementById("DemoSpider"),
+                            areaEl = root.getElementsByClassName("spider")[0],
+                            objEls = [].splice.call(areaEl.getElementsByTagName("li"),0);
+
+                        spider = new MultiDrag.Spider(areaEl,objEls);
+
+                    });
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+        </div>
+    </section>
+
+    <section id="MathPoint">
+        <div class="page-header">
+            <h1>mathPoint</h1>
+        </div>
+        <div class="row">
+            <div class="span6">
+                <h3>Point</h3>
+                <p>
+                    <code>Point(x, y)</code> "Точка" - використовуеться скрізь в бібліотеці.
+                </p>
+                <h4>Metods</h4>
+                <p>
+                    <code>add(point)</code> - додати вектор<br/>
+                    <code>sub(point)</code> - відняти вектор<br/>
+                    <code>mult(k)</code> - помножити вектор на коефіціент<br/>
+                    <code>negative()</code> - негативний вектор<br/>
+                    <code>compare(point)</code> - порівнює точки<br/>
+                    <code>clone()</code> - створення копії точки<br/>
+                </p>
+                <h3>Rectangle</h3>
+                <p>
+                    <code>Rectangle(position, size)</code> "Прямокутник" - фінгура якій притаманна позиція та розміри, позиція задає лівий верхній кут прямокутника.
+                </p>
+                <h4>Metods</h4>
+                <p>
+                    <code>getP1()</code> - повертає ліву верхню вершину прямокутника<br/>
+                    <code>getP2()</code> - повертає праву верхню вершину прямокутника<br/>
+                    <code>getP3()</code> - повертає праву нижню вершину прямокутника<br/>
+                    <code>getP4()</code> - повертає ліву нижню вершину прямокутника<br/>
+                    <code>getCenter()</code> - повертає центр(полюс) фігури<br/>
+                    <code>or(rect)</code> - повертає обеднаний прямокутник, який включає всі точки вхідних пррямокутників<br/>
+                    <code>and(rect)</code> - повертає перетин прямокутників, прямокутник який включає всі точки які співпадають у вхідних пррямокутниках<br/>
+                    <code>isOn(point)</code> - перевірка на входження точки<br/>
+                    <code>moveToBound(rect[, axis])</code> - переміщує вхідний прямокутник за межі заданого, якщо задана вісь <code> axis = ["y" | "x"]</code> то прямокутник переміститься вздовж неї <br/>
+                    <code>getSquare()</code> - повертає площу прямокутника<br/>
+                    <code>getMinSide()</code> - повертає розмір меншої сторони<br/>
+                    <code>growth(size)</code> - збільшує  прямокутника з фіксацією ценру прямокутника<br/>
+                </p>
+            </div>
+            <div class="span6">
+                <h3>mathPoint</h3>
+                <p>
+                    <code>mathPoint</code> - утилітний обєкт з набором функций для роботи з геометричними обєктами.
+                </p>
+                <h4>Metods</h4>
+                <p>
+                    <code>getAVG([point1,point2,point3,....])</code> - повертає середнє арифметичне вхіднич точок<br/>
+                    <code>getLength(options)</code> - фабрика побудови метрики (функції для визначення відстані між 2 точками),
+                        <code>options={x,y,isTransformationSpace}</code> задання властивостей <code>x</code>, <code>y</code> додає вісі в метрику визначення відстаней,
+                        якщо прапор <code>isTransformationSpace</code> заданий true тоді відбувається трансформація простору  а коефіціенти  <code>x,y</code> задають розтягнення стиснення координат,
+                        фукционал трасформації необхідний для виділення пріоритетної вісі, яка є більш важливою при виявленні наближених точок.<br/>
+                    <code>indexOfNearPoint(arr, val, radius, getLength)</code> - повертає індекс найближчої точки з масива <code>arr</code> до заданої <code>val</code>,
+                        пошук точок обмежуеться радіусом <code>radius</code>, а спосіб визначення відстанні передаеться як функція <code>getLength</code>.<br/>
+                    <code>bound(min, max, val)</code> - приводить число до входження в заданим інтервал<br/>
+                    <code>boundPoint(min, max, val)</code> - приводить точку до входження в прямокутну область<br/>
+                    <code>directCrossing(L1P1, L1P2, L2P1, L2P2)</code> - повертає точку пересічення 2 прямих задамними точками <code>L1P1, L1P2</code> та  <code>L2P1, L2P2</code><br/>
+                    <code>boundOnLine(LP1, LP2, P)</code> - переносить задану точку  <code>P</code> на пряму <code>LP1, LP2</code> шляхом відкладання перпендикуляра на пряму <br/>
+                    <code>getPointInLine(LP1, LP2, percent)</code> - знаходить точку на відрізку яка знаходиться на відстані <code>percent*(LP2-LP1)</code> від першої точки <br/>
+                    <code>getPointInLineByLenght(LP1, LP2, lenght)</code> - знаходить точку на відрізку яка знаходиться на відстані <code>lenght</code> від першої точки <br/>
+                    <code>createRectangleFromElement(el,parent,isContentBoxSize,isConsiderTranslate)</code> - створює прямокутник на основі лайоуту елемента,
+                        центр декартової системи задає верхній лівий кут <code>parent</code>-а,isContentBoxSize - прапор який включає в розміри прямокутника padding та border,
+                        isConsiderTranslate - прапор врахування css властивостей -webkit-translate  при знаходженні позиції<br/>
+                    <code>getSizeOfElement(el,isContentBoxSize)</code> - знаходить розміри елемента <br/>
+                    <code>getOffset(el,parent,isConsiderTranslate)</code> - знаходить позицію елемента <br/>
+                    <code>getPointFromRadialSystem(angle,length,center)</code> - переводить в декартову ситсему, точку заданою полярною системою <br/>
+                    <code>addPointToBoundPoints(boundpoints,point,isRight)</code> - використовується для "soft"-ого флоата елементів <br/>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="bound">
+        <div class="page-header">
+            <h1>bound</h1>
+        </div>
+        <div class="row">
+            <div class="span6">
+                <p>
+                    Для створення обмежень існує фабрика <code>MultiDrag.boundFactory</code> яка приймає тип обмеження.
+                    Існують наступні обмеження:
+                </p>
+                <ul>
+                    <li>
+                        <code>MultiDrag.boundType.element</code> - обмеження не виходу за межі елемента, де <code>parent</code> задає систему координат а, а <code>el</code> - задає обмеження <br>
+                        <pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.element)(el, parent)</pre>
+                    </li>
+                    <li>
+                        <code>MultiDrag.boundType.rectangle</code> - обмеження не виходу за межі прямокутника <code>rectangle</code>
+                        <pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.rectangle)(rectangle)</pre>
+                    </li>
+                    <li>
+                        <code>MultiDrag.boundType.lineX</code> - руху по осі X координта <code>x</code> з заданими обмеженнями по вертикалі <code>startY, endY</code>
+                        <pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.lineX)(x, startY, endY)</pre>
+                    </li>
+                </ul>
+            </div>
+            <div class="span6">
+                <ul>
+                    <li>
+                        <code>MultiDrag.boundType.lineY</code> - руху по осі Y координта <code>y</code> з заданими обмеженнями по горизонталі <code>startX, endX</code>
+                        <pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.lineY)(y, startX, endX)</pre>
+                    </li>
+                    <li>
+                        <code>MultiDrag.boundType.line</code> - рух по відрізку заданий точками <code>start, end</code>
+                        <pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.line)(start, end)</pre>
+                    </li>
+                </ul>
+                <h3>TODO</h3>
+                <ul>
+                    <li>додати збірні обмеження які  складатимуться з звязаних прямокутників</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="position">
+        <div class="page-header">
+            <h1>position</h1>
+        </div>
+        <div class="row">
+            <div class="span6">
+            <p>
+                Модуль position складаеться з 2 фабрик. Фабрика  <code>MultiDrag.sortingFactory</code> - сортує обекти,<code>MultiDrag.positionFactory</code> - позиціонує обєкти, тип поведінки залежить від обраної стратегії:
+            </p>
+            <ul>
+                <li>
+                    <code>MultiDrag.positionType.notCrossing</code>
+                    порядок сортування при данный стратегії не змінюеться.
+                    <pre class="prettyprint linenums">MultiDrag.sortingFactory(MultiDrag.positionType.notCrossing)()</pre>
+                    при позиціонуванні з данною стратегією поведінки обєкти зміщуються таким чином щоб уникнути перетинання
+                    <pre class="prettyprint linenums">MultiDrag.positionFactory(MultiDrag.positionType.notCrossing)(rectangle,options)</pre>
+                </li>
+                <li>
+                    <code>MultiDrag.positionType.floatLeft</code>
+                    порядок сортування в данній стратегії визначаеться в залежності від попередньої позиції елементів до якої методом вставки додаються нові елементи
+                    <pre class="prettyprint linenums">MultiDrag.sortingFactory(MultiDrag.positionType.floatLeft)(radius,getLength,options)</pre>
+                </li>
+                <li>
+                    <code>MultiDrag.positionType.floatRight</code>
+                    сортування та позиціонування для цієї стратегії схоже з попередньої змінюеться лише, позиціонування яка іде з правого боку.
+                </li>
+            </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>
+            Designed by Vitaliy Yarovuy (vitaliy.yarovuy@qa-power.com)
+        </p>
+    </footer>
+</div>
+
+<script id="codeViewTemplate" type="text/template">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab_{{id}}_html" data-toggle="tab">html</a></li>
+        <li><a href="#tab_{{id}}_css" data-toggle="tab">css</a></li>
+        <li><a href="#tab_{{id}}_js" data-toggle="tab">js</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_{{id}}_html">
+            <pre class="prettyprint linenums">{{html}}</pre>
+        </div>
+        <div class="tab-pane" id="tab_{{id}}_css">
+            <pre class="prettyprint linenums">{{css}}</pre>
+        </div>
+        <div class="tab-pane" id="tab_{{id}}_js">
+            <pre class="prettyprint linenums">{{js}}</pre>
+        </div>
+    </div>
+</script>
+<!-- bootstrap -->
+<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+<script src="bootstrap/js/jquery.js"></script>
+<script src="bootstrap/js/google-code-prettify/prettify.js"></script>
+<script src="bootstrap/js/bootstrap-transition.js"></script>
+<script src="bootstrap/js/bootstrap-alert.js"></script>
+<script src="bootstrap/js/bootstrap-modal.js"></script>
+<script src="bootstrap/js/bootstrap-dropdown.js"></script>
+<script src="bootstrap/js/bootstrap-scrollspy.js"></script>
+<script src="bootstrap/js/bootstrap-tab.js"></script>
+<script src="bootstrap/js/bootstrap-tooltip.js"></script>
+<script src="bootstrap/js/bootstrap-popover.js"></script>
+<script src="bootstrap/js/bootstrap-button.js"></script>
+<script src="bootstrap/js/bootstrap-collapse.js"></script>
+<script src="bootstrap/js/bootstrap-carousel.js"></script>
+<script src="bootstrap/js/bootstrap-typeahead.js"></script>
+
+<!-- MultiDrag -->
+<script src="../util.js"></script>
+<script src="../point.js"></script>
+<script src="../bound.js"></script>
+<script src="../positioning.js"></script>
+<script src="../obj.js"></script>
+<script src="../list.js"></script>
+<script src="../listswitcher.js"></script>
+<script src="../spider.js"></script>
+<script src="../target.js"></script>
+<script src="../targetManager.js"></script>
+
+<!-- setup -->
+<script src="mustache.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
