@@ -292,7 +292,7 @@
 		},
 		createCanvas: function(area, rectagle){
 			var canvas;
-			if(window.getComputedStyle(area)["position"] === "static"){
+			if(window.getComputedStyle(area).position === "static"){
 				area.style.position = "relative";
 			}
 			canvas = document.createElement("canvas");

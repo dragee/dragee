@@ -1,0 +1,29 @@
+{
+  "name": "multidrag",
+  "version": "0.8.0",
+  "description": "drag&drop framework",
+  "dependencies": {
+    "grunt": "~0.4.2",
+    "underscore": "*",
+    "console-browserify": "*",
+    "cli": "*",
+    "shelljs": "*",
+    "minimatch": "*",
+    "grunt-contrib-jshint": "~0.6.3",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-contrib-qunit": "*",
+    "grunt-contrib-watch": "*",  
+    "grunt-contrib-concat": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:vitaliy_yarovuy/multidrag.git"
+  },
+  "author": "Vitaliy Yarovuy",
+  "license": "ISC"
+}

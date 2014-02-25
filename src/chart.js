@@ -88,7 +88,7 @@
 			if(index!=-1){
 				that.setActiveArc(that.activeArcIndex !== index ?index : -1);
 			}
-		})
+		});
 	};
 
 	Chart.prototype.updateAngles = function (){
@@ -106,7 +106,7 @@
 				i += that.angles.length;
 			}
 			return mathPoint.normalizeAngle(that.angles[i] - sign * that.options.boundAngle);
-		}
+		};
 	};
 
 	Chart.prototype.draw = function (){

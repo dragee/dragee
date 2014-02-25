@@ -66,12 +66,12 @@
 	ListSwitcher.prototype.getSortedObjs = function(){
 		return this.objs.map(
 				function(obj){
-					return	 obj.initPosition;
+					return obj.initPosition;
 				}).map(function(position){
-						   return this.objs.filter(function(obj){
-							   return obj.fixPosition.compare(position) || obj.fixPosition.compare(position.add(this.options.stepOn));
-						   }, this)[0];
-					   }, this);
+					return this.objs.filter(function(obj){
+						return obj.fixPosition.compare(position) || obj.fixPosition.compare(position.add(this.options.stepOn));
+					}, this)[0];
+				}, this);
 	};
 
 	ListSwitcher.prototype.reset = function(){

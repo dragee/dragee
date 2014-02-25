@@ -1,0 +1,22 @@
+{
+  "name": "multidrag",
+  "version": "0.8.0",
+  "description": "drgag&drop framework",
+  "main": ["build/multidrag.js", "build/multidrag.min.js"],
+  "dependencies": {
+    "get-style-property": "desandro/get-style-property"
+  },
+  "authors": [
+    "Vitaliy Yarovuy",
+    "Vladimir Myskov"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "documentation"
+  ]
+}

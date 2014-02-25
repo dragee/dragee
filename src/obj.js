@@ -20,7 +20,9 @@
 			throw message;
 		}
 		objs.push(obj);
-	};
+	},
+	transformProperty = getStyleProperty('transform'),
+	transitionDurationProperty = getStyleProperty('transition-duration');
 
 	function Obj(el, options){
 				options = options || {};
@@ -99,25 +101,38 @@
 
 	Obj.prototype._setTranslate = function(point){
 		this._transformPosition = point;
-		var webkitTransform = this.el.style.webkitTransform, webkitTranslateCss = 'translate3d(' + point.x + 'px,' + point.y + 'px,0px)';
-		if(!/translate3d\([^)]+\)/.test(webkitTransform)){
-			webkitTransform += webkitTranslateCss;
+
+		var transform = this.el.style[transformProperty], 
+			translateCss = ' translate3d(' + point.x + 'px,' + point.y + 'px, 0px)';
+		if(!/translate3d\([^)]+\)/.test(transform)){
+			transform += translateCss;
 		}else{
-			webkitTransform = webkitTransform.replace(/translate3d\([^)]+\)/, webkitTranslateCss);
+			transform = transform.replace(/translate3d\([^)]+\)/, translateCss);
 		}
-		this.el.style.webkitTransform = webkitTransform;
+		this.el.style[transformProperty] = transform;
 	};
 
 	Obj.prototype.move = function(point, time, isFix, isSilent){
+		var that = this;
 		time = time || 0;
 		point = point.clone();
 		if(isFix){
 			this.fixPosition = point;
 		}
 		this.position = point;
-		this.el.style.webkitTransitionDuration = time + "ms";
+		requestAnimationFrame(function(){
+			transitionDurationProperty && (that.el.style[transitionDurationProperty] = time + "ms");
+			that._setTranslate(point.sub(that.offset));
+			isSilent || that.onMove.fire();
+		});
+	};
+
+	Obj.prototype.setPosition = function(point){
+		point = point.clone();
+		this.position = point;
+
+		transitionDurationProperty && (this.el.style[transitionDurationProperty] = "0ms");
 		this._setTranslate(point.sub(this.offset));
-		isSilent || this.onMove.fire();
 	};
 
 	Obj.prototype.dragStart = function(event){

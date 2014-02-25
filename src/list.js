@@ -40,7 +40,7 @@
 					obj.onMove.remove(moveHandler);
 					return true;
 				}
-			}
+			};
 			obj.onEnd.add(function(){
 				that.onEndDisplaycement(this);
 				obj.onMove.add(moveHandler);
@@ -125,7 +125,7 @@
 	List.prototype.getSortedObjs = function(){
 		var sortedObjs,
 			initPositions = this.objs.map(function(obj){
-				return 	obj.initPosition;
+				return obj.initPosition;
 			});
 		sortedObjs = initPositions.map(function(position){
 			return this.objs.filter(function(obj){
@@ -158,7 +158,7 @@
 
 	List.prototype.remove = function(objs){
 		var j, initPositions = this.objs.map(function(obj){
-				return 	obj.initPosition;
+				return obj.initPosition;
 			}),
 			list = [],
 			sortedObj = this.getSortedObjs();
