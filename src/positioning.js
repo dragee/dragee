@@ -11,7 +11,7 @@
 			case positionType.notCrossing:
 				return function(rectangle, options){
 					var i, opts = {
-						isRemove: true
+						removable: true
 					}
 					for(i in options){
 						opts[i] = options[i];
@@ -24,17 +24,17 @@
 							return indexes;
 						}, []);
 						indexesOfNews.forEach(function(index){
-							var rect = rectangleList[index], isRemove = false;
+							var rect = rectangleList[index], removable = false;
 							staticRectangleIndexes.forEach(function(indexOfStatic){
 								var staticRect = rectangleList[indexOfStatic];
 								rect = staticRect.moveToBound(rect);
 							});
-							isRemove = staticRectangleIndexes.some(function(indexOfStatic){
+							removable = staticRectangleIndexes.some(function(indexOfStatic){
 								var staticRect = rectangleList[indexOfStatic];
 								return  !!staticRect.and(rect);
 							}) || rect.and(boundRect).getSquare() !== rect.getSquare();
-							if(isRemove){
-								rect.isRemove = true;
+							if(removable){
+								rect.removable = true;
 							}else{
 								staticRectangleIndexes.push(index);
 							}
@@ -45,9 +45,10 @@
 			case positionType.floatLeft:
 				return function(rectangle, options){
 					var i, opts = {
-						paddingTopLeft: new Point(5, 5),
+						paddingTopLeft: new Point(0, 0),
 						paddingBottomRight: new Point(0, 0),
-						isRemove: true
+						yGapBetweenDraggables: 0,
+						removable: true
 					}
 					for(i in options){
 						opts[i] = options[i];
@@ -58,17 +59,17 @@
 						rectangleList.forEach(function(rect, index){
 							var position, isValid = false;
 							for(i = 0; i < boundaryPoints.length; i++){
-								position = (new Point(boundaryPoints[i].x, i > 0 ? boundaryPoints[i - 1].y : boundRect.position.y)).add(opts.paddingTopLeft);
+								position = (new Point(boundaryPoints[i].x, i > 0 ? (boundaryPoints[i - 1].y + opts.yGapBetweenDraggables) : boundRect.position.y)).add(opts.paddingTopLeft);
 								if(isValid = (position.x + rect.size.x < rectP2.x)){
 									break;
 								}
 							}
 							if(!isValid){
-								position = (new Point(boundRect.position.x, boundaryPoints[boundaryPoints.length - 1].y)).add(opts.paddingTopLeft);
+								position = (new Point(boundRect.position.x, boundaryPoints[boundaryPoints.length - 1].y + opts.yGapBetweenDraggables)).add(opts.paddingTopLeft);
 							}
 							rect.position = position;
-							if(opts.isRemove && rect.getP3().y > boundRect.getP3().y){
-								rect.isRemove = true;
+							if(opts.removable && rect.getP3().y > boundRect.getP3().y){
+								rect.removable = true;
 							}
 							boundaryPoints = mathPoint.addPointToBoundPoints(boundaryPoints, rect.getP3().add(opts.paddingBottomRight));
 						});
@@ -80,7 +81,7 @@
 					var paddingTopNegRight, paddingBottomNegLeft, i, opts = {
 						paddingTopRight: new Point(5, 5),
 						paddingBottomLeft: new Point(0, 0),
-						isRemove: true
+						removable: true
 					}
 					for(i in options){
 						opts[i] = options[i];
@@ -101,8 +102,8 @@
 								position = new Point(boundRect.getP2().x, boundaryPoints[boundaryPoints.length - 1].y);
 							}
 							rect.position = position;
-							if(opts.isRemove && rect.getLeftBottomPoint().y > boundRect.getP4().y){
-								rect.isRemove = true;
+							if(opts.removable && rect.getLeftBottomPoint().y > boundRect.getP4().y){
+								rect.removable = true;
 							}
 							boundaryPoints = mathPoint.addPointToBoundPoints(boundaryPoints, rect.getP4().add(paddingBottomNegLeft), true);
 						});
@@ -142,7 +143,7 @@
 							var index = mathPoint.indexOfNearPoint(listOldPosition, opts.getPosition(newObj), radius, getLength);
 							if(index === -1){
 								index = newList.length;
-							}else{
+							} else {
 								index = newList.indexOf(oldObjsList[index]);
 							}
 							newList.splice(index, 0, newObj);

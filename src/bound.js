@@ -14,21 +14,27 @@
 	function boundFactory(type){
 		switch(type){
 			case boundType.element:
-				return function(el, parent){
+				return function(element, parent){
 					var bound,
 						retFunc = function(){
-							return bound.apply(this,arguments);
+							return bound.apply(this, arguments);
 						};
+
 					retFunc.refresh = function(){
-						bound = boundFactory(boundType.rectangle)(mathPoint.createRectangleFromElement(el, parent));
+						bound = boundFactory(boundType.rectangle)(
+							mathPoint.createRectangleFromElement(element, parent)
+						);
 					};
+
 					retFunc.refresh();
 					return retFunc;
 				};
 			case boundType.rectangle:
 				return function (rectangle){
 					return function (point, size){
-						var calcPoint = point.clone(), rectP2 = rectangle.getP3();
+						var calcPoint = point.clone(), 
+							rectP2 = rectangle.getP3();
+
 						if(rectangle.position.x > calcPoint.x){
 							(calcPoint.x = rectangle.position.x);
 						}
@@ -79,38 +85,33 @@
 						someK = 10,
 						cosBeta = Math.cos(beta),
 						sinBeta = Math.sin(beta);
+
 					return function (point, size){
 						var point2 = new Point(point.x + someK * cosBeta, point.y + someK * sinBeta),
 							pointCrossing = mathPoint.directCrossing(start, end, point, point2),
 							newEnd = mathPoint.getPointInLineByLenght(end, start, size.x);
+
 						pointCrossing = mathPoint.boundOnLine(start, newEnd, pointCrossing);
 						return pointCrossing;
 					};
 				};
-			//todo add realization
-			case boundType.unificationOfRectangle:
-				return function (rectangles){
-					return function (point, size){
-						return point.clone();
-					};
-				};
 			case boundType.circle:
-				return function(center,radius){
+				return function(center, radius){
 					return function (point, size){
 						var boundedPoint = mathPoint.getPointInLineByLenght(center,point,radius);
-						console.log(point.toString(),boundedPoint.toString());
 						return boundedPoint;
 					};
 				};
 			case boundType.arc:
-				return function(center,radius,startAgle,endAngle){
+				return function(center, radius, startAgle, endAngle){
 					return function (point, size){
 						var boundStartAngle = typeof startAgle === "function" ? startAgle() : startAgle,
 							boundEndtAngle = typeof startAgle === "function" ? endAngle() : endAngle,
-							angle = mathPoint.getAngle(center,point);
+							angle = mathPoint.getAngle(center, point);
+
 						angle = mathPoint.normalizeAngle(angle);
-						angle = mathPoint.boundAngle(boundStartAngle,boundEndtAngle,angle);
-						return mathPoint.getPointFromRadialSystem(angle,radius,center);
+						angle = mathPoint.boundAngle(boundStartAngle, boundEndtAngle, angle);
+						return mathPoint.getPointFromRadialSystem(angle, radius, center);
 					};
 				};
 		}

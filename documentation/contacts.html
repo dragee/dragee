@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>MultiDrag library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0">
+
+    <!-- Le styles -->
+    <link href="style.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+
+</head>
+
+<body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="index.html">MultiDrag Documentation</a>
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li class="active"><a href="#">Contact</a></li>
+                </ul>
+                <a href="#" class="btn"> Download MultiDrag <small>(v0.0.1)</small></a>
+                <a href="#" class="btn btn-primary" >View project on GitHub</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <header class="jumbotron subhead" id="overview">
+        <h1>MultiDrag</h1>
+        <p class="lead">MultiDrag - drag&drop framework for desktop and mobile apps</p>
+
+        <div class="subnav">
+            <ul class="nav nav-pills">
+                <li><a href="#VM">Volodymyr Myskov</a></li>
+                <li><a href="#VY">Vitaliy Yaroviy</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section id="VM">
+        <div class="page-header">
+            <h1>
+                Volodymyr Myskov
+            </h1>
+        </div>
+        <div class="row">
+            <div class="span6">
+                <p>
+                    <code>email</code> jaromudr@gmail.com<br>
+                    <code>skype</code> val_de_moor
+                </p>
+            </div>
+        </div>
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+<div id="DemoReRoMove" class="demo-html">
+    <img src="images/cat.jpg" data-x="300" data-y="230" data-angle="350">    
+    <img src="images/bear.jpg" data-x="-30" data-y="250" data-angle="-350">
+    <img src="images/horse.jpg" data-x="-50" data-y="20" data-angle="-370"> 
+    <img src="images/wolf.jpg" data-x="300" data-y="20" data-angle="-20"> 
+</div>
+                <style>
+#DemoReRoMove {
+    position: relative;
+    height: 400px;
+    background: #eee;
+}
+
+#DemoReRoMove img{
+    
+}
+
+.re-ro-block {
+    position: absolute;
+    z-index: 1;
+    cursor: move;
+}
+
+.re-ro-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    width: 0px;
+    cursor: move;
+    z-index: 11;
+}
+
+.re-ro-corner[data-role="rotate"] {
+    cursor: crosshair;
+}
+
+.re-ro-corner.selected {
+    opacity: 1;
+}
+
+.re-ro-corner:after {
+    position: absolute;
+    content: "";
+    left: -10px;
+    top: -10px;
+    width: 12px;
+    height: 12px;
+    border: 4px solid rgba(255, 50, 40, 0.5);
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+}
+                </style>
+                <script>
+window.addEventListener("load", function(){
+    var root = document.getElementById("DemoReRoMove"),
+        images = [];
+
+    [].forEach.call(root.querySelectorAll("img"), function(element){
+        var reRoMove = new ReRoMove(element, root, {
+            scale: 1
+        });
+
+        images.push(reRoMove);
+
+        reRoMove.draggable.move(
+            new Point(
+                +element.getAttribute("data-x"),
+                +element.getAttribute("data-y")
+            ), 3000
+        );
+
+        reRoMove.rotate(+element.getAttribute("data-angle"));
+
+        element.addEventListener("click", function(){
+            images.forEach(function(im){
+                im.deselect();
+            });
+
+            reRoMove.select();
+        });
+
+        setTimeout(function(){
+            reRoMove.draggable.setZeroTransition();
+            
+        }, 3000)
+        
+    });
+});
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+        </div>
+    </section>
+
+    <section id="VY">
+        <div class="page-header">
+            <h1>
+                Vitaliy Yaroviy
+            </h1>
+        </div>
+        <div class="row">
+            <div class="span6">
+                <p>
+                    <code>email</code><br>
+                    <code>skype</code>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>
+            Designed by Vitaliy Yarovuy (vitaliy.yarovuy@qa-power.com)
+        </p>
+    </footer>
+</div>
+
+<script id="codeViewTemplate" type="text/template">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab_{{id}}_html" data-toggle="tab">html</a></li>
+        <li><a href="#tab_{{id}}_css" data-toggle="tab">css</a></li>
+        <li><a href="#tab_{{id}}_js" data-toggle="tab">js</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_{{id}}_html">
+            <pre class="prettyprint linenums">{{html}}</pre>
+        </div>
+        <div class="tab-pane" id="tab_{{id}}_css">
+            <pre class="prettyprint linenums">{{css}}</pre>
+        </div>
+        <div class="tab-pane" id="tab_{{id}}_js">
+            <pre class="prettyprint linenums">{{js}}</pre>
+        </div>
+    </div>
+</script>
+<!-- bootstrap -->
+<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+<script src="bootstrap/js/jquery.js"></script>
+<script src="bootstrap/js/google-code-prettify/prettify.js"></script>
+<script src="bootstrap/js/bootstrap-transition.js"></script>
+<script src="bootstrap/js/bootstrap-alert.js"></script>
+<script src="bootstrap/js/bootstrap-modal.js"></script>
+<script src="bootstrap/js/bootstrap-dropdown.js"></script>
+<script src="bootstrap/js/bootstrap-scrollspy.js"></script>
+<script src="bootstrap/js/bootstrap-tab.js"></script>
+<script src="bootstrap/js/bootstrap-tooltip.js"></script>
+<script src="bootstrap/js/bootstrap-popover.js"></script>
+<script src="bootstrap/js/bootstrap-button.js"></script>
+<script src="bootstrap/js/bootstrap-collapse.js"></script>
+<script src="bootstrap/js/bootstrap-carousel.js"></script>
+<script src="bootstrap/js/bootstrap-typeahead.js"></script>
+
+<!-- MultiDrag -->
+<script src="../bower_components/get-style-property/get-style-property.js"></script>
+<script src="../src/util.js"></script>
+<script src="../src/expandnative.js"></script>
+<script src="../src/point.js"></script>
+<script src="../src/bound.js"></script>
+<script src="../src/positioning.js"></script>
+<script src="../src/draggable.js"></script>
+<script src="../src/list.js"></script>
+<script src="../src/listswitcher.js"></script>
+<script src="../src/spider.js"></script>
+<script src="../src/target.js"></script>
+<script src="../src/targetManager.js"></script>
+<script type="text/javascript" src="re-ro-move/dombuilder.js"></script>
+<script type="text/javascript" src="re-ro-move/re-ro-move.js"></script>
+
+<!-- setup -->
+<script src="mustache.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

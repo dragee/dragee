@@ -1,22 +1,22 @@
 (function(){
 	'use strict';
-	var MultiDrag = window.MultiDrag || {},lists = [];
+	var MultiDrag = window.MultiDrag || {}, lists = [];
 
-	function List(objs, options){
+	function List(draggables, options){
 		var i;
 		this.options = {
 			timeEnd: 200,
 			timeExcange: 400,
 			radius: 30,
 			getLength: mathPoint.getLength(),
-			isDisplacement:false
+			isDisplacement: false
 		};
 		for(i in options){
 			if(options.hasOwnProperty(i)){
 				this.options[i] = options[i];
 			}
 		}
-		this.objs = objs;
+		this.draggables = draggables;
 		lists.push(this);
 		this.onChange = MultiDrag.util.triggerFactory({context: this});
 		if(options && options.onChange){
@@ -27,171 +27,173 @@
 
 	List.prototype.init = function(){
 		this._enable = true;
-		this.objs.forEach(this.initObj,this);
+		this.draggables.forEach(this.initDraggable, this);
 	};
 
-	List.prototype.initObj = function(obj){
-		var moveHandler,that = this;
-		obj.enable = this._enable;
+	List.prototype.initDraggable = function(draggable){
+		var moveHandler, that = this;
+		draggable.enable = this._enable;
 		if(this.options.isDisplacement){
 			moveHandler = function(){
 				if(this.isMultiDrag){
 					that.onStart(this);
-					obj.onMove.remove(moveHandler);
+					draggable.onMove.remove(moveHandler);
 					return true;
 				}
 			};
-			obj.onEnd.add(function(){
+			draggable.onEnd.add(function(){
 				that.onEndDisplaycement(this);
-				obj.onMove.add(moveHandler);
+				draggable.onMove.add(moveHandler);
 				return true;
 			});
-			obj.onMove.add(moveHandler);
+			draggable.onMove.add(moveHandler);
 		}else{
-			obj.onEnd.add(function(){
+			draggable.onEnd.add(function(){
 				that.onEnd(this);
 				return true;
 			});
 		}
 	};
 
-	List.prototype.moveOrSave = function(obj,position,time){
-		if(obj.isMultiDrag){
-			obj.fixPosition = position;
+	List.prototype.moveOrSave = function(draggable, position, time){
+		if(draggable.isMultiDrag){
+			draggable.fixPosition = position;
 		}else{
-			obj.move(position, time, true);
+			draggable.move(position, time, true);
 		}
 	};
 
-	List.prototype.onEnd = function(obj){
+	List.prototype.onEnd = function(draggable){
 		var fixPositions = this.getCurrentFixPosition(), currentIndex, excangeIndex;
-		currentIndex = this.objs.indexOf(obj);
-		excangeIndex = mathPoint.indexOfNearPoint(fixPositions, obj.position, this.options.radius, this.options.getLength);
+		currentIndex = this.draggables.indexOf(draggable);
+		excangeIndex = mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
 		if(excangeIndex === -1 || excangeIndex === currentIndex){
-			obj.move(obj.fixPosition, this.options.timeEnd, true);
+			draggable.move(draggable.fixPosition, this.options.timeEnd, true);
 		}else{
-			this.moveOrSave(this.objs[excangeIndex],fixPositions[currentIndex],this.options.timeExcange);
-			this.objs[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true);
+			this.moveOrSave(this.draggables[excangeIndex], fixPositions[currentIndex], this.options.timeExcange);
+			this.draggables[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true);
 			this.onChange.fire();
 		}
 		return true;
 	};
 
-	List.prototype.onEndDisplaycement = function(obj){
-		var currentIndex,i,targetIndex,
-			sortedObjs = this.getSortedObjs(),
-			fixPositions = sortedObjs.map(function(obj){
-				return obj.fixPosition;
+	List.prototype.onEndDisplaycement = function(draggable){
+		var currentIndex, i, targetIndex,
+			sortedDraggables = this.getSortedDraggables(),
+			fixPositions = sortedDraggables.map(function(draggable){
+				return draggable.fixPosition;
 			});
-		currentIndex = sortedObjs.indexOf(obj);
-		targetIndex = mathPoint.indexOfNearPoint(fixPositions, obj.position, this.options.radius, this.options.getLength);
+		currentIndex = sortedDraggables.indexOf(draggable);
+		targetIndex = mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
 		if(targetIndex !==-1){
 			if(targetIndex < currentIndex){
-				for(i = targetIndex ; i < currentIndex; i++){
-					this.moveOrSave(sortedObjs[i],fixPositions[i+1],this.options.timeExcange);
+				for(i=targetIndex; i<currentIndex; i++){
+					this.moveOrSave(sortedDraggables[i], fixPositions[i+1], this.options.timeExcange);
 				}
-			}else{
-				for(i = currentIndex; i < targetIndex; i++){
-					this.moveOrSave(sortedObjs[i+1],fixPositions[i],this.options.timeExcange);
+			} else {
+				for(i=currentIndex; i<targetIndex; i++){
+					this.moveOrSave(sortedDraggables[i+1], fixPositions[i], this.options.timeExcange);
 				}
 			}
-			obj.move(fixPositions[targetIndex],this.options.timeEnd, true);
-		}else{
-			obj.move(obj.fixPosition,this.options.timeEnd, true);
+			draggable.move(fixPositions[targetIndex], this.options.timeEnd, true);
+		} else {
+			draggable.move(draggable.fixPosition, this.options.timeEnd, true);
 		}
 	};
 
-	List.prototype.onStart = function(obj){
+	List.prototype.onStart = function(draggable){
 		var currentIndex,i,
-			sortedObjs = this.getSortedObjs(),
-			fixPositions = sortedObjs.map(function(obj){
-				return obj.fixPosition;
+			sortedDraggables = this.getSortedDraggables(),
+			fixPositions = sortedDraggables.map(function(draggable){
+				return draggable.fixPosition;
 			});
-		currentIndex = sortedObjs.indexOf(obj);
-		for(i = currentIndex + 1; i < sortedObjs.length; i++){
-			this.moveOrSave(sortedObjs[i],fixPositions[i-1],this.options.timeExcange);
+
+		currentIndex = sortedDraggables.indexOf(draggable);
+		for(i = currentIndex + 1; i < sortedDraggables.length; i++){
+			this.moveOrSave(sortedDraggables[i],fixPositions[i-1],this.options.timeExcange);
 		}
-		sortedObjs[currentIndex].fixPosition = fixPositions[i-1];
+		sortedDraggables[currentIndex].fixPosition = fixPositions[i-1];
 	};
 
 
 
 	List.prototype.getCurrentFixPosition = function(){
-		return this.objs.map(function(obj){
-			return obj.fixPosition.clone();
+		return this.draggables.map(function(draggable){
+			return draggable.fixPosition.clone();
 		});
 	};
 
-	List.prototype.getSortedObjs = function(){
-		var sortedObjs,
-			initPositions = this.objs.map(function(obj){
-				return obj.initPosition;
+	List.prototype.getSortedDraggables = function(){
+		var sortedDraggables,
+			initPositions = this.draggables.map(function(draggable){
+				return draggable.initPosition;
 			});
-		sortedObjs = initPositions.map(function(position){
-			return this.objs.filter(function(obj){
-				return obj.fixPosition.compare(position);
+		sortedDraggables = initPositions.map(function(position){
+			return this.draggables.filter(function(draggable){
+				return draggable.fixPosition.compare(position);
 			},this)[0];
 		},this);
-		return sortedObjs;
+		return sortedDraggables;
 	};
 
 	List.prototype.reset = function(){
-		this.objs.forEach(function(obj){
-			obj.move(obj.initPosition, 0, true, false);
+		this.draggables.forEach(function(draggable){
+			draggable.move(draggable.initPosition, 0, true, false);
 		});
 	};
 
 	List.prototype.refresh = function(){
-		this.objs.forEach(function(obj){
-			obj.refresh();
+		this.draggables.forEach(function(draggable){
+			draggable.refresh();
 		});
 	};
 
-	List.prototype.add = function(objs){
+	List.prototype.add = function(draggables){
 		var that = this;
-		if(!(objs instanceof Array)){
-			objs = [objs];
+		if(!(draggables instanceof Array)){
+			draggables = [draggables];
 		}
-		objs.forEach(this.initObj,this);
-		this.objs = this.objs.concat(objs);
+		draggables.forEach(this.initDraggable, this);
+		this.draggables = this.draggables.concat(draggables);
 	};
 
-	List.prototype.remove = function(objs){
-		var j, initPositions = this.objs.map(function(obj){
-				return obj.initPosition;
+	List.prototype.remove = function(draggables){
+		var j, initPositions = this.draggables.map(function(draggable){
+				return draggable.initPosition;
 			}),
 			list = [],
-			sortedObj = this.getSortedObjs();
-		if(!(objs instanceof Array)){
-			objs = [objs];
+			sortedDraggables = this.getSortedDraggables();
+		if(!(draggables instanceof Array)){
+			draggables = [draggables];
 
 		}
-		objs.forEach(function(obj){
-			obj.onEnd.reset();
-			obj.onMove.reset();//todo remove reset in future
-			MultiDrag.util.remove(this.objs,obj);
+		draggables.forEach(function(draggable){
+			draggable.onEnd.reset();
+			draggable.onMove.reset();//todo remove reset in future
+			this.draggables.removeItem(draggable);
+			MultiDrag.util.remove(this.draggables, draggable);
 		}, this);
 		j = 0;
-		sortedObj.forEach(function(obj, i){
-			if(this.objs.indexOf(obj) !== -1){
-				if(obj.fixPosition !== initPositions[j]){
-					obj.move(initPositions[j], this.options.timeExcange, true);
+		sortedDraggables.forEach(function(draggable, i){
+			if(this.draggables.indexOf(draggable) !== -1){
+				if(draggable.fixPosition !== initPositions[j]){
+					draggable.move(initPositions[j], this.options.timeExcange, true);
 				}
-				obj.initPosition = initPositions[j];
+				draggable.initPosition = initPositions[j];
 				j++;
-				list.push(obj);
+				list.push(draggable);
 			}
 		}, this);
-		this.objs = list;
+		this.draggables = list;
 	};
 
 	List.prototype.clear = function(){
-		this.remove(this.objs.slice());
+		this.remove(this.draggables.slice());
 	};
 
 	List.prototype.destroy = function(){
-		this.objs.forEach(function(obj){
-			obj.destroy();
+		this.draggables.forEach(function(draggable){
+			draggable.destroy();
 		});
 	};
 
@@ -201,9 +203,9 @@
 
 	List.prototype.__defineSetter__("positions", function(positions){
 		var message = "wrong array length";
-		if(positions.length === this.objs.length){
+		if(positions.length === this.draggables.length){
 			positions.forEach(function(point, i){
-				this.objs[i].move(point, 0, true, true);
+				this.draggables[i].move(point, 0, true, true);
 			}, this);
 		}else{
 			alert(message);
@@ -217,25 +219,25 @@
 
 	List.prototype.__defineSetter__("enable", function(value){
 		this._enable = value;
-		this.objs.forEach(function(obj){
-			obj.enable = value;
+		this.draggables.forEach(function(draggable){
+			draggable.enable = value;
 		});
 	});
 
 
-	function listFactory(el, objsElements, options){
-		var objs, objOptions, listOptions;
+	function listFactory(parentElement, elements, options){
+		var draggables, draggableOptions, listOptions;
 		options = options || {};
-		objOptions = options.obj || {};
+		draggableOptions = options.draggable || {};
 		listOptions = options.list || {};
-		objOptions.parent = objOptions.parent || el;
-		objsElements = Array.prototype.slice.call(objsElements);
+		draggableOptions.parent = draggableOptions.parent || parentElement;
+		elements = Array.prototype.slice.call(elements);
 
-		objs = objsElements.map(function(el){
-			return new MultiDrag.Obj(el, objOptions);
+		draggables = elements.map(function(element){
+			return new MultiDrag.Draggable(element, draggableOptions);
 		});
 
-		return new List(objs, listOptions);
+		return new List(draggables, listOptions);
 	}
 
 	MultiDrag.lists = lists;
