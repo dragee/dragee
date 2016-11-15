@@ -20,7 +20,7 @@ var config = {
   output: {
     path: __dirname + '/build',
     filename: outputFile,
-    library: libraryName,
+    library: 'Dragee',//libraryName, //todo make it consistant 
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
