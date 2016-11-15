@@ -1,7 +1,13 @@
-(function(){
     'use strict';
-    var Dragee = window.Dragee || {},
-        isTouch = 'ontouchstart' in window, mouseEvents = {
+
+
+    import util from './util'
+    import {boundType, boundFactory} from './bound'
+    import {mathPoint, Point} from './point'
+
+    var Dragee = { util, boundType, boundFactory };//todo remove after refactore
+
+    var isTouch = 'ontouchstart' in window, mouseEvents = {
         start: 'mousedown',
         move: 'mousemove',
         end: 'mouseup'
@@ -24,7 +30,7 @@
     transformProperty = getStyleProperty('transform'),
     transitionProperty = getStyleProperty('transition');
 
-    Dragee.events = events;
+    //Dragee.events = events;
 
     function Draggable(element, options){
         options = options || {};
@@ -343,7 +349,4 @@
         return this._enable = enable;
     });
 
-    Dragee.draggables = draggables;
-    Dragee.Draggable = Draggable;
-    window.Dragee = Dragee;
-})();
+    export {Draggable, draggables, events};

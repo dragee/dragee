@@ -1,5 +1,7 @@
-(function(){
-	'use strict';
+'use strict';
+import {mathPoint} from './point'
+
+
 	var Dragee = window.Dragee || {},
 		boundType = {
 			element: -1,
@@ -117,7 +119,4 @@
 		}
 	}
 
-	Dragee.boundType = boundType;
-	Dragee.boundFactory = boundFactory;
-	window.Dragee = Dragee;
-})();
+  export {boundType, boundFactory};

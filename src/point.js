@@ -1,6 +1,9 @@
-(function(){
-    'use strict';
+'use strict';
+    import util from './util'
     var mathPoint;
+    var Dragee = { util };//todo remove after refactore
+
+
 
     /*********************/
     function Point(x, y){
@@ -314,7 +317,5 @@
           return Math.sqrt( xs + ys );
         }
     };
-    window.Point = Point;
-    window.Rectangle = Rectangle;
-    window.mathPoint = mathPoint;
-})();
+
+    export {Point, Rectangle, mathPoint};

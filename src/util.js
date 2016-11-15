@@ -1,8 +1,6 @@
-(function(){
     'use strict';
-    var Dragee = window.Dragee || {}, util;
 
-    util = {
+    var util = {
         getDefaultParent: function (element){
             var parent = element.parentNode;
             while(parent.parentNode && window.getComputedStyle(parent)["position"] === "static"){
@@ -97,6 +95,4 @@
         }
     };
 
-    Dragee.util = util;
-    window.Dragee = Dragee;
-})();
+    export default util;
