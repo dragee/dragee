@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>MultiDrag library</title>
+	<title>Dragee library</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="">
 	<meta name="author" content="">
@@ -39,13 +39,13 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</a>
-			<a class="brand" href="index.html">MultiDrag Documentation</a>
+			<a class="brand" href="index.html">Dragee Documentation</a>
 			<div class="nav-collapse">
 				<ul class="nav">
 					<li class="active"><a href="index.html">Home</a></li>
 					<li><a href="contacts.html">Contact</a></li>
 				</ul>
-				<a href="#" class="btn"> Download MultiDrag <small>(v0.0.1)</small></a>
+				<a href="#" class="btn"> Download Dragee <small>(v0.0.1)</small></a>
 				<a href="#" class="btn btn-primary" >View project on GitHub</a>
 			</div>
 		</div>
@@ -55,8 +55,8 @@
 <div class="container">
 
 	<header class="jumbotron subhead" id="overview">
-		<h1>MultiDrag</h1>
-		<p class="lead">MultiDrag - drag&drop framework for desktop and mobile apps</p>
+		<h1>Dragee</h1>
+		<p class="lead">Dragee - drag&drop framework for desktop and mobile apps</p>
 
 		<div class="subnav">
 			<ul class="nav nav-pills">
@@ -75,17 +75,17 @@
 	<section id="Draggable">
 		<div class="page-header">
 			<h1>
-				MultiDrag.Draggable
+				Dragee.Draggable
 			</h1>
 		</div>
 		<div class="row">
 			<div class="span6">
 				<p>
-					<code>MultiDrag.Draggable(element[, options])</code>
+					<code>Dragee.Draggable(element[, options])</code>
 				</p>
 				<h3>Options</h3>
 				<p>
-					<code>parent</code> HTMLElement який визначає декартову систему координат для <code>MultiDrag.Draggable</code>, його верхній лівий кут буде визначений як точка <code>new Point (0,0)</code>.<br/><br/>
+					<code>parent</code> HTMLElement який визначає декартову систему координат для <code>Dragee.Draggable</code>, його верхній лівий кут буде визначений як точка <code>new Point (0,0)</code>.<br/><br/>
 
 					<code>bound</code> дозволяє задати функцію, що описує граничні обмеження для переміщення елементу. В модулі <code>bound.js</code> ви можете знайти декілька корисних функцій для побудови граничних обмежень.<br/><br/>
 
@@ -100,8 +100,8 @@
 			<div class="span6">
 				<h5>Значення по замовчуванню:</h5>
 				<pre class="prettyprint linenums">
-parent: parent = MultiDrag.util.getDafaultParent(element),
-bound: function(){ return MultiDrag.boundFactory(MultiDrag.boundType.element)(parent, parent); },
+parent: parent = Dragee.util.getDafaultParent(element),
+bound: function(){ return Dragee.boundFactory(Dragee.boundType.element)(parent, parent); },
 onEnd: function(){},
 onMove: function(){}
 				</pre>
@@ -203,10 +203,10 @@ onMove: function(){}
 							draggableCElement = root.getElementsByClassName("draggable-c")[0],
 							draggableDElement = root.getElementsByClassName("draggable-d")[0];
 
-						draggableA = new MultiDrag.Draggable(draggableAElement);
-						draggableB = new MultiDrag.Draggable(draggableBElement);
-						draggableC = new MultiDrag.Draggable(draggableCElement);
-						draggableD = new MultiDrag.Draggable(draggableDElement);
+						draggableA = new Dragee.Draggable(draggableAElement);
+						draggableB = new Dragee.Draggable(draggableBElement);
+						draggableC = new Dragee.Draggable(draggableCElement);
+						draggableD = new Dragee.Draggable(draggableDElement);
 					});
 				</script>
 			</div>
@@ -216,13 +216,13 @@ onMove: function(){}
 
 	<section id="Target">
 		<div class="page-header">
-			<h1>MultiDrag.Target</h1>
+			<h1>Dragee.Target</h1>
 		</div>
-		<h3>MultiDrag.Target</h3>
+		<h3>Dragee.Target</h3>
 		<div class="row">
 			<div class="span6">
 				<p>
-					"Кошик" в який можна додати <code>MultiDrag.Draggable</code> та сортувати їх. Самостійне використанняне не передбачене, використовується спільно з <code>MultiDrag.TargetManager</code>.
+					"Кошик" в який можна додати <code>Dragee.Draggable</code> та сортувати їх. Самостійне використанняне не передбачене, використовується спільно з <code>Dragee.TargetManager</code>.
 				</p>
 				<p>
 					<code>Target(element, draggables[, options])</code> Конструктор включає 3 параметра :<br/>
@@ -230,8 +230,8 @@ onMove: function(){}
 				</p>
 				<h3>Options:</h3>
 				<p>
-					<code>timeEnd</code> - час переміщення <code>MultiDrag.Draggable</code> в цільову точку.<br/>
-					<code>timeExcange</code> - час за який <code>MultiDrag.Draggables</code> обмінюються своїми позиціями.<br/>
+					<code>timeEnd</code> - час переміщення <code>Dragee.Draggable</code> в цільову точку.<br/>
+					<code>timeExcange</code> - час за який <code>Dragee.Draggables</code> обмінюються своїми позиціями.<br/>
 					<code>parent</code> - HTMLElement який визначає декартову систему координат що буде використовуватися<br/>
 					<code>sorting</code> - функція яка визначає, яким чином мають впорядковуватися блоки в "кошику".<br/>
 					B модулі <code>position.js</code> ви можете знайти декілька корисних функцій(<code>sortingFactory(type)</code>)<br/>
@@ -249,18 +249,18 @@ onMove: function(){}
 timeEnd: 200,
 timeExcange: 400,
 parent: parent,
-sorting: MultiDrag.sortingFactory(MultiDrag.positionType.floatLeft)(80, mathPoint.getLength({x: 1, y:4, IsTransformationSpace:true})),
-positioning: MultiDrag.positionFactory(MultiDrag.positionType.floatLeft)(MultiDrag.util.bind(this.getRectangle,this), {isRemove: true})
+sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, mathPoint.getLength({x: 1, y:4, IsTransformationSpace:true})),
+positioning: Dragee.positionFactory(Dragee.positionType.floatLeft)(Dragee.util.bind(this.getRectangle,this), {isRemove: true})
 				</pre>
 				<h3>Methods:</h3>
 				<p>
-					<code>getSortedDraggables()</code> - метод який повертає впорядкований список <code>MultiDrag.Draggable</code><br/>
+					<code>getSortedDraggables()</code> - метод який повертає впорядкований список <code>Dragee.Draggable</code><br/>
 					<code>reset()</code> - відновлення початкових позицій блоків(видалення з "кошика")<br/>
 				</p>
 
 			</div>
 		</div>
-		<h3>MultiDrag.TargetManager</h3>
+		<h3>Dragee.TargetManager</h3>
 		<div class="row">
 			<div class="span6">
 				<p>
@@ -269,13 +269,13 @@ positioning: MultiDrag.positionFactory(MultiDrag.positionType.floatLeft)(MultiDr
 				<p>
 					<code>TargetManager(element, draggables, targets, options)</code><br/>
 					<code>element</code> - HTMLElement який визначає робочу область <br/>
-					<code>draggables</code> - масив <code>MultiDrag.Draggable</code>, з якими працює менеджер<br/>
-					<code>targets</code> -  масив <code>MultiDrag.Target</code>, з якими працює менеджер<br/>
+					<code>draggables</code> - масив <code>Dragee.Draggable</code>, з якими працює менеджер<br/>
+					<code>targets</code> -  масив <code>Dragee.Target</code>, з якими працює менеджер<br/>
 				</p>
 				<h5>Options:</h5>
 				<p>
 					<code>onChange</code> функція-слухач яка викликається при переміщення елемента (з "кошика" чи в "кошик").<br/>
-					<code>timeEnd</code> час переміщення <code>MultiDrag.Draggable</code> з однієї точки в іншу.<br/>
+					<code>timeEnd</code> час переміщення <code>Dragee.Draggable</code> з однієї точки в іншу.<br/>
 				</p>
 				<h5>Defaults:</h5>
 				<pre class="prettyprint linenums">
@@ -293,7 +293,7 @@ timeEnd: 400,
 				</p>
 				<h3>Factory:</h3>
 				<p>
-					<code>MultiDrag.targetManagerFactory(element, draggableElements, targetElements, options)</code>. 
+					<code>Dragee.targetManagerFactory(element, draggableElements, targetElements, options)</code>. 
 					<code>options = { draggable: {...}, target: {...}, manager: {...} }</code>
 				</p>
 			</div>
@@ -464,7 +464,7 @@ timeEnd: 400,
 
 							draggables = Array.prototype.slice.call(draggableElements).map(
 								function(element, i){
-									return new MultiDrag.Draggable(element, {
+									return new Dragee.Draggable(element, {
 										parent: targetAreaElement
 									});
 								}
@@ -472,7 +472,7 @@ timeEnd: 400,
 
 							targets = Array.prototype.slice.call(targetElements).map(
 								function(element, i){
-									return new MultiDrag.Target(element, draggables,{
+									return new Dragee.Target(element, draggables,{
 										parent:targetAreaElement,
 										onAdd:function(draggable){
 											draggable.element.addClass(classForTargets[i]);
@@ -484,7 +484,7 @@ timeEnd: 400,
 								);
 							});
 
-							targetManger = new MultiDrag.TargetManager(targetAreaElement, draggables, targets);
+							targetManger = new Dragee.TargetManager(targetAreaElement, draggables, targets);
 					});
 				</script>
 			</div>
@@ -650,18 +650,18 @@ timeEnd: 400,
 							draggableElements = targetAreaElement.getElementsByClassName("draggable");
 
 						draggables = Array.prototype.slice.call(draggableElements).map(function(element, i){
-							return new MultiDrag.Draggable(element, {
+							return new Dragee.Draggable(element, {
 								parent: targetAreaElement
 							});
 						});
 
 						targets = Array.prototype.slice.call(targetElements).map(function(element, i){
-							var target = new MultiDrag.Target(element, draggables, {
+							var target = new Dragee.Target(element, draggables, {
 								parent: targetAreaElement,
-								positioning: MultiDrag.positionFactory(MultiDrag.positionType.notCrossing)(function(){
+								positioning: Dragee.positionFactory(Dragee.positionType.notCrossing)(function(){
 									return target.getRectangle();
 								}),
-								sorting: MultiDrag.sortingFactory(MultiDrag.positionType.notCrossing)(),
+								sorting: Dragee.sortingFactory(Dragee.positionType.notCrossing)(),
 								onAdd: function(draggable){
 									draggable.element.addClass("ontarget");
 								},
@@ -671,7 +671,7 @@ timeEnd: 400,
 							});
 							return target;
 						});
-						targetManger = new MultiDrag.TargetManager(targetAreaElement, draggables, targets);
+						targetManger = new Dragee.TargetManager(targetAreaElement, draggables, targets);
 					});
 				</script>
 			</div>
@@ -681,17 +681,17 @@ timeEnd: 400,
 
 	<section id="List">
 		<div class="page-header">
-			<h1>MultiDrag.List</h1>
+			<h1>Dragee.List</h1>
 		</div>
 		<div class="row">
 			<div class="span6">
 				<p>
-					<code>MultiDrag.List(draggables[, options])</code>
+					<code>Dragee.List(draggables[, options])</code>
 				</p>
 				<h3>Options:</h3>
 				<p>
-					<code>timeEnd</code> - час переміщення <code>MultiDrag.Draggable</code> в кінцеву точку.<br/>
-					<code>timeExcange</code> - час за який <code>MultiDrag.Draggables</code> обмінюються своїми позиціями.<br/>
+					<code>timeEnd</code> - час переміщення <code>Dragee.Draggable</code> в кінцеву точку.<br/>
+					<code>timeExcange</code> - час за який <code>Dragee.Draggables</code> обмінюються своїми позиціями.<br/>
 					<code>getLength</code> - функція яка визначає яким чином буде визначатися відстань між 2 точками в декартовій системі координат(метрика простору), необхідна для визначення "влучення в ціль". Модуль <code>mathPoint</code> містить фабрику <code>getLength(options)</code> для побудови базових метрик.<br/>
 					<code>radius</code> - радіус при попаданні блока в який ми вважаємо, що він попав в ціль.<br/>
 
@@ -716,7 +716,7 @@ getLength: mathPoint.getLength()
 				</p>
 				<h3>Factory:</h3>
 				<p>
-					Для спрощення ініціалізації списка існує фабика <code>MultiDrag.listFactory(parentElement, elements, options)</code>.<br/>
+					Для спрощення ініціалізації списка існує фабика <code>Dragee.listFactory(parentElement, elements, options)</code>.<br/>
 					<code>options = { draggable : {...} , list : {...} }</code>
 				</p>
 			</div>
@@ -801,8 +801,8 @@ getLength: mathPoint.getLength()
 							listBParentElement = root.getElementsByClassName("list-b")[0],
 							listBElements = listBParentElement.getElementsByTagName("li");
 
-						listA = new MultiDrag.listFactory(listAParentElement, listAElements);
-						listB = new MultiDrag.listFactory(listBParentElement, listBElements);
+						listA = new Dragee.listFactory(listAParentElement, listAElements);
+						listB = new Dragee.listFactory(listBParentElement, listBElements);
 					});
 				</script>
 			</div>
@@ -812,19 +812,19 @@ getLength: mathPoint.getLength()
 
 	<section id="Spider">
 		<div class="page-header">
-			<h1>MultiDrag.Spider</h1>
+			<h1>Dragee.Spider</h1>
 		</div>
 		<div class="row">
 			<div class="span6">
 				<p>
 					"Сітка" - використовується для задання вектору вибору, вона складається з променів по яких рухаються повзунки.
-					Позиціонувати елементи не потрібно їх позиції задасть <code>MultiDrag.Spider</code> при ініціалізації.
+					Позиціонувати елементи не потрібно їх позиції задасть <code>Dragee.Spider</code> при ініціалізації.
 				</p>
 				<p>
 					<code>Spider(area, elements, options)</code><br/>
 					<code>area</code> - HTMLElement який визначає робочу область <br/>
 					<code>elements</code> - масив HTMLElement-ів, які будуть задавати вектори<br/>
-					<code>targets</code> -  масив <code>MultiDrag.Target</code>, з якими працює менеджер<br/>
+					<code>targets</code> -  масив <code>Dragee.Target</code>, з якими працює менеджер<br/>
 				</p>
 				<h3>Options:</h3>
 				<p>
@@ -911,7 +911,7 @@ fillStyle: "rgba(150,255,50,0.8)"
 							areaElement = root.getElementsByClassName("spider")[0],
 							draggableElements = [].splice.call(areaElement.getElementsByTagName("li"), 0);
 
-						spider = new MultiDrag.Spider(areaElement, draggableElements, {
+						spider = new Dragee.Spider(areaElement, draggableElements, {
 							startRadius: 100,
 							endRadius: 150,
 							lineWidth: 20,
@@ -1001,15 +1001,15 @@ fillStyle: "rgba(150,255,50,0.8)"
 		<div class="row">
 			<div class="span6">
 				<p>
-					Для створення обмежень існує фабрика <code>MultiDrag.boundFactory</code>
+					Для створення обмежень існує фабрика <code>Dragee.boundFactory</code>
 					Існують наступні обмеження:
 				</p>
 				<p>
-					<pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.element)(element, parent)</pre>
-					<pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.rectangle)(rectangle)</pre>
-					<pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.lineX)(x, startY, endY)</pre>
-					<pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.lineY)(y, startX, endX)</pre>
-					<pre class="prettyprint linenums">MultiDrag.boundFactory(MultiDrag.boundType.line)(startPoint, endPoint)</pre>
+					<pre class="prettyprint linenums">Dragee.boundFactory(Dragee.boundType.element)(element, parent)</pre>
+					<pre class="prettyprint linenums">Dragee.boundFactory(Dragee.boundType.rectangle)(rectangle)</pre>
+					<pre class="prettyprint linenums">Dragee.boundFactory(Dragee.boundType.lineX)(x, startY, endY)</pre>
+					<pre class="prettyprint linenums">Dragee.boundFactory(Dragee.boundType.lineY)(y, startX, endX)</pre>
+					<pre class="prettyprint linenums">Dragee.boundFactory(Dragee.boundType.line)(startPoint, endPoint)</pre>
 				</p>
 			</div>
 		</div>
@@ -1024,22 +1024,22 @@ fillStyle: "rgba(150,255,50,0.8)"
 			<p>
 				Модуль складається з 2 фабрик.<br><br> 
 
-				<code>MultiDrag.sortingFactory</code> дозволяє створити функцію, що буде сортувати блоки.<br> <br> 
+				<code>Dragee.sortingFactory</code> дозволяє створити функцію, що буде сортувати блоки.<br> <br> 
 
-				<code>MultiDrag.positionFactory</code> дозволяє створити функцію, що буде контролювати розміщення блоків.<br> <br> 
+				<code>Dragee.positionFactory</code> дозволяє створити функцію, що буде контролювати розміщення блоків.<br> <br> 
 				Поведінка залежить від обраної стратегії.
 			</p>
 			<p>
-				<code>MultiDrag.positionType.notCrossing</code>
-				<pre class="prettyprint linenums">MultiDrag.sortingFactory(MultiDrag.positionType.notCrossing)()</pre>
-				<pre class="prettyprint linenums">MultiDrag.positionFactory(MultiDrag.positionType.notCrossing)(rectangle, options)</pre>
+				<code>Dragee.positionType.notCrossing</code>
+				<pre class="prettyprint linenums">Dragee.sortingFactory(Dragee.positionType.notCrossing)()</pre>
+				<pre class="prettyprint linenums">Dragee.positionFactory(Dragee.positionType.notCrossing)(rectangle, options)</pre>
 				при позиціонуванні з данною стратегією блоки зміщуються таким чином щоб уникнути перетинання <br><br>
 
-				<code>MultiDrag.positionType.floatLeft</code>
-				<pre class="prettyprint linenums">MultiDrag.sortingFactory(MultiDrag.positionType.floatLeft)(radius, getLength, options)</pre>
+				<code>Dragee.positionType.floatLeft</code>
+				<pre class="prettyprint linenums">Dragee.sortingFactory(Dragee.positionType.floatLeft)(radius, getLength, options)</pre>
 
-				<code>MultiDrag.positionType.floatRight</code>
-				<pre class="prettyprint linenums">MultiDrag.sortingFactory(MultiDrag.positionType.floatRight)(radius, getLength, options)</pre>
+				<code>Dragee.positionType.floatRight</code>
+				<pre class="prettyprint linenums">Dragee.sortingFactory(Dragee.positionType.floatRight)(radius, getLength, options)</pre>
 
 			</p>
 			</div>
@@ -1089,7 +1089,7 @@ fillStyle: "rgba(150,255,50,0.8)"
 <script src="bootstrap/js/bootstrap-carousel.js"></script>
 <script src="bootstrap/js/bootstrap-typeahead.js"></script>
 
-<!-- MultiDrag -->
+<!-- Dragee -->
 <script src="../bower_components/get-style-property/get-style-property.js"></script>
 <script src="../src/util.js"></script>
 <script src="../src/expandnative.js"></script>

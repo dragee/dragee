@@ -1,6 +1,6 @@
 (function(){
     'use strict';
-    var MultiDrag = window.MultiDrag || {},
+    var Dragee = window.Dragee || {},
         isTouch = 'ontouchstart' in window, mouseEvents = {
         start: 'mousedown',
         move: 'mousemove',
@@ -9,11 +9,11 @@
         start: 'touchstart',
         move: 'touchmove',
         end: 'touchend'
-    }, 
-    events = isTouch ? touchEvents : mouseEvents, 
-    draggables = [], 
+    },
+    events = isTouch ? touchEvents : mouseEvents,
+    draggables = [],
     onCreateDraggable = function(draggable){
-        var message = "for this element MultiDrag.Draggable is already exist, don't create it twice ";
+        var message = "for this element Dragee.Draggable is already exist, don't create it twice ";
         if(draggables.some(function(existing){
             return draggable.element === existing.element;
         })){
@@ -24,14 +24,14 @@
     transformProperty = getStyleProperty('transform'),
     transitionProperty = getStyleProperty('transition');
 
-    MultiDrag.events = events;
+    Dragee.events = events;
 
     function Draggable(element, options){
         options = options || {};
-        var i, that = this, displayListener, parent = options.parent || MultiDrag.util.getDefaultParent(element);
+        var i, that = this, displayListener, parent = options.parent || Dragee.util.getDefaultParent(element);
         this.options = {
             parent: parent,
-            bound: MultiDrag.boundFactory(MultiDrag.boundType.element)(parent, parent),
+            bound: Dragee.boundFactory(Dragee.boundType.element)(parent, parent),
             startFilter: false,
             isContentBoxSize: false,
             position: false
@@ -41,11 +41,11 @@
                 this.options[i] = options[i];
             }
         }
-        this.onEnd = MultiDrag.util.triggerFactory({
+        this.onEnd = Dragee.util.triggerFactory({
             context: this, isReverse: true, isStopOnTrue: true
         });
-        this.onMove = MultiDrag.util.triggerFactory({context: this});
-        this.onStart = MultiDrag.util.triggerFactory({context: this});
+        this.onMove = Dragee.util.triggerFactory({context: this});
+        this.onStart = Dragee.util.triggerFactory({context: this});
 
         this.onEnd.add(function(){
             this.move(this.position, 0, true, true);
@@ -77,10 +77,10 @@
         } else {
             this.initPosition = this.offset;
         }
-        this._dragStart = MultiDrag.util.bind(this.dragStart, this);
-        this._delayedDragStart = MultiDrag.util.bind(this.delayedDragStart, this);
-        this._dragMove = MultiDrag.util.bind(this.dragMove, this);
-        this._dragEnd = MultiDrag.util.bind(this.dragEnd, this);
+        this._dragStart = Dragee.util.bind(this.dragStart, this);
+        this._delayedDragStart = Dragee.util.bind(this.delayedDragStart, this);
+        this._dragMove = Dragee.util.bind(this.dragMove, this);
+        this._dragEnd = Dragee.util.bind(this.dragEnd, this);
 
         if(this.options.delayedStart) {
             this.element.addEventListener(touchEvents.start, this._delayedDragStart);
@@ -123,7 +123,7 @@
     Draggable.prototype._setTranslate = function(point){
         this._transformPosition = point;
 
-        var transform = this.element.style[transformProperty], 
+        var transform = this.element.style[transformProperty],
             translateCss = ' translate3d(' + point.x + 'px,' + point.y + 'px, 0px)';
 
         var ua = window.navigator.userAgent;
@@ -190,7 +190,7 @@
     Draggable.prototype.delayedDragStart = function(delayedEvent){
         var isTouchEvent = (isTouch && (delayedEvent instanceof TouchEvent)),
             startTouchPoint = new Point(
-                isTouchEvent ? delayedEvent.changedTouches[0].pageX : delayedEvent.clientX, 
+                isTouchEvent ? delayedEvent.changedTouches[0].pageX : delayedEvent.clientX,
                 isTouchEvent ? delayedEvent.changedTouches[0].pageY : delayedEvent.clientY
             ),
             that = this;
@@ -200,11 +200,11 @@
         function checkMovement(event){
             var isTouchEvent = (isTouch && (event instanceof TouchEvent)),
                 touchPoint = new Point(
-                    isTouchEvent ? event.changedTouches[0].pageX : event.clientX, 
+                    isTouchEvent ? event.changedTouches[0].pageX : event.clientX,
                     isTouchEvent ? event.changedTouches[0].pageY : event.clientY
                 );
 
-            if(Math.abs(touchPoint.x-startTouchPoint.x) > 5 
+            if(Math.abs(touchPoint.x-startTouchPoint.x) > 5
                 || Math.abs(touchPoint.y-startTouchPoint.y) > 5) {
 
                 document.removeEventListener(touchEvents.move, checkMovement);
@@ -245,7 +245,7 @@
             this._touchId = event.changedTouches[0].identifier;
         }
         event.stopPropagation();
-        if(!(event.target instanceof HTMLInputElement 
+        if(!(event.target instanceof HTMLInputElement
             || event.target instanceof HTMLInputElement)){
             event.preventDefault();
         }else{
@@ -258,7 +258,7 @@
         document.addEventListener(touchEvents.end, this._dragEnd);
         document.addEventListener(mouseEvents.end, this._dragEnd);
 
-        this.isMultiDrag = true;
+        this.isDragee = true;
 
         this.onStart.fire(event);
         this.element.addClass("active");
@@ -273,7 +273,7 @@
         var isTouchEvent = (isTouch && (event instanceof TouchEvent));
 
         if(isTouchEvent){
-            if(!(touch = MultiDrag.util.getTouchByID(event, this._touchId))){
+            if(!(touch = Dragee.util.getTouchByID(event, this._touchId))){
                 return;
             }
         }
@@ -292,7 +292,7 @@
         var isTouchEvent = (isTouch && (event instanceof TouchEvent));
 
         if(isTouchEvent){
-            if(!(touch = MultiDrag.util.getTouchByID(event, this._touchId))){
+            if(!(touch = Dragee.util.getTouchByID(event, this._touchId))){
                 return;
             }
         }
@@ -306,7 +306,7 @@
         document.removeEventListener(touchEvents.end, this._dragEnd);
         document.removeEventListener(mouseEvents.end, this._dragEnd);
 
-        this.isMultiDrag = false;
+        this.isDragee = false;
         this.element.removeClass("active");
     };
 
@@ -345,7 +345,7 @@
         return this._enable = enable;
     });
 
-    MultiDrag.draggables = draggables;
-    MultiDrag.Draggable = Draggable;
-    window.MultiDrag = MultiDrag;
+    Dragee.draggables = draggables;
+    Dragee.Draggable = Draggable;
+    window.Dragee = Dragee;
 })();

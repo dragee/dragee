@@ -1,6 +1,6 @@
 (function(){
 	'use strict';
-	var MultiDrag = window.MultiDrag || {},
+	var Dragee = window.Dragee || {},
 		spiders = [];
 
 	function Spider(area, elements, options){
@@ -29,7 +29,7 @@
 
 	Spider.prototype.init = function(elements){
 		var that = this;
-		this.canvas = MultiDrag.util.createCanvas(this.area, this.areaRectangle);
+		this.canvas = Dragee.util.createCanvas(this.area, this.areaRectangle);
 		this.context = this.canvas.getContext("2d");
 
 		this.draggables = elements.map(function (element, i){
@@ -37,9 +37,9 @@
 				halfSize = mathPoint.getSizeOfElement(element).mult(0.5),
 				start = mathPoint.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize),
 				end = mathPoint.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize),
-				bound = MultiDrag.boundFactory(MultiDrag.boundType.line)(start, end);
+				bound = Dragee.boundFactory(Dragee.boundType.line)(start, end);
 
-			return new MultiDrag.Draggable(element, {
+			return new Dragee.Draggable(element, {
 				parent: this.area, 
 				bound: bound, 
 				position: start, 
@@ -76,7 +76,7 @@
 		this.context.fill();
 	}
 
-	MultiDrag.spiders = spiders;
-	MultiDrag.Spider = Spider;
-	window.MultiDrag = MultiDrag;
+	Dragee.spiders = spiders;
+	Dragee.Spider = Spider;
+	window.Dragee = Dragee;
 })();

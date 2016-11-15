@@ -1,14 +1,14 @@
 (function(){
 	'use strict';
-	var MultiDrag = window.MultiDrag || {};
+	var Dragee = window.Dragee || {};
 
 	function ListSwitcher(draggables, options){
 		options = options || {};
 		options.stepOn = options.stepOn || new Point(-50, 0);
-		MultiDrag.List.call(this, draggables, options);
+		Dragee.List.call(this, draggables, options);
 	}
 
-	extend(ListSwitcher, MultiDrag.List);
+	extend(ListSwitcher, Dragee.List);
 
 	ListSwitcher.prototype.init = function(){
 		var that = this;
@@ -28,7 +28,7 @@
 		if(excangeIndex === -1 || excangeIndex === currentIndex){
 			this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd);
 		} else {
-			if(this.draggables[excangeIndex].isMultiDrag){
+			if(this.draggables[excangeIndex].isDragee){
 				this.fixToOff(excangeIndex, fixPositions[currentIndex]);
 			} else {
 				this.moveDraggableToOff(excangeIndex, fixPositions[currentIndex], this.options.timeExcange);
@@ -113,13 +113,13 @@
 		draggableElements = Array.prototype.slice.call(draggableElements);
 
 		draggables = draggableElements.map(function(element){
-			return new MultiDrag.Draggable(element, draggableOptions);
+			return new Dragee.Draggable(element, draggableOptions);
 		});
 		return new ListSwitcher(draggables, listOptions);
 	}
 
-	MultiDrag = MultiDrag || {};
-	MultiDrag.ListSwitcher = ListSwitcher;
-	MultiDrag.listSwitcherFactory = listSwitcherFactory;
-	window.MultiDrag = MultiDrag;
+	Dragee = Dragee || {};
+	Dragee.ListSwitcher = ListSwitcher;
+	Dragee.listSwitcherFactory = listSwitcherFactory;
+	window.Dragee = Dragee;
 })();

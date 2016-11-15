@@ -1,6 +1,6 @@
 (function(){
 	'use strict';
-	var MultiDrag = window.MultiDrag || {}, lists = [];
+	var Dragee = window.Dragee || {}, lists = [];
 
 	function List(draggables, options){
 		var i;
@@ -18,7 +18,7 @@
 		}
 		this.draggables = draggables;
 		lists.push(this);
-		this.onChange = MultiDrag.util.triggerFactory({context: this});
+		this.onChange = Dragee.util.triggerFactory({context: this});
 		if(options && options.onChange){
 			this.onChange.add(options.onChange);
 		}
@@ -35,7 +35,7 @@
 		draggable.enable = this._enable;
 		if(this.options.isDisplacement){
 			moveHandler = function(){
-				if(this.isMultiDrag){
+				if(this.isDragee){
 					that.onStart(this);
 					draggable.onMove.remove(moveHandler);
 					return true;
@@ -56,7 +56,7 @@
 	};
 
 	List.prototype.moveOrSave = function(draggable, position, time){
-		if(draggable.isMultiDrag){
+		if(draggable.isDragee){
 			draggable.fixPosition = position;
 		}else{
 			draggable.move(position, time, true);
@@ -171,7 +171,7 @@
 			draggable.onEnd.reset();
 			draggable.onMove.reset();//todo remove reset in future
 			this.draggables.removeItem(draggable);
-			MultiDrag.util.remove(this.draggables, draggable);
+			Dragee.util.remove(this.draggables, draggable);
 		}, this);
 		j = 0;
 		sortedDraggables.forEach(function(draggable, i){
@@ -234,14 +234,14 @@
 		elements = Array.prototype.slice.call(elements);
 
 		draggables = elements.map(function(element){
-			return new MultiDrag.Draggable(element, draggableOptions);
+			return new Dragee.Draggable(element, draggableOptions);
 		});
 
 		return new List(draggables, listOptions);
 	}
 
-	MultiDrag.lists = lists;
-	MultiDrag.List = List;
-	MultiDrag.listFactory = listFactory;
-	window.MultiDrag = MultiDrag;
+	Dragee.lists = lists;
+	Dragee.List = List;
+	Dragee.listFactory = listFactory;
+	window.Dragee = Dragee;
 })();

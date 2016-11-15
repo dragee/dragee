@@ -1,6 +1,6 @@
 (function(){
 	'use strict';
-	var MultiDrag = window.MultiDrag || {},
+	var Dragee = window.Dragee || {},
 		targetManagers = [];
 
 	function TargetManager(element, draggables, targets, options){
@@ -18,7 +18,7 @@
 				this.options[i] = options[i];
 			}
 		}
-		this.onChange = MultiDrag.util.triggerFactory({context: this});
+		this.onChange = Dragee.util.triggerFactory({context: this});
 		if(options && options.onChange){
 			this.onChange.add(options.onChange);
 		}
@@ -113,17 +113,17 @@
 		targetElements = Array.prototype.slice.call(targetElements);
 
 		draggables = draggableElements.map(function(element){
-			return new MultiDrag.Draggable(element, draggableOptions);
+			return new Dragee.Draggable(element, draggableOptions);
 		});
 
 		targets = targetElements.map(function(el){
-			return new MultiDrag.Target(element, draggables, targetOptions);
+			return new Dragee.Target(element, draggables, targetOptions);
 		});
 		return new TargetManager(element, draggables, targets, managerOptions);
 	}
 
-	MultiDrag.targetManagers = targetManagers;
-	MultiDrag.TargetManager = TargetManager;
-	MultiDrag.targetManagerFactory = targetManagerFactory;
-	window.MultiDrag = MultiDrag;
+	Dragee.targetManagers = targetManagers;
+	Dragee.TargetManager = TargetManager;
+	Dragee.targetManagerFactory = targetManagerFactory;
+	window.Dragee = Dragee;
 })();

@@ -1,6 +1,6 @@
 (function(){
     'use strict';
-    var MultiDrag = window.MultiDrag || {}, util;
+    var Dragee = window.Dragee || {}, util;
 
     util = {
         getDefaultParent: function (element){
@@ -138,6 +138,6 @@
         }
     };
 
-    MultiDrag.util = util;
-    window.MultiDrag = MultiDrag;
+    Dragee.util = util;
+    window.Dragee = Dragee;
 })();

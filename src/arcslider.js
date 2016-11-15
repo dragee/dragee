@@ -1,4 +1,4 @@
-(function (global, MultiDrag){
+(function (global, Dragee){
 	'use strict';
 	var arcSliders = [];
 
@@ -30,11 +30,11 @@
 		var that = this,
 			angle = this.options.startAngle,
 			position = mathPoint.getPointFromRadialSystem(
-				angle, 
-				this.options.radius, 
+				angle,
+				this.options.radius,
 				this.shiftedCenter
 			),
-			bound = MultiDrag.boundFactory(MultiDrag.boundType.arc)(
+			bound = Dragee.boundFactory(Dragee.boundType.arc)(
 				that.shiftedCenter,
 				that.options.radius,
 				this.options.startAngle,
@@ -42,10 +42,10 @@
 			);
 
 		this.angle = angle;
-		this.draggable = new MultiDrag.Draggable(element, {
-			parent: this.area, 
-			bound: bound, 
-			position: position, 
+		this.draggable = new Dragee.Draggable(element, {
+			parent: this.area,
+			bound: bound,
+			position: position,
 			onMove: function (){
 				that.change();
 				return true;
@@ -67,8 +67,8 @@
 	ArcSlider.prototype.setAngle = function(angle, time){
 		this.angle = mathPoint.normalizeAngle(angle, position);
 		var position = mathPoint.getPointFromRadialSystem(
-			this.angle, 
-			this.options.radius, 
+			this.angle,
+			this.options.radius,
 			this.shiftedCenter
 		);
 		this.draggable.move(position, time||0, true, true);
@@ -76,8 +76,8 @@
 	};
 
 
-	MultiDrag = MultiDrag || {};
-	MultiDrag.arcSliders = arcSliders;
-	MultiDrag.ArcSlider = ArcSlider;
-	global.MultiDrag = MultiDrag;
-})(window, window.MultiDrag);
+	Dragee = Dragee || {};
+	Dragee.arcSliders = arcSliders;
+	Dragee.ArcSlider = ArcSlider;
+	global.Dragee = Dragee;
+})(window, window.Dragee);

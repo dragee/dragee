@@ -1,17 +1,17 @@
 (function(){
 	'use strict';
 
-	var MultiDrag = window.MultiDrag || {}, targets = [];
+	var Dragee = window.Dragee || {}, targets = [];
 
 	function Target(element, draggables, options){
 		options = options || {};
-		var i, parent = options.parent || MultiDrag.util.getDefaultParent(element);
+		var i, parent = options.parent || Dragee.util.getDefaultParent(element);
 		this.options = {
 			timeEnd: 200,
 			timeExcange: 400,
 			parent: parent,
-			sorting: MultiDrag.sortingFactory(MultiDrag.positionType.floatLeft)(80, mathPoint.getLength({x: 1, y: 4, isTransformationSpace: true})),
-			positioning: MultiDrag.positionFactory(MultiDrag.positionType.floatLeft)(this.getRectangle.bind(this), {removable: true})
+			sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, mathPoint.getLength({x: 1, y: 4, isTransformationSpace: true})),
+			positioning: Dragee.positionFactory(Dragee.positionType.floatLeft)(this.getRectangle.bind(this), {removable: true})
 		};
 		for(i in options){
 			this.options[i] = options[i];
@@ -19,9 +19,9 @@
 		targets.push(this);
 		this.element = element;
 		this.draggables = draggables;
-		this.onAdd = MultiDrag.util.triggerFactory({context: this});
-		this.beforeAdd = MultiDrag.util.triggerFactory({context: this});
-		this.onRemove = MultiDrag.util.triggerFactory({context: this});
+		this.onAdd = Dragee.util.triggerFactory({context: this});
+		this.beforeAdd = Dragee.util.triggerFactory({context: this});
+		this.onRemove = Dragee.util.triggerFactory({context: this});
 
 		options.onRemove && this.onRemove.add(options.onRemove);
 		options.onAdd && this.onAdd.add(options.onAdd);
@@ -74,7 +74,7 @@
 		}, this);
 
 		if(this.innerDraggables.length){
-			indexesOfNew = MultiDrag.util.range(this.innerDraggables.length);
+			indexesOfNew = Dragee.util.range(this.innerDraggables.length);
 			rectangles = this.options.positioning(this.innerDraggables.map(function(draggable){
 				return draggable.getRectangle();
 			}), indexesOfNew);
@@ -86,7 +86,7 @@
 	};
 
 	Target.prototype.destroy = function(){
-		MultiDrag.targetManagers.forEach(function(targetManager){
+		Dragee.targetManagers.forEach(function(targetManager){
 			targetManager.targets.removeItem(this);
 		}, this);
 	}
@@ -204,7 +204,7 @@
 		this.innerDraggables.slice();
 	}
 
-	MultiDrag.targets = targets;
-	MultiDrag.Target = Target;
-	window.MultiDrag = MultiDrag;
+	Dragee.targets = targets;
+	Dragee.Target = Target;
+	window.Dragee = Dragee;
 })();

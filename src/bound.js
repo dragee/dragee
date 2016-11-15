@@ -1,6 +1,6 @@
 (function(){
 	'use strict';
-	var MultiDrag = window.MultiDrag || {},
+	var Dragee = window.Dragee || {},
 		boundType = {
 			element: -1,
 			rectangle: 0,
@@ -32,7 +32,7 @@
 			case boundType.rectangle:
 				return function (rectangle){
 					return function (point, size){
-						var calcPoint = point.clone(), 
+						var calcPoint = point.clone(),
 							rectP2 = rectangle.getP3();
 
 						if(rectangle.position.x > calcPoint.x){
@@ -117,7 +117,7 @@
 		}
 	}
 
-	MultiDrag.boundType = boundType;
-	MultiDrag.boundFactory = boundFactory;
-	window.MultiDrag = MultiDrag;
+	Dragee.boundType = boundType;
+	Dragee.boundFactory = boundFactory;
+	window.Dragee = Dragee;
 })();

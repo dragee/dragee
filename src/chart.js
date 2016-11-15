@@ -1,4 +1,4 @@
-(function (global, MultiDrag){
+(function (global, Dragee){
     'use strict';
     var isTouch = 'ontouchstart' in window, mouseEvents = {
             start:'mousedown',
@@ -30,10 +30,10 @@
             radius: areaRectangle.getMinSide() / 2,
             touchRadius: areaRectangle.getMinSide() / 2,
             boundAngle: Math.PI/9,
-            fillStyles: MultiDrag.util.range(0, elements.length).map(function(){
-                return MultiDrag.util.randomColor();
+            fillStyles: Dragee.util.range(0, elements.length).map(function(){
+                return Dragee.util.randomColor();
             }),
-            initAngles: MultiDrag.util.range(-90, 270, 360 / elements.length).map(function(angle){
+            initAngles: Dragee.util.range(-90, 270, 360 / elements.length).map(function(angle){
                 return mathPoint.toRadian(angle);
             }),
             onDraw:function(){},
@@ -56,27 +56,27 @@
 
     Chart.prototype.init = function (elements){
         var that = this;
-        this.canvas = MultiDrag.util.createCanvas(this.area, this.areaRectangle);
+        this.canvas = Dragee.util.createCanvas(this.area, this.areaRectangle);
         this.context = this.canvas.getContext("2d");
         this.draggables = elements.map(function (element, i){
             var angle = this.options.initAngles[i],
                 halfSize = mathPoint.getSizeOfElement(element).mult(0.5),
                 position = mathPoint.getPointFromRadialSystem(
-                    angle, 
-                    this.options.touchRadius, 
+                    angle,
+                    this.options.touchRadius,
                     this.options.center.sub(halfSize)
                 ),
-                bound = MultiDrag.boundFactory(MultiDrag.boundType.arc)(
+                bound = Dragee.boundFactory(Dragee.boundType.arc)(
                     that.options.center.sub(halfSize),
                     that.options.touchRadius,
                     that.getBoundAngle(i, false),
                     that.getBoundAngle(i, true)
                 );
 
-            return new MultiDrag.Draggable(element, {
-                parent:this.area, 
-                bound:bound, 
-                position:position, 
+            return new Dragee.Draggable(element, {
+                parent:this.area,
+                bound:bound,
+                position:position,
                 onMove:function (){
                     that.draw();
                     return true;
@@ -97,7 +97,7 @@
 
         this.canvas.addEventListener(events.start, function(e){
             var point = new Point(
-                    isTouch ? e.changedTouches[0].pageX : e.clientX, 
+                    isTouch ? e.changedTouches[0].pageX : e.clientX,
                     isTouch ? e.changedTouches[0].pageY : e.clientY
                 ), index;
 
@@ -173,7 +173,7 @@
                 opts[i] = options[i];
             }
         }
-        canvas = MultiDrag.util.createCanvas(element, rectangle);
+        canvas = Dragee.util.createCanvas(element, rectangle);
         context = canvas.getContext("2d");
         cloneObj = {
             draw: function(){
@@ -278,8 +278,8 @@
             var angle = this.angles[i],
                 halfSize = draggable.getSize().mult(0.5),
                 position = mathPoint.getPointFromRadialSystem(
-                    angle, 
-                    this.options.touchRadius, 
+                    angle,
+                    this.options.touchRadius,
                     this.options.center.sub(halfSize)
                 );
 
@@ -299,9 +299,9 @@
 
 
 
-    MultiDrag = MultiDrag || {};
-    MultiDrag.charts = charts;
-    MultiDrag.Chart = Chart;
-    global.MultiDrag = MultiDrag;
+    Dragee = Dragee || {};
+    Dragee.charts = charts;
+    Dragee.Chart = Chart;
+    global.Dragee = Dragee;
 
-})(window, window.MultiDrag);
+})(window, window.Dragee);

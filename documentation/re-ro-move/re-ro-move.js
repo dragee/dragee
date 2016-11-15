@@ -1,5 +1,5 @@
 (function(global) {
-    // Requirements: MultiDrag, dombuilder, get-style-property
+    // Requirements: Dragee, dombuilder, get-style-property
     var rotateOffset = 20,
         roles = ["lefttop", "righttop", "rightbottom", "leftbottom", "rotate"],
         transformProperty = getStyleProperty('transform'),
@@ -27,7 +27,7 @@
 
         this.proportion = +this.getWidth() / +that.getHeight();
 
-        that.draggable = new MultiDrag.Draggable(that.element, {
+        that.draggable = new Dragee.Draggable(that.element, {
             bound: boundPoint.bind(this),
             onMove: that.moveCorners.bind(this),
             onEnd: onEnd
@@ -51,7 +51,7 @@
                 rotation = e.rotation;
             that.prevscale = e.scale;
             that.currentZoom *= zoom;
-   
+
             if(Math.abs(that.prevRotation-e.rotation)>280) {
                 if(e.rotation<0) {
                     that.circle360 += 1;
@@ -70,17 +70,17 @@
 
             that.prevRotation = e.rotation;
 
-            e.stopPropagation();            
+            e.stopPropagation();
 
             width = that.startZoomWidth * that.currentZoom;
 
             requestAnimationFrame(function(){
                 that.setWidth(width);
                 if(that.prevRotation) {
-                    that.rotate(that.startRotation + rotation);  
-                } 
+                    that.rotate(that.startRotation + rotation);
+                }
             });
-            
+
         });
 
         this.element.addEventListener('gestureend', function(e) {
@@ -131,7 +131,7 @@
             switch(role){
                 case "lefttop":
                     return this.draggable.getPosition();
-                case "righttop": 
+                case "righttop":
                     return new Point(
                         this.draggable.getPosition().x + this.getWidth(),
                         this.draggable.getPosition().y
@@ -163,7 +163,7 @@
         rotate: function(angle){
             this.angle = angle;
 
-            var transform = this.element.style[transformProperty], 
+            var transform = this.element.style[transformProperty],
             translateCss = ' rotate(' + angle + 'deg)';
 
             if(!/rotate\([^)]+\)/.test(transform)){
@@ -202,13 +202,13 @@
                 case "lefttop":
                 case "leftbottom":
                     return {
-                        start: this.corners.righttop.getPosition(), 
+                        start: this.corners.righttop.getPosition(),
                         end: this.corners.rightbottom.getPosition()
                     };
                 case "righttop":
                 case "rightbottom":
                     return {
-                        start: this.corners.lefttop.getPosition(), 
+                        start: this.corners.lefttop.getPosition(),
                         end: this.corners.leftbottom.getPosition()
                     };
             }
@@ -253,7 +253,7 @@
     Corner.prototype = {
         setPosition: function(position){
             this.draggable.setPosition(position);
-        },  
+        },
         getPosition: function(){
             return this.draggable.getPosition();
         },
@@ -266,7 +266,7 @@
 
             this.block.container.appendChild(this.cornerElement);
 
-            this.draggable = new MultiDrag.Draggable(this.cornerElement, {
+            this.draggable = new Dragee.Draggable(this.cornerElement, {
                 parent: this.block.container,
                 bound: this.autoDetectBoundFunction(),
                 onMove: this.effectOnBlock.bind(this)
@@ -390,7 +390,7 @@
         },
         lineBound: function(point, size){
             var line = this.getDiagonalLine(),
-                start = line.start, 
+                start = line.start,
                 end = line.end,
                 alpha = Math.atan2(end.y - start.y, end.x - start.x),
                 beta = alpha + Math.PI / 2,

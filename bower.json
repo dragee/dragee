@@ -2,7 +2,7 @@
   "name": "multidrag",
   "version": "0.8.0",
   "description": "drgag&drop framework",
-  "main": ["build/multidrag.js", "build/multidrag.min.js"],
+  "main": ["build/dragee.js", "build/dragee.min.js"],
   "dependencies": {
     "get-style-property": "desandro/get-style-property"
   },

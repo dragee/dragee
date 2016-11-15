@@ -224,8 +224,8 @@
         getSizeOfElement: function(el, isContentBoxSize){
             var width = parseInt(window.getComputedStyle(el)['width']), height = parseInt(window.getComputedStyle(el)['height']);
             if(!isContentBoxSize){
-                width += MultiDrag.util.getSumValueOfStyleRule(el, ["padding-left", "padding-right", "border-left-width", "border-right-width"]);
-                height += MultiDrag.util.getSumValueOfStyleRule(el, ["padding-top", "padding-bottom", "border-top-width", "border-bottom-width"]);
+                width += Dragee.util.getSumValueOfStyleRule(el, ["padding-left", "padding-right", "border-left-width", "border-right-width"]);
+                height += Dragee.util.getSumValueOfStyleRule(el, ["padding-top", "padding-bottom", "border-top-width", "border-bottom-width"]);
             }
             return new Point(width, height);
         },

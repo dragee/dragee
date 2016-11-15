@@ -46,7 +46,7 @@
                         element[key] = attrs[key];
                     }else{
                         if(attributes.indexOf(key) ===-1){
-                            element.setAttributeNS('http://www.w3.org/2000/svg', key, attrs[key]);    
+                            element.setAttributeNS('http://www.w3.org/2000/svg', key, attrs[key]);
                         } else {
                             element.setAttribute(key, attrs[key]);
                         }

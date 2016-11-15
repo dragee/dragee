@@ -1,6 +1,6 @@
 (function(){
 	'use strict';
-	var MultiDrag = window.MultiDrag || {},
+	var Dragee = window.Dragee || {},
 		positionType = {
 			notCrossing: 0,
 			floatLeft: 1,
@@ -157,8 +157,8 @@
 		}
 	};
 
-	MultiDrag.positionType = positionType;
-	MultiDrag.sortingFactory = sortingFactory;
-	MultiDrag.positionFactory = positionFactory;
-	window.MultiDrag = MultiDrag;
+	Dragee.positionType = positionType;
+	Dragee.sortingFactory = sortingFactory;
+	Dragee.positionFactory = positionFactory;
+	window.Dragee = Dragee;
 })();
