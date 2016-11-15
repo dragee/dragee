@@ -22,8 +22,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:vitaliy_yarovuy/multidrag.git"
+    "url": "git@github.com:dragee/dragee.git"
   },
-  "author": "Vitaliy Yarovuy",
+  "author": "Vitaliy Yarovuy, Volodymyr Myskov",
   "license": "ISC"
 }

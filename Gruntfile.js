@@ -8,12 +8,13 @@ module.exports = function(grunt) {
       },
       dist: {
         src: [
-          "bower_components/**/.js",
+          "bower_components/get-style-property/get-style-property.js",
           "src/util.js",
+          "src/expandnative.js",
           "src/point.js",
           "src/bound.js",
           "src/positioning.js",
-          "src/obj.js",
+          "src/draggable.js",
           "src/list.js",
           "src/listswitcher.js",
           "src/spider.js",
@@ -62,6 +63,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', ['jshint', 'qunit']);
 
-  grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify']);
+  grunt.registerTask('default', ['concat', 'uglify']);
 
 };

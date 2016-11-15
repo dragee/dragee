@@ -206,7 +206,7 @@
                 AB = new Point(B.x - A.x, B.y - A.y),
                 ab2 = AB.x * AB.x + AB.y * AB.y,
                 ap_ab = AP.x * AB.x + AP.y * AB.y,
-                t = ap_ab/ab2;    
+                t = ap_ab/ab2;
             return new Point(A.x + AB.x * t, A.y + AB.y * t);
         },
         getPointInLine: function(LP1, LP2, percent){
@@ -304,13 +304,13 @@
         distance: function(P1, P2){
           var xs = 0;
           var ys = 0;
-         
+
           xs = P2.x - P1.x;
           xs = xs * xs;
-         
+
           ys = P2.y - P1.y;
           ys = ys * ys;
-         
+
           return Math.sqrt( xs + ys );
         }
     };
