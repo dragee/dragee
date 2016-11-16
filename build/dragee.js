@@ -114,47 +114,6 @@ if ( typeof define === 'function' && define.amd ) {
 
             element.style.cssText = cssText;
         },
-        triggerFactory: function(opts){
-            var funcs = [], i, options = {
-                isReverse: false,
-                isStopOnTrue: false,
-                context: window
-            };
-            for(i in opts){
-                if(opts.hasOwnProperty(i)){
-                    options[i] = opts[i];
-                }
-            };
-            return {
-                fire: function(){
-                    var args = [].slice.call(arguments), 
-                        i, retValue, fs = options.isReverse ? funcs.slice().reverse() : funcs;
-
-                    for(i = 0; i < fs.length; i++){
-                        retValue = fs[i].apply(options.context, args);
-                        if(options.isStopOnTrue && retValue){
-                            return true;
-                        }
-                    }
-                    return !options.isStopOnTrue;
-                },
-                add: function(f){
-                    funcs.push(f);
-                },
-                unshift: function(f){
-                    funcs.unshift(f);
-                },
-                remove: function(f){
-                    var index = funcs.indexOf(f);
-                    if(index !== -1){
-                        funcs.splice(index, 1)
-                    }
-                },
-                reset:function(){
-                    funcs = [];
-                }
-            }
-        },
         randomColor:function(){
             var rnd = function(){
                     return Math.round(Math.random()*255);
@@ -193,6 +152,52 @@ if ( typeof define === 'function' && define.amd ) {
     };
 
     Dragee.util = util;
+    window.Dragee = Dragee;
+})();;(function(){
+    'use strict';
+    var Dragee = window.Dragee || {}
+
+    function Event(context, options){
+        options = options || {}
+        this.funcs = [];
+        this.context = context;
+        this.isReverse = options.isReverse || false;
+        this.isStopOnTrue = options.isStopOnTrue || false;
+    }
+
+    Event.prototype.fire = function(){
+        var args = [].slice.call(arguments),
+            i, retValue, fs = this.isReverse ? this.funcs.slice().reverse() : this.funcs;
+
+        for(i = 0; i < fs.length; i++){
+            retValue = fs[i].apply(this.context, args);
+            if(this.isStopOnTrue && retValue){
+                return true;
+            }
+        }
+        return !this.isStopOnTrue;
+    };
+
+    Event.prototype.add = function(f){
+        this.funcs.push(f);
+    };
+
+    Event.prototype.unshift = function(f){
+        this.funcs.unshift(f);
+    };
+
+    Event.prototype.remove = function(f){
+        var index = this.funcs.indexOf(f);
+        if(index !== -1){
+            funcs.splice(index, 1)
+        }
+    };
+
+    Event.prototype.reset = function(f){
+        this.funcs = [];
+    };
+
+    Dragee.Event = Event;
     window.Dragee = Dragee;
 })();;clone = function (o) {
     function c(o) {
@@ -1133,11 +1138,9 @@ try {
                 this.options[i] = options[i];
             }
         }
-        this.onEnd = Dragee.util.triggerFactory({
-            context: this, isReverse: true, isStopOnTrue: true
-        });
-        this.onMove = Dragee.util.triggerFactory({context: this});
-        this.onStart = Dragee.util.triggerFactory({context: this});
+        this.onEnd = new Dragee.Event(this, { isReverse: true, isStopOnTrue: true });
+        this.onMove = new Dragee.Event(this);
+        this.onStart = new Dragee.Event(this);
 
         this.onEnd.add(function(){
             this.move(this.position, 0, true, true);
@@ -1460,7 +1463,7 @@ try {
 		}
 		this.draggables = draggables;
 		lists.push(this);
-		this.onChange = Dragee.util.triggerFactory({context: this});
+		this.onChange = new Dragee.Event(this);
 		if(options && options.onChange){
 			this.onChange.add(options.onChange);
 		}
@@ -1912,9 +1915,9 @@ try {
 		targets.push(this);
 		this.element = element;
 		this.draggables = draggables;
-		this.onAdd = Dragee.util.triggerFactory({context: this});
-		this.beforeAdd = Dragee.util.triggerFactory({context: this});
-		this.onRemove = Dragee.util.triggerFactory({context: this});
+		this.onAdd = new Dragee.Event(this);
+		this.beforeAdd = new Dragee.Event(this);
+		this.onRemove = new Dragee.Event(this);
 
 		options.onRemove && this.onRemove.add(options.onRemove);
 		options.onAdd && this.onAdd.add(options.onAdd);
@@ -1925,9 +1928,9 @@ try {
 
 	Target.prototype.getRectangle = function(){
 		return mathPoint.createRectangleFromElement(
-			this.element, 
-			this.options.parent, 
-			this.options.isContentBoxSize, 
+			this.element,
+			this.options.parent,
+			this.options.isContentBoxSize,
 			true
 		);
 	};
@@ -1936,10 +1939,10 @@ try {
 		if(this.options.catchDraggable) {
 			return this.options.catchDraggable(this, draggable);
 		} else {
-			var targetRectangle = this.getRectangle(), 
+			var targetRectangle = this.getRectangle(),
 				draggableSquare = draggable.getRectangle().getSquare();
 
-			return draggableSquare < targetRectangle.getSquare() 
+			return draggableSquare < targetRectangle.getSquare()
 				&& targetRectangle.includePoint(draggable.getCenter());
 		}
 	};
@@ -1992,16 +1995,16 @@ try {
 	};
 
 	Target.prototype.onEnd = function(draggable){
-		var newDraggablesIndex = [], 
-			rectangles, 
+		var newDraggablesIndex = [],
+			rectangles,
 			includePoint = this.getRectangle().includePoint(draggable.getPosition());
 
 		if(!includePoint){
 			if(this.getRectangle().includePoint(draggable.getCenter())) {
 				draggable.position = draggable.getCenter().clone();
 			} else {
-				return false;	
-			}	
+				return false;
+			}
 		}
 
 		this.beforeAdd.fire(draggable);
@@ -2020,14 +2023,14 @@ try {
 
 	Target.prototype.setPosition = function(rectangles, indexesOfNew, time){
 		this.innerDraggables.slice(0).forEach(function(draggable, i){
-			var rect = rectangles[i], 
-				that = this, 
+			var rect = rectangles[i],
+				that = this,
 				timeEnd = time || time == 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExcange;
 
 			if(rect.removable){
 				draggable.move(draggable.initPosition, timeEnd, true, true);
 				this.innerDraggables.removeItem(draggable);
-				
+
 				this.onRemove.fire(draggable);
 			} else {
 				draggable.move(rect.position, timeEnd, true, true);
@@ -2120,7 +2123,7 @@ try {
 				this.options[i] = options[i];
 			}
 		}
-		this.onChange = Dragee.util.triggerFactory({context: this});
+		this.onChange = new Dragee.Event(this);
 		if(options && options.onChange){
 			this.onChange.add(options.onChange);
 		}

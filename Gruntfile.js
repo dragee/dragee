@@ -10,6 +10,7 @@ module.exports = function(grunt) {
         src: [
           "bower_components/get-style-property/get-style-property.js",
           "src/util.js",
+          "src/event.js",
           "src/expandnative.js",
           "src/point.js",
           "src/bound.js",

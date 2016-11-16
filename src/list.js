@@ -18,7 +18,7 @@
 		}
 		this.draggables = draggables;
 		lists.push(this);
-		this.onChange = Dragee.util.triggerFactory({context: this});
+		this.onChange = new Dragee.Event(this);
 		if(options && options.onChange){
 			this.onChange.add(options.onChange);
 		}

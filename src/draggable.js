@@ -41,11 +41,9 @@
                 this.options[i] = options[i];
             }
         }
-        this.onEnd = Dragee.util.triggerFactory({
-            context: this, isReverse: true, isStopOnTrue: true
-        });
-        this.onMove = Dragee.util.triggerFactory({context: this});
-        this.onStart = Dragee.util.triggerFactory({context: this});
+        this.onEnd = new Dragee.Event(this, { isReverse: true, isStopOnTrue: true });
+        this.onMove = new Dragee.Event(this);
+        this.onStart = new Dragee.Event(this);
 
         this.onEnd.add(function(){
             this.move(this.position, 0, true, true);

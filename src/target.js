@@ -19,9 +19,9 @@
 		targets.push(this);
 		this.element = element;
 		this.draggables = draggables;
-		this.onAdd = Dragee.util.triggerFactory({context: this});
-		this.beforeAdd = Dragee.util.triggerFactory({context: this});
-		this.onRemove = Dragee.util.triggerFactory({context: this});
+		this.onAdd = new Dragee.Event(this);
+		this.beforeAdd = new Dragee.Event(this);
+		this.onRemove = new Dragee.Event(this);
 
 		options.onRemove && this.onRemove.add(options.onRemove);
 		options.onAdd && this.onAdd.add(options.onAdd);
@@ -32,9 +32,9 @@
 
 	Target.prototype.getRectangle = function(){
 		return mathPoint.createRectangleFromElement(
-			this.element, 
-			this.options.parent, 
-			this.options.isContentBoxSize, 
+			this.element,
+			this.options.parent,
+			this.options.isContentBoxSize,
 			true
 		);
 	};
@@ -43,10 +43,10 @@
 		if(this.options.catchDraggable) {
 			return this.options.catchDraggable(this, draggable);
 		} else {
-			var targetRectangle = this.getRectangle(), 
+			var targetRectangle = this.getRectangle(),
 				draggableSquare = draggable.getRectangle().getSquare();
 
-			return draggableSquare < targetRectangle.getSquare() 
+			return draggableSquare < targetRectangle.getSquare()
 				&& targetRectangle.includePoint(draggable.getCenter());
 		}
 	};
@@ -99,16 +99,16 @@
 	};
 
 	Target.prototype.onEnd = function(draggable){
-		var newDraggablesIndex = [], 
-			rectangles, 
+		var newDraggablesIndex = [],
+			rectangles,
 			includePoint = this.getRectangle().includePoint(draggable.getPosition());
 
 		if(!includePoint){
 			if(this.getRectangle().includePoint(draggable.getCenter())) {
 				draggable.position = draggable.getCenter().clone();
 			} else {
-				return false;	
-			}	
+				return false;
+			}
 		}
 
 		this.beforeAdd.fire(draggable);
@@ -127,14 +127,14 @@
 
 	Target.prototype.setPosition = function(rectangles, indexesOfNew, time){
 		this.innerDraggables.slice(0).forEach(function(draggable, i){
-			var rect = rectangles[i], 
-				that = this, 
+			var rect = rectangles[i],
+				that = this,
 				timeEnd = time || time == 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExcange;
 
 			if(rect.removable){
 				draggable.move(draggable.initPosition, timeEnd, true, true);
 				this.innerDraggables.removeItem(draggable);
-				
+
 				this.onRemove.fire(draggable);
 			} else {
 				draggable.move(rect.position, timeEnd, true, true);
