@@ -3,7 +3,7 @@
 
     import util from './util'
     import {boundType, boundFactory} from './bound'
-    import {mathPoint, Point} from './point'
+    import {mathPoint, Point, Rectangle} from './point'
 
     var Dragee = { util, boundType, boundFactory };//todo remove after refactore
 

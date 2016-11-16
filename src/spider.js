@@ -1,7 +1,12 @@
-(function(){
-	'use strict';
-	var Dragee = window.Dragee || {},
-		spiders = [];
+'use strict';
+
+	import util from './util'
+	import {mathPoint, Point} from './point'
+	import {boundType, boundFactory} from './bound'
+	import {Draggable, draggables, events} from './draggable'
+
+	var Dragee = {util, boundFactory, boundType, Draggable};
+	var spiders = [];
 
 	function Spider(area, elements, options){
 		var i, areaRectangle = mathPoint.createRectangleFromElement(area, area);
@@ -40,9 +45,9 @@
 				bound = Dragee.boundFactory(Dragee.boundType.line)(start, end);
 
 			return new Dragee.Draggable(element, {
-				parent: this.area, 
-				bound: bound, 
-				position: start, 
+				parent: this.area,
+				bound: bound,
+				position: start,
 				onMove:function (){
 					that.draw();
 					return true;
@@ -76,7 +81,5 @@
 		this.context.fill();
 	}
 
-	Dragee.spiders = spiders;
-	Dragee.Spider = Spider;
-	window.Dragee = Dragee;
-})();
+
+	export {spiders, Spider}

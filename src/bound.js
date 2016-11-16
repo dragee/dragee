@@ -2,8 +2,7 @@
 import {mathPoint} from './point'
 
 
-	var Dragee = window.Dragee || {},
-		boundType = {
+	var boundType = {
 			element: -1,
 			rectangle: 0,
 			lineX: 1,
@@ -12,7 +11,8 @@ import {mathPoint} from './point'
 			unificationOfRectangle: 4,
 			circle:5,
 			arc:6
-		};
+	};
+	
 	function boundFactory(type){
 		switch(type){
 			case boundType.element:

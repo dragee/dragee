@@ -249,8 +249,3 @@
 	}
 
   export {lists, List, listFactory};
-
-	// Dragee.lists = lists;
-	// Dragee.List = List;
-	// Dragee.listFactory = listFactory;
-	// window.Dragee = Dragee;
