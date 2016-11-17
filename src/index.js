@@ -9,6 +9,7 @@ import {boundType, boundFactory} from './bound'
 import {spiders, Spider} from './spider'
 import {arcSliders, ArcSlider} from './arcslider'
 import {charts, Chart} from './chart'
+import {listSwitcherFactory, ListSwitcher} from './listswitcher'
 
 global.Point = Point
 
@@ -21,4 +22,5 @@ export { Draggable,
   spiders, Spider,
   arcSliders, ArcSlider,
   charts, Chart,
+  listSwitcherFactory, ListSwitcher,
 }

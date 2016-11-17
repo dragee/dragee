@@ -1,6 +1,10 @@
-(function(){
-	'use strict';
-	var Dragee = window.Dragee || {};
+'use strict';
+
+	import {mathPoint, Point} from './point'
+	import {Draggable} from './draggable'
+	import {List} from './list'
+
+	var Dragee = { List, Draggable };//todo remove after refactore
 
 	function ListSwitcher(draggables, options){
 		options = options || {};
@@ -118,8 +122,4 @@
 		return new ListSwitcher(draggables, listOptions);
 	}
 
-	Dragee = Dragee || {};
-	Dragee.ListSwitcher = ListSwitcher;
-	Dragee.listSwitcherFactory = listSwitcherFactory;
-	window.Dragee = Dragee;
-})();
+  export {listSwitcherFactory, ListSwitcher}
