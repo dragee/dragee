@@ -1,10 +1,19 @@
 'use strict';
 
+
 	import {mathPoint, Point} from './point'
 	import {Draggable} from './draggable'
 	import {List} from './list'
 
 	var Dragee = { List, Draggable };//todo remove after refactore
+
+	var extend = function(Child, Parent) {
+	    var F = function() { }
+	    F.prototype = Parent.prototype;
+	    Child.prototype = new F();
+	    Child.prototype.constructor = Child;
+	    Child.superclass = Parent.prototype;
+	};//todo remove after refacore
 
 	function ListSwitcher(draggables, options){
 		options = options || {};
