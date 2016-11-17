@@ -1,7 +1,14 @@
-(function(){
 	'use strict';
 
-	var Dragee = window.Dragee || {}, targets = [];
+	import util from './util'
+	import Event from './event'
+	import {mathPoint} from './point'
+	import {positionType, sortingFactory, positionFactory} from './positioning'
+	import {targetManagers} from './targetManager'
+
+	var Dragee = { util, positionType,  positionFactory, sortingFactory, targetManagers, Event };//todo remove after refactore
+
+	var targets = [];
 
 	function Target(element, draggables, options){
 		options = options || {};
@@ -204,7 +211,4 @@
 		this.innerDraggables.slice();
 	}
 
-	Dragee.targets = targets;
-	Dragee.Target = Target;
-	window.Dragee = Dragee;
-})();
+	export {targets, Target};

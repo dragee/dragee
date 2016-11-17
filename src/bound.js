@@ -1,7 +1,8 @@
-(function(){
-	'use strict';
-	var Dragee = window.Dragee || {},
-		boundType = {
+'use strict';
+import {mathPoint} from './point'
+
+
+	var boundType = {
 			element: -1,
 			rectangle: 0,
 			lineX: 1,
@@ -10,7 +11,8 @@
 			unificationOfRectangle: 4,
 			circle:5,
 			arc:6
-		};
+	};
+	
 	function boundFactory(type){
 		switch(type){
 			case boundType.element:
@@ -117,7 +119,4 @@
 		}
 	}
 
-	Dragee.boundType = boundType;
-	Dragee.boundFactory = boundFactory;
-	window.Dragee = Dragee;
-})();
+  export {boundType, boundFactory};

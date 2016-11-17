@@ -1,6 +1,15 @@
-(function(){
-	'use strict';
-	var Dragee = window.Dragee || {}, lists = [];
+'use strict';
+
+	var lists = [];
+
+	import util from './util'
+	import Event from './event'
+	import {mathPoint, Point} from './point'
+	import {boundType, boundFactory} from './bound'
+	import {Draggable, draggables, events} from './draggable'
+
+	var Dragee = { util, boundType, boundFactory, Draggable, events, Event };//todo remove after refactore
+
 
 	function List(draggables, options){
 		var i;
@@ -240,8 +249,4 @@
 		return new List(draggables, listOptions);
 	}
 
-	Dragee.lists = lists;
-	Dragee.List = List;
-	Dragee.listFactory = listFactory;
-	window.Dragee = Dragee;
-})();
+  export {lists, List, listFactory};

@@ -1,7 +1,13 @@
-(function(){
-	'use strict';
-	var Dragee = window.Dragee || {},
-		targetManagers = [];
+'use strict';
+
+	import util from './util'
+	import Event from './event'
+	import {Draggable} from './draggable'
+	import {targets, Target} from './target'
+
+	var Dragee = { util, Draggable,  Target, Event };//todo remove after refactore
+
+	var	targetManagers = [];
 
 	function TargetManager(element, draggables, targets, options){
 		var i;
@@ -122,8 +128,4 @@
 		return new TargetManager(element, draggables, targets, managerOptions);
 	}
 
-	Dragee.targetManagers = targetManagers;
-	Dragee.TargetManager = TargetManager;
-	Dragee.targetManagerFactory = targetManagerFactory;
-	window.Dragee = Dragee;
-})();
+  export {targetManagers, TargetManager, targetManagerFactory};

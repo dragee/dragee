@@ -1,6 +1,4 @@
-(function(){
-    'use strict';
-    var Dragee = window.Dragee || {}
+'use strict';
 
     function Event(context, options){
         options = options || {}
@@ -34,7 +32,7 @@
     Event.prototype.remove = function(f){
         var index = this.funcs.indexOf(f);
         if(index !== -1){
-            funcs.splice(index, 1)
+            this.funcs.splice(index, 1)
         }
     };
 
@@ -42,6 +40,4 @@
         this.funcs = [];
     };
 
-    Dragee.Event = Event;
-    window.Dragee = Dragee;
-})();
+    export default Event;

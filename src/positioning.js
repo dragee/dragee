@@ -1,11 +1,12 @@
-(function(){
-	'use strict';
-	var Dragee = window.Dragee || {},
-		positionType = {
+'use strict';
+import {mathPoint, Point, Rectangle} from './point'
+
+	var	positionType = {
 			notCrossing: 0,
 			floatLeft: 1,
 			floatRight: 2
-		};
+	};
+
 	function positionFactory(type){
 		switch(type){
 			case positionType.notCrossing:
@@ -54,7 +55,7 @@
 						opts[i] = options[i];
 					}
 					return function(rectangleList, indexesOfNews){
-						var boundRect = typeof rectangle === "function" ? rectangle() : rectangle, 
+						var boundRect = typeof rectangle === "function" ? rectangle() : rectangle,
 							rectP2 = boundRect.getP2(), i, boundaryPoints = [boundRect.position];
 						rectangleList.forEach(function(rect, index){
 							var position, isValid = false;
@@ -157,8 +158,4 @@
 		}
 	};
 
-	Dragee.positionType = positionType;
-	Dragee.sortingFactory = sortingFactory;
-	Dragee.positionFactory = positionFactory;
-	window.Dragee = Dragee;
-})();
+  export {positionType, sortingFactory, positionFactory};

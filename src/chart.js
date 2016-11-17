@@ -1,17 +1,14 @@
-(function (global, Dragee){
-    'use strict';
-    var isTouch = 'ontouchstart' in window, mouseEvents = {
-            start:'mousedown',
-            move:'mousemove',
-            end:'mouseup'
-        },
-        touchEvents = {
-            start:'touchstart',
-            move:'touchmove',
-            end:'touchend'
-        },
-        events = isTouch ? touchEvents : mouseEvents,
-        charts = [];
+'use strict';
+
+    import util from './util'
+  	import {mathPoint, Point} from './point'
+  	import {Draggable, draggables, events} from './draggable'
+    import {boundType, boundFactory} from './bound'
+
+    var Dragee = { util, boundType, boundFactory, Draggable };//todo remove after refactore
+
+    var isTouch = 'ontouchstart' in window;
+    var charts = [];
 
     function getArrayWithBoundIndexes(index,length){
         var retIndexes = [];
@@ -227,9 +224,9 @@
 
     Chart.prototype.getAnglesDiff = function(){
         var baseAngle = this.angles[0],
-            angles = this.angles.slice(1),
-            angles.push(baseAngle);
+            angles = this.angles.slice(1);
 
+        angles.push(baseAngle);
         return angles.map(function(angle){
             var diffAngle = mathPoint.normalizeAngle(angle - baseAngle);
             baseAngle = angle;
@@ -298,10 +295,4 @@
     };
 
 
-
-    Dragee = Dragee || {};
-    Dragee.charts = charts;
-    Dragee.Chart = Chart;
-    global.Dragee = Dragee;
-
-})(window, window.Dragee);
+    export {charts, Chart}
