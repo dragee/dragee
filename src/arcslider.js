@@ -3,7 +3,7 @@
 	import util from './util'
 	import {mathPoint} from './point'
 	import {Draggable, draggables, events} from './draggable'
-	import {positionType, sortingFactory, positionFactory} from './positioning'
+	import {boundType, boundFactory} from './bound'
 
 	var Dragee = { util, boundType, boundFactory, Draggable };//todo remove after refactore
 
