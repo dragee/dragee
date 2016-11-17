@@ -1,10 +1,11 @@
 'use strict';
 
 	import util from './util'
+	import Event from './event'
 	import {Draggable} from './draggable'
 	import {targets, Target} from './target'
 
-	var Dragee = { util, Draggable,  Target };//todo remove after refactore
+	var Dragee = { util, Draggable,  Target, Event };//todo remove after refactore
 
 	var	targetManagers = [];
 

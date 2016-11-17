@@ -3,11 +3,12 @@
 	var lists = [];
 
 	import util from './util'
+	import Event from './event'
 	import {mathPoint, Point} from './point'
 	import {boundType, boundFactory} from './bound'
 	import {Draggable, draggables, events} from './draggable'
 
-	var Dragee = { util, boundType, boundFactory, Draggable, events };//todo remove after refactore
+	var Dragee = { util, boundType, boundFactory, Draggable, events, Event };//todo remove after refactore
 
 
 	function List(draggables, options){

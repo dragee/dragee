@@ -1,12 +1,12 @@
 	'use strict';
 
-
 	import util from './util'
+	import Event from './event'
 	import {mathPoint} from './point'
 	import {positionType, sortingFactory, positionFactory} from './positioning'
 	import {targetManagers} from './targetManager'
 
-	var Dragee = { util, positionType,  positionFactory, sortingFactory, targetManagers };//todo remove after refactore
+	var Dragee = { util, positionType,  positionFactory, sortingFactory, targetManagers, Event };//todo remove after refactore
 
 	var targets = [];
 

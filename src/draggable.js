@@ -2,10 +2,11 @@
 
 
     import util from './util'
+    import Event from './event'
     import {boundType, boundFactory} from './bound'
     import {mathPoint, Point, Rectangle} from './point'
 
-    var Dragee = { util, boundType, boundFactory };//todo remove after refactore
+    var Dragee = { util, boundType, boundFactory, Event};//todo remove after refactore
 
     var isTouch = 'ontouchstart' in window, mouseEvents = {
         start: 'mousedown',
