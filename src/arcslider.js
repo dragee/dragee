@@ -1,5 +1,12 @@
-(function (global, Dragee){
-	'use strict';
+'use strict';
+
+	import util from './util'
+	import {mathPoint} from './point'
+	import {Draggable, draggables, events} from './draggable'
+	import {positionType, sortingFactory, positionFactory} from './positioning'
+
+	var Dragee = { util, boundType, boundFactory, Draggable };//todo remove after refactore
+
 	var arcSliders = [];
 
 	function ArcSlider(area, element, options){
@@ -75,9 +82,4 @@
 		this.onChange(this.angle);
 	};
 
-
-	Dragee = Dragee || {};
-	Dragee.arcSliders = arcSliders;
-	Dragee.ArcSlider = ArcSlider;
-	global.Dragee = Dragee;
-})(window, window.Dragee);
+  export {arcSliders, ArcSlider};

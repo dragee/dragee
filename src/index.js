@@ -7,6 +7,7 @@ import {targetManagers, TargetManager, targetManagerFactory} from './targetManag
 import {positionType, sortingFactory, positionFactory } from './positioning'
 import {boundType, boundFactory} from './bound'
 import {spiders, Spider} from './spider'
+import {arcSliders, ArcSlider} from './arcslider'
 
 global.Point = Point
 
@@ -16,4 +17,6 @@ export { Draggable,
   targetManagers, TargetManager, targetManagerFactory,
   positionType, sortingFactory, positionFactory,
   boundType, boundFactory,
-  spiders, Spider }
+  spiders, Spider,
+  arcSliders, ArcSlider,
+}
