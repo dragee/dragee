@@ -8,6 +8,7 @@ import {positionType, sortingFactory, positionFactory } from './positioning'
 import {boundType, boundFactory} from './bound'
 import {spiders, Spider} from './spider'
 import {arcSliders, ArcSlider} from './arcslider'
+import {charts, Chart} from './chart'
 
 global.Point = Point
 
@@ -19,4 +20,5 @@ export { Draggable,
   boundType, boundFactory,
   spiders, Spider,
   arcSliders, ArcSlider,
+  charts, Chart,
 }
