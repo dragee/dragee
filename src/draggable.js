@@ -3,6 +3,7 @@
 
     import util from './util'
     import Event from './event'
+    import getStyleProperty from 'desandro-get-style-property'
     import {boundType, boundFactory} from './bound'
     import {mathPoint, Point, Rectangle} from './point'
 
