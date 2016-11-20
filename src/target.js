@@ -29,7 +29,7 @@ function Target(element, draggables, options){
 	targets.push(this);
 	this.element = element;
 	draggables.forEach(function(draggable){
-		draggable.target = target;
+		draggable.targets.push(target);
 	})
 	this.draggables = draggables;
 	this.onAdd = new Dragee.Event(this);

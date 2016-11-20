@@ -38,6 +38,7 @@ transitionProperty = getStyleProperty('transition');
 function Draggable(element, options){
     options = options || {};
     var i, that = this, parent = options.parent || Dragee.util.getDefaultParent(element);
+    this.targets = [];
     this.options = {
         parent: parent,
         bound: Dragee.boundFactory(Dragee.boundType.element)(parent, parent),
