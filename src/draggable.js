@@ -1,11 +1,11 @@
 'use strict';
 
-
 import util from './util'
 import Event from './event'
 import getStyleProperty from 'desandro-get-style-property'
 import {boundType, boundFactory} from './bound'
 import {mathPoint, Point, Rectangle} from './point'
+import {defaultScope} from "./scope"
 
 var Dragee = { util, boundType, boundFactory, Event};//todo remove after refactore
 
@@ -20,7 +20,7 @@ var isTouch = 'ontouchstart' in window, mouseEvents = {
 },
 events = isTouch ? touchEvents : mouseEvents,
 draggables = [],
-onCreateDraggable = function(draggable){
+preventDoubleInit = function(draggable){
     var message = "for this element Dragee.Draggable is already exist, don't create it twice ";
     if(draggables.some(function(existing){
         return draggable.element === existing.element;
@@ -29,14 +29,16 @@ onCreateDraggable = function(draggable){
     }
     draggables.push(draggable);
 },
+addToDefaultScope = function(draggable){
+    defaultScope.addDraggable(draggable);
+},
 transformProperty = getStyleProperty('transform'),
 transitionProperty = getStyleProperty('transition');
 
-//Dragee.events = events;
-
 function Draggable(element, options){
     options = options || {};
-    var i, that = this, displayListener, parent = options.parent || Dragee.util.getDefaultParent(element);
+    var i, that = this, parent = options.parent || Dragee.util.getDefaultParent(element);
+    this.targets = [];
     this.options = {
         parent: parent,
         bound: Dragee.boundFactory(Dragee.boundType.element)(parent, parent),
@@ -68,9 +70,13 @@ function Draggable(element, options){
     }
     this.element = element;
     this.bound = this.options.bound;
-    onCreateDraggable(this);
+    preventDoubleInit(this);
+    Draggable.onCreate.fire(this);
     that.init();
 }
+
+Draggable.onCreate = new Dragee.Event(Draggable, {isReverse: true, isStopOnTrue: true});
+Draggable.onCreate.add(addToDefaultScope);
 
 Draggable.prototype.init = function(){
     this._enable = true;

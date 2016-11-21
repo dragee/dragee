@@ -59,19 +59,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.ListSwitcher = exports.listSwitcherFactory = exports.Chart = exports.charts = exports.ArcSlider = exports.arcSliders = exports.Spider = exports.spiders = exports.boundFactory = exports.boundType = exports.positionFactory = exports.sortingFactory = exports.positionType = exports.targetManagerFactory = exports.TargetManager = exports.targetManagers = exports.Target = exports.targets = exports.listFactory = exports.List = exports.Draggable = undefined;
+	exports.ListSwitcher = exports.listSwitcherFactory = exports.Chart = exports.charts = exports.ArcSlider = exports.arcSliders = exports.Spider = exports.spiders = exports.boundFactory = exports.boundType = exports.positionFactory = exports.sortingFactory = exports.positionType = exports.scope = exports.scopeFactory = exports.Scope = exports.defaultScope = exports.scopes = exports.Target = exports.targets = exports.listFactory = exports.List = exports.Draggable = undefined;
 	
-	__webpack_require__(2);
+	__webpack_require__(1);
 	
-	var _point = __webpack_require__(3);
+	var _point = __webpack_require__(2);
 	
-	var _draggable = __webpack_require__(5);
+	var _draggable = __webpack_require__(4);
 	
-	var _list = __webpack_require__(8);
+	var _list = __webpack_require__(11);
 	
 	var _target = __webpack_require__(9);
 	
-	var _targetManager = __webpack_require__(11);
+	var _scope = __webpack_require__(8);
 	
 	var _positioning = __webpack_require__(10);
 	
@@ -92,9 +92,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.listFactory = _list.listFactory;
 	exports.targets = _target.targets;
 	exports.Target = _target.Target;
-	exports.targetManagers = _targetManager.targetManagers;
-	exports.TargetManager = _targetManager.TargetManager;
-	exports.targetManagerFactory = _targetManager.targetManagerFactory;
+	exports.scopes = _scope.scopes;
+	exports.defaultScope = _scope.defaultScope;
+	exports.Scope = _scope.Scope;
+	exports.scopeFactory = _scope.scopeFactory;
+	exports.scope = _scope.scope;
 	exports.positionType = _positioning.positionType;
 	exports.sortingFactory = _positioning.sortingFactory;
 	exports.positionFactory = _positioning.positionFactory;
@@ -112,67 +114,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	 * getStyleProperty v1.0.4
-	 * original by kangax
-	 * http://perfectionkills.com/feature-testing-css-properties/
-	 * MIT license
-	 */
-	
-	/*jshint browser: true, strict: true, undef: true */
-	/*global define: false, exports: false, module: false */
-	
-	( function( window ) {
-	
-	'use strict';
-	
-	var prefixes = 'Webkit Moz ms Ms O'.split(' ');
-	var docElemStyle = document.documentElement.style;
-	
-	function getStyleProperty( propName ) {
-	  if ( !propName ) {
-	    return;
-	  }
-	
-	  // test standard property first
-	  if ( typeof docElemStyle[ propName ] === 'string' ) {
-	    return propName;
-	  }
-	
-	  // capitalize
-	  propName = propName.charAt(0).toUpperCase() + propName.slice(1);
-	
-	  // test vendor specific properties
-	  var prefixed;
-	  for ( var i=0, len = prefixes.length; i < len; i++ ) {
-	    prefixed = prefixes[i] + propName;
-	    if ( typeof docElemStyle[ prefixed ] === 'string' ) {
-	      return prefixed;
-	    }
-	  }
-	}
-	
-	// transport
-	if ( true ) {
-	  // AMD
-	  !(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
-	    return getStyleProperty;
-	  }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	} else if ( typeof exports === 'object' ) {
-	  // CommonJS for Component
-	  module.exports = getStyleProperty;
-	} else {
-	  // browser global
-	  window.getStyleProperty = getStyleProperty;
-	}
-	
-	})( window );
-
-
-/***/ },
-/* 2 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -442,7 +383,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	} catch (defPropException) {/*Do nothing if an exception occurs*/};
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -452,7 +393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.mathPoint = exports.Rectangle = exports.Point = undefined;
 	
-	var _util = __webpack_require__(4);
+	var _util = __webpack_require__(3);
 	
 	var _util2 = _interopRequireDefault(_util);
 	
@@ -796,7 +737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.mathPoint = mathPoint;
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -904,7 +845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -914,21 +855,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.events = exports.draggables = exports.Draggable = undefined;
 	
-	var _util = __webpack_require__(4);
+	var _util = __webpack_require__(3);
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _event = __webpack_require__(6);
+	var _event = __webpack_require__(5);
 	
 	var _event2 = _interopRequireDefault(_event);
 	
-	var _desandroGetStyleProperty = __webpack_require__(1);
+	var _desandroGetStyleProperty = __webpack_require__(6);
 	
 	var _desandroGetStyleProperty2 = _interopRequireDefault(_desandroGetStyleProperty);
 	
 	var _bound = __webpack_require__(7);
 	
-	var _point = __webpack_require__(3);
+	var _point = __webpack_require__(2);
+	
+	var _scope = __webpack_require__(8);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -947,7 +890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	},
 	    events = isTouch ? touchEvents : mouseEvents,
 	    draggables = [],
-	    onCreateDraggable = function onCreateDraggable(draggable) {
+	    preventDoubleInit = function preventDoubleInit(draggable) {
 	    var message = "for this element Dragee.Draggable is already exist, don't create it twice ";
 	    if (draggables.some(function (existing) {
 	        return draggable.element === existing.element;
@@ -956,17 +899,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    draggables.push(draggable);
 	},
+	    addToDefaultScope = function addToDefaultScope(draggable) {
+	    _scope.defaultScope.addDraggable(draggable);
+	},
 	    transformProperty = (0, _desandroGetStyleProperty2.default)('transform'),
 	    transitionProperty = (0, _desandroGetStyleProperty2.default)('transition');
-	
-	//Dragee.events = events;
 	
 	function Draggable(element, options) {
 	    options = options || {};
 	    var i,
 	        that = this,
-	        displayListener,
 	        parent = options.parent || Dragee.util.getDefaultParent(element);
+	    this.targets = [];
 	    this.options = {
 	        parent: parent,
 	        bound: Dragee.boundFactory(Dragee.boundType.element)(parent, parent),
@@ -998,9 +942,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    this.element = element;
 	    this.bound = this.options.bound;
-	    onCreateDraggable(this);
+	    preventDoubleInit(this);
+	    Draggable.onCreate.fire(this);
 	    that.init();
 	}
+	
+	Draggable.onCreate = new Dragee.Event(Draggable, { isReverse: true, isStopOnTrue: true });
+	Draggable.onCreate.add(addToDefaultScope);
 	
 	Draggable.prototype.init = function () {
 	    this._enable = true;
@@ -1278,7 +1226,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.events = events;
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1332,6 +1280,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	 * getStyleProperty v1.0.4
+	 * original by kangax
+	 * http://perfectionkills.com/feature-testing-css-properties/
+	 * MIT license
+	 */
+	
+	/*jshint browser: true, strict: true, undef: true */
+	/*global define: false, exports: false, module: false */
+	
+	( function( window ) {
+	
+	'use strict';
+	
+	var prefixes = 'Webkit Moz ms Ms O'.split(' ');
+	var docElemStyle = document.documentElement.style;
+	
+	function getStyleProperty( propName ) {
+	  if ( !propName ) {
+	    return;
+	  }
+	
+	  // test standard property first
+	  if ( typeof docElemStyle[ propName ] === 'string' ) {
+	    return propName;
+	  }
+	
+	  // capitalize
+	  propName = propName.charAt(0).toUpperCase() + propName.slice(1);
+	
+	  // test vendor specific properties
+	  var prefixed;
+	  for ( var i=0, len = prefixes.length; i < len; i++ ) {
+	    prefixed = prefixes[i] + propName;
+	    if ( typeof docElemStyle[ prefixed ] === 'string' ) {
+	      return prefixed;
+	    }
+	  }
+	}
+	
+	// transport
+	if ( true ) {
+	  // AMD
+	  !(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
+	    return getStyleProperty;
+	  }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	} else if ( typeof exports === 'object' ) {
+	  // CommonJS for Component
+	  module.exports = getStyleProperty;
+	} else {
+	  // browser global
+	  window.getStyleProperty = getStyleProperty;
+	}
+	
+	})( window );
+
+
+/***/ },
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1342,7 +1351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.boundFactory = exports.boundType = undefined;
 	
-	var _point = __webpack_require__(3);
+	var _point = __webpack_require__(2);
 	
 	var boundType = {
 		element: -1,
@@ -1469,275 +1478,180 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	    value: true
 	});
-	exports.listFactory = exports.List = exports.lists = undefined;
+	exports.scope = exports.scopeFactory = exports.Scope = exports.defaultScope = exports.scopes = undefined;
 	
-	var _util = __webpack_require__(4);
+	var _util = __webpack_require__(3);
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _event = __webpack_require__(6);
+	var _event = __webpack_require__(5);
 	
 	var _event2 = _interopRequireDefault(_event);
 	
-	var _point = __webpack_require__(3);
+	var _draggable = __webpack_require__(4);
 	
-	var _bound = __webpack_require__(7);
-	
-	var _draggable = __webpack_require__(5);
+	var _target = __webpack_require__(9);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var lists = [];
+	var Dragee = { util: _util2.default, Draggable: _draggable.Draggable, Target: _target.Target, Event: _event2.default }; //todo remove after refactore
 	
-	var Dragee = { util: _util2.default, boundType: _bound.boundType, boundFactory: _bound.boundFactory, Draggable: _draggable.Draggable, events: _draggable.events, Event: _event2.default }; //todo remove after refactore
+	var scopes = [],
+	    defaultScope;
 	
+	function Scope(draggables, targets, options) {
+	    scopes.forEach(function (scope) {
+	        draggables && draggables.forEach(function (draggable) {
+	            scope.draggables.removeItem(draggable);
+	        });
+	        targets && targets.forEach(function (target) {
+	            scope.targets.removeItem(target);
+	        });
+	    });
 	
-	function List(draggables, options) {
-		var i;
-		this.options = {
-			timeEnd: 200,
-			timeExcange: 400,
-			radius: 30,
-			getLength: _point.mathPoint.getLength(),
-			isDisplacement: false
-		};
-		for (i in options) {
-			if (options.hasOwnProperty(i)) {
-				this.options[i] = options[i];
-			}
-		}
-		this.draggables = draggables;
-		lists.push(this);
-		this.onChange = new Dragee.Event(this);
-		if (options && options.onChange) {
-			this.onChange.add(options.onChange);
-		}
-		this.init();
+	    this.draggables = draggables || [];
+	    this.targets = targets || [];
+	    scopes.push(this);
+	    this.options = {
+	        timeEnd: options && options.timeEnd || 400
+	    };
+	
+	    this.onChange = new Dragee.Event(this);
+	    if (options && options.onChange) {
+	        this.onChange.add(options.onChange);
+	    }
+	    this.init();
 	}
 	
-	List.prototype.init = function () {
-		this._enable = true;
-		this.draggables.forEach(this.initDraggable, this);
+	Scope.prototype.init = function () {
+	    var that = this;
+	    this.draggables.forEach(function (draggable) {
+	        draggable.onEnd.add(function () {
+	            return that.onEnd(this);
+	        });
+	    });
 	};
 	
-	List.prototype.initDraggable = function (draggable) {
-		var _moveHandler,
-		    that = this;
-		draggable.enable = this._enable;
-		if (this.options.isDisplacement) {
-			_moveHandler = function moveHandler() {
-				if (this.isDragee) {
-					that.onStart(this);
-					draggable.onMove.remove(_moveHandler);
-					return true;
-				}
-			};
-			draggable.onEnd.add(function () {
-				that.onEndDisplaycement(this);
-				draggable.onMove.add(_moveHandler);
-				return true;
-			});
-			draggable.onMove.add(_moveHandler);
-		} else {
-			draggable.onEnd.add(function () {
-				that.onEnd(this);
-				return true;
-			});
-		}
+	Scope.prototype.addDraggable = function (draggable) {
+	    var that = this;
+	
+	    this.draggables.push(draggable);
+	    draggable.onEnd.unshift(function () {
+	        return that.onEnd(this);
+	    });
 	};
 	
-	List.prototype.moveOrSave = function (draggable, position, time) {
-		if (draggable.isDragee) {
-			draggable.fixPosition = position;
-		} else {
-			draggable.move(position, time, true);
-		}
+	Scope.prototype.addTarget = function (target) {
+	    this.targets.push(target);
 	};
 	
-	List.prototype.onEnd = function (draggable) {
-		var fixPositions = this.getCurrentFixPosition(),
-		    currentIndex,
-		    excangeIndex;
-		currentIndex = this.draggables.indexOf(draggable);
-		excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
-		if (excangeIndex === -1 || excangeIndex === currentIndex) {
-			draggable.move(draggable.fixPosition, this.options.timeEnd, true);
-		} else {
-			this.moveOrSave(this.draggables[excangeIndex], fixPositions[currentIndex], this.options.timeExcange);
-			this.draggables[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true);
-			this.onChange.fire();
-		}
-		return true;
+	Scope.prototype.onEnd = function (draggable) {
+	    var shotTargets = this.targets.filter(function (target) {
+	        return target.draggables.indexOf(draggable) !== -1;
+	    }).filter(function (target) {
+	        return target.catchDraggable(draggable);
+	    }).sort(function (a, b) {
+	        return a.getRectangle().getSquare() - b.getRectangle().getSquare();
+	    });
+	
+	    if (shotTargets.length) {
+	        shotTargets[0].onEnd(draggable);
+	    } else if (draggable.targets.length) {
+	        draggable.move(draggable.initPosition, this.options.timeEnd, true, true);
+	    }
+	    this.onChange.fire();
+	    return true;
 	};
 	
-	List.prototype.onEndDisplaycement = function (draggable) {
-		var currentIndex,
-		    i,
-		    targetIndex,
-		    sortedDraggables = this.getSortedDraggables(),
-		    fixPositions = sortedDraggables.map(function (draggable) {
-			return draggable.fixPosition;
-		});
-		currentIndex = sortedDraggables.indexOf(draggable);
-		targetIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
-		if (targetIndex !== -1) {
-			if (targetIndex < currentIndex) {
-				for (i = targetIndex; i < currentIndex; i++) {
-					this.moveOrSave(sortedDraggables[i], fixPositions[i + 1], this.options.timeExcange);
-				}
-			} else {
-				for (i = currentIndex; i < targetIndex; i++) {
-					this.moveOrSave(sortedDraggables[i + 1], fixPositions[i], this.options.timeExcange);
-				}
-			}
-			draggable.move(fixPositions[targetIndex], this.options.timeEnd, true);
-		} else {
-			draggable.move(draggable.fixPosition, this.options.timeEnd, true);
-		}
+	Scope.prototype.reset = function () {
+	    this.targets.forEach(function (target) {
+	        target.reset();
+	    });
 	};
 	
-	List.prototype.onStart = function (draggable) {
-		var currentIndex,
-		    i,
-		    sortedDraggables = this.getSortedDraggables(),
-		    fixPositions = sortedDraggables.map(function (draggable) {
-			return draggable.fixPosition;
-		});
-	
-		currentIndex = sortedDraggables.indexOf(draggable);
-		for (i = currentIndex + 1; i < sortedDraggables.length; i++) {
-			this.moveOrSave(sortedDraggables[i], fixPositions[i - 1], this.options.timeExcange);
-		}
-		sortedDraggables[currentIndex].fixPosition = fixPositions[i - 1];
+	Scope.prototype.refresh = function () {
+	    this.draggables.forEach(function (draggable) {
+	        draggable.refresh();
+	    });
+	    this.targets.forEach(function (target) {
+	        target.refresh();
+	    });
 	};
 	
-	List.prototype.getCurrentFixPosition = function () {
-		return this.draggables.map(function (draggable) {
-			return draggable.fixPosition.clone();
-		});
-	};
-	
-	List.prototype.getSortedDraggables = function () {
-		var sortedDraggables,
-		    initPositions = this.draggables.map(function (draggable) {
-			return draggable.initPosition;
-		});
-		sortedDraggables = initPositions.map(function (position) {
-			return this.draggables.filter(function (draggable) {
-				return draggable.fixPosition.compare(position);
-			}, this)[0];
-		}, this);
-		return sortedDraggables;
-	};
-	
-	List.prototype.reset = function () {
-		this.draggables.forEach(function (draggable) {
-			draggable.move(draggable.initPosition, 0, true, false);
-		});
-	};
-	
-	List.prototype.refresh = function () {
-		this.draggables.forEach(function (draggable) {
-			draggable.refresh();
-		});
-	};
-	
-	List.prototype.add = function (draggables) {
-		var that = this;
-		if (!(draggables instanceof Array)) {
-			draggables = [draggables];
-		}
-		draggables.forEach(this.initDraggable, this);
-		this.draggables = this.draggables.concat(draggables);
-	};
-	
-	List.prototype.remove = function (draggables) {
-		var j,
-		    initPositions = this.draggables.map(function (draggable) {
-			return draggable.initPosition;
-		}),
-		    list = [],
-		    sortedDraggables = this.getSortedDraggables();
-		if (!(draggables instanceof Array)) {
-			draggables = [draggables];
-		}
-		draggables.forEach(function (draggable) {
-			draggable.onEnd.reset();
-			draggable.onMove.reset(); //todo remove reset in future
-			this.draggables.removeItem(draggable);
-			Dragee.util.remove(this.draggables, draggable);
-		}, this);
-		j = 0;
-		sortedDraggables.forEach(function (draggable, i) {
-			if (this.draggables.indexOf(draggable) !== -1) {
-				if (draggable.fixPosition !== initPositions[j]) {
-					draggable.move(initPositions[j], this.options.timeExcange, true);
-				}
-				draggable.initPosition = initPositions[j];
-				j++;
-				list.push(draggable);
-			}
-		}, this);
-		this.draggables = list;
-	};
-	
-	List.prototype.clear = function () {
-		this.remove(this.draggables.slice());
-	};
-	
-	List.prototype.destroy = function () {
-		this.draggables.forEach(function (draggable) {
-			draggable.destroy();
-		});
-	};
-	
-	List.prototype.__defineGetter__("positions", function () {
-		return this.getCurrentFixPosition();
+	Scope.prototype.__defineGetter__("positions", function () {
+	    return this.targets.map(function (target) {
+	        return target.innerDraggables.map(function (draggable) {
+	            return this.draggables.indexOf(draggable);
+	        }, this);
+	    }, this);
 	});
 	
-	List.prototype.__defineSetter__("positions", function (positions) {
-		var message = "wrong array length";
-		if (positions.length === this.draggables.length) {
-			positions.forEach(function (point, i) {
-				this.draggables[i].move(point, 0, true, true);
-			}, this);
-		} else {
-			alert(message);
-			throw message;
-		}
+	Scope.prototype.__defineSetter__("positions", function (positions) {
+	    var message = "wrong array length";
+	    if (positions.length === this.targets.length) {
+	        this.targets.forEach(function (target) {
+	            target.reset();
+	        }, this);
+	        positions.forEach(function (targetIndexes, i) {
+	            targetIndexes.forEach(function (index) {
+	                this.targets[i].add(this.draggables[index]);
+	            }, this);
+	        }, this);
+	    } else {
+	        alert(message);
+	        throw message;
+	    }
 	});
 	
-	List.prototype.__defineGetter__("enable", function () {
-		return this._enable;
-	});
+	exports.defaultScope = defaultScope = new Scope();
 	
-	List.prototype.__defineSetter__("enable", function (value) {
-		this._enable = value;
-		this.draggables.forEach(function (draggable) {
-			draggable.enable = value;
-		});
-	});
+	function scope(fn) {
+	    var currentScope = new Scope(),
+	        addDraggableToScope = function addDraggableToScope(draggable) {
+	        currentScope.addDraggable(draggable);
+	        return true;
+	    },
+	        addTargetToScope = function addTargetToScope(target) {
+	        currentScope.addTarget(target);
+	        return true;
+	    };
 	
-	function listFactory(parentElement, elements, options) {
-		var draggables, draggableOptions, listOptions;
-		options = options || {};
-		draggableOptions = options.draggable || {};
-		listOptions = options.list || {};
-		draggableOptions.parent = draggableOptions.parent || parentElement;
-		elements = Array.prototype.slice.call(elements);
-	
-		draggables = elements.map(function (element) {
-			return new Dragee.Draggable(element, draggableOptions);
-		});
-	
-		return new List(draggables, listOptions);
+	    _draggable.Draggable.onCreate.add(addDraggableToScope);
+	    _target.Target.onCreate.add(addTargetToScope);
+	    fn.call();
+	    _draggable.Draggable.onCreate.remove(addDraggableToScope);
+	    _target.Target.onCreate.remove(addTargetToScope);
+	    return currentScope;
 	}
 	
-	exports.lists = lists;
-	exports.List = List;
-	exports.listFactory = listFactory;
+	function scopeFactory(parentElement, draggableElements, targetElements, options) {
+	    var draggables, targets, draggableOptions, targetOptions, scopeOptions;
+	    options = options || {};
+	    draggableOptions = options.draggable || {};
+	    targetOptions = options.target || {};
+	    scopeOptions = options.scope || {};
+	    draggableOptions.parent = draggableOptions.parent || parentElement;
+	    targetOptions.parent = targetOptions.parent || parentElement;
+	    draggableElements = Array.prototype.slice.call(draggableElements);
+	    targetElements = Array.prototype.slice.call(targetElements);
+	
+	    draggables = draggableElements.map(function (element) {
+	        return new Dragee.Draggable(element, draggableOptions);
+	    });
+	
+	    targets = targetElements.map(function (el) {
+	        return new Dragee.Target(element, draggables, targetOptions);
+	    });
+	    return new Scope(draggables, targets, scopeOptions);
+	}
+	
+	exports.scopes = scopes;
+	exports.defaultScope = defaultScope;
+	exports.Scope = Scope;
+	exports.scopeFactory = scopeFactory;
+	exports.scope = scope;
 
 /***/ },
 /* 9 */
@@ -1750,29 +1664,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.Target = exports.targets = undefined;
 	
-	var _util = __webpack_require__(4);
+	var _util = __webpack_require__(3);
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _event = __webpack_require__(6);
+	var _event = __webpack_require__(5);
 	
 	var _event2 = _interopRequireDefault(_event);
 	
-	var _point = __webpack_require__(3);
+	var _point = __webpack_require__(2);
 	
 	var _positioning = __webpack_require__(10);
 	
-	var _targetManager = __webpack_require__(11);
+	var _scope = __webpack_require__(8);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Dragee = { util: _util2.default, positionType: _positioning.positionType, positionFactory: _positioning.positionFactory, sortingFactory: _positioning.sortingFactory, targetManagers: _targetManager.targetManagers, Event: _event2.default }; //todo remove after refactore
+	var Dragee = { util: _util2.default, positionType: _positioning.positionType, positionFactory: _positioning.positionFactory, sortingFactory: _positioning.sortingFactory, scopes: _scope.scopes, Event: _event2.default }; //todo remove after refactore
 	
-	var targets = [];
+	var targets = [],
+	    addToDefaultScope = function addToDefaultScope(target) {
+		_scope.defaultScope.addTarget(target);
+	};
 	
 	function Target(element, draggables, options) {
 		options = options || {};
-		var i,
+		var target = this,
+		    i,
 		    parent = options.parent || Dragee.util.getDefaultParent(element);
 		this.options = {
 			timeEnd: 200,
@@ -1786,6 +1704,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 		targets.push(this);
 		this.element = element;
+		draggables.forEach(function (draggable) {
+			draggable.targets.push(target);
+		});
 		this.draggables = draggables;
 		this.onAdd = new Dragee.Event(this);
 		this.beforeAdd = new Dragee.Event(this);
@@ -1794,9 +1715,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		options.onRemove && this.onRemove.add(options.onRemove);
 		options.onAdd && this.onAdd.add(options.onAdd);
 		options.beforeAdd && this.beforeAdd.add(options.beforeAdd);
+		Target.onCreate.fire(this);
 	
 		this.init();
 	};
+	
+	Target.onCreate = new Dragee.Event(Target, { isReverse: true, isStopOnTrue: true });
+	Target.onCreate.add(addToDefaultScope);
 	
 	Target.prototype.getRectangle = function () {
 		return _point.mathPoint.createRectangleFromElement(this.element, this.options.parent, this.options.isContentBoxSize, true);
@@ -1848,8 +1773,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	Target.prototype.destroy = function () {
-		Dragee.targetManagers.forEach(function (targetManager) {
-			targetManager.targets.removeItem(this);
+		Dragee.scopes.forEach(function (scope) {
+			scope.targets.removeItem(this);
 		}, this);
 	};
 	
@@ -1890,7 +1815,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Target.prototype.setPosition = function (rectangles, indexesOfNew, time) {
 		this.innerDraggables.slice(0).forEach(function (draggable, i) {
 			var rect = rectangles[i],
-			    that = this,
 			    timeEnd = time || time == 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExcange;
 	
 			if (rect.removable) {
@@ -1981,7 +1905,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.positionFactory = exports.sortingFactory = exports.positionType = undefined;
 	
-	var _point = __webpack_require__(3);
+	var _point = __webpack_require__(2);
 	
 	var positionType = {
 		notCrossing: 0,
@@ -2168,41 +2092,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.targetManagerFactory = exports.TargetManager = exports.targetManagers = undefined;
+	exports.listFactory = exports.List = exports.lists = undefined;
 	
-	var _util = __webpack_require__(4);
+	var _util = __webpack_require__(3);
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _event = __webpack_require__(6);
+	var _event = __webpack_require__(5);
 	
 	var _event2 = _interopRequireDefault(_event);
 	
-	var _draggable = __webpack_require__(5);
+	var _point = __webpack_require__(2);
 	
-	var _target = __webpack_require__(9);
+	var _bound = __webpack_require__(7);
+	
+	var _draggable = __webpack_require__(4);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Dragee = { util: _util2.default, Draggable: _draggable.Draggable, Target: _target.Target, Event: _event2.default }; //todo remove after refactore
+	var lists = [];
 	
-	var targetManagers = [];
+	var Dragee = { util: _util2.default, boundType: _bound.boundType, boundFactory: _bound.boundFactory, Draggable: _draggable.Draggable, events: _draggable.events, Event: _event2.default }; //todo remove after refactore
 	
-	function TargetManager(element, draggables, targets, options) {
+	
+	function List(draggables, options) {
 		var i;
-		this.element = element;
-		this.draggables = draggables;
-		this.targets = targets;
-		targetManagers.push(this);
 		this.options = {
-			timeEnd: 400,
-			timeWaitForRefresh: 500
+			timeEnd: 200,
+			timeExcange: 400,
+			radius: 30,
+			getLength: _point.mathPoint.getLength(),
+			isDisplacement: false
 		};
 		for (i in options) {
 			if (options.hasOwnProperty(i)) {
 				this.options[i] = options[i];
 			}
 		}
+		this.draggables = draggables;
+		lists.push(this);
 		this.onChange = new Dragee.Event(this);
 		if (options && options.onChange) {
 			this.onChange.add(options.onChange);
@@ -2210,75 +2138,190 @@ return /******/ (function(modules) { // webpackBootstrap
 		this.init();
 	}
 	
-	TargetManager.prototype.init = function () {
-		var that = this;
-		this.draggables.forEach(function (draggable) {
+	List.prototype.init = function () {
+		this._enable = true;
+		this.draggables.forEach(this.initDraggable, this);
+	};
+	
+	List.prototype.initDraggable = function (draggable) {
+		var _moveHandler,
+		    that = this;
+		draggable.enable = this._enable;
+		if (this.options.isDisplacement) {
+			_moveHandler = function moveHandler() {
+				if (this.isDragee) {
+					that.onStart(this);
+					draggable.onMove.remove(_moveHandler);
+					return true;
+				}
+			};
 			draggable.onEnd.add(function () {
-				return that.onEnd(this);
+				that.onEndDisplaycement(this);
+				draggable.onMove.add(_moveHandler);
+				return true;
 			});
-		});
-	};
-	
-	TargetManager.prototype.addDraggable = function (draggable) {
-		var that = this;
-	
-		this.draggables.push(draggable);
-		draggable.onEnd.unshift(function () {
-			return that.onEnd(this);
-		});
-	};
-	
-	TargetManager.prototype.onEnd = function (draggable) {
-		var shotTargets = this.targets.filter(function (target) {
-			return target.draggables.indexOf(draggable) !== -1;
-		}).filter(function (target) {
-			return target.catchDraggable(draggable);
-		}).sort(function (a, b) {
-			return a.getRectangle().getSquare() - b.getRectangle().getSquare();
-		});
-	
-		if (shotTargets.length) {
-			shotTargets[0].onEnd(draggable);
+			draggable.onMove.add(_moveHandler);
 		} else {
-			draggable.move(draggable.initPosition, this.options.timeEnd, true, true);
+			draggable.onEnd.add(function () {
+				that.onEnd(this);
+				return true;
+			});
 		}
-		this.onChange.fire();
+	};
+	
+	List.prototype.moveOrSave = function (draggable, position, time) {
+		if (draggable.isDragee) {
+			draggable.fixPosition = position;
+		} else {
+			draggable.move(position, time, true);
+		}
+	};
+	
+	List.prototype.onEnd = function (draggable) {
+		var fixPositions = this.getCurrentFixPosition(),
+		    currentIndex,
+		    excangeIndex;
+		currentIndex = this.draggables.indexOf(draggable);
+		excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
+		if (excangeIndex === -1 || excangeIndex === currentIndex) {
+			draggable.move(draggable.fixPosition, this.options.timeEnd, true);
+		} else {
+			this.moveOrSave(this.draggables[excangeIndex], fixPositions[currentIndex], this.options.timeExcange);
+			this.draggables[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true);
+			this.onChange.fire();
+		}
 		return true;
 	};
 	
-	TargetManager.prototype.reset = function () {
-		this.targets.forEach(function (target) {
-			target.reset();
+	List.prototype.onEndDisplaycement = function (draggable) {
+		var currentIndex,
+		    i,
+		    targetIndex,
+		    sortedDraggables = this.getSortedDraggables(),
+		    fixPositions = sortedDraggables.map(function (draggable) {
+			return draggable.fixPosition;
+		});
+		currentIndex = sortedDraggables.indexOf(draggable);
+		targetIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
+		if (targetIndex !== -1) {
+			if (targetIndex < currentIndex) {
+				for (i = targetIndex; i < currentIndex; i++) {
+					this.moveOrSave(sortedDraggables[i], fixPositions[i + 1], this.options.timeExcange);
+				}
+			} else {
+				for (i = currentIndex; i < targetIndex; i++) {
+					this.moveOrSave(sortedDraggables[i + 1], fixPositions[i], this.options.timeExcange);
+				}
+			}
+			draggable.move(fixPositions[targetIndex], this.options.timeEnd, true);
+		} else {
+			draggable.move(draggable.fixPosition, this.options.timeEnd, true);
+		}
+	};
+	
+	List.prototype.onStart = function (draggable) {
+		var currentIndex,
+		    i,
+		    sortedDraggables = this.getSortedDraggables(),
+		    fixPositions = sortedDraggables.map(function (draggable) {
+			return draggable.fixPosition;
+		});
+	
+		currentIndex = sortedDraggables.indexOf(draggable);
+		for (i = currentIndex + 1; i < sortedDraggables.length; i++) {
+			this.moveOrSave(sortedDraggables[i], fixPositions[i - 1], this.options.timeExcange);
+		}
+		sortedDraggables[currentIndex].fixPosition = fixPositions[i - 1];
+	};
+	
+	List.prototype.getCurrentFixPosition = function () {
+		return this.draggables.map(function (draggable) {
+			return draggable.fixPosition.clone();
 		});
 	};
 	
-	TargetManager.prototype.refresh = function () {
+	List.prototype.getSortedDraggables = function () {
+		var sortedDraggables,
+		    initPositions = this.draggables.map(function (draggable) {
+			return draggable.initPosition;
+		});
+		sortedDraggables = initPositions.map(function (position) {
+			return this.draggables.filter(function (draggable) {
+				return draggable.fixPosition.compare(position);
+			}, this)[0];
+		}, this);
+		return sortedDraggables;
+	};
+	
+	List.prototype.reset = function () {
+		this.draggables.forEach(function (draggable) {
+			draggable.move(draggable.initPosition, 0, true, false);
+		});
+	};
+	
+	List.prototype.refresh = function () {
 		this.draggables.forEach(function (draggable) {
 			draggable.refresh();
 		});
-		this.targets.forEach(function (target) {
-			target.refresh();
+	};
+	
+	List.prototype.add = function (draggables) {
+		if (!(draggables instanceof Array)) {
+			draggables = [draggables];
+		}
+		draggables.forEach(this.initDraggable, this);
+		this.draggables = this.draggables.concat(draggables);
+	};
+	
+	List.prototype.remove = function (draggables) {
+		var j,
+		    initPositions = this.draggables.map(function (draggable) {
+			return draggable.initPosition;
+		}),
+		    list = [],
+		    sortedDraggables = this.getSortedDraggables();
+		if (!(draggables instanceof Array)) {
+			draggables = [draggables];
+		}
+		draggables.forEach(function (draggable) {
+			draggable.onEnd.reset();
+			draggable.onMove.reset(); //todo remove reset in future
+			this.draggables.removeItem(draggable);
+			Dragee.util.remove(this.draggables, draggable);
+		}, this);
+		j = 0;
+		sortedDraggables.forEach(function (draggable, i) {
+			if (this.draggables.indexOf(draggable) !== -1) {
+				if (draggable.fixPosition !== initPositions[j]) {
+					draggable.move(initPositions[j], this.options.timeExcange, true);
+				}
+				draggable.initPosition = initPositions[j];
+				j++;
+				list.push(draggable);
+			}
+		}, this);
+		this.draggables = list;
+	};
+	
+	List.prototype.clear = function () {
+		this.remove(this.draggables.slice());
+	};
+	
+	List.prototype.destroy = function () {
+		this.draggables.forEach(function (draggable) {
+			draggable.destroy();
 		});
 	};
 	
-	TargetManager.prototype.__defineGetter__("positions", function () {
-		return this.targets.map(function (target) {
-			return target.innerDraggables.map(function (draggable) {
-				return this.draggables.indexOf(draggable);
-			}, this);
-		}, this);
+	List.prototype.__defineGetter__("positions", function () {
+		return this.getCurrentFixPosition();
 	});
 	
-	TargetManager.prototype.__defineSetter__("positions", function (positions) {
+	List.prototype.__defineSetter__("positions", function (positions) {
 		var message = "wrong array length";
-		if (positions.length === this.targets.length) {
-			this.targets.forEach(function (target) {
-				target.reset();
-			}, this);
-			positions.forEach(function (targetIndexes, i) {
-				targetIndexes.forEach(function (index) {
-					this.targets[i].add(this.draggables[index]);
-				}, this);
+		if (positions.length === this.draggables.length) {
+			positions.forEach(function (point, i) {
+				this.draggables[i].move(point, 0, true, true);
 			}, this);
 		} else {
 			alert(message);
@@ -2286,30 +2329,35 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	});
 	
-	function targetManagerFactory(element, draggableElements, targetElements, options) {
-		var draggables, targets, draggableOptions, targetOptions, managerOptions;
+	List.prototype.__defineGetter__("enable", function () {
+		return this._enable;
+	});
+	
+	List.prototype.__defineSetter__("enable", function (value) {
+		this._enable = value;
+		this.draggables.forEach(function (draggable) {
+			draggable.enable = value;
+		});
+	});
+	
+	function listFactory(parentElement, elements, options) {
+		var draggables, draggableOptions, listOptions;
 		options = options || {};
 		draggableOptions = options.draggable || {};
-		targetOptions = options.target || {};
-		managerOptions = options.manager || {};
-		draggableOptions.parent = draggableOptions.parent || element;
-		targetOptions.parent = targetOptions.parent || element;
-		draggableElements = Array.prototype.slice.call(draggableElements);
-		targetElements = Array.prototype.slice.call(targetElements);
+		listOptions = options.list || {};
+		draggableOptions.parent = draggableOptions.parent || parentElement;
+		elements = Array.prototype.slice.call(elements);
 	
-		draggables = draggableElements.map(function (element) {
+		draggables = elements.map(function (element) {
 			return new Dragee.Draggable(element, draggableOptions);
 		});
 	
-		targets = targetElements.map(function (el) {
-			return new Dragee.Target(element, draggables, targetOptions);
-		});
-		return new TargetManager(element, draggables, targets, managerOptions);
+		return new List(draggables, listOptions);
 	}
 	
-	exports.targetManagers = targetManagers;
-	exports.TargetManager = TargetManager;
-	exports.targetManagerFactory = targetManagerFactory;
+	exports.lists = lists;
+	exports.List = List;
+	exports.listFactory = listFactory;
 
 /***/ },
 /* 12 */
@@ -2322,15 +2370,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.Spider = exports.spiders = undefined;
 	
-	var _util = __webpack_require__(4);
+	var _util = __webpack_require__(3);
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _point = __webpack_require__(3);
+	var _point = __webpack_require__(2);
 	
 	var _bound = __webpack_require__(7);
 	
-	var _draggable = __webpack_require__(5);
+	var _draggable = __webpack_require__(4);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -2424,13 +2472,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.ArcSlider = exports.arcSliders = undefined;
 	
-	var _util = __webpack_require__(4);
+	var _util = __webpack_require__(3);
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _point = __webpack_require__(3);
+	var _point = __webpack_require__(2);
 	
-	var _draggable = __webpack_require__(5);
+	var _draggable = __webpack_require__(4);
 	
 	var _bound = __webpack_require__(7);
 	
@@ -2515,13 +2563,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.Chart = exports.charts = undefined;
 	
-	var _util = __webpack_require__(4);
+	var _util = __webpack_require__(3);
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _point = __webpack_require__(3);
+	var _point = __webpack_require__(2);
 	
-	var _draggable = __webpack_require__(5);
+	var _draggable = __webpack_require__(4);
 	
 	var _bound = __webpack_require__(7);
 	
@@ -2821,141 +2869,141 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	exports.ListSwitcher = exports.listSwitcherFactory = undefined;
 	
-	var _point = __webpack_require__(3);
+	var _point = __webpack_require__(2);
 	
-	var _draggable = __webpack_require__(5);
+	var _draggable = __webpack_require__(4);
 	
-	var _list = __webpack_require__(8);
+	var _list = __webpack_require__(11);
 	
 	var Dragee = { List: _list.List, Draggable: _draggable.Draggable }; //todo remove after refactore
 	
 	var extend = function extend(Child, Parent) {
-		var F = function F() {};
-		F.prototype = Parent.prototype;
-		Child.prototype = new F();
-		Child.prototype.constructor = Child;
-		Child.superclass = Parent.prototype;
+	  var F = function F() {};
+	  F.prototype = Parent.prototype;
+	  Child.prototype = new F();
+	  Child.prototype.constructor = Child;
+	  Child.superclass = Parent.prototype;
 	}; //todo remove after refacore
 	
 	function ListSwitcher(draggables, options) {
-		options = options || {};
-		options.stepOn = options.stepOn || new _point.Point(-50, 0);
-		Dragee.List.call(this, draggables, options);
+	  options = options || {};
+	  options.stepOn = options.stepOn || new _point.Point(-50, 0);
+	  Dragee.List.call(this, draggables, options);
 	}
 	
 	extend(ListSwitcher, Dragee.List);
 	
 	ListSwitcher.prototype.init = function () {
-		var that = this;
-		this.draggables.forEach(function (draggable) {
-			draggable.isOn = false;
-			draggable.onEnd.add(function () {
-				that.onEnd(this);
-				return true;
-			});
-		});
+	  var that = this;
+	  this.draggables.forEach(function (draggable) {
+	    draggable.isOn = false;
+	    draggable.onEnd.add(function () {
+	      that.onEnd(this);
+	      return true;
+	    });
+	  });
 	};
 	
 	ListSwitcher.prototype.onEnd = function (draggable) {
-		var fixPositions = this.getCurrentFixPositionWithOff(),
-		    currentIndex,
-		    excangeIndex;
-		currentIndex = this.draggables.indexOf(draggable);
-		excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
-		if (excangeIndex === -1 || excangeIndex === currentIndex) {
-			this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd);
-		} else {
-			if (this.draggables[excangeIndex].isDragee) {
-				this.fixToOff(excangeIndex, fixPositions[currentIndex]);
-			} else {
-				this.moveDraggableToOff(excangeIndex, fixPositions[currentIndex], this.options.timeExcange);
-			}
-			this.moveDraggable(currentIndex, draggable.position, fixPositions[excangeIndex], this.options.timeEnd);
-			this.onChange.fire();
-		}
-		return true;
+	  var fixPositions = this.getCurrentFixPositionWithOff(),
+	      currentIndex,
+	      excangeIndex;
+	  currentIndex = this.draggables.indexOf(draggable);
+	  excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
+	  if (excangeIndex === -1 || excangeIndex === currentIndex) {
+	    this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd);
+	  } else {
+	    if (this.draggables[excangeIndex].isDragee) {
+	      this.fixToOff(excangeIndex, fixPositions[currentIndex]);
+	    } else {
+	      this.moveDraggableToOff(excangeIndex, fixPositions[currentIndex], this.options.timeExcange);
+	    }
+	    this.moveDraggable(currentIndex, draggable.position, fixPositions[excangeIndex], this.options.timeEnd);
+	    this.onChange.fire();
+	  }
+	  return true;
 	};
 	
 	ListSwitcher.prototype.moveDraggable = function (index, position, fixOffPosition, time) {
-		var positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)],
-		    isOn = _point.mathPoint.indexOfNearPoint(positions, position, -1, _point.mathPoint.getLength({ x: true }));
-		if (this.draggables[index].isOn !== !!isOn) {
-			this.draggables[index].isOn = !!isOn;
-			this.onChange.fire();
-		}
-		this.draggables[index].move(positions[isOn], time, true);
+	  var positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)],
+	      isOn = _point.mathPoint.indexOfNearPoint(positions, position, -1, _point.mathPoint.getLength({ x: true }));
+	  if (this.draggables[index].isOn !== !!isOn) {
+	    this.draggables[index].isOn = !!isOn;
+	    this.onChange.fire();
+	  }
+	  this.draggables[index].move(positions[isOn], time, true);
 	};
 	
 	ListSwitcher.prototype.fixToOff = function (index, fixOffPosition) {
-		this.draggables[index].isOn = false;
-		this.draggables[index].fixPosition = fixOffPosition;
+	  this.draggables[index].isOn = false;
+	  this.draggables[index].fixPosition = fixOffPosition;
 	};
 	
 	ListSwitcher.prototype.moveDraggableToOff = function (index, fixOffPosition, time) {
-		this.draggables[index].isOn = false;
-		this.draggables[index].move(fixOffPosition, time, true);
+	  this.draggables[index].isOn = false;
+	  this.draggables[index].move(fixOffPosition, time, true);
 	};
 	
 	ListSwitcher.prototype.getCurrentFixPositionWithOff = function () {
-		return this.draggables.map(function (draggable) {
-			return draggable.isOn ? draggable.fixPosition.sub(this.options.stepOn) : draggable.fixPosition.clone();
-		}, this);
+	  return this.draggables.map(function (draggable) {
+	    return draggable.isOn ? draggable.fixPosition.sub(this.options.stepOn) : draggable.fixPosition.clone();
+	  }, this);
 	};
 	
 	ListSwitcher.prototype.getSortedDraggables = function () {
-		return this.draggables.map(function (draggable) {
-			return draggable.initPosition;
-		}).map(function (position) {
-			return this.draggables.filter(function (draggable) {
-				return draggable.fixPosition.compare(position) || draggable.fixPosition.compare(position.add(this.options.stepOn));
-			}, this)[0];
-		}, this);
+	  return this.draggables.map(function (draggable) {
+	    return draggable.initPosition;
+	  }).map(function (position) {
+	    return this.draggables.filter(function (draggable) {
+	      return draggable.fixPosition.compare(position) || draggable.fixPosition.compare(position.add(this.options.stepOn));
+	    }, this)[0];
+	  }, this);
 	};
 	
 	ListSwitcher.prototype.reset = function () {
-		this.draggables.forEach(function (draggable) {
-			draggable.move(draggable.initPosition, 0, true, false);
-			draggable.isOn = false;
-		});
+	  this.draggables.forEach(function (draggable) {
+	    draggable.move(draggable.initPosition, 0, true, false);
+	    draggable.isOn = false;
+	  });
 	};
 	
 	ListSwitcher.prototype.__defineGetter__("positions", function () {
-		return this.draggables.map(function (draggable) {
-			var position = draggable.fixPosition.clone();
-			position.isOn = draggable.isOn;
-			return position;
-		});
+	  return this.draggables.map(function (draggable) {
+	    var position = draggable.fixPosition.clone();
+	    position.isOn = draggable.isOn;
+	    return position;
+	  });
 	});
 	
 	ListSwitcher.prototype.__defineSetter__("positions", function (positions) {
-		var message = "wrong array length";
-		if (positions.length === this.draggables.length) {
-			positions.forEach(function (point, i) {
-				this.draggables[i].isOn = point.isOn;
-				this.draggables[i].move(point, 0, true, true);
-			}, this);
-		} else {
-			alert(message);
-			throw message;
-		}
+	  var message = "wrong array length";
+	  if (positions.length === this.draggables.length) {
+	    positions.forEach(function (point, i) {
+	      this.draggables[i].isOn = point.isOn;
+	      this.draggables[i].move(point, 0, true, true);
+	    }, this);
+	  } else {
+	    alert(message);
+	    throw message;
+	  }
 	});
 	
 	function listSwitcherFactory(element, draggableElements, options) {
-		var draggables, draggableOptions, listOptions;
-		options = options || {};
-		draggableOptions = options.draggable || {};
-		listOptions = options.list || {};
-		draggableOptions.parent = draggableOptions.parent || element;
-		draggableElements = Array.prototype.slice.call(draggableElements);
+	  var draggables, draggableOptions, listOptions;
+	  options = options || {};
+	  draggableOptions = options.draggable || {};
+	  listOptions = options.list || {};
+	  draggableOptions.parent = draggableOptions.parent || element;
+	  draggableElements = Array.prototype.slice.call(draggableElements);
 	
-		draggables = draggableElements.map(function (element) {
-			return new Dragee.Draggable(element, draggableOptions);
-		});
-		return new ListSwitcher(draggables, listOptions);
+	  draggables = draggableElements.map(function (element) {
+	    return new Dragee.Draggable(element, draggableOptions);
+	  });
+	  return new ListSwitcher(draggables, listOptions);
 	}
 	
 	exports.listSwitcherFactory = listSwitcherFactory;

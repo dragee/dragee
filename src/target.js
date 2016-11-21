@@ -4,15 +4,18 @@ import util from './util'
 import Event from './event'
 import {mathPoint} from './point'
 import {positionType, sortingFactory, positionFactory} from './positioning'
-import {targetManagers} from './targetManager'
+import {scopes, defaultScope} from './scope'
 
-var Dragee = { util, positionType,  positionFactory, sortingFactory, targetManagers, Event };//todo remove after refactore
+var Dragee = { util, positionType,  positionFactory, sortingFactory, scopes, Event };//todo remove after refactore
 
-var targets = [];
+var targets = [],
+		addToDefaultScope = function(target){
+			defaultScope.addTarget(target)
+		};
 
 function Target(element, draggables, options){
 	options = options || {};
-	var i, parent = options.parent || Dragee.util.getDefaultParent(element);
+	var target = this, i, parent = options.parent || Dragee.util.getDefaultParent(element);
 	this.options = {
 		timeEnd: 200,
 		timeExcange: 400,
@@ -25,6 +28,9 @@ function Target(element, draggables, options){
 	}
 	targets.push(this);
 	this.element = element;
+	draggables.forEach(function(draggable){
+		draggable.targets.push(target);
+	})
 	this.draggables = draggables;
 	this.onAdd = new Dragee.Event(this);
 	this.beforeAdd = new Dragee.Event(this);
@@ -33,9 +39,13 @@ function Target(element, draggables, options){
 	options.onRemove && this.onRemove.add(options.onRemove);
 	options.onAdd && this.onAdd.add(options.onAdd);
 	options.beforeAdd && this.beforeAdd.add(options.beforeAdd);
+	Target.onCreate.fire(this);
 
 	this.init();
 };
+
+Target.onCreate = new Dragee.Event(Target, {isReverse: true, isStopOnTrue: true});
+Target.onCreate.add(addToDefaultScope);
 
 Target.prototype.getRectangle = function(){
 	return mathPoint.createRectangleFromElement(
@@ -93,8 +103,8 @@ Target.prototype.init = function(){
 };
 
 Target.prototype.destroy = function(){
-	Dragee.targetManagers.forEach(function(targetManager){
-		targetManager.targets.removeItem(this);
+	Dragee.scopes.forEach(function(scope){
+		scope.targets.removeItem(this);
 	}, this);
 }
 
@@ -135,7 +145,6 @@ Target.prototype.onEnd = function(draggable){
 Target.prototype.setPosition = function(rectangles, indexesOfNew, time){
 	this.innerDraggables.slice(0).forEach(function(draggable, i){
 		var rect = rectangles[i],
-			that = this,
 			timeEnd = time || time == 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExcange;
 
 		if(rect.removable){

@@ -158,7 +158,6 @@ List.prototype.refresh = function(){
 };
 
 List.prototype.add = function(draggables){
-	var that = this;
 	if(!(draggables instanceof Array)){
 		draggables = [draggables];
 	}
