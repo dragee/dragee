@@ -190,7 +190,7 @@ mathPoint = {
     },
     //Get point and check that point belong to segment of the line
     // if not - return the nearest point of segment
-    boundOnSegment: function(LP1, LP2, P){
+    boundToSegment: function(LP1, LP2, P){
         var x, y;
         x = mathPoint.bound(Math.min(LP1.x, LP2.x), Math.max(LP1.x, LP2.x), P.x);
         if(x != P.x){
@@ -204,7 +204,7 @@ mathPoint = {
         }
         return P;
     },
-    boundOnLine: function(A, B, P){
+    boundToLine: function(A, B, P){
         var AP = new Point(P.x - A.x, P.y - A.y),
             AB = new Point(B.x - A.x, B.y - A.y),
             ab2 = AB.x * AB.x + AB.y * AB.y,

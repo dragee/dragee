@@ -3,9 +3,9 @@
 import util from './util'
 import {mathPoint} from './point'
 import {Draggable, draggables, events} from './draggable'
-import {boundType, boundFactory} from './bound'
+import {bound} from './bound'
 
-var Dragee = { util, boundType, boundFactory, Draggable };//todo remove after refactore
+var Dragee = { util, Draggable, bound };//todo remove after refactore
 
 var arcSliders = [];
 
@@ -41,7 +41,7 @@ ArcSlider.prototype.init = function (element){
 			this.options.radius,
 			this.shiftedCenter
 		),
-		bound = Dragee.boundFactory(Dragee.boundType.arc)(
+		bound = Dragee.bound.toArc(
 			that.shiftedCenter,
 			that.options.radius,
 			this.options.startAngle,

@@ -3,9 +3,9 @@
 import util from './util'
 import {mathPoint, Point} from './point'
 import {Draggable, draggables, events} from './draggable'
-import {boundType, boundFactory} from './bound'
+import {bound} from './bound'
 
-var Dragee = { util, boundType, boundFactory, Draggable };//todo remove after refactore
+var Dragee = { util, bound, Draggable };//todo remove after refactore
 
 var isTouch = 'ontouchstart' in window;
 var charts = [];
@@ -63,7 +63,7 @@ Chart.prototype.init = function (elements){
                 this.options.touchRadius,
                 this.options.center.sub(halfSize)
             ),
-            bound = Dragee.boundFactory(Dragee.boundType.arc)(
+            bound = Dragee.bound.toArc(
                 that.options.center.sub(halfSize),
                 that.options.touchRadius,
                 that.getBoundAngle(i, false),

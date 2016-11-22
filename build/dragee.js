@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.ListSwitcher = exports.listSwitcherFactory = exports.Chart = exports.charts = exports.ArcSlider = exports.arcSliders = exports.Spider = exports.spiders = exports.boundFactory = exports.boundType = exports.positionFactory = exports.sortingFactory = exports.positionType = exports.scope = exports.scopeFactory = exports.Scope = exports.defaultScope = exports.scopes = exports.Target = exports.targets = exports.listFactory = exports.List = exports.Draggable = undefined;
+	exports.ListSwitcher = exports.listSwitcherFactory = exports.Chart = exports.charts = exports.ArcSlider = exports.arcSliders = exports.Spider = exports.spiders = exports.bound = exports.positionFactory = exports.sortingFactory = exports.positionType = exports.scope = exports.scopeFactory = exports.Scope = exports.defaultScope = exports.scopes = exports.Target = exports.targets = exports.listFactory = exports.List = exports.Draggable = undefined;
 	
 	__webpack_require__(1);
 	
@@ -100,8 +100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.positionType = _positioning.positionType;
 	exports.sortingFactory = _positioning.sortingFactory;
 	exports.positionFactory = _positioning.positionFactory;
-	exports.boundType = _bound.boundType;
-	exports.boundFactory = _bound.boundFactory;
+	exports.bound = _bound.bound;
 	exports.spiders = _spider.spiders;
 	exports.Spider = _spider.Spider;
 	exports.arcSliders = _arcslider.arcSliders;
@@ -595,7 +594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    //Get point and check that point belong to segment of the line
 	    // if not - return the nearest point of segment
-	    boundOnSegment: function boundOnSegment(LP1, LP2, P) {
+	    boundToSegment: function boundToSegment(LP1, LP2, P) {
 	        var x, y;
 	        x = mathPoint.bound(Math.min(LP1.x, LP2.x), Math.max(LP1.x, LP2.x), P.x);
 	        if (x != P.x) {
@@ -609,7 +608,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return P;
 	    },
-	    boundOnLine: function boundOnLine(A, B, P) {
+	    boundToLine: function boundToLine(A, B, P) {
 	        var AP = new Point(P.x - A.x, P.y - A.y),
 	            AB = new Point(B.x - A.x, B.y - A.y),
 	            ab2 = AB.x * AB.x + AB.y * AB.y,
@@ -875,7 +874,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Dragee = { util: _util2.default, boundType: _bound.boundType, boundFactory: _bound.boundFactory, Event: _event2.default }; //todo remove after refactore
+	var Dragee = { util: _util2.default, bound: _bound.bound, Event: _event2.default }; //todo remove after refactore
 	
 	var isTouch = 'ontouchstart' in window,
 	    mouseEvents = {
@@ -913,7 +912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.targets = [];
 	    this.options = {
 	        parent: parent,
-	        bound: Dragee.boundFactory(Dragee.boundType.element)(parent, parent),
+	        bound: Dragee.bound.toElement(parent, parent),
 	        startFilter: false,
 	        isContentBoxSize: false,
 	        position: false
@@ -962,17 +961,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.initPosition = this.offset;
 	    }
 	    this._dragStart = Dragee.util.bind(this.dragStart, this);
-	    this._delayedDragStart = Dragee.util.bind(this.delayedDragStart, this);
 	    this._dragMove = Dragee.util.bind(this.dragMove, this);
 	    this._dragEnd = Dragee.util.bind(this.dragEnd, this);
 	
-	    if (this.options.delayedStart) {
-	        this.element.addEventListener(touchEvents.start, this._delayedDragStart);
-	        this.element.addEventListener(mouseEvents.start, this._delayedDragStart);
-	    } else {
-	        this.element.addEventListener(touchEvents.start, this._dragStart);
-	        this.element.addEventListener(mouseEvents.start, this._dragStart);
-	    }
+	    this.element.addEventListener(touchEvents.start, this._dragStart);
+	    this.element.addEventListener(mouseEvents.start, this._dragStart);
 	
 	    this.bound.refresh && this.bound.refresh();
 	};
@@ -1069,42 +1062,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.rightDirection = this.position.x > point.x;
 	    this.upDirection = this.position.y > point.y;
 	    this.downDirection = this.position.y < point.y;
-	};
-	
-	Draggable.prototype.delayedDragStart = function (delayedEvent) {
-	    var isTouchEvent = isTouch && delayedEvent instanceof TouchEvent,
-	        startTouchPoint = new _point.Point(isTouchEvent ? delayedEvent.changedTouches[0].pageX : delayedEvent.clientX, isTouchEvent ? delayedEvent.changedTouches[0].pageY : delayedEvent.clientY),
-	        that = this;
-	
-	    if (delayedEvent.shiftKey) return;
-	
-	    function checkMovement(event) {
-	        var isTouchEvent = isTouch && event instanceof TouchEvent,
-	            touchPoint = new _point.Point(isTouchEvent ? event.changedTouches[0].pageX : event.clientX, isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
-	
-	        if (Math.abs(touchPoint.x - startTouchPoint.x) > 5 || Math.abs(touchPoint.y - startTouchPoint.y) > 5) {
-	
-	            document.removeEventListener(touchEvents.move, checkMovement);
-	            document.removeEventListener(mouseEvents.move, checkMovement);
-	
-	            BlockSelection.startDragSelection(that, delayedEvent);
-	            that.dragStart(delayedEvent);
-	        }
-	    }
-	
-	    function removeCheckMovement(event) {
-	        document.removeEventListener(touchEvents.move, checkMovement);
-	        document.removeEventListener(mouseEvents.move, checkMovement);
-	
-	        document.removeEventListener(touchEvents.end, removeCheckMovement);
-	        document.removeEventListener(mouseEvents.end, removeCheckMovement);
-	    }
-	
-	    document.addEventListener(touchEvents.move, checkMovement);
-	    document.addEventListener(mouseEvents.move, checkMovement);
-	
-	    document.addEventListener(touchEvents.end, removeCheckMovement);
-	    document.addEventListener(mouseEvents.end, removeCheckMovement);
 	};
 	
 	Draggable.prototype.dragStart = function (event) {
@@ -1347,129 +1304,121 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	    value: true
 	});
-	exports.boundFactory = exports.boundType = undefined;
+	exports.bound = undefined;
 	
 	var _point = __webpack_require__(2);
 	
-	var boundType = {
-		element: -1,
-		rectangle: 0,
-		lineX: 1,
-		lineY: 2,
-		line: 3,
-		unificationOfRectangle: 4,
-		circle: 5,
-		arc: 6
-	};
+	function boundToRectangle(rectangle) {
+	    return function (point, size) {
+	        var calcPoint = point.clone(),
+	            rectP2 = rectangle.getP3();
 	
-	function boundFactory(type) {
-		switch (type) {
-			case boundType.element:
-				return function (element, parent) {
-					var bound,
-					    retFunc = function retFunc() {
-						return bound.apply(this, arguments);
-					};
-	
-					retFunc.refresh = function () {
-						bound = boundFactory(boundType.rectangle)(_point.mathPoint.createRectangleFromElement(element, parent));
-					};
-	
-					retFunc.refresh();
-					return retFunc;
-				};
-			case boundType.rectangle:
-				return function (rectangle) {
-					return function (point, size) {
-						var calcPoint = point.clone(),
-						    rectP2 = rectangle.getP3();
-	
-						if (rectangle.position.x > calcPoint.x) {
-							calcPoint.x = rectangle.position.x;
-						}
-						if (rectangle.position.y > calcPoint.y) {
-							calcPoint.y = rectangle.position.y;
-						}
-						if (rectP2.x < calcPoint.x + size.x) {
-							calcPoint.x = rectP2.x - size.x;
-						}
-						if (rectP2.y < calcPoint.y + size.y) {
-							calcPoint.y = rectP2.y - size.y;
-						}
-						return calcPoint;
-					};
-				};
-			case boundType.lineX:
-				return function (x, startY, endY) {
-					return function (point, size) {
-						var calcPoint = point.clone();
-						calcPoint.x = x;
-						if (startY > calcPoint.y) {
-							calcPoint.y = startY;
-						}
-						if (endY < calcPoint.y + size.y) {
-							calcPoint.y = endY - size.y;
-						}
-						return calcPoint;
-					};
-				};
-			case boundType.lineY:
-				return function (y, startX, endX) {
-					return function (point, size) {
-						var calcPoint = point.clone();
-						calcPoint.y = y;
-						if (startX > calcPoint.x) {
-							calcPoint.x = startX;
-						}
-						if (endX < calcPoint.x + size.x) {
-							calcPoint.x = endX - size.x;
-						}
-						return calcPoint;
-					};
-				};
-			case boundType.line:
-				return function (start, end) {
-					var alpha = Math.atan2(end.y - start.y, end.x - start.x),
-					    beta = alpha + Math.PI / 2,
-					    someK = 10,
-					    cosBeta = Math.cos(beta),
-					    sinBeta = Math.sin(beta);
-	
-					return function (point, size) {
-						var point2 = new Point(point.x + someK * cosBeta, point.y + someK * sinBeta),
-						    pointCrossing = _point.mathPoint.directCrossing(start, end, point, point2),
-						    newEnd = _point.mathPoint.getPointInLineByLenght(end, start, size.x);
-	
-						pointCrossing = _point.mathPoint.boundOnLine(start, newEnd, pointCrossing);
-						return pointCrossing;
-					};
-				};
-			case boundType.circle:
-				return function (center, radius) {
-					return function (point, size) {
-						var boundedPoint = _point.mathPoint.getPointInLineByLenght(center, point, radius);
-						return boundedPoint;
-					};
-				};
-			case boundType.arc:
-				return function (center, radius, startAgle, endAngle) {
-					return function (point, size) {
-						var boundStartAngle = typeof startAgle === "function" ? startAgle() : startAgle,
-						    boundEndtAngle = typeof startAgle === "function" ? endAngle() : endAngle,
-						    angle = _point.mathPoint.getAngle(center, point);
-	
-						angle = _point.mathPoint.normalizeAngle(angle);
-						angle = _point.mathPoint.boundAngle(boundStartAngle, boundEndtAngle, angle);
-						return _point.mathPoint.getPointFromRadialSystem(angle, radius, center);
-					};
-				};
-		}
+	        if (rectangle.position.x > calcPoint.x) {
+	            calcPoint.x = rectangle.position.x;
+	        }
+	        if (rectangle.position.y > calcPoint.y) {
+	            calcPoint.y = rectangle.position.y;
+	        }
+	        if (rectP2.x < calcPoint.x + size.x) {
+	            calcPoint.x = rectP2.x - size.x;
+	        }
+	        if (rectP2.y < calcPoint.y + size.y) {
+	            calcPoint.y = rectP2.y - size.y;
+	        }
+	        return calcPoint;
+	    };
 	}
 	
-	exports.boundType = boundType;
-	exports.boundFactory = boundFactory;
+	function boundToElement(element, parent) {
+	    var bound,
+	        retFunc = function retFunc() {
+	        return bound.apply(this, arguments);
+	    };
+	
+	    retFunc.refresh = function () {
+	        bound = boundToRectangle(_point.mathPoint.createRectangleFromElement(element, parent));
+	    };
+	    retFunc.refresh();
+	    return retFunc;
+	}
+	
+	function boundToLineX(x, startY, endY) {
+	    return function (point, size) {
+	        var calcPoint = point.clone();
+	        calcPoint.x = x;
+	        if (startY > calcPoint.y) {
+	            calcPoint.y = startY;
+	        }
+	        if (endY < calcPoint.y + size.y) {
+	            calcPoint.y = endY - size.y;
+	        }
+	        return calcPoint;
+	    };
+	}
+	
+	function boundToLineY(y, startX, endX) {
+	    return function (point, size) {
+	        var calcPoint = point.clone();
+	        calcPoint.y = y;
+	        if (startX > calcPoint.x) {
+	            calcPoint.x = startX;
+	        }
+	        if (endX < calcPoint.x + size.x) {
+	            calcPoint.x = endX - size.x;
+	        }
+	        return calcPoint;
+	    };
+	}
+	
+	function boundToLine(start, end) {
+	    var alpha = Math.atan2(end.y - start.y, end.x - start.x),
+	        beta = alpha + Math.PI / 2,
+	        someK = 10,
+	        cosBeta = Math.cos(beta),
+	        sinBeta = Math.sin(beta);
+	
+	    return function (point, size) {
+	        var point2 = new Point(point.x + someK * cosBeta, point.y + someK * sinBeta),
+	            pointCrossing = _point.mathPoint.directCrossing(start, end, point, point2),
+	            newEnd = _point.mathPoint.getPointInLineByLenght(end, start, size.x);
+	
+	        pointCrossing = _point.mathPoint.boundToLine(start, newEnd, pointCrossing);
+	        return pointCrossing;
+	    };
+	}
+	
+	function boundToCircle(center, radius) {
+	    return function (point, size) {
+	        var boundedPoint = _point.mathPoint.getPointInLineByLenght(center, point, radius);
+	        return boundedPoint;
+	    };
+	};
+	
+	function boundToArc(center, radius, startAgle, endAngle) {
+	    return function (point, size) {
+	        var boundStartAngle = typeof startAgle === "function" ? startAgle() : startAgle,
+	            boundEndtAngle = typeof startAgle === "function" ? endAngle() : endAngle,
+	            angle = _point.mathPoint.getAngle(center, point);
+	
+	        angle = _point.mathPoint.normalizeAngle(angle);
+	        angle = _point.mathPoint.boundAngle(boundStartAngle, boundEndtAngle, angle);
+	        return _point.mathPoint.getPointFromRadialSystem(angle, radius, center);
+	    };
+	}
+	
+	exports.bound = bound = {
+	    toRectangle: boundToRectangle,
+	    toElement: boundToElement,
+	    toLineX: boundToLineX,
+	    toLineY: boundToLineY,
+	    toLine: boundToLine,
+	    toCircle: boundToCircle,
+	    toArc: boundToArc
+	};
+	
+	exports.bound = bound;
 
 /***/ },
 /* 8 */
@@ -2112,7 +2061,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var lists = [];
 	
-	var Dragee = { util: _util2.default, boundType: _bound.boundType, boundFactory: _bound.boundFactory, Draggable: _draggable.Draggable, events: _draggable.events, Event: _event2.default }; //todo remove after refactore
+	var Dragee = { util: _util2.default, bound: _bound.bound, Draggable: _draggable.Draggable, events: _draggable.events, Event: _event2.default }; //todo remove after refactore
 	
 	
 	function List(draggables, options) {
@@ -2382,7 +2331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Dragee = { util: _util2.default, boundFactory: _bound.boundFactory, boundType: _bound.boundType, Draggable: _draggable.Draggable };
+	var Dragee = { util: _util2.default, bound: _bound.bound, Draggable: _draggable.Draggable };
 	var spiders = [];
 	
 	function Spider(area, elements, options) {
@@ -2420,7 +2369,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			    halfSize = _point.mathPoint.getSizeOfElement(element).mult(0.5),
 			    start = _point.mathPoint.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize),
 			    end = _point.mathPoint.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize),
-			    bound = Dragee.boundFactory(Dragee.boundType.line)(start, end);
+			    bound = Dragee.bound.toLine(start, end);
 	
 			return new Dragee.Draggable(element, {
 				parent: this.area,
@@ -2484,7 +2433,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Dragee = { util: _util2.default, boundType: _bound.boundType, boundFactory: _bound.boundFactory, Draggable: _draggable.Draggable }; //todo remove after refactore
+	var Dragee = { util: _util2.default, Draggable: _draggable.Draggable, bound: _bound.bound }; //todo remove after refactore
 	
 	var arcSliders = [];
 	
@@ -2517,7 +2466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		var that = this,
 		    angle = this.options.startAngle,
 		    position = _point.mathPoint.getPointFromRadialSystem(angle, this.options.radius, this.shiftedCenter),
-		    bound = Dragee.boundFactory(Dragee.boundType.arc)(that.shiftedCenter, that.options.radius, this.options.startAngle, this.options.endAngle);
+		    bound = Dragee.bound.toArc(that.shiftedCenter, that.options.radius, this.options.startAngle, this.options.endAngle);
 	
 		this.angle = angle;
 		this.draggable = new Dragee.Draggable(element, {
@@ -2575,7 +2524,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Dragee = { util: _util2.default, boundType: _bound.boundType, boundFactory: _bound.boundFactory, Draggable: _draggable.Draggable }; //todo remove after refactore
+	var Dragee = { util: _util2.default, bound: _bound.bound, Draggable: _draggable.Draggable }; //todo remove after refactore
 	
 	var isTouch = 'ontouchstart' in window;
 	var charts = [];
@@ -2629,7 +2578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var angle = this.options.initAngles[i],
 	            halfSize = _point.mathPoint.getSizeOfElement(element).mult(0.5),
 	            position = _point.mathPoint.getPointFromRadialSystem(angle, this.options.touchRadius, this.options.center.sub(halfSize)),
-	            bound = Dragee.boundFactory(Dragee.boundType.arc)(that.options.center.sub(halfSize), that.options.touchRadius, that.getBoundAngle(i, false), that.getBoundAngle(i, true));
+	            bound = Dragee.bound.toArc(that.options.center.sub(halfSize), that.options.touchRadius, that.getBoundAngle(i, false), that.getBoundAngle(i, true));
 	
 	        return new Dragee.Draggable(element, {
 	            parent: this.area,

@@ -2,10 +2,10 @@
 
 import util from './util'
 import {mathPoint, Point} from './point'
-import {boundType, boundFactory} from './bound'
+import {bound} from './bound'
 import {Draggable, draggables, events} from './draggable'
 
-var Dragee = {util, boundFactory, boundType, Draggable};
+var Dragee = {util, bound, Draggable};
 var spiders = [];
 
 function Spider(area, elements, options){
@@ -42,7 +42,7 @@ Spider.prototype.init = function(elements){
 			halfSize = mathPoint.getSizeOfElement(element).mult(0.5),
 			start = mathPoint.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize),
 			end = mathPoint.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize),
-			bound = Dragee.boundFactory(Dragee.boundType.line)(start, end);
+			bound = Dragee.bound.toLine(start, end);
 
 		return new Dragee.Draggable(element, {
 			parent: this.area,

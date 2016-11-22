@@ -3,11 +3,11 @@
 import util from './util'
 import Event from './event'
 import getStyleProperty from 'desandro-get-style-property'
-import {boundType, boundFactory} from './bound'
+import {bound} from './bound'
 import {mathPoint, Point, Rectangle} from './point'
 import {defaultScope} from "./scope"
 
-var Dragee = { util, boundType, boundFactory, Event};//todo remove after refactore
+var Dragee = { util, bound, Event};//todo remove after refactore
 
 var isTouch = 'ontouchstart' in window, mouseEvents = {
     start: 'mousedown',
@@ -41,7 +41,7 @@ function Draggable(element, options){
     this.targets = [];
     this.options = {
         parent: parent,
-        bound: Dragee.boundFactory(Dragee.boundType.element)(parent, parent),
+        bound: Dragee.bound.toElement(parent, parent),
         startFilter: false,
         isContentBoxSize: false,
         position: false
