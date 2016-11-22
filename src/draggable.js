@@ -90,17 +90,11 @@ Draggable.prototype.init = function(){
         this.initPosition = this.offset;
     }
     this._dragStart = Dragee.util.bind(this.dragStart, this);
-    this._delayedDragStart = Dragee.util.bind(this.delayedDragStart, this);
     this._dragMove = Dragee.util.bind(this.dragMove, this);
     this._dragEnd = Dragee.util.bind(this.dragEnd, this);
 
-    if(this.options.delayedStart) {
-        this.element.addEventListener(touchEvents.start, this._delayedDragStart);
-        this.element.addEventListener(mouseEvents.start, this._delayedDragStart);
-    } else {
-        this.element.addEventListener(touchEvents.start, this._dragStart);
-        this.element.addEventListener(mouseEvents.start, this._dragStart);
-    }
+    this.element.addEventListener(touchEvents.start, this._dragStart);
+    this.element.addEventListener(mouseEvents.start, this._dragStart);
 
     this.bound.refresh && this.bound.refresh();
 };
@@ -197,49 +191,6 @@ Draggable.prototype.determineDirection = function(point){
     this.rightDirection = (this.position.x > point.x);
     this.upDirection = (this.position.y > point.y);
     this.downDirection = (this.position.y < point.y);
-};
-
-Draggable.prototype.delayedDragStart = function(delayedEvent){
-    var isTouchEvent = (isTouch && (delayedEvent instanceof TouchEvent)),
-        startTouchPoint = new Point(
-            isTouchEvent ? delayedEvent.changedTouches[0].pageX : delayedEvent.clientX,
-            isTouchEvent ? delayedEvent.changedTouches[0].pageY : delayedEvent.clientY
-        ),
-        that = this;
-
-    if(delayedEvent.shiftKey) return;
-
-    function checkMovement(event){
-        var isTouchEvent = (isTouch && (event instanceof TouchEvent)),
-            touchPoint = new Point(
-                isTouchEvent ? event.changedTouches[0].pageX : event.clientX,
-                isTouchEvent ? event.changedTouches[0].pageY : event.clientY
-            );
-
-        if(Math.abs(touchPoint.x-startTouchPoint.x) > 5
-            || Math.abs(touchPoint.y-startTouchPoint.y) > 5) {
-
-            document.removeEventListener(touchEvents.move, checkMovement);
-            document.removeEventListener(mouseEvents.move, checkMovement);
-
-            BlockSelection.startDragSelection(that, delayedEvent);
-            that.dragStart(delayedEvent);
-        }
-    }
-
-    function removeCheckMovement(event){
-        document.removeEventListener(touchEvents.move, checkMovement);
-        document.removeEventListener(mouseEvents.move, checkMovement);
-
-        document.removeEventListener(touchEvents.end, removeCheckMovement);
-        document.removeEventListener(mouseEvents.end, removeCheckMovement);
-    }
-
-    document.addEventListener(touchEvents.move, checkMovement);
-    document.addEventListener(mouseEvents.move, checkMovement);
-
-    document.addEventListener(touchEvents.end, removeCheckMovement);
-    document.addEventListener(mouseEvents.end, removeCheckMovement);
 };
 
 Draggable.prototype.dragStart = function(event){
