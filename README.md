@@ -11,7 +11,7 @@ Draggable(element[, options])
 function boundPoint(point, size){ return point; }
 
 that.draggable = new Dragee.Draggable(that.element, {
-    bound: boundPoint.bind(this),
+    bound: boundPoint,
     onMove: that.moveCorners.bind(this),
     onEnd: onEnd
 });
