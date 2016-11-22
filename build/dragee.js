@@ -1408,7 +1408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	
-	exports.bound = bound = {
+	var bound = {
 	    toRectangle: boundToRectangle,
 	    toElement: boundToElement,
 	    toLineX: boundToLineX,

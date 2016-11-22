@@ -99,7 +99,7 @@ function boundToArc(center, radius, startAgle, endAngle) {
     };
 }
 
-bound = {
+var bound = {
     toRectangle: boundToRectangle,
     toElement: boundToElement,
     toLineX: boundToLineX,
