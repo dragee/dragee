@@ -59,11 +59,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.ListSwitcher = exports.listSwitcherFactory = exports.Chart = exports.charts = exports.ArcSlider = exports.arcSliders = exports.Spider = exports.spiders = exports.bound = exports.positionFactory = exports.sortingFactory = exports.positionType = exports.scope = exports.scopeFactory = exports.Scope = exports.defaultScope = exports.scopes = exports.Target = exports.targets = exports.listFactory = exports.List = exports.Draggable = undefined;
+	exports.ListSwitcher = exports.listSwitcherFactory = exports.Chart = exports.charts = exports.ArcSlider = exports.arcSliders = exports.Spider = exports.spiders = exports.bound = exports.positionFactory = exports.sortingFactory = exports.positionType = exports.scope = exports.scopeFactory = exports.Scope = exports.defaultScope = exports.scopes = exports.Target = exports.targets = exports.listFactory = exports.List = exports.Geometry = exports.Rectangle = exports.Point = exports.Draggable = undefined;
 	
 	__webpack_require__(1);
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	var _draggable = __webpack_require__(4);
 	
@@ -85,9 +85,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _listswitcher = __webpack_require__(15);
 	
-	global.Point = _point.Point;
+	global.Point = _geometry.Point;
 	
 	exports.Draggable = _draggable.Draggable;
+	exports.Point = _geometry.Point;
+	exports.Rectangle = _geometry.Rectangle;
+	exports.Geometry = _geometry.Geometry;
 	exports.List = _list.List;
 	exports.listFactory = _list.listFactory;
 	exports.targets = _target.targets;
@@ -385,7 +388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.mathPoint = exports.Rectangle = exports.Point = undefined;
+	exports.Geometry = exports.Rectangle = exports.Point = undefined;
 	
 	var _util = __webpack_require__(3);
 	
@@ -393,9 +396,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var mathPoint;
+	var Geometry;
 	var Dragee = { util: _util2.default }; //todo remove after refactore
-	
 	
 	/*********************/
 	function Point(x, y) {
@@ -502,14 +504,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	/*****************/
-	exports.mathPoint = mathPoint = {
+	exports.Geometry = Geometry = {
 	    getDistance: function getDistance(p1, p2) {
 	        var dx = p1.x - p2.x,
 	            dy = p1.y - p2.y;
 	        return Math.sqrt(dx * dx + dy * dy);
 	    },
 	    distance: function distance(p1, p2) {
-	        return mathPoint.getDistance(p1, p2);
+	        return Geometry.getDistance(p1, p2);
 	    },
 	    getXDifference: function getXDifference(p1, p2) {
 	        return Math.abs(p1.x - p2.x);
@@ -527,7 +529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            index = 0,
 	            i,
 	            temp;
-	        getDistance = getDistance || mathPoint.getDistance;
+	        getDistance = getDistance || Geometry.getDistance;
 	        if (arr.length === 0) {
 	            return -1;
 	        }
@@ -583,12 +585,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // if not - return the nearest point of segment
 	    boundToSegment: function boundToSegment(LP1, LP2, P) {
 	        var x, y;
-	        x = mathPoint.bound(Math.min(LP1.x, LP2.x), Math.max(LP1.x, LP2.x), P.x);
+	        x = Geometry.bound(Math.min(LP1.x, LP2.x), Math.max(LP1.x, LP2.x), P.x);
 	        if (x != P.x) {
 	            y = x === LP1.x ? LP1.y : LP2.y;
 	            P = new Point(x, y);
 	        }
-	        y = mathPoint.bound(Math.min(LP1.y, LP2.y), Math.max(LP1.y, LP2.y), P.y);
+	        y = Geometry.bound(Math.min(LP1.y, LP2.y), Math.max(LP1.y, LP2.y), P.y);
 	        if (y != P.y) {
 	            x = y === LP1.y ? LP1.x : LP2.x;
 	            P = new Point(x, y);
@@ -611,7 +613,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getPointInLineByLenght: function getPointInLineByLenght(LP1, LP2, lenght) {
 	        var dx = LP2.x - LP1.x,
 	            dy = LP2.y - LP1.y,
-	            percent = lenght / mathPoint.distance(LP1, LP2);
+	            percent = lenght / Geometry.distance(LP1, LP2);
 	        return new Point(LP1.x + percent * dx, LP1.y + percent * dy);
 	    },
 	    createRectangleFromElement: function createRectangleFromElement(el, parent, isContentBoxSize, isConsiderTranslate) {
@@ -682,7 +684,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            diff = Math.PI * 2,
 	            value;
 	        for (i = 0; i < arr.length; i++) {
-	            temp = mathPoint.getAngleDiff(arr[i], angle);
+	            temp = Geometry.getAngleDiff(arr[i], angle);
 	            if (diff < temp) {
 	                diff = temp;
 	                value = arr[i];
@@ -708,7 +710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.Point = Point;
 	exports.Rectangle = Rectangle;
-	exports.mathPoint = mathPoint;
+	exports.Geometry = Geometry;
 
 /***/ },
 /* 3 */
@@ -843,7 +845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _bound = __webpack_require__(7);
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	var _scope = __webpack_require__(8);
 	
@@ -926,7 +928,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	Draggable.prototype.init = function () {
 	    this._enable = true;
-	    this.offset = _point.mathPoint.getOffset(this.element, this.options.parent, true);
+	    this.offset = _geometry.Geometry.getOffset(this.element, this.options.parent, true);
 	    this.fixPosition = this.offset;
 	    this.position = this.offset;
 	    if (this.options.position) {
@@ -946,7 +948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	Draggable.prototype.reinit = function () {
-	    this.offset = _point.mathPoint.getOffset(this.element, this.options.parent, true);
+	    this.offset = _geometry.Geometry.getOffset(this.element, this.options.parent, true);
 	    this.fixPosition = this.offset;
 	    this.position = this.offset;
 	    if (this.options.position) {
@@ -960,11 +962,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	Draggable.prototype.getSize = function (recalulate) {
-	    return _point.mathPoint.getSizeOfElement(this.element, this.options.isContentBoxSize);
+	    return _geometry.Geometry.getSizeOfElement(this.element, this.options.isContentBoxSize);
 	};
 	
 	Draggable.prototype.getPosition = function () {
-	    this.position = this.offset.add(this._transformPosition || new _point.Point(0, 0));
+	    this.position = this.offset.add(this._transformPosition || new _geometry.Point(0, 0));
 	    return this.position;
 	};
 	
@@ -1047,7 +1049,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var isTouchEvent = isTouch && event instanceof TouchEvent;
 	
-	    this._startTouchPoint = new _point.Point(isTouchEvent ? event.changedTouches[0].pageX : event.clientX, isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
+	    this._startTouchPoint = new _geometry.Point(isTouchEvent ? event.changedTouches[0].pageX : event.clientX, isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
 	
 	    this._startPosition = this.getPosition();
 	    if (isTouchEvent) {
@@ -1087,7 +1089,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    event.stopPropagation();
 	    event.preventDefault();
-	    touchPoint = new _point.Point(isTouchEvent ? touch.pageX : event.clientX, isTouchEvent ? touch.pageY : event.clientY);
+	    touchPoint = new _geometry.Point(isTouchEvent ? touch.pageX : event.clientX, isTouchEvent ? touch.pageY : event.clientY);
 	    point = this._startPosition.add(touchPoint.sub(this._startTouchPoint));
 	    point = this.bound(point, this.getSize());
 	    this.touchPoint = touchPoint;
@@ -1119,7 +1121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	Draggable.prototype.getRectangle = function () {
-	    return new _point.Rectangle(this.position, this.getSize());
+	    return new _geometry.Rectangle(this.position, this.getSize());
 	};
 	
 	Draggable.prototype.refresh = function () {
@@ -1283,7 +1285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.bound = undefined;
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	function boundToRectangle(rectangle) {
 	    return function (point, size) {
@@ -1313,7 +1315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	
 	    retFunc.refresh = function () {
-	        bound = boundToRectangle(_point.mathPoint.createRectangleFromElement(element, parent));
+	        bound = boundToRectangle(_geometry.Geometry.createRectangleFromElement(element, parent));
 	    };
 	    retFunc.refresh();
 	    return retFunc;
@@ -1356,17 +1358,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return function (point, size) {
 	        var point2 = new Point(point.x + someK * cosBeta, point.y + someK * sinBeta),
-	            pointCrossing = _point.mathPoint.directCrossing(start, end, point, point2),
-	            newEnd = _point.mathPoint.getPointInLineByLenght(end, start, size.x);
+	            pointCrossing = _geometry.Geometry.directCrossing(start, end, point, point2),
+	            newEnd = _geometry.Geometry.getPointInLineByLenght(end, start, size.x);
 	
-	        pointCrossing = _point.mathPoint.boundToLine(start, newEnd, pointCrossing);
+	        pointCrossing = _geometry.Geometry.boundToLine(start, newEnd, pointCrossing);
 	        return pointCrossing;
 	    };
 	}
 	
 	function boundToCircle(center, radius) {
 	    return function (point, size) {
-	        var boundedPoint = _point.mathPoint.getPointInLineByLenght(center, point, radius);
+	        var boundedPoint = _geometry.Geometry.getPointInLineByLenght(center, point, radius);
 	        return boundedPoint;
 	    };
 	};
@@ -1375,11 +1377,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return function (point, size) {
 	        var boundStartAngle = typeof startAgle === "function" ? startAgle() : startAgle,
 	            boundEndtAngle = typeof startAgle === "function" ? endAngle() : endAngle,
-	            angle = _point.mathPoint.getAngle(center, point);
+	            angle = _geometry.Geometry.getAngle(center, point);
 	
-	        angle = _point.mathPoint.normalizeAngle(angle);
-	        angle = _point.mathPoint.boundAngle(boundStartAngle, boundEndtAngle, angle);
-	        return _point.mathPoint.getPointFromRadialSystem(angle, radius, center);
+	        angle = _geometry.Geometry.normalizeAngle(angle);
+	        angle = _geometry.Geometry.boundAngle(boundStartAngle, boundEndtAngle, angle);
+	        return _geometry.Geometry.getPointFromRadialSystem(angle, radius, center);
 	    };
 	}
 	
@@ -1596,7 +1598,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _event2 = _interopRequireDefault(_event);
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	var _positioning = __webpack_require__(10);
 	
@@ -1620,7 +1622,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			timeEnd: 200,
 			timeExcange: 400,
 			parent: parent,
-			sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, _point.mathPoint.transformedSpaceDistanceFactory({ x: 1, y: 4 })),
+			sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, _geometry.Geometry.transformedSpaceDistanceFactory({ x: 1, y: 4 })),
 			positioning: Dragee.positionFactory(Dragee.positionType.floatLeft)(this.getRectangle.bind(this), { removable: true })
 		};
 		for (i in options) {
@@ -1648,7 +1650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Target.onCreate.add(addToDefaultScope);
 	
 	Target.prototype.getRectangle = function () {
-		return _point.mathPoint.createRectangleFromElement(this.element, this.options.parent, this.options.isContentBoxSize, true);
+		return _geometry.Geometry.createRectangleFromElement(this.element, this.options.parent, this.options.isContentBoxSize, true);
 	};
 	
 	Target.prototype.catchDraggable = function (draggable) {
@@ -1829,7 +1831,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.positionFactory = exports.sortingFactory = exports.positionType = undefined;
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	var positionType = {
 		notCrossing: 0,
@@ -1880,8 +1882,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				return function (rectangle, options) {
 					var i,
 					    opts = {
-						paddingTopLeft: new _point.Point(0, 0),
-						paddingBottomRight: new _point.Point(0, 0),
+						paddingTopLeft: new _geometry.Point(0, 0),
+						paddingBottomRight: new _geometry.Point(0, 0),
 						yGapBetweenDraggables: 0,
 						removable: true
 					};
@@ -1897,19 +1899,19 @@ return /******/ (function(modules) { // webpackBootstrap
 							var position,
 							    isValid = false;
 							for (i = 0; i < boundaryPoints.length; i++) {
-								position = new _point.Point(boundaryPoints[i].x, i > 0 ? boundaryPoints[i - 1].y + opts.yGapBetweenDraggables : boundRect.position.y).add(opts.paddingTopLeft);
+								position = new _geometry.Point(boundaryPoints[i].x, i > 0 ? boundaryPoints[i - 1].y + opts.yGapBetweenDraggables : boundRect.position.y).add(opts.paddingTopLeft);
 								if (isValid = position.x + rect.size.x < rectP2.x) {
 									break;
 								}
 							}
 							if (!isValid) {
-								position = new _point.Point(boundRect.position.x, boundaryPoints[boundaryPoints.length - 1].y + opts.yGapBetweenDraggables).add(opts.paddingTopLeft);
+								position = new _geometry.Point(boundRect.position.x, boundaryPoints[boundaryPoints.length - 1].y + opts.yGapBetweenDraggables).add(opts.paddingTopLeft);
 							}
 							rect.position = position;
 							if (opts.removable && rect.getP3().y > boundRect.getP3().y) {
 								rect.removable = true;
 							}
-							boundaryPoints = _point.mathPoint.addPointToBoundPoints(boundaryPoints, rect.getP3().add(opts.paddingBottomRight));
+							boundaryPoints = _geometry.Geometry.addPointToBoundPoints(boundaryPoints, rect.getP3().add(opts.paddingBottomRight));
 						});
 						return rectangleList;
 					};
@@ -1920,15 +1922,15 @@ return /******/ (function(modules) { // webpackBootstrap
 					    paddingBottomNegLeft,
 					    i,
 					    opts = {
-						paddingTopRight: new _point.Point(5, 5),
-						paddingBottomLeft: new _point.Point(0, 0),
+						paddingTopRight: new _geometry.Point(5, 5),
+						paddingBottomLeft: new _geometry.Point(0, 0),
 						removable: true
 					};
 					for (i in options) {
 						opts[i] = options[i];
 					}
-					paddingTopNegRight = new _point.Point(-opts.paddingTopRight.x, opts.paddingTopRight.y);
-					paddingBottomNegLeft = new _point.Point(-opts.paddingBottomLeft.x, opts.paddingBottomLeft.y);
+					paddingTopNegRight = new _geometry.Point(-opts.paddingTopRight.x, opts.paddingTopRight.y);
+					paddingBottomNegLeft = new _geometry.Point(-opts.paddingBottomLeft.x, opts.paddingBottomLeft.y);
 					return function (rectangleList, indexesOfNews) {
 						var boundRect = typeof rectangle === "function" ? rectangle() : rectangle,
 						    i,
@@ -1937,19 +1939,19 @@ return /******/ (function(modules) { // webpackBootstrap
 							var position,
 							    isValid = false;
 							for (i = 0; i < boundaryPoints.length; i++) {
-								position = new _point.Point(boundaryPoints[i].x - rect.size.x, i > 0 ? boundaryPoints[i - 1].y : boundRect.position.y).add(paddingTopNegRight);
+								position = new _geometry.Point(boundaryPoints[i].x - rect.size.x, i > 0 ? boundaryPoints[i - 1].y : boundRect.position.y).add(paddingTopNegRight);
 								if (isValid = position.x > rect.position.x) {
 									break;
 								}
 							}
 							if (!isValid) {
-								position = new _point.Point(boundRect.getP2().x, boundaryPoints[boundaryPoints.length - 1].y);
+								position = new _geometry.Point(boundRect.getP2().x, boundaryPoints[boundaryPoints.length - 1].y);
 							}
 							rect.position = position;
 							if (opts.removable && rect.getLeftBottomPoint().y > boundRect.getP4().y) {
 								rect.removable = true;
 							}
-							boundaryPoints = _point.mathPoint.addPointToBoundPoints(boundaryPoints, rect.getP4().add(paddingBottomNegLeft), true);
+							boundaryPoints = _geometry.Geometry.addPointToBoundPoints(boundaryPoints, rect.getP4().add(paddingBottomNegLeft), true);
 						});
 						return rectangleList;
 					};
@@ -1986,7 +1988,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						    listOldPosition;
 						listOldPosition = oldObjsList.map(opts.getPosition);
 						newObjs.forEach(function (newObj) {
-							var index = _point.mathPoint.indexOfNearPoint(listOldPosition, opts.getPosition(newObj), radius, getDistance);
+							var index = _geometry.Geometry.indexOfNearPoint(listOldPosition, opts.getPosition(newObj), radius, getDistance);
 							if (index === -1) {
 								index = newList.length;
 							} else {
@@ -2026,7 +2028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _event2 = _interopRequireDefault(_event);
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	var _bound = __webpack_require__(7);
 	
@@ -2045,7 +2047,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			timeEnd: 200,
 			timeExcange: 400,
 			radius: 30,
-			getDistance: _point.mathPoint.getDistance,
+			getDistance: _geometry.Geometry.getDistance,
 			isDisplacement: false
 		};
 		for (i in options) {
@@ -2106,7 +2108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    currentIndex,
 		    excangeIndex;
 		currentIndex = this.draggables.indexOf(draggable);
-		excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
+		excangeIndex = _geometry.Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 		if (excangeIndex === -1 || excangeIndex === currentIndex) {
 			draggable.move(draggable.fixPosition, this.options.timeEnd, true);
 		} else {
@@ -2126,7 +2128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			return draggable.fixPosition;
 		});
 		currentIndex = sortedDraggables.indexOf(draggable);
-		targetIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
+		targetIndex = _geometry.Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 		if (targetIndex !== -1) {
 			if (targetIndex < currentIndex) {
 				for (i = targetIndex; i < currentIndex; i++) {
@@ -2298,7 +2300,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	var _bound = __webpack_require__(7);
 	
@@ -2311,7 +2313,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function Spider(area, elements, options) {
 		var i,
-		    areaRectangle = _point.mathPoint.createRectangleFromElement(area, area);
+		    areaRectangle = _geometry.Geometry.createRectangleFromElement(area, area);
 		this.options = {
 			angle: 0,
 			dAngle: 2 * Math.PI / elements.length,
@@ -2341,9 +2343,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		this.draggables = elements.map(function (element, i) {
 			var angle = this.options.angle + i * this.options.dAngle,
-			    halfSize = _point.mathPoint.getSizeOfElement(element).mult(0.5),
-			    start = _point.mathPoint.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize),
-			    end = _point.mathPoint.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize),
+			    halfSize = _geometry.Geometry.getSizeOfElement(element).mult(0.5),
+			    start = _geometry.Geometry.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize),
+			    end = _geometry.Geometry.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize),
 			    bound = Dragee.bound.toLine(start, end);
 	
 			return new Dragee.Draggable(element, {
@@ -2400,7 +2402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	var _draggable = __webpack_require__(4);
 	
@@ -2414,8 +2416,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function ArcSlider(area, element, options) {
 		var i,
-		    areaRectangle = _point.mathPoint.createRectangleFromElement(area, area),
-		    halfSize = _point.mathPoint.getSizeOfElement(element).mult(0.5);
+		    areaRectangle = _geometry.Geometry.createRectangleFromElement(area, area),
+		    halfSize = _geometry.Geometry.getSizeOfElement(element).mult(0.5);
 		this.options = {
 			center: areaRectangle.getCenter(),
 			radius: areaRectangle.getMinSide() / 2,
@@ -2440,7 +2442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	ArcSlider.prototype.init = function (element) {
 		var that = this,
 		    angle = this.options.startAngle,
-		    position = _point.mathPoint.getPointFromRadialSystem(angle, this.options.radius, this.shiftedCenter),
+		    position = _geometry.Geometry.getPointFromRadialSystem(angle, this.options.radius, this.shiftedCenter),
 		    bound = Dragee.bound.toArc(that.shiftedCenter, that.options.radius, this.options.startAngle, this.options.endAngle);
 	
 		this.angle = angle;
@@ -2456,19 +2458,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	ArcSlider.prototype.updateAngle = function () {
-		this.angle = _point.mathPoint.getAngle(this.shiftedCenter, this.draggable.position);
+		this.angle = _geometry.Geometry.getAngle(this.shiftedCenter, this.draggable.position);
 	};
 	
 	ArcSlider.prototype.change = function () {
 		this.updateAngle();
-		//		var angle = mathPoint.getNearestAngle(this.options.angles, this.angle);
+		//		var angle = Geometry.getNearestAngle(this.options.angles, this.angle);
 		//		this.setAngle(angle,this.options.time);
 		this.onChange(this.angle);
 	};
 	
 	ArcSlider.prototype.setAngle = function (angle, time) {
-		this.angle = _point.mathPoint.normalizeAngle(angle, position);
-		var position = _point.mathPoint.getPointFromRadialSystem(this.angle, this.options.radius, this.shiftedCenter);
+		this.angle = _geometry.Geometry.normalizeAngle(angle, position);
+		var position = _geometry.Geometry.getPointFromRadialSystem(this.angle, this.options.radius, this.shiftedCenter);
 		this.draggable.move(position, time || 0, true, true);
 		this.onChange(this.angle);
 	};
@@ -2491,7 +2493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _util2 = _interopRequireDefault(_util);
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	var _draggable = __webpack_require__(4);
 	
@@ -2515,7 +2517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function Chart(area, elements, options) {
 	    var i,
-	        areaRectangle = _point.mathPoint.createRectangleFromElement(area, area);
+	        areaRectangle = _geometry.Geometry.createRectangleFromElement(area, area);
 	    this.options = {
 	        center: areaRectangle.getCenter(),
 	        radius: areaRectangle.getMinSide() / 2,
@@ -2525,11 +2527,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return Dragee.util.randomColor();
 	        }),
 	        initAngles: Dragee.util.range(-90, 270, 360 / elements.length).map(function (angle) {
-	            return _point.mathPoint.toRadian(angle);
+	            return _geometry.Geometry.toRadian(angle);
 	        }),
 	        onDraw: function onDraw() {},
 	        limitImg: null,
-	        limitImgOffset: new _point.Point(0, 0),
+	        limitImgOffset: new _geometry.Point(0, 0),
 	        isSelectable: false
 	    };
 	    for (i in options) {
@@ -2551,8 +2553,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.context = this.canvas.getContext("2d");
 	    this.draggables = elements.map(function (element, i) {
 	        var angle = this.options.initAngles[i],
-	            halfSize = _point.mathPoint.getSizeOfElement(element).mult(0.5),
-	            position = _point.mathPoint.getPointFromRadialSystem(angle, this.options.touchRadius, this.options.center.sub(halfSize)),
+	            halfSize = _geometry.Geometry.getSizeOfElement(element).mult(0.5),
+	            position = _geometry.Geometry.getPointFromRadialSystem(angle, this.options.touchRadius, this.options.center.sub(halfSize)),
 	            bound = Dragee.bound.toArc(that.options.center.sub(halfSize), that.options.touchRadius, that.getBoundAngle(i, false), that.getBoundAngle(i, true));
 	
 	        return new Dragee.Draggable(element, {
@@ -2578,11 +2580,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.setActiveArc(-1);
 	
 	    this.canvas.addEventListener(_draggable.events.start, function (e) {
-	        var point = new _point.Point(isTouch ? e.changedTouches[0].pageX : e.clientX, isTouch ? e.changedTouches[0].pageY : e.clientY),
+	        var point = new _geometry.Point(isTouch ? e.changedTouches[0].pageX : e.clientX, isTouch ? e.changedTouches[0].pageY : e.clientY),
 	            index;
 	
 	        if (!that.canvasOffset) {
-	            that.canvasOffset = _point.mathPoint.getOffset(that.canvas);
+	            that.canvasOffset = _geometry.Geometry.getOffset(that.canvas);
 	        }
 	
 	        point = point.sub(that.canvasOffset);
@@ -2596,7 +2598,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Chart.prototype.updateAngles = function () {
 	    this.angles = this.draggables.map(function (draggable) {
 	        var halfSize = draggable.getSize().mult(0.5);
-	        return _point.mathPoint.getAngle(this.options.center.sub(halfSize), draggable.position);
+	        return _geometry.Geometry.getAngle(this.options.center.sub(halfSize), draggable.position);
 	    }, this);
 	};
 	
@@ -2609,7 +2611,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (i < 0) {
 	            i += that.angles.length;
 	        }
-	        return _point.mathPoint.normalizeAngle(that.angles[i] - sign * that.options.boundAngle);
+	        return _geometry.Geometry.normalizeAngle(that.angles[i] - sign * that.options.boundAngle);
 	    };
 	};
 	
@@ -2649,7 +2651,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (!this.isInit) {
 	        return;
 	    }
-	    rectangle = _point.mathPoint.createRectangleFromElement(element, element);
+	    rectangle = _geometry.Geometry.createRectangleFromElement(element, element);
 	    opts = {
 	        center: rectangle.getCenter(),
 	        radius: rectangle.getMinSide() / 2,
@@ -2703,8 +2705,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (!img) {
 	        return;
 	    }
-	    angle = _point.mathPoint.normalizeAngle(this.angles[index]);
-	    point = new _point.Point(0, -img.height / 2);
+	    angle = _geometry.Geometry.normalizeAngle(this.angles[index]);
+	    point = new _geometry.Point(0, -img.height / 2);
 	    point = point.add(this.options.limitImgOffset);
 	    this.context.translate(this.areaRectangle.size.x / 2, this.areaRectangle.size.y / 2);
 	    this.context.rotate(angle);
@@ -2718,7 +2720,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    angles.push(baseAngle);
 	    return angles.map(function (angle) {
-	        var diffAngle = _point.mathPoint.normalizeAngle(angle - baseAngle);
+	        var diffAngle = _geometry.Geometry.normalizeAngle(angle - baseAngle);
 	        baseAngle = angle;
 	        return diffAngle;
 	    });
@@ -2732,16 +2734,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	Chart.prototype.getArcBisectrixs = function () {
 	    return this.getAnglesDiff().map(function (diffAngle, i) {
-	        return _point.mathPoint.normalizeAngle(this.angles[i] + diffAngle / 2);
+	        return _geometry.Geometry.normalizeAngle(this.angles[i] + diffAngle / 2);
 	    }, this);
 	};
 	
 	Chart.prototype.getArcOnPoint = function (point) {
-	    var angle = _point.mathPoint.getAngle(this.options.center, point),
+	    var angle = _geometry.Geometry.getAngle(this.options.center, point),
 	        i,
 	        offset,
 	        j,
-	        radius = _point.mathPoint.getDistance(this.options.center, point);
+	        radius = _geometry.Geometry.getDistance(this.options.center, point);
 	    if (radius > this.options.radius) {
 	        return -1;
 	    }
@@ -2767,7 +2769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.draggables.forEach(function (draggable, i) {
 	        var angle = this.angles[i],
 	            halfSize = draggable.getSize().mult(0.5),
-	            position = _point.mathPoint.getPointFromRadialSystem(angle, this.options.touchRadius, this.options.center.sub(halfSize));
+	            position = _geometry.Geometry.getPointFromRadialSystem(angle, this.options.touchRadius, this.options.center.sub(halfSize));
 	
 	        draggable.move(position, 0, true, true);
 	    }, this);
@@ -2797,7 +2799,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.ListSwitcher = exports.listSwitcherFactory = undefined;
 	
-	var _point = __webpack_require__(2);
+	var _geometry = __webpack_require__(2);
 	
 	var _draggable = __webpack_require__(4);
 	
@@ -2815,7 +2817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function ListSwitcher(draggables, options) {
 	  options = options || {};
-	  options.stepOn = options.stepOn || new _point.Point(-50, 0);
+	  options.stepOn = options.stepOn || new _geometry.Point(-50, 0);
 	  Dragee.List.call(this, draggables, options);
 	}
 	
@@ -2837,7 +2839,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      currentIndex,
 	      excangeIndex;
 	  currentIndex = this.draggables.indexOf(draggable);
-	  excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
+	  excangeIndex = _geometry.Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 	  if (excangeIndex === -1 || excangeIndex === currentIndex) {
 	    this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd);
 	  } else {
@@ -2854,7 +2856,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	ListSwitcher.prototype.moveDraggable = function (index, position, fixOffPosition, time) {
 	  var positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)],
-	      isOn = _point.mathPoint.indexOfNearPoint(positions, position, -1, _point.mathPoint.getXDifference);
+	      isOn = _geometry.Geometry.indexOfNearPoint(positions, position, -1, _geometry.Geometry.getXDifference);
 	  if (this.draggables[index].isOn !== !!isOn) {
 	    this.draggables[index].isOn = !!isOn;
 	    this.onChange.fire();

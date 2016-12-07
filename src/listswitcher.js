@@ -1,7 +1,7 @@
 'use strict';
 
 
-import {mathPoint, Point} from './point'
+import {Geometry, Point} from './geometry'
 import {Draggable} from './draggable'
 import {List} from './list'
 
@@ -37,7 +37,7 @@ ListSwitcher.prototype.init = function(){
 ListSwitcher.prototype.onEnd = function(draggable){
   var fixPositions = this.getCurrentFixPositionWithOff(), currentIndex, excangeIndex;
   currentIndex = this.draggables.indexOf(draggable);
-  excangeIndex = mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
+  excangeIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
   if(excangeIndex === -1 || excangeIndex === currentIndex){
     this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd);
   } else {
@@ -53,7 +53,7 @@ ListSwitcher.prototype.onEnd = function(draggable){
 };
 
 ListSwitcher.prototype.moveDraggable = function(index, position, fixOffPosition, time){
-  var positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)], isOn = mathPoint.indexOfNearPoint(positions, position, -1, mathPoint.getXDifference);
+  var positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)], isOn = Geometry.indexOfNearPoint(positions, position, -1, Geometry.getXDifference);
   if(this.draggables[index].isOn !== !!isOn){
     this.draggables[index].isOn = !!isOn;
     this.onChange.fire();

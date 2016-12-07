@@ -2,7 +2,7 @@
 
 import util from './util'
 import Event from './event'
-import {mathPoint} from './point'
+import {Geometry} from './geometry'
 import {positionType, sortingFactory, positionFactory} from './positioning'
 import {scopes, defaultScope} from './scope'
 
@@ -20,7 +20,7 @@ function Target(element, draggables, options){
 		timeEnd: 200,
 		timeExcange: 400,
 		parent: parent,
-		sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, mathPoint.transformedSpaceDistanceFactory({x: 1, y: 4})),
+		sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, Geometry.transformedSpaceDistanceFactory({x: 1, y: 4})),
 		positioning: Dragee.positionFactory(Dragee.positionType.floatLeft)(this.getRectangle.bind(this), {removable: true})
 	};
 	for(i in options){
@@ -48,7 +48,7 @@ Target.onCreate = new Dragee.Event(Target, {isReverse: true, isStopOnTrue: true}
 Target.onCreate.add(addToDefaultScope);
 
 Target.prototype.getRectangle = function(){
-	return mathPoint.createRectangleFromElement(
+	return Geometry.createRectangleFromElement(
 		this.element,
 		this.options.parent,
 		this.options.isContentBoxSize,

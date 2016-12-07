@@ -1,5 +1,5 @@
 import './expandnative'
-import {Point} from './point'
+import {Point, Rectangle, Geometry} from './geometry'
 import {Draggable} from './draggable'
 import {List, listFactory} from './list'
 import {targets, Target} from './target'
@@ -14,6 +14,7 @@ import {listSwitcherFactory, ListSwitcher} from './listswitcher'
 global.Point = Point
 
 export { Draggable,
+  Point, Rectangle, Geometry,
   List, listFactory,
   targets, Target,
   scopes, defaultScope, Scope, scopeFactory, scope,

@@ -4,7 +4,7 @@ import util from './util'
 import Event from './event'
 import getStyleProperty from 'desandro-get-style-property'
 import {bound} from './bound'
-import {mathPoint, Point, Rectangle} from './point'
+import {Geometry, Point, Rectangle} from './geometry'
 import {defaultScope} from "./scope"
 
 var Dragee = { util, bound, Event};//todo remove after refactore
@@ -80,7 +80,7 @@ Draggable.onCreate.add(addToDefaultScope);
 
 Draggable.prototype.init = function(){
     this._enable = true;
-    this.offset = mathPoint.getOffset(this.element, this.options.parent, true);
+    this.offset = Geometry.getOffset(this.element, this.options.parent, true);
     this.fixPosition = this.offset;
     this.position = this.offset;
     if(this.options.position){
@@ -100,7 +100,7 @@ Draggable.prototype.init = function(){
 };
 
 Draggable.prototype.reinit = function(){
-    this.offset = mathPoint.getOffset(this.element, this.options.parent, true);
+    this.offset = Geometry.getOffset(this.element, this.options.parent, true);
     this.fixPosition = this.offset;
     this.position = this.offset;
     if(this.options.position){
@@ -114,7 +114,7 @@ Draggable.prototype.reinit = function(){
 };
 
 Draggable.prototype.getSize = function(recalulate){
-    return mathPoint.getSizeOfElement(this.element, this.options.isContentBoxSize);
+    return Geometry.getSizeOfElement(this.element, this.options.isContentBoxSize);
 };
 
 Draggable.prototype.getPosition = function(){

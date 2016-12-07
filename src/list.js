@@ -4,7 +4,7 @@ var lists = [];
 
 import util from './util'
 import Event from './event'
-import {mathPoint, Point} from './point'
+import {Geometry, Point} from './geometry'
 import {bound} from './bound'
 import {Draggable, draggables, events} from './draggable'
 
@@ -17,7 +17,7 @@ function List(draggables, options){
 		timeEnd: 200,
 		timeExcange: 400,
 		radius: 30,
-		getDistance: mathPoint.getDistance,
+		getDistance: Geometry.getDistance,
 		isDisplacement: false
 	};
 	for(i in options){
@@ -75,7 +75,7 @@ List.prototype.moveOrSave = function(draggable, position, time){
 List.prototype.onEnd = function(draggable){
 	var fixPositions = this.getCurrentFixPosition(), currentIndex, excangeIndex;
 	currentIndex = this.draggables.indexOf(draggable);
-	excangeIndex = mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
+	excangeIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 	if(excangeIndex === -1 || excangeIndex === currentIndex){
 		draggable.move(draggable.fixPosition, this.options.timeEnd, true);
 	}else{
@@ -93,7 +93,7 @@ List.prototype.onEndDisplaycement = function(draggable){
 			return draggable.fixPosition;
 		});
 	currentIndex = sortedDraggables.indexOf(draggable);
-	targetIndex = mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
+	targetIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 	if(targetIndex !==-1){
 		if(targetIndex < currentIndex){
 			for(i=targetIndex; i<currentIndex; i++){

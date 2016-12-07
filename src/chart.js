@@ -1,7 +1,7 @@
 'use strict';
 
 import util from './util'
-import {mathPoint, Point} from './point'
+import {Geometry, Point} from './geometry'
 import {Draggable, draggables, events} from './draggable'
 import {bound} from './bound'
 
@@ -21,7 +21,7 @@ function getArrayWithBoundIndexes(index,length){
 
 
 function Chart(area, elements, options){
-    var i, areaRectangle = mathPoint.createRectangleFromElement(area, area);
+    var i, areaRectangle = Geometry.createRectangleFromElement(area, area);
     this.options = {
         center: areaRectangle.getCenter(),
         radius: areaRectangle.getMinSide() / 2,
@@ -31,7 +31,7 @@ function Chart(area, elements, options){
             return Dragee.util.randomColor();
         }),
         initAngles: Dragee.util.range(-90, 270, 360 / elements.length).map(function(angle){
-            return mathPoint.toRadian(angle);
+            return Geometry.toRadian(angle);
         }),
         onDraw:function(){},
         limitImg: null,
@@ -57,8 +57,8 @@ Chart.prototype.init = function (elements){
     this.context = this.canvas.getContext("2d");
     this.draggables = elements.map(function (element, i){
         var angle = this.options.initAngles[i],
-            halfSize = mathPoint.getSizeOfElement(element).mult(0.5),
-            position = mathPoint.getPointFromRadialSystem(
+            halfSize = Geometry.getSizeOfElement(element).mult(0.5),
+            position = Geometry.getPointFromRadialSystem(
                 angle,
                 this.options.touchRadius,
                 this.options.center.sub(halfSize)
@@ -99,7 +99,7 @@ Chart.prototype.initSelect = function (){
             ), index;
 
         if(!that.canvasOffset){
-            that.canvasOffset = mathPoint.getOffset(that.canvas);
+            that.canvasOffset = Geometry.getOffset(that.canvas);
         }
 
         point = point.sub(that.canvasOffset);
@@ -113,7 +113,7 @@ Chart.prototype.initSelect = function (){
 Chart.prototype.updateAngles = function (){
     this.angles = this.draggables.map(function(draggable){
         var halfSize = draggable.getSize().mult(0.5);
-        return mathPoint.getAngle(this.options.center.sub(halfSize), draggable.position);
+        return Geometry.getAngle(this.options.center.sub(halfSize), draggable.position);
     },this);
 };
 
@@ -125,7 +125,7 @@ Chart.prototype.getBoundAngle = function(index, isClossing){
         if(i < 0){
             i += that.angles.length;
         }
-        return mathPoint.normalizeAngle(that.angles[i] - sign * that.options.boundAngle);
+        return Geometry.normalizeAngle(that.angles[i] - sign * that.options.boundAngle);
     };
 };
 
@@ -159,7 +159,7 @@ Chart.prototype.createClone = function(element, options){
     if(!this.isInit){
         return;
     }
-    rectangle = mathPoint.createRectangleFromElement(element, element);
+    rectangle = Geometry.createRectangleFromElement(element, element);
     opts = {
         center: rectangle.getCenter(),
         radius: rectangle.getMinSide() / 2,
@@ -213,7 +213,7 @@ Chart.prototype.drawLimitImg = function(index){
     if(!img){
         return ;
     }
-    angle = mathPoint.normalizeAngle(this.angles[index]);
+    angle = Geometry.normalizeAngle(this.angles[index]);
     point = new Point(0, -img.height/2);
     point = point.add(this.options.limitImgOffset);
     this.context.translate(this.areaRectangle.size.x / 2, this.areaRectangle.size.y / 2);
@@ -228,7 +228,7 @@ Chart.prototype.getAnglesDiff = function(){
 
     angles.push(baseAngle);
     return angles.map(function(angle){
-        var diffAngle = mathPoint.normalizeAngle(angle - baseAngle);
+        var diffAngle = Geometry.normalizeAngle(angle - baseAngle);
         baseAngle = angle;
         return diffAngle;
     });
@@ -242,13 +242,13 @@ Chart.prototype.getPercent = function(){
 
 Chart.prototype.getArcBisectrixs = function(){
     return this.getAnglesDiff().map(function(diffAngle,i){
-        return mathPoint.normalizeAngle(this.angles[i] + diffAngle/2);
+        return Geometry.normalizeAngle(this.angles[i] + diffAngle/2);
     },this);
 };
 
 Chart.prototype.getArcOnPoint = function(point){
-    var angle = mathPoint.getAngle(this.options.center, point), i, offset, j,
-        radius = mathPoint.getDistance(this.options.center, point);
+    var angle = Geometry.getAngle(this.options.center, point), i, offset, j,
+        radius = Geometry.getDistance(this.options.center, point);
     if(radius > this.options.radius ){
         return -1;
     }
@@ -274,7 +274,7 @@ Chart.prototype.setAngles = function(angles){
     this.draggables.forEach(function (draggable, i){
         var angle = this.angles[i],
             halfSize = draggable.getSize().mult(0.5),
-            position = mathPoint.getPointFromRadialSystem(
+            position = Geometry.getPointFromRadialSystem(
                 angle,
                 this.options.touchRadius,
                 this.options.center.sub(halfSize)

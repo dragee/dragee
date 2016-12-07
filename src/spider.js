@@ -1,7 +1,7 @@
 'use strict';
 
 import util from './util'
-import {mathPoint, Point} from './point'
+import {Geometry, Point} from './geometry'
 import {bound} from './bound'
 import {Draggable, draggables, events} from './draggable'
 
@@ -9,7 +9,7 @@ var Dragee = {util, bound, Draggable};
 var spiders = [];
 
 function Spider(area, elements, options){
-	var i, areaRectangle = mathPoint.createRectangleFromElement(area, area);
+	var i, areaRectangle = Geometry.createRectangleFromElement(area, area);
 	this.options = {
 		angle: 0,
 		dAngle: 2 * Math.PI / elements.length,
@@ -39,9 +39,9 @@ Spider.prototype.init = function(elements){
 
 	this.draggables = elements.map(function (element, i){
 		var angle = this.options.angle + i * this.options.dAngle,
-			halfSize = mathPoint.getSizeOfElement(element).mult(0.5),
-			start = mathPoint.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize),
-			end = mathPoint.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize),
+			halfSize = Geometry.getSizeOfElement(element).mult(0.5),
+			start = Geometry.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize),
+			end = Geometry.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize),
 			bound = Dragee.bound.toLine(start, end);
 
 		return new Dragee.Draggable(element, {

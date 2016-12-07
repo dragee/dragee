@@ -1,5 +1,5 @@
 'use strict';
-import {mathPoint} from './point'
+import {Geometry} from './geometry'
 
 function boundToRectangle(rectangle) {
     return function (point, size){
@@ -29,7 +29,7 @@ function boundToElement(element, parent) {
         };
 
     retFunc.refresh = function(){
-        bound = boundToRectangle(mathPoint.createRectangleFromElement(element, parent))
+        bound = boundToRectangle(Geometry.createRectangleFromElement(element, parent))
     }
     retFunc.refresh();
     return retFunc;
@@ -72,17 +72,17 @@ function boundToLine(start, end) {
 
     return function (point, size){
         var point2 = new Point(point.x + someK * cosBeta, point.y + someK * sinBeta),
-            pointCrossing = mathPoint.directCrossing(start, end, point, point2),
-            newEnd = mathPoint.getPointInLineByLenght(end, start, size.x);
+            pointCrossing = Geometry.directCrossing(start, end, point, point2),
+            newEnd = Geometry.getPointInLineByLenght(end, start, size.x);
 
-        pointCrossing = mathPoint.boundToLine(start, newEnd, pointCrossing);
+        pointCrossing = Geometry.boundToLine(start, newEnd, pointCrossing);
         return pointCrossing;
     };
 }
 
 function boundToCircle(center, radius){
     return function (point, size){
-        var boundedPoint = mathPoint.getPointInLineByLenght(center, point, radius);
+        var boundedPoint = Geometry.getPointInLineByLenght(center, point, radius);
         return boundedPoint;
     };
 };
@@ -91,11 +91,11 @@ function boundToArc(center, radius, startAgle, endAngle) {
     return function (point, size){
         var boundStartAngle = typeof startAgle === "function" ? startAgle() : startAgle,
             boundEndtAngle = typeof startAgle === "function" ? endAngle() : endAngle,
-            angle = mathPoint.getAngle(center, point);
+            angle = Geometry.getAngle(center, point);
 
-        angle = mathPoint.normalizeAngle(angle);
-        angle = mathPoint.boundAngle(boundStartAngle, boundEndtAngle, angle);
-        return mathPoint.getPointFromRadialSystem(angle, radius, center);
+        angle = Geometry.normalizeAngle(angle);
+        angle = Geometry.boundAngle(boundStartAngle, boundEndtAngle, angle);
+        return Geometry.getPointFromRadialSystem(angle, radius, center);
     };
 }
 

@@ -1,5 +1,5 @@
 'use strict';
-import {mathPoint, Point, Rectangle} from './point'
+import {Geometry, Point, Rectangle} from './geometry'
 
 var	positionType = {
 		notCrossing: 0,
@@ -72,7 +72,7 @@ function positionFactory(type){
 						if(opts.removable && rect.getP3().y > boundRect.getP3().y){
 							rect.removable = true;
 						}
-						boundaryPoints = mathPoint.addPointToBoundPoints(boundaryPoints, rect.getP3().add(opts.paddingBottomRight));
+						boundaryPoints = Geometry.addPointToBoundPoints(boundaryPoints, rect.getP3().add(opts.paddingBottomRight));
 					});
 					return rectangleList;
 				};
@@ -106,7 +106,7 @@ function positionFactory(type){
 						if(opts.removable && rect.getLeftBottomPoint().y > boundRect.getP4().y){
 							rect.removable = true;
 						}
-						boundaryPoints = mathPoint.addPointToBoundPoints(boundaryPoints, rect.getP4().add(paddingBottomNegLeft), true);
+						boundaryPoints = Geometry.addPointToBoundPoints(boundaryPoints, rect.getP4().add(paddingBottomNegLeft), true);
 					});
 					return rectangleList;
 				};
@@ -141,7 +141,7 @@ function sortingFactory(type){
 					var newList = oldObjsList.concat(), listOldPosition;
 					listOldPosition = oldObjsList.map(opts.getPosition);
 					newObjs.forEach(function(newObj){
-						var index = mathPoint.indexOfNearPoint(listOldPosition, opts.getPosition(newObj), radius, getDistance);
+						var index = Geometry.indexOfNearPoint(listOldPosition, opts.getPosition(newObj), radius, getDistance);
 						if(index === -1){
 							index = newList.length;
 						} else {

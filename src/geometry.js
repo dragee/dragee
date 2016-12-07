@@ -1,9 +1,7 @@
 'use strict';
 import util from './util'
-var mathPoint;
+var Geometry;
 var Dragee = { util };//todo remove after refactore
-
-
 
 /*********************/
 function Point(x, y){
@@ -108,13 +106,13 @@ Rectangle.prototype.getMinSide = function(){
 };
 
 /*****************/
-mathPoint = {
+Geometry = {
     getDistance: function(p1, p2){
         var dx = p1.x - p2.x, dy = p1.y - p2.y;
         return Math.sqrt(dx * dx + dy * dy);
     },
     distance: function(p1, p2){
-        return mathPoint.getDistance(p1, p2)
+        return Geometry.getDistance(p1, p2)
     },
     getXDifference: function(p1, p2){
         return Math.abs(p1.x - p2.x);
@@ -131,7 +129,7 @@ mathPoint = {
     },
     indexOfNearPoint: function(arr, val, radius, getDistance){
         var size, index = 0, i, temp;
-        getDistance = getDistance || mathPoint.getDistance;
+        getDistance = getDistance || Geometry.getDistance;
         if(arr.length === 0){
             return -1;
         }
@@ -186,12 +184,12 @@ mathPoint = {
     // if not - return the nearest point of segment
     boundToSegment: function(LP1, LP2, P){
         var x, y;
-        x = mathPoint.bound(Math.min(LP1.x, LP2.x), Math.max(LP1.x, LP2.x), P.x);
+        x = Geometry.bound(Math.min(LP1.x, LP2.x), Math.max(LP1.x, LP2.x), P.x);
         if(x != P.x){
             y = (x === LP1.x) ? LP1.y : LP2.y;
             P = new Point(x, y);
         }
-        y = mathPoint.bound(Math.min(LP1.y, LP2.y), Math.max(LP1.y, LP2.y), P.y);
+        y = Geometry.bound(Math.min(LP1.y, LP2.y), Math.max(LP1.y, LP2.y), P.y);
         if(y != P.y){
             x = (y === LP1.y) ? LP1.x : LP2.x;
             P = new Point(x, y);
@@ -211,7 +209,7 @@ mathPoint = {
         return new Point(LP1.x + percent * dx, LP1.y + percent * dy);
     },
     getPointInLineByLenght: function(LP1, LP2, lenght){
-        var dx = LP2.x - LP1.x, dy = LP2.y - LP1.y, percent = lenght / mathPoint.distance(LP1, LP2);
+        var dx = LP2.x - LP1.x, dy = LP2.y - LP1.y, percent = lenght / Geometry.distance(LP1, LP2);
         return new Point(LP1.x + percent * dx, LP1.y + percent * dy);
     },
     createRectangleFromElement: function(el, parent, isContentBoxSize, isConsiderTranslate){
@@ -276,7 +274,7 @@ mathPoint = {
     getNearestAngle:function(arr,angle){
         var i,temp,diff = Math.PI * 2 ,value;
         for(i = 0; i < arr.length;i++){
-            temp = mathPoint.getAngleDiff(arr[i],angle);
+            temp = Geometry.getAngleDiff(arr[i],angle);
             if(diff < temp){
                 diff = temp;
                 value = arr[i];
@@ -300,4 +298,4 @@ mathPoint = {
     }
 };
 
-export {Point, Rectangle, mathPoint};
+export {Point, Rectangle, Geometry};
