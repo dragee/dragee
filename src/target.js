@@ -20,7 +20,7 @@ function Target(element, draggables, options){
 		timeEnd: 200,
 		timeExcange: 400,
 		parent: parent,
-		sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, mathPoint.getLength({x: 1, y: 4, isTransformationSpace: true})),
+		sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, mathPoint.transformedSpaceDistanceFactory({x: 1, y: 4})),
 		positioning: Dragee.positionFactory(Dragee.positionType.floatLeft)(this.getRectangle.bind(this), {removable: true})
 	};
 	for(i in options){

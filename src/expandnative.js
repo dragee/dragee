@@ -233,11 +233,6 @@ Math.boundPoint = function(min, max, val){
     var y = Math.max(min.y, Math.min(max.y, val.y));
     return new Point(x, y);
 }
-Math.getLength = function(p1, p2){
-    var dx = p1.x - p2.x;
-    var dy = p1.y - p2.y;
-    return Math.sqrt(dx*dx + dy*dy);
-}
 
 Math.toRadian = function(angle){
     return ((angle % 361) * Math.PI / 180);

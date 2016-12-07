@@ -128,7 +128,7 @@ function sortingFactory(type){
 			};
 		case positionType.floatLeft:
 		case positionType.floatRight:
-			return function(radius, getLength, options){
+			return function(radius, getDistance, options){
 				var i, opts = {
 					getPosition: function(obj){
 						return obj.position;
@@ -141,7 +141,7 @@ function sortingFactory(type){
 					var newList = oldObjsList.concat(), listOldPosition;
 					listOldPosition = oldObjsList.map(opts.getPosition);
 					newObjs.forEach(function(newObj){
-						var index = mathPoint.indexOfNearPoint(listOldPosition, opts.getPosition(newObj), radius, getLength);
+						var index = mathPoint.indexOfNearPoint(listOldPosition, opts.getPosition(newObj), radius, getDistance);
 						if(index === -1){
 							index = newList.length;
 						} else {

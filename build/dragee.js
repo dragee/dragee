@@ -330,11 +330,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var y = Math.max(min.y, Math.min(max.y, val.y));
 	    return new Point(x, y);
 	};
-	Math.getLength = function (p1, p2) {
-	    var dx = p1.x - p2.x;
-	    var dy = p1.y - p2.y;
-	    return Math.sqrt(dx * dx + dy * dy);
-	};
 	
 	Math.toRadian = function (angle) {
 	    return angle % 361 * Math.PI / 180;
@@ -508,45 +503,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*****************/
 	exports.mathPoint = mathPoint = {
-	    getLength: function getLength(options) {
-	        if (!options || options.x && options.y && !options.isTransformationSpace) {
-	            return function (p1, p2) {
-	                var dx = p1.x - p2.x,
-	                    dy = p1.y - p2.y;
-	                return Math.sqrt(dx * dx + dy * dy);
-	            };
-	        } else {
-	            if (options.x && options.y && options.isTransformationSpace) {
-	                return function (p1, p2) {
-	                    return Math.sqrt(Math.pow(options.x * Math.abs(p1.x - p2.x), 2) + Math.pow(options.y * Math.abs(p1.y - p2.y), 2));
-	                };
-	            } else {
-	                if (options.x) {
-	                    return function (p1, p2) {
-	                        return Math.abs(p1.x - p2.x);
-	                    };
-	                } else {
-	                    if (options.y) {
-	                        return function (p1, p2) {
-	                            return Math.abs(p1.y - p2.y);
-	                        };
-	                    }
-	                }
-	            }
-	        }
+	    getDistance: function getDistance(p1, p2) {
+	        var dx = p1.x - p2.x,
+	            dy = p1.y - p2.y;
+	        return Math.sqrt(dx * dx + dy * dy);
 	    },
-	    indexOfNearPoint: function indexOfNearPoint(arr, val, radius, getLength) {
+	    distance: function distance(p1, p2) {
+	        return mathPoint.getDistance(p1, p2);
+	    },
+	    getXDifference: function getXDifference(p1, p2) {
+	        return Math.abs(p1.x - p2.x);
+	    },
+	    getYDifference: function getYDifference(p1, p2) {
+	        return Math.abs(p1.y - p2.y);
+	    },
+	    transformedSpaceDistanceFactory: function transformedSpaceDistanceFactory(options) {
+	        return function (p1, p2) {
+	            return Math.sqrt(Math.pow(options.x * Math.abs(p1.x - p2.x), 2) + Math.pow(options.y * Math.abs(p1.y - p2.y), 2));
+	        };
+	    },
+	    indexOfNearPoint: function indexOfNearPoint(arr, val, radius, getDistance) {
 	        var size,
 	            index = 0,
 	            i,
 	            temp;
-	        getLength = getLength || this.getLength();
+	        getDistance = getDistance || mathPoint.getDistance;
 	        if (arr.length === 0) {
 	            return -1;
 	        }
-	        size = getLength(arr[0], val);
+	        size = getDistance(arr[0], val);
 	        for (i = 0; i < arr.length; i++) {
-	            temp = getLength(arr[i], val);
+	            temp = getDistance(arr[i], val);
 	            if (temp < size) {
 	                size = temp;
 	                index = i;
@@ -624,7 +611,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getPointInLineByLenght: function getPointInLineByLenght(LP1, LP2, lenght) {
 	        var dx = LP2.x - LP1.x,
 	            dy = LP2.y - LP1.y,
-	            percent = lenght / this.getLength()(LP1, LP2);
+	            percent = lenght / mathPoint.distance(LP1, LP2);
 	        return new Point(LP1.x + percent * dx, LP1.y + percent * dy);
 	    },
 	    createRectangleFromElement: function createRectangleFromElement(el, parent, isContentBoxSize, isConsiderTranslate) {
@@ -716,18 +703,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            val -= 2 * Math.PI;
 	        }
 	        return val;
-	    },
-	    distance: function distance(P1, P2) {
-	        var xs = 0;
-	        var ys = 0;
-	
-	        xs = P2.x - P1.x;
-	        xs = xs * xs;
-	
-	        ys = P2.y - P1.y;
-	        ys = ys * ys;
-	
-	        return Math.sqrt(xs + ys);
 	    }
 	};
 	
@@ -1645,7 +1620,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			timeEnd: 200,
 			timeExcange: 400,
 			parent: parent,
-			sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, _point.mathPoint.getLength({ x: 1, y: 4, isTransformationSpace: true })),
+			sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, _point.mathPoint.transformedSpaceDistanceFactory({ x: 1, y: 4 })),
 			positioning: Dragee.positionFactory(Dragee.positionType.floatLeft)(this.getRectangle.bind(this), { removable: true })
 		};
 		for (i in options) {
@@ -1996,7 +1971,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				};
 			case positionType.floatLeft:
 			case positionType.floatRight:
-				return function (radius, getLength, options) {
+				return function (radius, getDistance, options) {
 					var i,
 					    opts = {
 						getPosition: function getPosition(obj) {
@@ -2011,7 +1986,7 @@ return /******/ (function(modules) { // webpackBootstrap
 						    listOldPosition;
 						listOldPosition = oldObjsList.map(opts.getPosition);
 						newObjs.forEach(function (newObj) {
-							var index = _point.mathPoint.indexOfNearPoint(listOldPosition, opts.getPosition(newObj), radius, getLength);
+							var index = _point.mathPoint.indexOfNearPoint(listOldPosition, opts.getPosition(newObj), radius, getDistance);
 							if (index === -1) {
 								index = newList.length;
 							} else {
@@ -2070,7 +2045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			timeEnd: 200,
 			timeExcange: 400,
 			radius: 30,
-			getLength: _point.mathPoint.getLength(),
+			getDistance: _point.mathPoint.getDistance,
 			isDisplacement: false
 		};
 		for (i in options) {
@@ -2131,7 +2106,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    currentIndex,
 		    excangeIndex;
 		currentIndex = this.draggables.indexOf(draggable);
-		excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
+		excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 		if (excangeIndex === -1 || excangeIndex === currentIndex) {
 			draggable.move(draggable.fixPosition, this.options.timeEnd, true);
 		} else {
@@ -2151,7 +2126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			return draggable.fixPosition;
 		});
 		currentIndex = sortedDraggables.indexOf(draggable);
-		targetIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
+		targetIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 		if (targetIndex !== -1) {
 			if (targetIndex < currentIndex) {
 				for (i = targetIndex; i < currentIndex; i++) {
@@ -2766,7 +2741,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        i,
 	        offset,
 	        j,
-	        radius = _point.mathPoint.getLength()(this.options.center, point);
+	        radius = _point.mathPoint.getDistance(this.options.center, point);
 	    if (radius > this.options.radius) {
 	        return -1;
 	    }
@@ -2862,7 +2837,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      currentIndex,
 	      excangeIndex;
 	  currentIndex = this.draggables.indexOf(draggable);
-	  excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
+	  excangeIndex = _point.mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 	  if (excangeIndex === -1 || excangeIndex === currentIndex) {
 	    this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd);
 	  } else {
@@ -2879,7 +2854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	ListSwitcher.prototype.moveDraggable = function (index, position, fixOffPosition, time) {
 	  var positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)],
-	      isOn = _point.mathPoint.indexOfNearPoint(positions, position, -1, _point.mathPoint.getLength({ x: true }));
+	      isOn = _point.mathPoint.indexOfNearPoint(positions, position, -1, _point.mathPoint.getXDifference);
 	  if (this.draggables[index].isOn !== !!isOn) {
 	    this.draggables[index].isOn = !!isOn;
 	    this.onChange.fire();

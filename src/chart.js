@@ -248,7 +248,7 @@ Chart.prototype.getArcBisectrixs = function(){
 
 Chart.prototype.getArcOnPoint = function(point){
     var angle = mathPoint.getAngle(this.options.center, point), i, offset, j,
-        radius = mathPoint.getLength()(this.options.center, point);
+        radius = mathPoint.getDistance(this.options.center, point);
     if(radius > this.options.radius ){
         return -1;
     }

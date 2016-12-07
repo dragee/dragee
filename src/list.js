@@ -17,7 +17,7 @@ function List(draggables, options){
 		timeEnd: 200,
 		timeExcange: 400,
 		radius: 30,
-		getLength: mathPoint.getLength(),
+		getDistance: mathPoint.getDistance,
 		isDisplacement: false
 	};
 	for(i in options){
@@ -75,7 +75,7 @@ List.prototype.moveOrSave = function(draggable, position, time){
 List.prototype.onEnd = function(draggable){
 	var fixPositions = this.getCurrentFixPosition(), currentIndex, excangeIndex;
 	currentIndex = this.draggables.indexOf(draggable);
-	excangeIndex = mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
+	excangeIndex = mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 	if(excangeIndex === -1 || excangeIndex === currentIndex){
 		draggable.move(draggable.fixPosition, this.options.timeEnd, true);
 	}else{
@@ -93,7 +93,7 @@ List.prototype.onEndDisplaycement = function(draggable){
 			return draggable.fixPosition;
 		});
 	currentIndex = sortedDraggables.indexOf(draggable);
-	targetIndex = mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getLength);
+	targetIndex = mathPoint.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
 	if(targetIndex !==-1){
 		if(targetIndex < currentIndex){
 			for(i=targetIndex; i<currentIndex; i++){

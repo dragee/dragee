@@ -109,41 +109,35 @@ Rectangle.prototype.getMinSide = function(){
 
 /*****************/
 mathPoint = {
-    getLength: function(options){
-        if(!options || (options.x && options.y && !options.isTransformationSpace)){
-            return function(p1, p2){
-                var dx = p1.x - p2.x, dy = p1.y - p2.y;
-                return Math.sqrt(dx * dx + dy * dy);
-            };
-        }else{
-            if(options.x && options.y && options.isTransformationSpace){
-                return function(p1, p2){
-                    return Math.sqrt(Math.pow(options.x * Math.abs(p1.x - p2.x), 2) + Math.pow(options.y * Math.abs(p1.y - p2.y), 2));
-                };
-            }else{
-                if(options.x){
-                    return function(p1, p2){
-                        return Math.abs(p1.x - p2.x);
-                    };
-                }else{
-                    if(options.y){
-                        return function(p1, p2){
-                            return Math.abs(p1.y - p2.y);
-                        };
-                    }
-                }
-            }
-        }
+    getDistance: function(p1, p2){
+        var dx = p1.x - p2.x, dy = p1.y - p2.y;
+        return Math.sqrt(dx * dx + dy * dy);
     },
-    indexOfNearPoint: function(arr, val, radius, getLength){
+    distance: function(p1, p2){
+        return mathPoint.getDistance(p1, p2)
+    },
+    getXDifference: function(p1, p2){
+        return Math.abs(p1.x - p2.x);
+    },
+    getYDifference: function(p1, p2) {
+        return Math.abs(p1.y - p2.y);
+    },
+    transformedSpaceDistanceFactory: function(options) {
+        return function(p1, p2){
+            return Math.sqrt(
+                Math.pow(options.x * Math.abs(p1.x - p2.x), 2) + Math.pow(options.y * Math.abs(p1.y - p2.y), 2)
+            );
+        };
+    },
+    indexOfNearPoint: function(arr, val, radius, getDistance){
         var size, index = 0, i, temp;
-        getLength = getLength || this.getLength();
+        getDistance = getDistance || mathPoint.getDistance;
         if(arr.length === 0){
             return -1;
         }
-        size = getLength(arr[0], val);
+        size = getDistance(arr[0], val);
         for(i = 0; i < arr.length; i++){
-            temp = getLength(arr[i], val);
+            temp = getDistance(arr[i], val);
             if(temp < size){
                 size = temp;
                 index = i;
@@ -217,7 +211,7 @@ mathPoint = {
         return new Point(LP1.x + percent * dx, LP1.y + percent * dy);
     },
     getPointInLineByLenght: function(LP1, LP2, lenght){
-        var dx = LP2.x - LP1.x, dy = LP2.y - LP1.y, percent = lenght / this.getLength()(LP1, LP2);
+        var dx = LP2.x - LP1.x, dy = LP2.y - LP1.y, percent = lenght / mathPoint.distance(LP1, LP2);
         return new Point(LP1.x + percent * dx, LP1.y + percent * dy);
     },
     createRectangleFromElement: function(el, parent, isContentBoxSize, isConsiderTranslate){
@@ -303,18 +297,6 @@ mathPoint = {
             val-= 2 * Math.PI;
         }
         return val;
-    },
-    distance: function(P1, P2){
-      var xs = 0;
-      var ys = 0;
-
-      xs = P2.x - P1.x;
-      xs = xs * xs;
-
-      ys = P2.y - P1.y;
-      ys = ys * ys;
-
-      return Math.sqrt( xs + ys );
     }
 };
 
