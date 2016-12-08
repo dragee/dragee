@@ -1,6 +1,6 @@
 # Dragee
 
-[dragee.github.io](http://dragee.github.io) - drag&drop library for desltop and touch devices
+[dragee.github.io](http://dragee.github.io) - drag&drop library for desktop and touch devices
 
 # Dragee.Draggable
 ```javascript
