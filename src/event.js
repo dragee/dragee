@@ -14,7 +14,7 @@ Event.prototype.fire = function(){
 
     for(i = 0; i < fs.length; i++){
         retValue = fs[i].apply(this.context, args);
-        if(this.isStopOnTrue && retValue){
+        if (this.isStopOnTrue && retValue) {
             return true;
         }
     }
@@ -31,7 +31,7 @@ Event.prototype.unshift = function(f){
 
 Event.prototype.remove = function(f){
     var index = this.funcs.indexOf(f);
-    if(index !== -1){
+    if (index !== -1) {
         this.funcs.splice(index, 1)
     }
 };

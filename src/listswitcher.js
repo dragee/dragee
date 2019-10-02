@@ -1,9 +1,8 @@
 'use strict';
 
-
-import {Geometry, Point} from './geometry'
-import {Draggable} from './draggable'
-import {List} from './list'
+import { Geometry, Point } from './geometry'
+import { Draggable } from './draggable'
+import { List } from './list'
 
 var Dragee = { List, Draggable };//todo remove after refactore
 
@@ -38,10 +37,10 @@ ListSwitcher.prototype.onEnd = function(draggable){
   var fixPositions = this.getCurrentFixPositionWithOff(), currentIndex, excangeIndex;
   currentIndex = this.draggables.indexOf(draggable);
   excangeIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
-  if(excangeIndex === -1 || excangeIndex === currentIndex){
+  if (excangeIndex === -1 || excangeIndex === currentIndex) {
     this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd);
   } else {
-    if(this.draggables[excangeIndex].isDragee){
+    if (this.draggables[excangeIndex].isDragee) {
       this.fixToOff(excangeIndex, fixPositions[currentIndex]);
     } else {
       this.moveDraggableToOff(excangeIndex, fixPositions[currentIndex], this.options.timeExcange);
@@ -54,7 +53,7 @@ ListSwitcher.prototype.onEnd = function(draggable){
 
 ListSwitcher.prototype.moveDraggable = function(index, position, fixOffPosition, time){
   var positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)], isOn = Geometry.indexOfNearPoint(positions, position, -1, Geometry.getXDifference);
-  if(this.draggables[index].isOn !== !!isOn){
+  if (this.draggables[index].isOn !== !!isOn) {
     this.draggables[index].isOn = !!isOn;
     this.onChange.fire();
   }
@@ -105,7 +104,7 @@ ListSwitcher.prototype.__defineGetter__("positions", function(){
 
 ListSwitcher.prototype.__defineSetter__("positions", function(positions){
   var message = "wrong array length";
-  if(positions.length === this.draggables.length){
+  if (positions.length === this.draggables.length) {
     positions.forEach(function(point, i){
       this.draggables[i].isOn = point.isOn;
       this.draggables[i].move(point, 0, true, true);
@@ -131,4 +130,4 @@ function listSwitcherFactory(element, draggableElements, options){
   return new ListSwitcher(draggables, listOptions);
 }
 
-export {listSwitcherFactory, ListSwitcher}
+export { listSwitcherFactory, ListSwitcher }

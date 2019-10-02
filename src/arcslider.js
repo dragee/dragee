@@ -1,9 +1,9 @@
 'use strict';
 
 import util from './util'
-import {Geometry} from './geometry'
-import {Draggable, draggables, events} from './draggable'
-import {bound} from './bound'
+import { Geometry } from './geometry'
+import { Draggable, draggables, events } from './draggable'
+import { bound } from './bound'
 
 var Dragee = { util, Draggable, bound };//todo remove after refactore
 
@@ -17,12 +17,12 @@ function ArcSlider(area, element, options){
 		radius: areaRectangle.getMinSide() / 2,
 		startAngle: Math.PI,
 		endAngle: 0,
-		angles: [Math.PI,-Math.PI/4,0,Math.PI/4,Math.PI/2],
-		onChange:function(){},
+		angles: [Math.PI, -Math.PI/4, 0, Math.PI/4, Math.PI/2],
+		onChange: function(){},
 		time: 500
 	};
-	for(i in options){
-		if(options.hasOwnProperty(i)){
+	for(i in options) {
+		if (options.hasOwnProperty(i)) {
 			this.options[i] = options[i];
 		}
 	}
@@ -82,4 +82,4 @@ ArcSlider.prototype.setAngle = function(angle, time){
 	this.onChange(this.angle);
 };
 
-export {arcSliders, ArcSlider};
+export { arcSliders, ArcSlider };

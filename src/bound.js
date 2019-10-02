@@ -1,34 +1,35 @@
 'use strict';
-import {Geometry} from './geometry'
+import { Geometry } from './geometry'
 
 function boundToRectangle(rectangle) {
     return function (point, size){
         var calcPoint = point.clone(),
             rectP2 = rectangle.getP3();
 
-        if(rectangle.position.x > calcPoint.x){
+        if (rectangle.position.x > calcPoint.x) {
             (calcPoint.x = rectangle.position.x);
         }
-        if(rectangle.position.y > calcPoint.y){
+        if (rectangle.position.y > calcPoint.y) {
             calcPoint.y = rectangle.position.y;
         }
-        if(rectP2.x < calcPoint.x + size.x){
+        if (rectP2.x < calcPoint.x + size.x) {
             calcPoint.x = rectP2.x - size.x;
         }
-        if(rectP2.y < calcPoint.y + size.y){
+        if (rectP2.y < calcPoint.y + size.y) {
             calcPoint.y = rectP2.y - size.y;
         }
+
         return calcPoint;
     };
 }
 
 function boundToElement(element, parent) {
     var bound,
-        retFunc = function(){
+        retFunc = function () {
             return bound.apply(this, arguments)
         };
 
-    retFunc.refresh = function(){
+    retFunc.refresh = function () {
         bound = boundToRectangle(Geometry.createRectangleFromElement(element, parent))
     }
     retFunc.refresh();
@@ -39,12 +40,13 @@ function boundToLineX(x, startY, endY) {
     return function (point, size){
         var calcPoint = point.clone();
         calcPoint.x = x;
-        if(startY > calcPoint.y){
+        if (startY > calcPoint.y) {
             calcPoint.y = startY;
         }
-        if(endY < calcPoint.y + size.y){
+        if (endY < calcPoint.y + size.y) {
             calcPoint.y = endY - size.y;
         }
+
         return calcPoint;
     };
 }

@@ -2,9 +2,9 @@
 
 import util from './util'
 import Event from './event'
-import {Geometry} from './geometry'
-import {positionType, sortingFactory, positionFactory} from './positioning'
-import {scopes, defaultScope} from './scope'
+import { Geometry } from './geometry'
+import { positionType, sortingFactory, positionFactory } from './positioning'
+import { scopes, defaultScope } from './scope'
 
 var Dragee = { util, positionType,  positionFactory, sortingFactory, scopes, Event };//todo remove after refactore
 
@@ -44,7 +44,7 @@ function Target(element, draggables, options){
 	this.init();
 };
 
-Target.onCreate = new Dragee.Event(Target, {isReverse: true, isStopOnTrue: true});
+Target.onCreate = new Dragee.Event(Target, { isReverse: true, isStopOnTrue: true });
 Target.onCreate.add(addToDefaultScope);
 
 Target.prototype.getRectangle = function(){
@@ -57,7 +57,7 @@ Target.prototype.getRectangle = function(){
 };
 
 Target.prototype.catchDraggable = function(draggable){
-	if(this.options.catchDraggable) {
+	if (this.options.catchDraggable) {
 		return this.options.catchDraggable(this, draggable);
 	} else {
 		var targetRectangle = this.getRectangle(),
@@ -81,8 +81,8 @@ Target.prototype.init = function(){
 
 	this.innerDraggables = this.draggables.filter(function(draggable){
 		var element = draggable.element.parentNode;
-		while(element){
-			if(element === this.element){
+		while(element) {
+			if (element === this.element) {
 				return true;
 			}
 			element = element.parentNode;
@@ -90,7 +90,7 @@ Target.prototype.init = function(){
 		return false;
 	}, this);
 
-	if(this.innerDraggables.length){
+	if (this.innerDraggables.length) {
 		indexesOfNew = Dragee.util.range(this.innerDraggables.length);
 		rectangles = this.options.positioning(this.innerDraggables.map(function(draggable){
 			return draggable.getRectangle();
@@ -120,8 +120,8 @@ Target.prototype.onEnd = function(draggable){
 		rectangles,
 		includePoint = this.getRectangle().includePoint(draggable.getPosition());
 
-	if(!includePoint){
-		if(this.getRectangle().includePoint(draggable.getCenter())) {
+	if (!includePoint) {
+		if (this.getRectangle().includePoint(draggable.getCenter())) {
 			draggable.position = draggable.getCenter().clone();
 		} else {
 			return false;
@@ -147,7 +147,7 @@ Target.prototype.setPosition = function(rectangles, indexesOfNew, time){
 		var rect = rectangles[i],
 			timeEnd = time || time == 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExcange;
 
-		if(rect.removable){
+		if (rect.removable) {
 			draggable.move(draggable.initPosition, timeEnd, true, true);
 			this.innerDraggables.removeItem(draggable);
 
@@ -174,7 +174,7 @@ Target.prototype.add = function(draggable, time){
 };
 
 Target.prototype.pushInnerDraggable = function(draggable){
-	if(this.innerDraggables.indexOf(draggable)===-1){
+	if (this.innerDraggables.indexOf(draggable)===-1) {
 		this.innerDraggables.push(draggable);
 	}
 };
@@ -194,7 +194,7 @@ Target.prototype.remove = function(draggable){
 	draggable.onMove.remove(this.removeHandler);
 
 	index = this.innerDraggables.indexOf(draggable);
-	if(index === -1){
+	if (index === -1) {
 		return;
 	}
 
@@ -220,4 +220,4 @@ Target.prototype.getSortedDraggables = function(){
 	this.innerDraggables.slice();
 }
 
-export {targets, Target};
+export { targets, Target };

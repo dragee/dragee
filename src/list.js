@@ -4,9 +4,9 @@ var lists = [];
 
 import util from './util'
 import Event from './event'
-import {Geometry, Point} from './geometry'
-import {bound} from './bound'
-import {Draggable, draggables, events} from './draggable'
+import { Geometry, Point } from './geometry'
+import { bound } from './bound'
+import { Draggable, draggables, events } from './draggable'
 
 var Dragee = { util, bound, Draggable, events, Event };//todo remove after refactore
 
@@ -28,7 +28,7 @@ function List(draggables, options){
 	this.draggables = draggables;
 	lists.push(this);
 	this.onChange = new Dragee.Event(this);
-	if(options && options.onChange){
+	if (options && options.onChange) {
 		this.onChange.add(options.onChange);
 	}
 	this.init();
@@ -42,7 +42,7 @@ List.prototype.init = function(){
 List.prototype.initDraggable = function(draggable){
 	var moveHandler, that = this;
 	draggable.enable = this._enable;
-	if(this.options.isDisplacement){
+	if (this.options.isDisplacement) {
 		moveHandler = function(){
 			if(this.isDragee){
 				that.onStart(this);
@@ -56,7 +56,7 @@ List.prototype.initDraggable = function(draggable){
 			return true;
 		});
 		draggable.onMove.add(moveHandler);
-	}else{
+	} else {
 		draggable.onEnd.add(function(){
 			that.onEnd(this);
 			return true;
@@ -65,9 +65,9 @@ List.prototype.initDraggable = function(draggable){
 };
 
 List.prototype.moveOrSave = function(draggable, position, time){
-	if(draggable.isDragee){
+	if (draggable.isDragee) {
 		draggable.fixPosition = position;
-	}else{
+	} else {
 		draggable.move(position, time, true);
 	}
 };
@@ -76,9 +76,9 @@ List.prototype.onEnd = function(draggable){
 	var fixPositions = this.getCurrentFixPosition(), currentIndex, excangeIndex;
 	currentIndex = this.draggables.indexOf(draggable);
 	excangeIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
-	if(excangeIndex === -1 || excangeIndex === currentIndex){
+	if (excangeIndex === -1 || excangeIndex === currentIndex) {
 		draggable.move(draggable.fixPosition, this.options.timeEnd, true);
-	}else{
+	} else {
 		this.moveOrSave(this.draggables[excangeIndex], fixPositions[currentIndex], this.options.timeExcange);
 		this.draggables[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true);
 		this.onChange.fire();
@@ -92,10 +92,11 @@ List.prototype.onEndDisplaycement = function(draggable){
 		fixPositions = sortedDraggables.map(function(draggable){
 			return draggable.fixPosition;
 		});
+
 	currentIndex = sortedDraggables.indexOf(draggable);
 	targetIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance);
-	if(targetIndex !==-1){
-		if(targetIndex < currentIndex){
+	if (targetIndex !==-1) {
+		if (targetIndex < currentIndex) {
 			for(i=targetIndex; i<currentIndex; i++){
 				this.moveOrSave(sortedDraggables[i], fixPositions[i+1], this.options.timeExcange);
 			}
@@ -137,11 +138,13 @@ List.prototype.getSortedDraggables = function(){
 		initPositions = this.draggables.map(function(draggable){
 			return draggable.initPosition;
 		});
+
 	sortedDraggables = initPositions.map(function(position){
 		return this.draggables.filter(function(draggable){
 			return draggable.fixPosition.compare(position);
 		},this)[0];
 	},this);
+
 	return sortedDraggables;
 };
 
@@ -158,7 +161,7 @@ List.prototype.refresh = function(){
 };
 
 List.prototype.add = function(draggables){
-	if(!(draggables instanceof Array)){
+	if (!(draggables instanceof Array)) {
 		draggables = [draggables];
 	}
 	draggables.forEach(this.initDraggable, this);
@@ -171,10 +174,12 @@ List.prototype.remove = function(draggables){
 		}),
 		list = [],
 		sortedDraggables = this.getSortedDraggables();
-	if(!(draggables instanceof Array)){
+
+	if (!(draggables instanceof Array)) {
 		draggables = [draggables];
 
 	}
+
 	draggables.forEach(function(draggable){
 		draggable.onEnd.reset();
 		draggable.onMove.reset();//todo remove reset in future
@@ -211,11 +216,11 @@ List.prototype.__defineGetter__("positions", function(){
 
 List.prototype.__defineSetter__("positions", function(positions){
 	var message = "wrong array length";
-	if(positions.length === this.draggables.length){
+	if (positions.length === this.draggables.length) {
 		positions.forEach(function(point, i){
 			this.draggables[i].move(point, 0, true, true);
 		}, this);
-	}else{
+	} else {
 		alert(message);
 		throw message;
 	}
@@ -248,4 +253,4 @@ function listFactory(parentElement, elements, options){
 	return new List(draggables, listOptions);
 }
 
-export {lists, List, listFactory};
+export { lists, List, listFactory };

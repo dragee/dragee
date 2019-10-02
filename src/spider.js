@@ -1,11 +1,11 @@
 'use strict';
 
 import util from './util'
-import {Geometry, Point} from './geometry'
-import {bound} from './bound'
-import {Draggable, draggables, events} from './draggable'
+import { Geometry, Point } from './geometry'
+import { bound } from './bound'
+import { Draggable, draggables, events } from './draggable'
 
-var Dragee = {util, bound, Draggable};
+var Dragee = { util, bound, Draggable };
 var spiders = [];
 
 function Spider(area, elements, options){
@@ -62,7 +62,7 @@ Spider.prototype.init = function(elements){
 
 Spider.prototype.draw = function (){
 	var point, i;
-	if(!this.isInit){
+	if (!this.isInit) {
 		return;
 	}
 	this.context.clearRect(0, 0, this.areaRectangle.size.x, this.areaRectangle.size.y);
@@ -81,5 +81,4 @@ Spider.prototype.draw = function (){
 	this.context.fill();
 }
 
-
-export {spiders, Spider}
+export { spiders, Spider }

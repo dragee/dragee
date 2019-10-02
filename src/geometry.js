@@ -12,21 +12,27 @@ function Point(x, y){
 Point.prototype.toString = function(){
     return '{x=' + this.x + ',y=' + this.y + '}';
 };
+
 Point.prototype.add = function(p){
     return new Point(this.x + p.x, this.y + p.y);
 };
+
 Point.prototype.sub = function(p){
     return new Point(this.x - p.x, this.y - p.y);
 };
+
 Point.prototype.mult = function(k){
     return new Point(this.x * k, this.y * k);
 };
+
 Point.prototype.negative = function(){
     return new Point(-this.x, -this.y);
 };
+
 Point.prototype.compare = function(p){
     return (this.x === p.x && this.y === p.y);
 };
+
 Point.prototype.clone = function(){
     return new Point(this.x, this.y);
 };
@@ -40,42 +46,51 @@ function Rectangle(position, size){
 Rectangle.prototype.getP1 = function(){
     return this.position;
 };
+
 Rectangle.prototype.getP2 = function(){
     return new Point(this.position.x + this.size.x, this.position.y);
 };
+
 Rectangle.prototype.getP3 = function(){
     return this.position.add(this.size);
 };
+
 Rectangle.prototype.getP4 = function(){
     return new Point(this.position.x, this.position.y + this.size.y);
 };
+
 Rectangle.prototype.getCenter = function(){
     return this.position.add(this.size.mult(0.5));
 };
+
 Rectangle.prototype.or = function(rect){
     var position = new Point(Math.min(this.position.x, rect.position.x), Math.min(this.position.y, rect.position.y)), size = (new Point(Math.max(this.position.x + this.size.x, rect.position.x + rect.size.x), Math.max(this.position.y + this.size.y, rect.position.y + rect.size.y))).sub(position);
     return new Rectangle(position, size);
 };
+
 Rectangle.prototype.and = function(rect){
     var position = new Point(Math.max(this.position.x, rect.position.x), Math.max(this.position.y, rect.position.y)), size = (new Point(Math.min(this.position.x + this.size.x, rect.position.x + rect.size.x), Math.min(this.position.y + this.size.y, rect.position.y + rect.size.y))).sub(position);
-    if(size.x <= 0 || size.y <= 0){
+    if (size.x <= 0 || size.y <= 0) {
         return null;
     }
     return new Rectangle(position, size);
 };
+
 Rectangle.prototype.includePoint = function(p){
 	return !(this.position.x > p.x || this.position.x + this.size.x < p.x || this.position.y > p.y || this.position.y + this.size.y < p.y);
 };
+
 Rectangle.prototype.includeRectangle = function(rectangle){
 	return this.includePoint(rectangle.position) && this.includePoint(rectangle.getP3());
 };
+
 Rectangle.prototype.moveToBound = function(rect, axis){
     var selAxis, crossRectangle, thisCenter, rectCenter, sign, offset;
-    if(axis){
+    if (axis) {
         selAxis = axis;
-    }else{
+    } else {
         crossRectangle = this.and(rect);
-        if(!crossRectangle){
+        if (!crossRectangle) {
             return rect;
         }
         selAxis = crossRectangle.size.x > crossRectangle.size.y ? "y" : "x";
@@ -87,9 +102,11 @@ Rectangle.prototype.moveToBound = function(rect, axis){
     rect.position[selAxis] = rect.position[selAxis] + offset;
     return rect;
 };
+
 Rectangle.prototype.getSquare = function(){
     return this.size.x * this.size.y;
 };
+
 Rectangle.prototype.styleApply = function(el){
     el = el || document.querySelector("ind");
     el.style.left = this.position.x + "px";
@@ -97,10 +114,12 @@ Rectangle.prototype.styleApply = function(el){
     el.style.width = this.size.x + "px";
     el.style.height = this.size.y + "px";
 };
+
 Rectangle.prototype.growth = function(size){
     this.size = this.size.add(size);
     this.position = this.position.add(size.mult(-0.5));
 };
+
 Rectangle.prototype.getMinSide = function(){
     return Math.min(this.size.x, this.size.y);
 };
@@ -156,7 +175,7 @@ Geometry = {
     //Return crossing point of two lines
     directCrossing: function(L1P1, L1P2, L2P1, L2P2){
         var temp, k1, k2, b1, b2, x, y;
-        if(L2P1.x === L2P2.x){
+        if (L2P1.x === L2P2.x) {
             temp = L2P1;
             L2P1 = L1P1;
             L1P1 = temp;
@@ -164,13 +183,13 @@ Geometry = {
             L2P2 = L1P2;
             L1P2 = temp;
         }
-        if(L1P1.x === L1P2.x){
+        if (L1P1.x === L1P2.x) {
             k2 = (L2P2.y - L2P1.y) / (L2P2.x - L2P1.x);
             b2 = (L2P2.x * L2P1.y - L2P1.x * L2P2.y) / (L2P2.x - L2P1.x);
             x = L1P1.x;
             y = x * k2 + b2;
             return new Point(x, y);
-        }else{
+        } else {
             k1 = (L1P2.y - L1P1.y) / (L1P2.x - L1P1.x);
             b1 = (L1P2.x * L1P1.y - L1P1.x * L1P2.y) / (L1P2.x - L1P1.x);
             k2 = (L2P2.y - L2P1.y) / (L2P2.x - L2P1.x);
@@ -185,15 +204,17 @@ Geometry = {
     boundToSegment: function(LP1, LP2, P){
         var x, y;
         x = Geometry.bound(Math.min(LP1.x, LP2.x), Math.max(LP1.x, LP2.x), P.x);
-        if(x != P.x){
+        if (x != P.x) {
             y = (x === LP1.x) ? LP1.y : LP2.y;
             P = new Point(x, y);
         }
+
         y = Geometry.bound(Math.min(LP1.y, LP2.y), Math.max(LP1.y, LP2.y), P.y);
-        if(y != P.y){
+        if (y != P.y) {
             x = (y === LP1.y) ? LP1.x : LP2.x;
             P = new Point(x, y);
         }
+
         return P;
     },
     boundToLine: function(A, B, P){
@@ -201,7 +222,7 @@ Geometry = {
             AB = new Point(B.x - A.x, B.y - A.y),
             ab2 = AB.x * AB.x + AB.y * AB.y,
             ap_ab = AP.x * AB.x + AP.y * AB.y,
-            t = ap_ab/ab2;
+            t = ap_ab / ab2;
         return new Point(A.x + AB.x * t, A.y + AB.y * t);
     },
     getPointInLine: function(LP1, LP2, percent){
@@ -218,7 +239,7 @@ Geometry = {
     },
     getSizeOfElement: function(el, isContentBoxSize){
         var width = parseInt(window.getComputedStyle(el)['width']), height = parseInt(window.getComputedStyle(el)['height']);
-        if(!isContentBoxSize){
+        if (!isContentBoxSize) {
             width += Dragee.util.getSumValueOfStyleRule(el, ["padding-left", "padding-right", "border-left-width", "border-right-width"]);
             height += Dragee.util.getSumValueOfStyleRule(el, ["padding-top", "padding-bottom", "border-top-width", "border-bottom-width"]);
         }
@@ -236,8 +257,9 @@ Geometry = {
         var i, result = boundpoints.filter(function(bPoint){
             return  bPoint.y > point.y || (isRight ? bPoint.x < point.x : bPoint.x > point.x);
         });
+
         for(i = 0; i < result.length; i++){
-            if(point.y < result[i].y){
+            if (point.y < result[i].y) {
                 result.splice(i, 0, point);
                 return result;
             }
@@ -271,8 +293,8 @@ Geometry = {
             }
         }
     },
-    getNearestAngle:function(arr,angle){
-        var i,temp,diff = Math.PI * 2 ,value;
+    getNearestAngle: function(arr,angle){
+        var i, temp, diff = Math.PI * 2, value;
         for(i = 0; i < arr.length;i++){
             temp = Geometry.getAngleDiff(arr[i],angle);
             if(diff < temp){
@@ -282,20 +304,20 @@ Geometry = {
         }
         return value;
     },
-    getAngleDiff:function(alpha,beta){
+    getAngleDiff: function(alpha,beta){
         var minAngle = Math.min(alpha,beta),
             maxAngle =  Math.max(alpha,beta);
         return Math.min(maxAngle - minAngle,minAngle + Math.PI*2 - maxAngle);
     },
     normalizeAngle: function( val){
-        while(val < 0 ){
-            val+= 2 * Math.PI;
+        while(val < 0){
+            val += 2 * Math.PI;
         }
-        while(val > 2 * Math.PI ){
-            val-= 2 * Math.PI;
+        while(val > 2 * Math.PI){
+            val -= 2 * Math.PI;
         }
         return val;
     }
 };
 
-export {Point, Rectangle, Geometry};
+export { Point, Rectangle, Geometry };

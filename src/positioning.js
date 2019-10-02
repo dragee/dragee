@@ -1,5 +1,5 @@
 'use strict';
-import {Geometry, Point, Rectangle} from './geometry'
+import { Geometry, Point, Rectangle } from './geometry'
 
 var	positionType = {
 		notCrossing: 0,
@@ -158,4 +158,4 @@ function sortingFactory(type){
 	}
 };
 
-export {positionType, sortingFactory, positionFactory};
+export { positionType, sortingFactory, positionFactory };

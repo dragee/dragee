@@ -1,26 +1,27 @@
 'use strict';
 
 import util from './util'
-import {Geometry, Point} from './geometry'
-import {Draggable, draggables, events} from './draggable'
-import {bound} from './bound'
+import { Geometry, Point } from './geometry'
+import { Draggable, draggables, events } from './draggable'
+import { bound } from './bound'
 
 var Dragee = { util, bound, Draggable };//todo remove after refactore
 
 var isTouch = 'ontouchstart' in window;
 var charts = [];
 
-function getArrayWithBoundIndexes(index,length){
+function getArrayWithBoundIndexes(index, length){
     var retIndexes = [];
-    if(index != -1){
+    if (index != -1) {
         retIndexes.push(index);
         retIndexes.push((index + 1) % length);
     }
+
     return retIndexes;
 }
 
 
-function Chart(area, elements, options){
+function Chart(area, elements, options) {
     var i, areaRectangle = Geometry.createRectangleFromElement(area, area);
     this.options = {
         center: areaRectangle.getCenter(),
@@ -33,13 +34,13 @@ function Chart(area, elements, options){
         initAngles: Dragee.util.range(-90, 270, 360 / elements.length).map(function(angle){
             return Geometry.toRadian(angle);
         }),
-        onDraw:function(){},
+        onDraw: function(){},
         limitImg: null,
         limitImgOffset: new Point(0,0),
         isSelectable: false
     };
-    for(i in options){
-        if(options.hasOwnProperty(i)){
+    for(i in options) {
+        if (options.hasOwnProperty(i)) {
             this.options[i] = options[i];
         }
     }
@@ -82,7 +83,7 @@ Chart.prototype.init = function (elements){
     }, this);
 
     this.isInit = true;
-    if(this.options.isSelectable){
+    if (this.options.isSelectable) {
         this.initSelect();
     }
     this.draw();
@@ -98,19 +99,19 @@ Chart.prototype.initSelect = function (){
                 isTouch ? e.changedTouches[0].pageY : e.clientY
             ), index;
 
-        if(!that.canvasOffset){
+        if (!that.canvasOffset) {
             that.canvasOffset = Geometry.getOffset(that.canvas);
         }
 
         point = point.sub(that.canvasOffset);
         index = that.getArcOnPoint(point);
-        if(index!=-1){
+        if (index!=-1) {
             that.setActiveArc((that.activeArcIndex !== index)?index:-1);
         }
     });
 };
 
-Chart.prototype.updateAngles = function (){
+Chart.prototype.updateAngles = function () {
     this.angles = this.draggables.map(function(draggable){
         var halfSize = draggable.getSize().mult(0.5);
         return Geometry.getAngle(this.options.center.sub(halfSize), draggable.position);
@@ -122,7 +123,7 @@ Chart.prototype.getBoundAngle = function(index, isClossing){
 
     return function(){
         var i = (index + sign) % that.angles.length;
-        if(i < 0){
+        if (i < 0) {
             i += that.angles.length;
         }
         return Geometry.normalizeAngle(that.angles[i] - sign * that.options.boundAngle);
@@ -130,7 +131,7 @@ Chart.prototype.getBoundAngle = function(index, isClossing){
 };
 
 Chart.prototype.draw = function (){
-    if(!this.isInit){
+    if (!this.isInit) {
         return;
     }
 
@@ -156,7 +157,7 @@ Chart.prototype.draw = function (){
 
 Chart.prototype.createClone = function(element, options){
     var i, canvas, context, opts, rectangle, cloneObj, that = this;
-    if(!this.isInit){
+    if (!this.isInit) {
         return;
     }
     rectangle = Geometry.createRectangleFromElement(element, element);
@@ -185,7 +186,7 @@ Chart.prototype.createClone = function(element, options){
 };
 
 Chart.prototype.getFillStyle = function(index){
-    if(typeof this.options.fillStyles[index] === "function"){
+    if (typeof this.options.fillStyles[index] === "function") {
         this.options.fillStyles[index] = this.options.fillStyles[index].call(this);
     }
     return this.options.fillStyles[index];
@@ -207,14 +208,14 @@ Chart.prototype.drawArc = function(context,center,radius,index){
 
 Chart.prototype.drawLimitImg = function(index){
     var angle, point, img;
-    if(this.options.limitImg){
+    if (this.options.limitImg) {
         img = this.options.limitImg instanceof Array ? this.options.limitImg[index] : this.options.limitImg;
     }
-    if(!img){
+    if (!img){
         return ;
     }
     angle = Geometry.normalizeAngle(this.angles[index]);
-    point = new Point(0, -img.height/2);
+    point = new Point(0, -img.height / 2);
     point = point.add(this.options.limitImgOffset);
     this.context.translate(this.areaRectangle.size.x / 2, this.areaRectangle.size.y / 2);
     this.context.rotate(angle);
@@ -241,29 +242,29 @@ Chart.prototype.getPercent = function(){
 };
 
 Chart.prototype.getArcBisectrixs = function(){
-    return this.getAnglesDiff().map(function(diffAngle,i){
-        return Geometry.normalizeAngle(this.angles[i] + diffAngle/2);
+    return this.getAnglesDiff().map(function(diffAngle, i){
+        return Geometry.normalizeAngle(this.angles[i] + diffAngle / 2);
     },this);
 };
 
 Chart.prototype.getArcOnPoint = function(point){
     var angle = Geometry.getAngle(this.options.center, point), i, offset, j,
         radius = Geometry.getDistance(this.options.center, point);
-    if(radius > this.options.radius ){
+    if (radius > this.options.radius) {
         return -1;
     }
     offset = -1;
-    for(i = 0; i < this.angles.length; i++){
-        if(offset === -1 || this.angles[offset] > this.angles[i]){
+    for(i = 0; i < this.angles.length; i++) {
+        if (offset === -1 || this.angles[offset] > this.angles[i]) {
             offset = i;
         }
     }
-    for(i = 0,j = offset; i < this.angles.length; i++,j = (i + offset) % this.angles.length){
-        if(angle < this.angles[j]){
+    for(i = 0, j = offset; i < this.angles.length; i++, j = (i + offset) % this.angles.length) {
+        if (angle < this.angles[j]) {
             break;
         }
     }
-    if(--j < 0){
+    if (--j < 0) {
         j += this.angles.length;
     }
     return j;
@@ -295,4 +296,4 @@ Chart.prototype.setActiveArc = function(index){
 };
 
 
-export {charts, Chart}
+export { charts, Chart }

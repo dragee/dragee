@@ -2,8 +2,8 @@
 
 import util from './util'
 import Event from './event'
-import {Draggable} from './draggable'
-import {targets, Target} from './target'
+import { Draggable } from './draggable'
+import { targets, Target } from './target'
 
 var Dragee = { util, Draggable,  Target, Event };//todo remove after refactore
 
@@ -155,4 +155,4 @@ function scopeFactory(parentElement, draggableElements, targetElements, options)
     return new Scope(draggables, targets, scopeOptions);
 }
 
-export {scopes, defaultScope, Scope, scopeFactory, scope};
+export { scopes, defaultScope, Scope, scopeFactory, scope };

@@ -3,11 +3,11 @@
 import util from './util'
 import Event from './event'
 import getStyleProperty from 'desandro-get-style-property'
-import {bound} from './bound'
-import {Geometry, Point, Rectangle} from './geometry'
-import {defaultScope} from "./scope"
+import { bound } from './bound'
+import { Geometry, Point, Rectangle } from './geometry'
+import { defaultScope } from "./scope"
 
-var Dragee = { util, bound, Event};//todo remove after refactore
+var Dragee = { util, bound, Event };//todo remove after refactore
 
 var isTouch = 'ontouchstart' in window, mouseEvents = {
     start: 'mousedown',
@@ -22,9 +22,9 @@ events = isTouch ? touchEvents : mouseEvents,
 draggables = [],
 preventDoubleInit = function(draggable){
     var message = "for this element Dragee.Draggable is already exist, don't create it twice ";
-    if(draggables.some(function(existing){
+    if (draggables.some(function(existing){
         return draggable.element === existing.element;
-    })){
+    })) {
         throw message;
     }
     draggables.push(draggable);
@@ -47,7 +47,7 @@ function Draggable(element, options){
         position: false
     }
     for(i in options){
-        if(options.hasOwnProperty(i)){
+        if (options.hasOwnProperty(i)) {
             this.options[i] = options[i];
         }
     }
@@ -59,13 +59,13 @@ function Draggable(element, options){
         this.move(this.position, 0, true, true);
     });
 
-    if(options.onEnd){
+    if (options.onEnd) {
         this.onEnd.add(options.onEnd);
     }
-    if(options.onMove){
+    if (options.onMove) {
         this.onMove.add(options.onMove);
     }
-    if(options.onStart){
+    if (options.onStart) {
         this.onStart.add(options.onStart);
     }
     this.element = element;
@@ -75,7 +75,7 @@ function Draggable(element, options){
     that.init();
 }
 
-Draggable.onCreate = new Dragee.Event(Draggable, {isReverse: true, isStopOnTrue: true});
+Draggable.onCreate = new Dragee.Event(Draggable, { isReverse: true, isStopOnTrue: true });
 Draggable.onCreate.add(addToDefaultScope);
 
 Draggable.prototype.init = function(){
@@ -103,7 +103,7 @@ Draggable.prototype.reinit = function(){
     this.offset = Geometry.getOffset(this.element, this.options.parent, true);
     this.fixPosition = this.offset;
     this.position = this.offset;
-    if(this.options.position){
+    if (this.options.position) {
         this.initPosition = this.options.position;
         this.move(this.initPosition, 0, true, true);
     } else {
@@ -137,15 +137,15 @@ Draggable.prototype._setTranslate = function(point){
 
     if(msie) {
         translateCss = ' translate(' + point.x + 'px,' + point.y + 'px)';
-        if(!/translate\([^)]+\)/.test(transform)){
+        if (!/translate\([^)]+\)/.test(transform)) {
             transform += translateCss;
-        }else{
+        } else {
             transform = transform.replace(/translate\([^)]+\)/, translateCss);
         }
     } else {
-        if(!/translate3d\([^)]+\)/.test(transform)){
+        if (!/translate3d\([^)]+\)/.test(transform)) {
             transform += translateCss;
-        }else{
+        } else {
             transform = transform.replace(/translate3d\([^)]+\)/, translateCss);
         }
     }
@@ -157,7 +157,7 @@ Draggable.prototype.move = function(point, time, isFix, isSilent){
     var that = this;
     time = time || 0;
     point = point.clone();
-    if(isFix){
+    if (isFix) {
         this.fixPosition = point;
     }
 
@@ -195,7 +195,7 @@ Draggable.prototype.determineDirection = function(point){
 
 Draggable.prototype.dragStart = function(event){
     this.currentEvent = event;
-    if(!this._enable || ( this.options.startFilter && !this.options.startFilter(event))){
+    if (!this._enable || ( this.options.startFilter && !this.options.startFilter(event))) {
         return;
     }
 
@@ -204,14 +204,14 @@ Draggable.prototype.dragStart = function(event){
     this._startTouchPoint = new Point(isTouchEvent ? event.changedTouches[0].pageX : event.clientX, isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
 
     this._startPosition = this.getPosition();
-    if(isTouchEvent){
+    if (isTouchEvent) {
         this._touchId = event.changedTouches[0].identifier;
     }
     event.stopPropagation();
-    if(!(event.target instanceof HTMLInputElement
-        || event.target instanceof HTMLInputElement)){
+    if (!(event.target instanceof HTMLInputElement
+        || event.target instanceof HTMLInputElement)) {
         event.preventDefault();
-    }else{
+    } else {
         event.target.focus();
     }
 
@@ -235,8 +235,8 @@ Draggable.prototype.dragMove = function(event){
 
     var isTouchEvent = (isTouch && (event instanceof TouchEvent));
 
-    if(isTouchEvent){
-        if(!(touch = Dragee.util.getTouchByID(event, this._touchId))){
+    if (isTouchEvent) {
+        if (!(touch = Dragee.util.getTouchByID(event, this._touchId))) {
             return;
         }
     }
@@ -254,8 +254,8 @@ Draggable.prototype.dragEnd = function(event){
 
     var isTouchEvent = (isTouch && (event instanceof TouchEvent));
 
-    if(isTouchEvent){
-        if(!(touch = Dragee.util.getTouchByID(event, this._touchId))){
+    if (isTouchEvent) {
+        if (!(touch = Dragee.util.getTouchByID(event, this._touchId))) {
             return;
         }
     }
@@ -299,7 +299,7 @@ Draggable.prototype.__defineGetter__("enable", function(){
 });
 
 Draggable.prototype.__defineSetter__("enable", function(enable) {
-    if(enable) {
+    if (enable) {
         this.element.removeClass("disable");
     } else {
         this.element.addClass("disable");
@@ -308,4 +308,4 @@ Draggable.prototype.__defineSetter__("enable", function(enable) {
     return this._enable = enable;
 });
 
-export {Draggable, draggables, events};
+export { Draggable, draggables, events };
