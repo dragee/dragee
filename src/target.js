@@ -1,12 +1,15 @@
-'use strict'
+import {
+  getDefaultParent,
+  removeItem,
+  range
+} from './util'
 
-import util from './util'
 import Event from './event'
 import { Geometry } from './geometry'
 import { positionType, sortingFactory, positionFactory } from './positioning'
 import { scopes, defaultScope } from './scope'
 
-const Dragee = { util, positionType,  positionFactory, sortingFactory, scopes, Event }//todo remove after refactore
+const Dragee = { positionType,  positionFactory, sortingFactory, scopes, Event }//todo remove after refactore
 
 const targets = [],
   addToDefaultScope = function(target) {
@@ -15,7 +18,7 @@ const targets = [],
 
 function Target(element, draggables, options = {}) {
   const target = this
-  const parent = options.parent || Dragee.util.getDefaultParent(element)
+  const parent = options.parent || getDefaultParent(element)
 
   this.options = Object.assign({
     timeEnd: 200,
@@ -97,7 +100,7 @@ Target.prototype.init = function() {
   }, this)
 
   if (this.innerDraggables.length) {
-    indexesOfNew = Dragee.util.range(this.innerDraggables.length)
+    indexesOfNew = range(this.innerDraggables.length)
     rectangles = this.options.positioning(this.innerDraggables.map(function(draggable) {
       return draggable.getRectangle()
     }), indexesOfNew)
@@ -110,7 +113,7 @@ Target.prototype.init = function() {
 
 Target.prototype.destroy = function() {
   Dragee.scopes.forEach(function(scope) {
-    scope.targets.removeItem(this)
+    removeItem(scope.targets, this)
   }, this)
 }
 
@@ -154,7 +157,7 @@ Target.prototype.setPosition = function(rectangles, indexesOfNew, time) {
 
     if (rect.removable) {
       draggable.move(draggable.initPosition, timeEnd, true, true)
-      this.innerDraggables.removeItem(draggable)
+      removeItem(this.innerDraggables, draggable)
 
       this.onRemove.fire(draggable)
     } else {
