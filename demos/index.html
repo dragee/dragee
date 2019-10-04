@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Dragee library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0">
+
+    <!-- Le styles -->
+    <link href="style.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+</head>
+
+<body data-spy="scroll" data-target=".subnav" data-offset="0">
+
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="index.html">Dragee Documentation</a>
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li class="active"><a href="index.html">Home</a></li>
+                    <li><a href="contacts.html">Contacts</a></li>
+                </ul>
+                <a href="https://github.com/dragee/dragee" class="btn btn-primary" >View project on GitHub</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <section id="Draggable" >
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoDraggable" class="demo-html">
+                    <div class="area">
+                        <div class="area">
+                            <div class="draggable draggable-a">
+                                <i class="icon-move"></i> A
+                            </div>
+                        </div>
+                        <div class="area">
+                            <div class="draggable draggable-b">
+                                <i class="icon-move"></i> B
+                            </div>
+                            <div class="draggable draggable-c">
+                                <i class="icon-move"></i> C
+                            </div>
+                        </div>
+                        <div class="draggable draggable-d">
+                            <i class="icon-move"></i> D
+                        </div>
+                    </div>
+                </div>
+                <style>
+                    #DemoDraggable .area{
+                        position: relative;
+                        overflow: hidden;
+                        padding: 10%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225,0.4);
+                    }
+                    #DemoDraggable .area > .area{
+                        float: left;
+                        width: 45%;
+                        padding: 0;
+                    }
+                    #DemoDraggable .area > .area:first-child{
+                        margin-right: 8%;
+                    }
+                    #DemoDraggable .area .draggable{
+                        margin: 20px;
+                        display: inline-block;
+                        padding: 9px 14px;
+                        font-size: 15px;
+                        color: #333;
+                        cursor: move;
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        background: #f5f5f5;
+                        position: relative;
+                    }
+                    #DemoDraggable .area .draggable.active{
+                        z-index: 2;
+                    }
+                    #DemoDraggable .area .draggable.draggable-b.active{
+                        background-color: rgb(75, 75, 75);
+                        color: #fff;
+                    }
+                    #DemoDraggable .area .draggable.draggable-b.active [class*="icon-"]{
+                        background-image: url("bootstrap/img/glyphicons-halflings-white.png");
+                    }
+                    #DemoDraggable .area .draggable.draggable-c.active{
+                        background-color: #ffc40d;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        var root = document.getElementById("DemoDraggable");
+                        root.querySelectorAll(".draggable").forEach(function(draggableElement){
+                            new Dragee.Draggable(draggableElement)
+                        })
+                    });
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+        </div>
+    </section>
+
+    <section id="List" >
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoList" class="demo-html">
+                    <div id="DemoList" class="demo-html">
+                      <ul class="list list-a">
+                        <li>↔ A</li>
+                        <li>↔ B</li>
+                        <li>↔ C</li>
+                        <li>↔ D</li>
+                        <li>↔ E</li>
+                        <li>↔ F</li>
+                      </ul>
+                      <ul class="list list-b">
+                        <li>⇔ 1</li>
+                        <li>⇔ 2</li>
+                        <li>⇔ 3</li>
+                        <li>⇔ 4</li>
+                        <li>⇔ 5</li>
+                        <li>⇔ 6</li>
+                        <li>⇔ 7</li>
+                        <li>⇔ 8</li>
+                        <li>⇔ 9</li>
+                      </ul>
+                    </div>
+                </div>
+                <style>
+                    #DemoList{
+                      padding: 2%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: hidden;
+                    }
+
+                    #DemoList ul.list{
+                      position: relative;
+                      margin-bottom: 30px;
+                      padding: 5%;
+                      margin: 2%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      float: left;
+                    }
+
+                    #DemoList ul.list li{
+                      list-style: none;
+                      margin: 4px;
+                      padding: 9px 14px;
+                      font-size: 15px;
+                      color: #333;
+                      cursor: move;
+                      border: 1px solid #333;
+                      border-radius: 5px;
+                      background: #f5f5f5;
+                      position: relative;
+                    }
+                    #DemoList ul.list li.active{
+                      z-index: 2;
+                    }
+
+                    #DemoList ul.list.list-a{
+                      width: 26%;
+                    }
+                    #DemoList ul.list.list-b{
+                      width: 44%;
+                    }
+
+                    #DemoList ul.list.list-b li{
+                      display: inline-block;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        var listA, listB,
+                            root = document.getElementById("DemoList"),
+                            listAParentElement = root.getElementsByClassName("list-a")[0],
+                            listAElements = listAParentElement.getElementsByTagName("li"),
+                            listBParentElement = root.getElementsByClassName("list-b")[0],
+                            listBElements = listBParentElement.getElementsByTagName("li");
+
+                        listA = new Dragee.listFactory(listAParentElement, listAElements);
+                        listB = new Dragee.listFactory(listBParentElement, listBElements);
+                    });
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+        </div>
+    </section>
+</div>
+
+<script id="codeViewTemplate" type="text/template">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab_{{id}}_html" data-toggle="tab">html</a></li>
+        <li><a href="#tab_{{id}}_css" data-toggle="tab">css</a></li>
+        <li><a href="#tab_{{id}}_js" data-toggle="tab">js</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_{{id}}_html">
+            <pre class="prettyprint linenums">{{html}}</pre>
+        </div>
+        <div class="tab-pane" id="tab_{{id}}_css">
+            <pre class="prettyprint linenums">{{css}}</pre>
+        </div>
+        <div class="tab-pane" id="tab_{{id}}_js">
+            <pre class="prettyprint linenums">{{js}}</pre>
+        </div>
+    </div>
+</script>
+<!-- bootstrap -->
+<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+<script src="bootstrap/js/jquery.js"></script>
+<script src="bootstrap/js/google-code-prettify/prettify.js"></script>
+<script src="bootstrap/js/bootstrap-transition.js"></script>
+<script src="bootstrap/js/bootstrap-alert.js"></script>
+<script src="bootstrap/js/bootstrap-modal.js"></script>
+<script src="bootstrap/js/bootstrap-dropdown.js"></script>
+<script src="bootstrap/js/bootstrap-scrollspy.js"></script>
+<script src="bootstrap/js/bootstrap-tab.js"></script>
+<script src="bootstrap/js/bootstrap-tooltip.js"></script>
+<script src="bootstrap/js/bootstrap-popover.js"></script>
+<script src="bootstrap/js/bootstrap-button.js"></script>
+<script src="bootstrap/js/bootstrap-collapse.js"></script>
+<script src="bootstrap/js/bootstrap-carousel.js"></script>
+<script src="bootstrap/js/bootstrap-typeahead.js"></script>
+
+<!-- Dragee -->
+<script src="../dist/index.bundle.js"></script>
+
+</body>
+</html>

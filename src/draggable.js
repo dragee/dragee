@@ -1,13 +1,18 @@
 'use strict'
 
-import util from './util'
+import {
+  getDefaultParent,
+  getTouchByID,
+  addClass, removeClass
+} from './util'
+
 import Event from './event'
 import getStyleProperty from 'desandro-get-style-property'
 import { bound } from './bound'
 import { Geometry, Point, Rectangle } from './geometry'
 import { defaultScope } from './scope'
 
-const Dragee = { util, bound, Event }//todo remove after refactore
+const Dragee = { bound, Event } //todo remove after refactore
 
 const isTouch = 'ontouchstart' in window, mouseEvents = {
     start: 'mousedown',
@@ -37,7 +42,7 @@ const isTouch = 'ontouchstart' in window, mouseEvents = {
 
 function Draggable(element, options={}) {
   const that = this
-  const parent = options.parent || Dragee.util.getDefaultParent(element)
+  const parent = options.parent || getDefaultParent(element)
   this.targets = []
   this.options = Object.assign({
     parent: parent,
@@ -233,7 +238,7 @@ Draggable.prototype.dragStart = function(event) {
   this.isDragee = true
 
   this.onStart.fire(event)
-  util.addClass(this.element, 'active')
+  addClass(this.element, 'active')
   this.onMove.fire(event)
 }
 
@@ -243,7 +248,7 @@ Draggable.prototype.dragMove = function(event) {
 
   const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
   if (isTouchEvent) {
-    touch = Dragee.util.getTouchByID(event, this._touchId)
+    touch = getTouchByID(event, this._touchId)
 
     if (!touch) {
       return
@@ -261,14 +266,9 @@ Draggable.prototype.dragMove = function(event) {
 
 Draggable.prototype.dragEnd = function(event) {
   const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
-  let touch
 
-  if (isTouchEvent) {
-    touch = Dragee.util.getTouchByID(event, this._touchId)
-
-    if (!touch) {
-      return
-    }
+  if (isTouchEvent && !getTouchByID(event, this._touchId)) {
+    return
   }
 
   event.stopPropagation()
@@ -282,7 +282,7 @@ Draggable.prototype.dragEnd = function(event) {
   document.removeEventListener(mouseEvents.end, this._dragEnd)
 
   this.isDragee = false
-  util.removeClass(this.element, 'active')
+  removeClass(this.element, 'active')
 }
 
 Draggable.prototype.getRectangle = function() {
@@ -314,9 +314,9 @@ Draggable.prototype.__defineGetter__('enable', function() {
 
 Draggable.prototype.__defineSetter__('enable', function(enable) {
   if (enable) {
-    util.removeClass(this.element, 'disable')
+    removeClass(this.element, 'disable')
   } else {
-    util.addClass(this.element, 'disable')
+    addClass(this.element, 'disable')
   }
 
   return this._enable = enable
