@@ -11,8 +11,6 @@ import { arcSliders, ArcSlider } from './arcslider'
 import { charts, Chart } from './chart'
 import { listSwitcherFactory, ListSwitcher } from './listswitcher'
 
-global.Point = Point
-
 export { Draggable,
   Point, Rectangle, Geometry,
   List, listFactory,
@@ -23,5 +21,5 @@ export { Draggable,
   spiders, Spider,
   arcSliders, ArcSlider,
   charts, Chart,
-  listSwitcherFactory, ListSwitcher,
+  listSwitcherFactory, ListSwitcher
 }
