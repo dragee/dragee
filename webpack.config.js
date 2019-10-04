@@ -1,17 +1,6 @@
 const path = require('path')
-const env = require('yargs').argv.mode
 // const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-
-const libraryName = 'dragee'
-
-let outputFile
-
-if (env === 'build') {
-  outputFile = libraryName + '.min.js'
-} else {
-  outputFile = libraryName + '.js'
-}
 
 module.exports = {
   mode: 'development',
