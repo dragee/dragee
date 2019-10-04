@@ -25,20 +25,20 @@ const isTouch = 'ontouchstart' in window, mouseEvents = {
   },
   events = isTouch ? touchEvents : mouseEvents,
   draggables = [],
-  preventDoubleInit = function(draggable) {
-    const message = "for this element Dragee.Draggable is already exist, don't create it twice "
-    if (draggables.some(function(existing) {
-      return draggable.element === existing.element
-    })) {
-      throw message
-    }
-    draggables.push(draggable)
-  },
-  addToDefaultScope = function(draggable) {
-    defaultScope.addDraggable(draggable)
-  },
   transformProperty = getStyleProperty('transform'),
   transitionProperty = getStyleProperty('transition')
+
+function preventDoubleInit(draggable) {
+  const message = "for this element Dragee.Draggable is already exist, don't create it twice "
+  if (draggables.some((existing) => draggable.element === existing.element)) {
+    throw message
+  }
+  draggables.push(draggable)
+}
+
+function addToDefaultScope(draggable) {
+  defaultScope.addDraggable(draggable)
+}
 
 class Draggable {
   constructor(element, options={}) {

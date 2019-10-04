@@ -2,236 +2,221 @@
 
 const lists = []
 
-import util from './util'
+import { removeItem } from './util'
 import Event from './event'
 import { Geometry } from './geometry'
-import { bound } from './bound'
-import { Draggable, events } from './draggable'
+import { Draggable } from './draggable'
 
-const Dragee = { util, bound, Draggable, events, Event }//todo remove after refactore
+const Dragee = { Event } //todo remove after refactore
 
-function List(draggables, options) {
-  this.options = {
-    timeEnd: 200,
-    timeExcange: 400,
-    radius: 30,
-    getDistance: Geometry.getDistance,
-    isDisplacement: false
-  }
-  for (const i in options) {
-    if (options.hasOwnProperty(i)) {
-      this.options[i] = options[i]
+class List {
+  constructor(draggables, options={}) {
+    this.options = Object.assign({
+      timeEnd: 200,
+      timeExcange: 400,
+      radius: 30,
+      getDistance: Geometry.getDistance,
+      isDisplacement: false
+    }, options)
+
+    this.draggables = draggables
+    lists.push(this)
+    this.onChange = new Dragee.Event(this)
+    if (options.onChange) {
+      this.onChange.add(options.onChange)
     }
+    this.init()
   }
-  this.draggables = draggables
-  lists.push(this)
-  this.onChange = new Dragee.Event(this)
-  if (options && options.onChange) {
-    this.onChange.add(options.onChange)
+
+  init() {
+    this._enable = true
+    this.draggables.forEach(this.initDraggable, this)
   }
-  this.init()
-}
 
-List.prototype.init = function() {
-  this._enable = true
-  this.draggables.forEach(this.initDraggable, this)
-}
+  initDraggable(draggable) {
+    let moveHandler
+    const list = this
 
-List.prototype.initDraggable = function(draggable) {
-  let moveHandler
-  const that = this
-  draggable.enable = this._enable
-  if (this.options.isDisplacement) {
-    moveHandler = function() {
-      if (this.isDragee) {
-        that.onStart(this)
-        draggable.onMove.remove(moveHandler)
+    draggable.enable = this._enable
+    if (this.options.isDisplacement) {
+      moveHandler = function() {
+        if (draggable.isDragee) {
+          list.onStart(draggable)
+          draggable.onMove.remove(moveHandler)
+          return true
+        }
+      }
+
+      draggable.onEnd.add(() => {
+        this.onEndDisplaycement(draggable)
+        draggable.onMove.add(moveHandler)
         return true
-      }
-    }
-    draggable.onEnd.add(function() {
-      that.onEndDisplaycement(this)
+      })
+
       draggable.onMove.add(moveHandler)
-      return true
-    })
-    draggable.onMove.add(moveHandler)
-  } else {
-    draggable.onEnd.add(function() {
-      that.onEnd(this)
-      return true
-    })
-  }
-}
-
-List.prototype.moveOrSave = function(draggable, position, time) {
-  if (draggable.isDragee) {
-    draggable.fixPosition = position
-  } else {
-    draggable.move(position, time, true)
-  }
-}
-
-List.prototype.onEnd = function(draggable) {
-  const fixPositions = this.getCurrentFixPosition()
-  const currentIndex = this.draggables.indexOf(draggable)
-  const excangeIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
-
-  if (excangeIndex === -1 || excangeIndex === currentIndex) {
-    draggable.move(draggable.fixPosition, this.options.timeEnd, true)
-  } else {
-    this.moveOrSave(this.draggables[excangeIndex], fixPositions[currentIndex], this.options.timeExcange)
-    this.draggables[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true)
-    this.onChange.fire()
-  }
-  return true
-}
-
-List.prototype.onEndDisplaycement = function(draggable) {
-  const sortedDraggables = this.getSortedDraggables()
-  const fixPositions = sortedDraggables.map(function(draggable) {
-    return draggable.fixPosition
-  })
-
-  const currentIndex = sortedDraggables.indexOf(draggable)
-  const targetIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
-
-  if (targetIndex !== -1) {
-    if (targetIndex < currentIndex) {
-      for (let i=targetIndex; i<currentIndex; i++) {
-        this.moveOrSave(sortedDraggables[i], fixPositions[i+1], this.options.timeExcange)
-      }
     } else {
-      for (let i=currentIndex; i<targetIndex; i++) {
-        this.moveOrSave(sortedDraggables[i+1], fixPositions[i], this.options.timeExcange)
-      }
+      draggable.onEnd.add(() => {
+        this.onEnd(draggable)
+        return true
+      })
     }
-    draggable.move(fixPositions[targetIndex], this.options.timeEnd, true)
-  } else {
-    draggable.move(draggable.fixPosition, this.options.timeEnd, true)
-  }
-}
-
-List.prototype.onStart = function(draggable) {
-  let i
-  const sortedDraggables = this.getSortedDraggables()
-  const fixPositions = sortedDraggables.map(function(draggable) {
-    return draggable.fixPosition
-  })
-
-  const currentIndex = sortedDraggables.indexOf(draggable)
-  for (i = currentIndex + 1; i < sortedDraggables.length; i++) {
-    this.moveOrSave(sortedDraggables[i], fixPositions[i - 1], this.options.timeExcange)
-  }
-  sortedDraggables[currentIndex].fixPosition = fixPositions[i - 1]
-}
-
-List.prototype.getCurrentFixPosition = function() {
-  return this.draggables.map(function(draggable) {
-    return draggable.fixPosition.clone()
-  })
-}
-
-List.prototype.getSortedDraggables = function() {
-  const initPositions = this.draggables.map(function(draggable) {
-    return draggable.initPosition
-  })
-
-  const sortedDraggables = initPositions.map(function(position) {
-    return this.draggables.filter(function(draggable) {
-      return draggable.fixPosition.compare(position)
-    }, this)[0]
-  }, this)
-
-  return sortedDraggables
-}
-
-List.prototype.reset = function() {
-  this.draggables.forEach(function(draggable) {
-    draggable.move(draggable.initPosition, 0, true, false)
-  })
-}
-
-List.prototype.refresh = function() {
-  this.draggables.forEach(function(draggable) {
-    draggable.refresh()
-  })
-}
-
-List.prototype.add = function(draggables) {
-  if (!(draggables instanceof Array)) {
-    draggables = [draggables]
-  }
-  draggables.forEach(this.initDraggable, this)
-  this.draggables = this.draggables.concat(draggables)
-}
-
-List.prototype.remove = function(draggables) {
-  let j
-  const initPositions = this.draggables.map(function(draggable) {
-    return draggable.initPosition
-  })
-  const list = []
-  const sortedDraggables = this.getSortedDraggables()
-
-  if (!(draggables instanceof Array)) {
-    draggables = [draggables]
   }
 
-  draggables.forEach(function(draggable) {
-    draggable.onEnd.reset()
-    draggable.onMove.reset()//todo remove reset in future
-    this.draggables.removeItem(draggable)
-    Dragee.util.remove(this.draggables, draggable)
-  }, this)
-  j = 0
-  sortedDraggables.forEach(function(draggable) {
-    if (this.draggables.indexOf(draggable) !== -1) {
-      if (draggable.fixPosition !== initPositions[j]) {
-        draggable.move(initPositions[j], this.options.timeExcange, true)
-      }
-      draggable.initPosition = initPositions[j]
-      j++
-      list.push(draggable)
+  moveOrSave(draggable, position, time) {
+    if (draggable.isDragee) {
+      draggable.fixPosition = position
+    } else {
+      draggable.move(position, time, true)
     }
-  }, this)
-  this.draggables = list
-}
-
-List.prototype.clear = function() {
-  this.remove(this.draggables.slice())
-}
-
-List.prototype.destroy = function() {
-  this.draggables.forEach(function(draggable) {
-    draggable.destroy()
-  })
-}
-
-List.prototype.__defineGetter__('positions', function() {
-  return this.getCurrentFixPosition()
-})
-
-List.prototype.__defineSetter__('positions', function(positions) {
-  const message = 'wrong array length'
-  if (positions.length === this.draggables.length) {
-    positions.forEach(function(point, i) {
-      this.draggables[i].move(point, 0, true, true)
-    }, this)
-  } else {
-    throw message
   }
-})
 
-List.prototype.__defineGetter__('enable', function() {
-  return this._enable
-})
+  onEnd(draggable) {
+    const fixPositions = this.getCurrentFixPosition()
+    const currentIndex = this.draggables.indexOf(draggable)
+    const excangeIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
 
-List.prototype.__defineSetter__('enable', function(value) {
-  this._enable = value
-  this.draggables.forEach(function(draggable) {
-    draggable.enable = value
-  })
-})
+    if (excangeIndex === -1 || excangeIndex === currentIndex) {
+      draggable.move(draggable.fixPosition, this.options.timeEnd, true)
+    } else {
+      this.moveOrSave(this.draggables[excangeIndex], fixPositions[currentIndex], this.options.timeExcange)
+      this.draggables[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true)
+      this.onChange.fire()
+    }
+    return true
+  }
+
+  onEndDisplaycement(draggable) {
+    const sortedDraggables = this.getSortedDraggables()
+    const fixPositions = sortedDraggables.map((draggable) => draggable.fixPosition)
+
+    const currentIndex = sortedDraggables.indexOf(draggable)
+    const targetIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
+
+    if (targetIndex !== -1) {
+      if (targetIndex < currentIndex) {
+        for (let i=targetIndex; i<currentIndex; i++) {
+          this.moveOrSave(sortedDraggables[i], fixPositions[i+1], this.options.timeExcange)
+        }
+      } else {
+        for (let i=currentIndex; i<targetIndex; i++) {
+          this.moveOrSave(sortedDraggables[i+1], fixPositions[i], this.options.timeExcange)
+        }
+      }
+      draggable.move(fixPositions[targetIndex], this.options.timeEnd, true)
+    } else {
+      draggable.move(draggable.fixPosition, this.options.timeEnd, true)
+    }
+  }
+
+  onStart(draggable) {
+    let i
+    const sortedDraggables = this.getSortedDraggables()
+    const fixPositions = sortedDraggables.map((draggable) => draggable.fixPosition)
+
+    const currentIndex = sortedDraggables.indexOf(draggable)
+    for (i = currentIndex + 1; i < sortedDraggables.length; i++) {
+      this.moveOrSave(sortedDraggables[i], fixPositions[i - 1], this.options.timeExcange)
+    }
+    sortedDraggables[currentIndex].fixPosition = fixPositions[i - 1]
+  }
+
+  getCurrentFixPosition() {
+    return this.draggables.map((draggable) => draggable.fixPosition.clone())
+  }
+
+  getSortedDraggables() {
+    const initPositions = this.draggables.map((draggable) => draggable.initPosition)
+
+    const sortedDraggables = initPositions.map((position) => {
+      return this.draggables.filter((draggable) => draggable.fixPosition.compare(position))[0]
+    })
+
+    return sortedDraggables
+  }
+
+  reset() {
+    this.draggables.forEach((draggable) => {
+      draggable.move(draggable.initPosition, 0, true, false)
+    })
+  }
+
+  refresh() {
+    this.draggables.forEach((draggable) => {
+      draggable.refresh()
+    })
+  }
+
+  add(draggables) {
+    if (!(draggables instanceof Array)) {
+      draggables = [draggables]
+    }
+    draggables.forEach(this.initDraggable, this)
+    this.draggables = this.draggables.concat(draggables)
+  }
+
+  remove(draggables) {
+    const initPositions = this.draggables.map((draggable) => draggable.initPosition)
+    const list = []
+    const sortedDraggables = this.getSortedDraggables()
+
+    if (!(draggables instanceof Array)) {
+      draggables = [draggables]
+    }
+
+    draggables.forEach((draggable) => {
+      draggable.onEnd.reset()
+      draggable.onMove.reset() //todo remove reset in future
+      removeItem(this.draggables, draggable)
+    })
+
+    let j = 0
+    sortedDraggables.forEach((draggable) => {
+      if (this.draggables.indexOf(draggable) !== -1) {
+        if (draggable.fixPosition !== initPositions[j]) {
+          draggable.move(initPositions[j], this.options.timeExcange, true)
+        }
+        draggable.initPosition = initPositions[j]
+        j++
+        list.push(draggable)
+      }
+    })
+    this.draggables = list
+  }
+
+  clear() {
+    this.remove(this.draggables.slice())
+  }
+
+  destroy() {
+    this.draggables.forEach((draggable) => draggable.destroy())
+  }
+
+  get positions() {
+    return this.getCurrentFixPosition()
+  }
+
+  set positions(positions) {
+    const message = 'wrong array length'
+    if (positions.length === this.draggables.length) {
+      positions.forEach((point, i) => {
+        this.draggables[i].move(point, 0, true, true)
+      }, this)
+    } else {
+      throw message
+    }
+  }
+
+  get enable() {
+    return this._enable
+  }
+
+  set enable(enable) {
+    this._enable = enable
+    this.draggables.forEach((draggable) => {
+      draggable.enable = enable
+    })
+  }
+}
 
 function listFactory(parentElement, elements, options={}) {
   const draggableOptions = options.draggable || {}
@@ -239,8 +224,8 @@ function listFactory(parentElement, elements, options={}) {
   draggableOptions.parent = draggableOptions.parent || parentElement
   elements = Array.prototype.slice.call(elements)
 
-  const draggables = elements.map(function(element) {
-    return new Dragee.Draggable(element, draggableOptions)
+  const draggables = elements.map((element) => {
+    return new Draggable(element, draggableOptions)
   })
 
   return new List(draggables, listOptions)

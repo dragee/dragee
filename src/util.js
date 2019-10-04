@@ -107,6 +107,16 @@ function removeClass(element, c) {
   element.className = element.className.replace(re, '$1').replace(/\s+/g, ' ').replace(/(^ | $)/g, '')
 }
 
+function removeItem(array, val) {
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === val) {
+      array.splice(i, 1)
+      i--
+    }
+  }
+  return array
+}
+
 const util = {
   getDefaultParent,
   getTouchByID,
@@ -118,7 +128,8 @@ const util = {
   createCanvas,
   hasClass,
   addClass,
-  removeClass
+  removeClass,
+  removeItem
 }
 
 export {
@@ -132,7 +143,8 @@ export {
   createCanvas,
   hasClass,
   addClass,
-  removeClass
+  removeClass,
+  removeItem
 }
 
 export default util
