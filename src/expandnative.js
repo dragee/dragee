@@ -1,17 +1,3 @@
-/************ Array **************/
-
-if (!Array.prototype.removeItem) {
-  Array.prototype.removeItem = function(val) {
-    for (let i = 0; i < this.length; i++) {
-      if (this[i] === val) {
-        this.splice(i, 1)
-        i--
-      }
-    }
-    return this
-  }
-}
-
 /*********************** 00P *************************/
 const augment = function(receivingClass, givingClass) {
     /* only provide certain methods */
