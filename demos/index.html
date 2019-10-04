@@ -207,6 +207,187 @@
             </div>
         </div>
     </section>
+
+    <section id="TargetBasic" >
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoTargetA" class="demo-html">
+                  <div class="area area-a">
+                    <div class="target target-a">
+                      dropzone A
+                    </div>
+                    <div class="target target-b">
+                      dropzone B
+                    </div>
+                    <div class="target target-c">
+                      dropzone C
+                    </div>
+                    <ul class="draggable-holder">
+                      <li class="draggable draggable-a">
+                        ✈ A<small>(origin)</small>
+                      </li>
+                      <li class="draggable draggable-b">
+                        ✈ B<small>(clone)</small>
+                      </li>
+                      <li class="draggable draggable-b">
+                        ✈ B<small>(clone)</small>
+                      </li>
+                      <li class="draggable draggable-b">
+                        ✈ B<small>(clone)</small>
+                      </li>
+                      <li class="draggable draggable-b">
+                        ✈ B<small>(clone)</small>
+                      </li>
+                      <li class="draggable draggable-c">
+                        ✈ C<small>(origin)</small>
+                      </li>
+                      <li class="draggable draggable-d">
+                        ✈ D<small>(origin)</small>
+                      </li>
+                      <li class="draggable draggable-e">
+                        ✈ E<small>(origin)</small>
+                      </li>
+                      <li class="draggable draggable-e">
+                        ✈ F<small>(origin)</small>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <style>
+                    #DemoTargetB{
+                      padding: 2%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: hidden;
+                    }
+
+                    #DemoTargetB small{
+                      color: #999999;
+                      font-size: 11px;
+                      line-height: 11px;
+                    }
+
+                    #DemoTargetA .area{
+                      position: relative;
+                      padding: 3%;
+                      margin: 2%;
+                      width: 88%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      float: left;
+                    }
+
+                    #DemoTargetA .area .target{
+                      width: 26%;
+                      margin: 1%;
+                      padding: 2%;
+                      padding-top: 20px;
+                      padding-bottom: 20px;
+
+                      float: left;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                    }
+
+
+                    #DemoTargetA ul.draggable-holder{
+                      list-style: none;
+                      clear: both;
+                      margin: 4%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      float: left;
+                    }
+
+                    #DemoTargetA ul.draggable-holder .draggable{
+                      width: 24%;
+                      margin: 1% 4%;
+                      padding: 9px 0;
+                      font-size: 15px;
+                      color: #333;
+                      cursor: move;
+                      text-align: center;
+                      border: 1px solid #333;
+                      border-radius: 5px;
+                      background: #f5f5f5;
+                      position: relative;
+                      float: left;
+                    }
+
+                    #DemoTargetA ul.draggable-holder .draggable.active{
+                      z-index: 2;
+                      background: #ffc40d;
+                    }
+
+                    #DemoTargetA .area .target.target-b{
+                      padding-top: 40px;
+                      padding-bottom: 40px;
+                    }
+
+                    #DemoTargetA .area .target.target-c{
+                      padding-top: 60px;
+                      padding-bottom: 60px;
+                    }
+
+                    #DemoTargetA ul.draggable-holder .draggable.draggable-b + .draggable-b{
+                      margin-left: -28%;
+                    }
+
+                    #DemoTargetA ul.draggable-holder .draggable.draggable-c{
+                      margin-left: 3%;
+                    }
+
+                    #DemoTargetA ul.draggable-holder .draggable.green{
+                      background: #62c462;
+                    }
+
+                    #DemoTargetA ul.draggable-holder .draggable.red{
+                      background: #ee5f5b;
+                    }
+
+                    #DemoTargetA ul.draggable-holder .draggable.blue{
+                      background: #049cdb;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        var targetManger, draggables, targets,
+                            root = document.getElementById("DemoTargetA"),
+                            targetAreaElement = root.getElementsByClassName("area-a")[0],
+                            targetElements = targetAreaElement.getElementsByClassName("target"),
+                            draggableElements = targetAreaElement.getElementsByClassName("draggable"),
+                            classForTargets = ["green", "red", "blue"];
+
+                        draggables = Array.prototype.slice.call(draggableElements).map(
+                          function(element, i){
+                            return new Dragee.Draggable(element, {
+                              parent: targetAreaElement
+                            });
+                          }
+                        );
+
+                        targets = Array.prototype.slice.call(targetElements).map(
+                          function(element, i){
+                            return new Dragee.Target(element, draggables,{
+                              parent:targetAreaElement,
+                              onAdd: function(draggable){
+                                Dragee.util.addClass(draggable.element, classForTargets[i]);
+                              },
+                              onRemove: function(draggable){
+                                Dragee.util.removeClass(draggable.element, classForTargets[i]);
+                              }
+                            }
+                          );
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </section>
 </div>
 
 <script id="codeViewTemplate" type="text/template">
