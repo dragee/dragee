@@ -28,7 +28,7 @@ class ListSwitcher extends List {
     if (excangeIndex === -1 || excangeIndex === currentIndex) {
       this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd)
     } else {
-      if (this.draggables[excangeIndex].isDragee) {
+      if (this.draggables[excangeIndex].isDragging) {
         this.fixToOff(excangeIndex, fixPositions[currentIndex])
       } else {
         this.moveDraggableToOff(excangeIndex, fixPositions[currentIndex], this.options.timeExcange)

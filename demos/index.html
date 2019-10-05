@@ -200,7 +200,9 @@
                             listBParentElement = root.getElementsByClassName("list-b")[0],
                             listBElements = listBParentElement.getElementsByTagName("li");
 
-                        listA = new Dragee.listFactory(listAParentElement, listAElements);
+                        listA = new Dragee.listFactory(listAParentElement, listAElements, {
+                            list: {isDisplacement: true}
+                        });
                         listB = new Dragee.listFactory(listBParentElement, listBElements);
                     });
                 </script>

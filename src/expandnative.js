@@ -7,9 +7,9 @@ const augment = function(receivingClass, givingClass) {
     }
   } else {
     for (const methodName in givingClass.prototype) {
-            /* check to make sure the receiving class doesn't
-               have a method of the same name as the one currently
-               being processed */
+      /* check to make sure the receiving class doesn't
+         have a method of the same name as the one currently
+         being processed */
       if (!receivingClass.prototype[methodName]) {
         receivingClass.prototype[methodName] = givingClass.prototype[methodName]
       }

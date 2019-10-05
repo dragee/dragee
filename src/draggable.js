@@ -229,7 +229,7 @@ class Draggable {
     document.addEventListener(touchEvents.end, this._dragEnd)
     document.addEventListener(mouseEvents.end, this._dragEnd)
 
-    this.isDragee = true
+    this.isDragging = true
 
     this.onStart.fire(event)
     addClass(this.element, 'active')
@@ -275,7 +275,7 @@ class Draggable {
     document.removeEventListener(touchEvents.end, this._dragEnd)
     document.removeEventListener(mouseEvents.end, this._dragEnd)
 
-    this.isDragee = false
+    this.isDragging = false
     removeClass(this.element, 'active')
   }
 

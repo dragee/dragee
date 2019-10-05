@@ -40,7 +40,7 @@ class List {
     draggable.enable = this._enable
     if (this.options.isDisplacement) {
       moveHandler = function() {
-        if (draggable.isDragee) {
+        if (draggable.isDragging) {
           list.onStart(draggable)
           draggable.onMove.remove(moveHandler)
           return true
@@ -63,7 +63,7 @@ class List {
   }
 
   moveOrSave(draggable, position, time) {
-    if (draggable.isDragee) {
+    if (draggable.isDragging) {
       draggable.fixPosition = position
     } else {
       draggable.move(position, time, true)
