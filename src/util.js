@@ -23,10 +23,6 @@ function getSumValueOfStyleRule(element, rules) {
   }, 0)
 }
 
-function appendFirstChild(element, node) {
-  element.firstChild ? element.insertBefore(node, element.firstChild) : element.appendChild(node)
-}
-
 function range(start, stop, step) {
   const result = []
   if (typeof stop === 'undefined') {
@@ -43,52 +39,6 @@ function range(start, stop, step) {
     result.push(i)
   }
   return result
-}
-
-function setStyle(element, style) {
-  style = style || {}
-  let cssText = ''
-  for (const key in style) {
-    if (style.hasOwnProperty(key)) {
-      cssText += key + ': ' + style[key] + '; '
-    }
-  }
-
-  element.style.cssText = cssText
-}
-
-function randomColor() {
-  const rnd = function() {
-    return Math.round(Math.random()*255)
-  }
-  const toHexString = function(digit) {
-    let str = digit.toString(16)
-    while (str.length < 2) {
-      str = '0' + str
-    }
-    return str
-  }
-
-  return '#' + toHexString(rnd()) + toHexString(rnd()) + toHexString(rnd())
-}
-
-function createCanvas(area, rectagle) {
-  const canvas = document.createElement('canvas')
-  if (window.getComputedStyle(area).position === 'static') {
-    area.style.position = 'relative'
-  }
-
-  canvas.setAttribute('width', rectagle.size.x + 'px')
-  canvas.setAttribute('height', rectagle.size.y + 'px')
-  setStyle(canvas, {
-    position: 'absolute',
-    left: rectagle.position.y + 'px',
-    top: rectagle.position.y + 'px',
-    width: rectagle.size.x + 'px',
-    height: rectagle.size.y + 'px'
-  })
-  appendFirstChild(area, canvas)
-  return canvas
 }
 
 function hasClass(element, c) {
@@ -121,11 +71,7 @@ const util = {
   getDefaultParent,
   getTouchByID,
   getSumValueOfStyleRule,
-  appendFirstChild,
   range,
-  setStyle,
-  randomColor,
-  createCanvas,
   hasClass,
   addClass,
   removeClass,
@@ -136,11 +82,7 @@ export {
   getDefaultParent,
   getTouchByID,
   getSumValueOfStyleRule,
-  appendFirstChild,
   range,
-  setStyle,
-  randomColor,
-  createCanvas,
   hasClass,
   addClass,
   removeClass,

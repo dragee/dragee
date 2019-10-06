@@ -576,6 +576,81 @@
             </div>
         </div>
     </section>
+
+    <section id="Spider" >
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoSpider" class="demo-html">
+                    <ul class="spider">
+                      <li>A</li>
+                      <li>B</li>
+                      <li>C</li>
+                      <li>D</li>
+                      <li>E</li>
+                      <li>F</li>
+                      <li>H</li>
+                    </ul>
+                </div>
+                <style>
+                    #DemoSpider{
+                      padding: 5%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: hidden;
+                      position: relative;
+                    }
+
+                    #DemoSpider ul.spider{
+                      height: 400px;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: hidden;
+                      list-style: none;
+                    }
+
+                    #DemoSpider ul.spider li{
+                      margin: 20px;
+                      display: block;
+                      float: left;
+                      padding: 9px 14px;
+                      font-size: 15px;
+                      color: #333;
+                      cursor: move;
+                      border: 1px solid #333;
+                      border-radius: 25px;
+                      background: #f5f5f5;
+                      position: relative;
+                    }
+
+                    #DemoSpider ul.spider li.active{
+                      z-index: 2;
+                      background: #ffc40d;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        var spider,
+                            root = document.getElementById("DemoSpider"),
+                            areaElement = root.getElementsByClassName("spider")[0],
+                            draggableElements = [];
+
+                        [].push.apply(draggableElements, areaElement.getElementsByTagName("li"))
+
+                        spider = new Dragee.Spider(areaElement, draggableElements, {
+                          startRadius: 100,
+                          endRadius: 150,
+                          lineWidth: 20,
+                          strokeStyle: "#ff5533",
+                          fillStyle: "rgba(100,255,220,0.8)"
+                        });
+                    });
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+        </div>
+    </section>
 </div>
 
 <script id="codeViewTemplate" type="text/template">
