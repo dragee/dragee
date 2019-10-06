@@ -5,7 +5,6 @@ import { List, listFactory } from './list'
 import { targets, Target } from './target'
 import { scopes, defaultScope, Scope, scopeFactory, scope } from './scope'
 import { positionType, sortingFactory, positionFactory  } from './positioning'
-import { bound } from './bound'
 import { spiders, Spider } from './spider'
 import { arcSliders, ArcSlider } from './arcslider'
 import { charts, Chart } from './chart'
@@ -18,7 +17,6 @@ export { Draggable,
   targets, Target,
   scopes, defaultScope, Scope, scopeFactory, scope,
   positionType, sortingFactory, positionFactory,
-  bound,
   spiders, Spider,
   arcSliders, ArcSlider,
   charts, Chart,

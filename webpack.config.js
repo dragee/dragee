@@ -6,7 +6,12 @@ module.exports = {
   mode: 'development',
   entry: {
     index: './src/index.js',
-    draggable: './src/draggable.js'
+    draggable: './src/draggable.js',
+    arcslider: './src/arcslider.js',
+    chart: './src/chart.js',
+    list: './src/list.js',
+    listswitcher: './src/listswitcher.js',
+    spider: './src/spider.js'
   },
   devtool: 'inline-source-map',
   output: {
