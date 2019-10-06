@@ -1,9 +1,6 @@
-import {
-  getDefaultParent,
-  removeItem,
-  range
-} from './util'
-
+import range from './utils/range.js'
+import removeItems from 'remove-array-items'
+import getDefaultParent from './utils/getdefaultparent'
 import Event from './event'
 import { Geometry } from './geometry'
 import { positionType, sortingFactory, positionFactory } from './positioning'
@@ -108,7 +105,7 @@ class Target {
   }
 
   destroy() {
-    Dragee.scopes.forEach((scope) => removeItem(scope.targets, this))
+    Dragee.scopes.forEach((scope) => removeItems(scope.targets, this))
   }
 
   refresh() {
@@ -151,7 +148,7 @@ class Target {
 
       if (rect.removable) {
         draggable.move(draggable.initPosition, timeEnd, true, true)
-        removeItem(this.innerDraggables, draggable)
+        removeItems(this.innerDraggables, draggable)
 
         this.onRemove.fire(draggable)
       } else {

@@ -1,5 +1,5 @@
 import createCanvas from './utils/createcanvas'
-import util from './util'
+import range from './utils/range'
 import { Geometry, Point } from './geometry'
 import { Draggable, events } from './draggable'
 import { boundToArc } from './bound'
@@ -40,8 +40,8 @@ class Chart {
       radius: areaRectangle.getMinSide() / 2,
       touchRadius: areaRectangle.getMinSide() / 2,
       boundAngle: Math.PI / 9,
-      fillStyles: util.range(0, elements.length).map(() => randomColor()),
-      initAngles: util.range(-90, 270, 360 / elements.length).map((angle) => {
+      fillStyles: range(0, elements.length).map(() => randomColor()),
+      initAngles: range(-90, 270, 360 / elements.length).map((angle) => {
         return Geometry.toRadian(angle)
       }),
       limitImg: null,

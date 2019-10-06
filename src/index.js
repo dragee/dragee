@@ -9,7 +9,6 @@ import { spiders, Spider } from './spider'
 import { arcSliders, ArcSlider } from './arcslider'
 import { charts, Chart } from './chart'
 import { listSwitcherFactory, ListSwitcher } from './listswitcher'
-import util from './util'
 
 export { Draggable,
   Point, Rectangle, Geometry,
@@ -20,6 +19,5 @@ export { Draggable,
   spiders, Spider,
   arcSliders, ArcSlider,
   charts, Chart,
-  listSwitcherFactory, ListSwitcher,
-  util
+  listSwitcherFactory, ListSwitcher
 }

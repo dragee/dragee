@@ -1,11 +1,5 @@
-'use strict'
-
-import {
-  getDefaultParent,
-  getTouchByID,
-  addClass, removeClass
-} from './util'
-
+import { addClass, removeClass } from './utils/classes'
+import getDefaultParent from './utils/getdefaultparent'
 import Event from './event'
 import getStyleProperty from 'desandro-get-style-property'
 import { boundToElement } from './bound'
@@ -27,6 +21,15 @@ const isTouch = 'ontouchstart' in window, mouseEvents = {
   draggables = [],
   transformProperty = getStyleProperty('transform'),
   transitionProperty = getStyleProperty('transition')
+
+function getTouchByID(element, touchId) {
+  for (let i = 0; i < element.changedTouches.length; i++) {
+    if (element.changedTouches[i].identifier === touchId) {
+      return element.changedTouches[i]
+    }
+  }
+  return false
+}
 
 function preventDoubleInit(draggable) {
   const message = "for this element Dragee.Draggable is already exist, don't create it twice "

@@ -1,4 +1,4 @@
-import { removeItem } from './util'
+import removeItems from 'remove-array-items'
 import Event from './event'
 import { Draggable } from './draggable'
 import { Target } from './target'
@@ -12,13 +12,13 @@ class Scope {
     scopes.forEach((scope) => {
       if (draggables) {
         draggables.forEach((draggable) => {
-          removeItem(scope.draggables, draggable)
+          removeItems(scope.draggables, draggable)
         })
       }
 
       if (targets) {
         targets.forEach((target) => {
-          removeItem(scope.targets, target)
+          removeItems(scope.targets, target)
         })
       }
     })

@@ -2,7 +2,7 @@
 
 const lists = []
 
-import { removeItem } from './util'
+import removeItems from 'remove-array-items'
 import Event from './event'
 import { Geometry } from './geometry'
 import { Draggable } from './draggable'
@@ -166,7 +166,7 @@ class List {
     draggables.forEach((draggable) => {
       draggable.onEnd.reset()
       draggable.onMove.reset() //todo remove reset in future
-      removeItem(this.draggables, draggable)
+      removeItems(this.draggables, draggable)
     })
 
     let j = 0
