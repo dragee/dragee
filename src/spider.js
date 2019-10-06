@@ -1,6 +1,6 @@
 'use strict'
 
-import createCanvas from './createcanvas'
+import createCanvas from './utils/createcanvas'
 import { Geometry } from './geometry'
 import { boundToLine } from './bound'
 import { Draggable } from './draggable'
