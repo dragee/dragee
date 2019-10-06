@@ -17,12 +17,6 @@ function getTouchByID(element, touchId) {
   return false
 }
 
-function getSumValueOfStyleRule(element, rules) {
-  return rules.reduce(function(sum, rule) {
-    return sum + parseInt(window.getComputedStyle(element)[rule]||0)
-  }, 0)
-}
-
 function range(start, stop, step) {
   const result = []
   if (typeof stop === 'undefined') {
@@ -70,7 +64,6 @@ function removeItem(array, val) {
 const util = {
   getDefaultParent,
   getTouchByID,
-  getSumValueOfStyleRule,
   range,
   hasClass,
   addClass,
@@ -81,7 +74,6 @@ const util = {
 export {
   getDefaultParent,
   getTouchByID,
-  getSumValueOfStyleRule,
   range,
   hasClass,
   addClass,
