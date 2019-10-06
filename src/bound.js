@@ -1,8 +1,6 @@
-'use strict'
-import { Geometry } from './geometry'
-import { Point } from './geometry'
+import { Geometry, Point } from './geometry'
 
-function boundToRectangle(rectangle) {
+export function boundToRectangle(rectangle) {
   return function(point, size) {
     const calcPoint = point.clone(),
       rectP2 = rectangle.getP3()
@@ -24,7 +22,7 @@ function boundToRectangle(rectangle) {
   }
 }
 
-function boundToElement(element, parent) {
+export function boundToElement(element, parent) {
   const retFunc = function() {
     return bound.apply(this, arguments)
   }
@@ -38,7 +36,7 @@ function boundToElement(element, parent) {
   return retFunc
 }
 
-function boundToLineX(x, startY, endY) {
+export function boundToLineX(x, startY, endY) {
   return function(point, size) {
     const calcPoint = point.clone()
     calcPoint.x = x
@@ -53,7 +51,7 @@ function boundToLineX(x, startY, endY) {
   }
 }
 
-function boundToLineY(y, startX, endX) {
+export function boundToLineY(y, startX, endX) {
   return function(point, size) {
     const calcPoint = point.clone()
     calcPoint.y = y
@@ -67,7 +65,7 @@ function boundToLineY(y, startX, endX) {
   }
 }
 
-function boundToLine(start, end) {
+export function boundToLine(start, end) {
   const alpha = Math.atan2(end.y - start.y, end.x - start.x),
     beta = alpha + Math.PI / 2,
     someK = 10,
@@ -84,14 +82,14 @@ function boundToLine(start, end) {
   }
 }
 
-function boundToCircle(center, radius) {
+export function boundToCircle(center, radius) {
   return function(point, _size) {
     const boundedPoint = Geometry.getPointInLineByLenght(center, point, radius)
     return boundedPoint
   }
 }
 
-function boundToArc(center, radius, startAgle, endAngle) {
+export function boundToArc(center, radius, startAgle, endAngle) {
   return function(point, _size) {
     const boundStartAngle = typeof startAgle === 'function' ? startAgle() : startAgle
     const boundEndtAngle = typeof startAgle === 'function' ? endAngle() : endAngle
@@ -102,15 +100,3 @@ function boundToArc(center, radius, startAgle, endAngle) {
     return Geometry.getPointFromRadialSystem(angle, radius, center)
   }
 }
-
-const bound = {
-  toRectangle: boundToRectangle,
-  toElement: boundToElement,
-  toLineX: boundToLineX,
-  toLineY: boundToLineY,
-  toLine: boundToLine,
-  toCircle: boundToCircle,
-  toArc: boundToArc
-}
-
-export { bound }

@@ -1,8 +1,6 @@
 import { Geometry } from './geometry'
 import { Draggable } from './draggable'
-import { bound } from './bound'
-
-const Dragee = { bound } //todo remove after refactore
+import { boundToArc } from './bound'
 
 const arcSliders = []
 
@@ -34,7 +32,7 @@ class ArcSlider {
       this.options.radius,
       this.shiftedCenter
     )
-    const bound = Dragee.bound.toArc(
+    const bound = boundToArc(
       this.shiftedCenter,
       this.options.radius,
       this.options.startAngle,

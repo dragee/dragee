@@ -8,11 +8,11 @@ import {
 
 import Event from './event'
 import getStyleProperty from 'desandro-get-style-property'
-import { bound } from './bound'
+import { boundToElement } from './bound'
 import { Geometry, Point, Rectangle } from './geometry'
 import { defaultScope } from './scope'
 
-const Dragee = { bound, Event } //todo remove after refactore
+const Dragee = { Event } //todo remove after refactore
 
 const isTouch = 'ontouchstart' in window, mouseEvents = {
     start: 'mousedown',
@@ -46,7 +46,7 @@ class Draggable {
     this.targets = []
     this.options = Object.assign({
       parent: parent,
-      bound: Dragee.bound.toElement(parent, parent),
+      bound: boundToElement(parent, parent),
       startFilter: false,
       isContentBoxSize: false,
       position: false

@@ -2,9 +2,7 @@ import createCanvas from './createcanvas'
 import util from './util'
 import { Geometry, Point } from './geometry'
 import { Draggable, events } from './draggable'
-import { bound } from './bound'
-
-const Dragee = { bound, Draggable }//todo remove after refactore
+import { boundToArc } from './bound'
 
 const isTouch = 'ontouchstart' in window
 const charts = []
@@ -69,7 +67,7 @@ class Chart {
         this.options.touchRadius,
         this.options.center.sub(halfSize)
       )
-      const bound = Dragee.bound.toArc(
+      const bound = boundToArc(
         this.options.center.sub(halfSize),
         this.options.touchRadius,
         this.getBoundAngle(i, false),

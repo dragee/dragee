@@ -2,10 +2,9 @@
 
 import createCanvas from './createcanvas'
 import { Geometry } from './geometry'
-import { bound } from './bound'
+import { boundToLine } from './bound'
 import { Draggable } from './draggable'
 
-const Dragee = { bound }
 const spiders = []
 
 class Spider {
@@ -37,7 +36,7 @@ class Spider {
       const halfSize = Geometry.getSizeOfElement(element).mult(0.5)
       const start = Geometry.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize)
       const end = Geometry.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize)
-      const bound = Dragee.bound.toLine(start, end)
+      const bound = boundToLine(start, end)
 
       return new Draggable(element, {
         parent: this.area,
