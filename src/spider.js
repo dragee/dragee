@@ -5,8 +5,6 @@ import { Geometry } from './geometry'
 import { boundToLine } from './bound'
 import { Draggable } from './draggable'
 
-const spiders = []
-
 class Spider {
   constructor(area, elements, options={}) {
     const areaRectangle = Geometry.createRectangleFromElement(area, area)
@@ -21,7 +19,6 @@ class Spider {
       fillStyle: 'rgba(150,255,50,0.8)'
     }, options)
 
-    spiders.push(this)
     this.area = area
     this.areaRectangle = areaRectangle
     this.init(elements)
@@ -76,4 +73,4 @@ class Spider {
   }
 }
 
-export { spiders, Spider }
+export { Spider }

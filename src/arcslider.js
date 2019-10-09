@@ -2,8 +2,6 @@ import { Geometry } from './geometry'
 import { Draggable } from './draggable'
 import { boundToArc } from './bound'
 
-const arcSliders = []
-
 class ArcSlider {
   constructor(area, element, options={}) {
     const areaRectangle = Geometry.createRectangleFromElement(area, area)
@@ -20,7 +18,6 @@ class ArcSlider {
 
     this.shiftedCenter = this.options.center.sub(halfSize)
     this.onChange = this.options.onChange
-    arcSliders.push(this)
     this.area = area
     this.init(element)
   }
@@ -74,4 +71,4 @@ class ArcSlider {
   }
 }
 
-export { arcSliders, ArcSlider }
+export { ArcSlider }

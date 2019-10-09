@@ -5,7 +5,6 @@ import { Draggable, events } from './draggable'
 import { boundToArc } from './bound'
 
 const isTouch = 'ontouchstart' in window
-const charts = []
 
 function randomColor() {
   const rnd = function() {
@@ -49,7 +48,6 @@ class Chart {
       isSelectable: false
     }, options)
 
-    charts.push(this)
     this.onDraw = this.options.onDraw || function() {}
     this.area = area
     this.areaRectangle = areaRectangle
@@ -293,4 +291,4 @@ class Chart {
   }
 }
 
-export { charts, Chart }
+export { Chart }

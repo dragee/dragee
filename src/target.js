@@ -8,10 +8,9 @@ import { scopes, defaultScope } from './scope'
 
 const Dragee = { positionType,  positionFactory, sortingFactory, scopes, Event }//todo remove after refactore
 
-const targets = [],
-  addToDefaultScope = function(target) {
-    defaultScope.addTarget(target)
-  }
+const addToDefaultScope = function(target) {
+  defaultScope.addTarget(target)
+}
 
 class Target {
   constructor(element, draggables, options = {}) {
@@ -26,7 +25,6 @@ class Target {
       positioning: Dragee.positionFactory(Dragee.positionType.floatLeft)(this.getRectangle.bind(this), { removable: true })
     }, options)
 
-    targets.push(this)
     this.element = element
     draggables.forEach((draggable) => draggable.targets.push(target))
     this.draggables = draggables
@@ -221,4 +219,4 @@ class Target {
 Target.onCreate = new Dragee.Event(Target, { isReverse: true, isStopOnTrue: true })
 Target.onCreate.add(addToDefaultScope)
 
-export { targets, Target }
+export { Target }

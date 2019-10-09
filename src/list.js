@@ -1,5 +1,3 @@
-const lists = []
-
 import removeItems from 'remove-array-items'
 import Event from './event'
 import { Geometry } from './geometry'
@@ -19,7 +17,6 @@ class List {
     }, options)
 
     this.draggables = draggables
-    lists.push(this)
     this.onChange = new Dragee.Event(this)
     if (options.onChange) {
       this.onChange.add(options.onChange)
@@ -257,4 +254,4 @@ function listFactory(parentElement, elements, options={}) {
   return new List(draggables, listOptions)
 }
 
-export { lists, List, listFactory }
+export { List, listFactory }

@@ -323,4 +323,4 @@ class Draggable {
 Draggable.onCreate = new Dragee.Event(Draggable, { isReverse: true, isStopOnTrue: true })
 Draggable.onCreate.add(addToDefaultScope)
 
-export { Draggable, draggables, events }
+export { Draggable, events }
