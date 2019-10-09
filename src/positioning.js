@@ -135,7 +135,7 @@ function sortingFactory(type) {
         const newList = oldObjsList.concat()
         const listOldPosition = oldObjsList.map(options.getPosition)
         newObjs.forEach(function(newObj) {
-          let index = Geometry.indexOfNearPoint(listOldPosition, options.getPosition(newObj), radius, getDistance)
+          let index = Geometry.indexOfNearestPoint(listOldPosition, options.getPosition(newObj), radius, getDistance)
           if (index === -1) {
             index = newList.length
           } else {

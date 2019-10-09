@@ -146,7 +146,7 @@ const Geometry = {
       )
     }
   },
-  indexOfNearPoint(arr, val, radius, getDistance) {
+  indexOfNearestPoint(arr, val, radius, getDistance) {
     let size, index = 0, i, temp
     getDistance = getDistance || Geometry.getDistance
     if (arr.length === 0) {

@@ -23,7 +23,7 @@ class ListSwitcher extends List {
   onEnd(draggable) {
     const fixPositions = this.getCurrentFixPositionWithOff()
     const currentIndex = this.draggables.indexOf(draggable)
-    const excangeIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
+    const excangeIndex = Geometry.indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
 
     if (excangeIndex === -1 || excangeIndex === currentIndex) {
       this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd)
@@ -41,7 +41,7 @@ class ListSwitcher extends List {
 
   moveDraggable(index, position, fixOffPosition, time) {
     const positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)]
-    const isOn = Geometry.indexOfNearPoint(positions, position, -1, Geometry.getXDifference)
+    const isOn = Geometry.indexOfNearestPoint(positions, position, -1, Geometry.getXDifference)
 
     if (this.draggables[index].isOn !== !!isOn) {
       this.draggables[index].isOn = !!isOn

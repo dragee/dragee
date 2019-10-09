@@ -1,5 +1,3 @@
-'use strict'
-
 const lists = []
 
 import removeItems from 'remove-array-items'
@@ -16,7 +14,8 @@ class List {
       timeExcange: 400,
       radius: 30,
       getDistance: Geometry.getDistance,
-      isDisplacement: false
+      isDisplacement: false,
+      isSortable: true
     }, options)
 
     this.draggables = draggables
@@ -73,7 +72,7 @@ class List {
   onEnd(draggable) {
     const fixPositions = this.getCurrentFixPosition()
     const currentIndex = this.draggables.indexOf(draggable)
-    const excangeIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
+    const excangeIndex = Geometry.indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
 
     if (excangeIndex === -1 || excangeIndex === currentIndex) {
       draggable.move(draggable.fixPosition, this.options.timeEnd, true)
@@ -85,12 +84,39 @@ class List {
     return true
   }
 
+  sortIfPossible(draggable) {
+    const fixPosition = draggable.fixPosition
+    const currentIndex = this.draggables.indexOf(draggable)
+    const nextDraggable = this.draggables[currentIndex + 1]
+    const prevDraggable = this.draggables[currentIndex - 1]
+
+    if (draggable.downDirection && nextDraggable) {
+      const distance = this.options.getDistance(draggable.position, nextDraggable.position)
+      if (distance < this.options.radius) {
+        draggable.fixPosition = nextDraggable.fixPosition
+        this.moveOrSave(nextDraggable, fixPosition, this.options.timeExcange);
+        [this.draggables[currentIndex], this.draggables[currentIndex + 1]] = [this.draggables[currentIndex + 1], this.draggables[currentIndex]]
+        this.sortIfPossible(draggable)
+      }
+    }
+
+    if (draggable.upDirection && prevDraggable) {
+      const distance = this.options.getDistance(draggable.position, prevDraggable.position)
+      if (distance < this.options.radius) {
+        draggable.fixPosition = prevDraggable.fixPosition
+        this.moveOrSave(prevDraggable, fixPosition, this.options.timeExcange);
+        [this.draggables[currentIndex], this.draggables[currentIndex - 1]] = [this.draggables[currentIndex - 1], this.draggables[currentIndex]]
+        this.sortIfPossible(draggable)
+      }
+    }
+  }
+
   onEndDisplaycement(draggable) {
     const sortedDraggables = this.getSortedDraggables()
     const fixPositions = sortedDraggables.map((draggable) => draggable.fixPosition)
 
     const currentIndex = sortedDraggables.indexOf(draggable)
-    const targetIndex = Geometry.indexOfNearPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
+    const targetIndex = Geometry.indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
 
     if (targetIndex !== -1) {
       if (targetIndex < currentIndex) {
