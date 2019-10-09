@@ -142,12 +142,12 @@
                 <div id="DemoList" class="demo-html">
                     <div id="DemoList" class="demo-html">
                       <ul class="list list-a">
-                        <li>↔ A</li>
-                        <li>↔ B</li>
-                        <li>↔ C</li>
-                        <li>↔ D</li>
-                        <li>↔ E</li>
-                        <li>↔ F</li>
+                        <li><span class='handler'>↔</span> A</li>
+                        <li><span class='handler'>↔</span> B</li>
+                        <li><span class='handler'>↔</span> C</li>
+                        <li><span class='handler'>↔</span> D</li>
+                        <li><span class='handler'>↔</span> E</li>
+                        <li><span class='handler'>↔</span> F</li>
                       </ul>
                       <ul class="list list-b">
                         <li>⇔ 1</li>
@@ -218,7 +218,11 @@
                             listBParentElement = root.getElementsByClassName("list-b")[0],
                             listBElements = listBParentElement.getElementsByTagName("li");
 
-                        listA = new Dragee.sortableFactory(listAParentElement, listAElements);
+                        listA = new Dragee.sortableFactory(listAParentElement, listAElements, {
+                            draggable: {
+                                handler: ".handler"
+                            }
+                        });
 
                         listB = new Dragee.listFactory(listBParentElement, listBElements);
                     });

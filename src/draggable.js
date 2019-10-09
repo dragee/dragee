@@ -55,6 +55,12 @@ class Draggable {
       position: false
     }, options)
 
+    if (typeof options.handler === 'string') {
+      this.handler = element.querySelector(options.handler) || element
+    } else {
+      this.handler = options.handler || element
+    }
+
     this.onEnd = new Dragee.Event(this, { isReverse: true, isStopOnTrue: true })
     this.onMove = new Dragee.Event(this)
     this.onStart = new Dragee.Event(this)
@@ -92,8 +98,8 @@ class Draggable {
     this._dragMove = this.dragMove.bind(this)
     this._dragEnd = this.dragEnd.bind(this)
 
-    this.element.addEventListener(touchEvents.start, this._dragStart)
-    this.element.addEventListener(mouseEvents.start, this._dragStart)
+    this.handler.addEventListener(touchEvents.start, this._dragStart)
+    this.handler.addEventListener(mouseEvents.start, this._dragStart)
 
     if (this.bound.refresh) {
       this.bound.refresh()
@@ -294,12 +300,12 @@ class Draggable {
   }
 
   destroy() {
-    this.element.removeEventListener(touchEvents.start, this._dragStart)
-    this.element.removeEventListener(mouseEvents.start, this._dragStart)
-    this.element.removeEventListener(touchEvents.move, this._dragMove)
-    this.element.removeEventListener(mouseEvents.move, this._dragMove)
-    this.element.removeEventListener(touchEvents.end, this._dragEnd)
-    this.element.removeEventListener(mouseEvents.end, this._dragEnd)
+    this.handler.removeEventListener(touchEvents.start, this._dragStart)
+    this.handler.removeEventListener(mouseEvents.start, this._dragStart)
+    document.removeEventListener(touchEvents.move, this._dragMove)
+    document.removeEventListener(mouseEvents.move, this._dragMove)
+    document.removeEventListener(touchEvents.end, this._dragEnd)
+    document.removeEventListener(mouseEvents.end, this._dragEnd)
 
     this.onEnd.reset()
     this.onMove.reset()
