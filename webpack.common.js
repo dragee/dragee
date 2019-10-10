@@ -1,4 +1,5 @@
 const path = require('path')
+const TerserPlugin = require('terser-webpack-plugin')
 // const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
@@ -11,6 +12,7 @@ module.exports = {
     chart: './src/chart.js',
     list: './src/list.js',
     listswitcher: './src/listswitcher.js',
+    sortable: './src/sortable.js',
     spider: './src/spider.js'
   },
   devtool: 'inline-source-map',
@@ -24,7 +26,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin()
     // new HtmlWebpackPlugin({
-    //   title: 'Development',
+    //   title: 'Production',
     // }),
   ],
   module: {
@@ -42,7 +44,15 @@ module.exports = {
     ]
   },
   optimization: {
-    // TODO
-    minimize: false
+    minimizer: [
+      new TerserPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: true, // Must be set to true if using source-maps in production
+        terserOptions: {
+          // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
+        }
+      })
+    ]
   }
 }

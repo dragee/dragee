@@ -1,12 +1,13 @@
 import range from './utils/range.js'
-import removeItems from 'remove-array-items'
-import getDefaultParent from './utils/getdefaultparent'
+import removeItem from './utils/remove-array-item'
+import getDefaultParent from './utils/get-default-parent'
 import Event from './event'
 import { Geometry } from './geometry'
-import { positionType, sortingFactory, positionFactory } from './positioning'
 import { scopes, defaultScope } from './scope'
 
-const Dragee = { positionType,  positionFactory, sortingFactory, scopes, Event }//todo remove after refactore
+import { FloatLeftStrategy } from './positioning'
+
+const Dragee = { Event }//todo remove after refactore
 
 const addToDefaultScope = function(target) {
   defaultScope.addTarget(target)
@@ -20,10 +21,17 @@ class Target {
     this.options = Object.assign({
       timeEnd: 200,
       timeExcange: 400,
-      parent: parent,
-      sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, Geometry.transformedSpaceDistanceFactory({ x: 1, y: 4 })),
-      positioning: Dragee.positionFactory(Dragee.positionType.floatLeft)(this.getRectangle.bind(this), { removable: true })
+      parent: parent
     }, options)
+
+    this.positioningStrategy = options.strategy || new FloatLeftStrategy(
+      this.getRectangle.bind(this),
+      {
+        radius: 80,
+        getDistance: Geometry.transformedSpaceDistanceFactory({ x: 1, y: 4 }),
+        removable: true
+      }
+    )
 
     this.element = element
     draggables.forEach((draggable) => draggable.targets.push(target))
@@ -49,6 +57,14 @@ class Target {
     this.init()
   }
 
+  positioning (draggables, indexesOfNew) {
+    return this.positioningStrategy.positioning(draggables, indexesOfNew)
+  }
+
+  sorting (oldDraggables, newDraggables, indexOfNews) {
+    return this.positioningStrategy.sorting(oldDraggables, newDraggables, indexOfNews)
+  }
+
   init() {
     let rectangles, indexesOfNew
 
@@ -65,7 +81,7 @@ class Target {
 
     if (this.innerDraggables.length) {
       indexesOfNew = range(this.innerDraggables.length)
-      rectangles = this.options.positioning(this.innerDraggables.map((draggable) => {
+      rectangles = this.positioning(this.innerDraggables.map((draggable) => {
         return draggable.getRectangle()
       }), indexesOfNew)
       this.setPosition(rectangles, indexesOfNew)
@@ -103,11 +119,11 @@ class Target {
   }
 
   destroy() {
-    Dragee.scopes.forEach((scope) => removeItems(scope.targets, this))
+    scopes.forEach((scope) => removeItem(scope.targets, this))
   }
 
   refresh() {
-    const rectangles = this.options.positioning(this.innerDraggables.map((draggable) => {
+    const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
       return draggable.getRectangle()
     }), [])
     this.setPosition(rectangles, [], 0)
@@ -127,10 +143,10 @@ class Target {
 
     this.beforeAdd.fire(draggable)
 
-    this.innerDraggables = this.options.sorting(this.innerDraggables, [draggable], newDraggablesIndex)
-    const rectangles = this.options.positioning(this.innerDraggables.map((draggable) => {
+    this.innerDraggables = this.sorting(this.innerDraggables, [draggable], newDraggablesIndex)
+    const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
       return draggable.getRectangle()
-    }), newDraggablesIndex, draggable)
+    }), newDraggablesIndex)
 
     this.setPosition(rectangles, newDraggablesIndex)
     if (this.innerDraggables.indexOf(draggable) !== -1) {
@@ -146,7 +162,7 @@ class Target {
 
       if (rect.removable) {
         draggable.move(draggable.initPosition, timeEnd, true, true)
-        removeItems(this.innerDraggables, draggable)
+        removeItem(this.innerDraggables, draggable)
 
         this.onRemove.fire(draggable)
       } else {
@@ -161,7 +177,7 @@ class Target {
     this.beforeAdd.fire(draggable)
 
     this.pushInnerDraggable(draggable)
-    const rectangles = this.options.positioning(this.innerDraggables.map((draggable) => {
+    const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
       return draggable.getRectangle()
     }), newDraggablesIndex, draggable)
 
@@ -195,7 +211,7 @@ class Target {
 
     this.innerDraggables.splice(index, 1)
 
-    const rectangles = this.options.positioning(this.innerDraggables.map((draggable) => {
+    const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
       return draggable.getRectangle()
     }), [])
 

@@ -1,5 +1,5 @@
 import { addClass, removeClass } from './utils/classes'
-import getDefaultParent from './utils/getdefaultparent'
+import getDefaultParent from './utils/get-default-parent'
 import Event from './event'
 import getStyleProperty from 'desandro-get-style-property'
 import { boundToElement } from './bound'

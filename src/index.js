@@ -5,7 +5,7 @@ import { List, listFactory } from './list'
 import { Sortable, sortableFactory } from './sortable'
 import { Target } from './target'
 import { scopes, defaultScope, Scope, scopeFactory, scope } from './scope'
-import { positionType, sortingFactory, positionFactory  } from './positioning'
+import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './positioning'
 import { Spider } from './spider'
 import { ArcSlider } from './arcslider'
 import { Chart } from './chart'
@@ -17,7 +17,7 @@ export { Draggable,
   Sortable, sortableFactory,
   Target,
   scopes, defaultScope, Scope, scopeFactory, scope,
-  positionType, sortingFactory, positionFactory,
+  NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy,
   Spider,
   ArcSlider,
   Chart,

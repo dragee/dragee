@@ -1,4 +1,4 @@
-import removeItems from 'remove-array-items'
+import removeItem from 'remove-array-items'
 import Event from './event'
 import { Geometry } from './geometry'
 import { Draggable } from './draggable'
@@ -189,7 +189,7 @@ class List {
     draggables.forEach((draggable) => {
       draggable.onEnd.reset()
       draggable.onMove.reset() //todo remove reset in future
-      removeItems(this.draggables, draggable)
+      removeItem(this.draggables, draggable)
     })
 
     let j = 0

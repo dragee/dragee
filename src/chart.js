@@ -1,4 +1,4 @@
-import createCanvas from './utils/createcanvas'
+import createCanvas from './utils/create-canvas'
 import range from './utils/range'
 import { Geometry, Point } from './geometry'
 import { Draggable, events } from './draggable'

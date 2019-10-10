@@ -25,7 +25,7 @@
           }
         }
 
-        function removexClass(element, c) {
+        function removeClass(element, c) {
           const re = new RegExp('(^|\\s)' + c + '(\\s|$)', 'g')
           element.className = element.className.replace(re, '$1').replace(/\s+/g, ' ').replace(/(^ | $)/g, '')
         }
@@ -575,10 +575,9 @@
                         targets = Array.prototype.slice.call(targetElements).map(function(element, i){
                             var target = new Dragee.Target(element, draggables, {
                                 parent: targetAreaElement,
-                                positioning: Dragee.positionFactory(Dragee.positionType.notCrossing)(function(){
-                                    return target.getRectangle();
+                                strategy: new Dragee.NotCrossingStrategy(function(){
+                                  return target.getRectangle();
                                 }),
-                                  sorting: Dragee.sortingFactory(Dragee.positionType.notCrossing)(),
                                 onAdd: function(draggable){
                                     addClass(draggable.element, "ontarget");
                                 },
