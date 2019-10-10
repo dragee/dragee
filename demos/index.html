@@ -218,11 +218,7 @@
                             listBParentElement = root.getElementsByClassName("list-b")[0],
                             listBElements = listBParentElement.getElementsByTagName("li");
 
-                        listA = new Dragee.sortableFactory(listAParentElement, listAElements, {
-                            draggable: {
-                                handler: ".handler"
-                            }
-                        });
+                        listA = new Dragee.sortableFactory(listAParentElement, listAElements);
 
                         listB = new Dragee.listFactory(listBParentElement, listBElements);
                     });

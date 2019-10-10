@@ -1,7 +1,7 @@
 {
   "name": "dragee",
-  "version": "0.8.0",
-  "description": "drag&drop framework",
+  "version": "0.9.0",
+  "description": "Dragee(drag&drop)d library",
   "scripts": {
     "build": "webpack",
     "start:dev": "webpack-dev-server",
@@ -20,14 +20,22 @@
     "webpack-dev-server": "^3.8.2",
     "yargs": "3.32.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:dragee/dragee.git"
-  },
+  "repository": "github:dragee/dragee",
   "author": "Vitaliy Yarovuy, Volodymyr Myskov",
   "license": "ISC",
   "dependencies": {
     "desandro-get-style-property": "^1.0.4",
     "remove-array-items": "^2.0.0"
-  }
+  },
+  "main": "src/index.js",
+  "homepage": "https://dragee.github.io/",
+  "bugs": "https://github.com/dragee/dragee/issues",
+  "keywords": [
+    "drag&drop",
+    "drag",
+    "drop",
+    "dragging",
+    "draggable",
+    "sortable"
+  ]
 }
