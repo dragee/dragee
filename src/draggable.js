@@ -139,7 +139,8 @@ class Draggable {
     this._transformPosition = point
 
     let transform = this.element.style[transformProperty]
-    let translateCss = ' translate3d(' + point.x + 'px,' + point.y + 'px, 0px)'
+    const z = this.isDragging ? 1 : 0
+    let translateCss = ` translate3d(${point.x}px, ${point.y}px, ${z}px)`
 
     const ua = window.navigator.userAgent
     const msie = ua.indexOf('MSIE ')

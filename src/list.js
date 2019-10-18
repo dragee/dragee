@@ -1,4 +1,4 @@
-import removeItem from 'remove-array-items'
+import removeItem from './utils/remove-array-item'
 import Event from './event'
 import { Geometry } from './geometry'
 import { Draggable } from './draggable'

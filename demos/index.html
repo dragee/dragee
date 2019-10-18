@@ -34,8 +34,6 @@
 </head>
 
 <body data-spy="scroll" data-target=".subnav" data-offset="0">
-
-
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
@@ -132,7 +130,114 @@
                     });
                 </script>
             </div>
-            <div class="span6 code-span"></div>
+            <div class="span6 demo-span">
+              <div id="DemoDraggable" class="demo-html">
+                  <div class="draggable-area">
+                     <div class="draggable draggable-b"></div>
+                     <div class="draggable draggable-a"></div>
+                     <canvas id="myCanvas" width="700" height="300"></canvas>
+                  </div>
+              </div>
+              <style>
+                canvas#myCanvas {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  z-index:1;
+                }
+                .draggable-area{
+                  height: 230px;
+                  position: relative;
+                  overflow: hidden;
+                  padding: 0;
+                  border: 1px dashed #333;
+                  border-radius: 6px;
+                  background-color: rgba(225, 225, 225,0.4);
+                }
+
+                .draggable-area .draggable{
+                  z-index: 2;
+                  position: relative;
+                  margin: 20px;
+                  display: inline-block;
+                  padding: 9px 14px;
+                  font-size: 15px;
+                  color: #333;
+                  cursor: move;
+                  border: 1px solid #333;
+                  border-radius: 5px;
+                  background: #f5f5f5;
+                  position: relative;
+                }
+
+                .draggable-area .draggable-a,
+                .draggable-area .draggable-b {
+                  border-radius: 30px;
+                  padding: 0;
+                  width: 50px;
+                  height: 50px;
+                  background: green;
+                  border: 1px solid yellow;
+                }
+
+                .draggable-area .draggable-b {
+                  background: red;
+                }
+
+                .draggable-area .draggable.active{
+                  z-index: 2;
+                }
+              </style>
+              <script>
+                  window.addEventListener("load", function(){
+                      var draggableArea = document.querySelector(".draggable-area"),
+                          draggableAElement = draggableArea.querySelector(".draggable-a"),
+                          draggableBElement = draggableArea.querySelector(".draggable-b"),
+                          draggableRadius = 25;
+
+                      new Dragee.Draggable(draggableAElement, {
+                          bound: Dragee.bound.toCircle(new Dragee.Point(100, 90), 80),
+                          position: new Dragee.Point(100, 10)
+                      });
+
+                      function calculusFx(x) {
+                          x = x/100;
+                          return x * Math.sin(x * x) * 10 + 80;
+                      }
+
+                      function calculusBound(point, size){
+                          var retPoint = point.clone();
+                          retPoint.y = calculusFx(point.x);
+                          return retPoint;
+                      }
+
+                      new Dragee.Draggable(draggableBElement, {
+                          bound: calculusBound,
+                          position: new Dragee.Point(210, calculusFx(210))
+                      });
+
+                      var canvas = document.getElementById("myCanvas");
+                      var context = canvas.getContext("2d");
+
+                      context.lineWidth = 2;
+                      context.strokeStyle = '#55bb55';
+                      context.beginPath();
+                      context.arc(100 + draggableRadius, 90 + draggableRadius, 80, 0, 2 * Math.PI);
+                      context.stroke();
+                      context.closePath()
+                      context.moveTo(-1, 0);
+
+                      context.strokeStyle = '#ffbb55';
+                      context.beginPath();
+                      var x, y;
+                      for(x=-26; x<=726; x+=1){
+                       y = calculusFx(x) + draggableRadius;
+                       context.lineTo(x + draggableRadius, y);
+                      }
+                      context.stroke();
+                  });
+              </script>
+            </div>
         </div>
     </section>
 
@@ -405,11 +510,7 @@
                     });
                 </script>
             </div>
-        </div>
-    </section>
 
-    <section id="TargetAdvanced" >
-        <div class="row demo-row">
             <div class="span6 demo-span">
                 <div id="DemoTargetB" class="demo-html">
                   <div class="area area-a">
@@ -669,24 +770,7 @@
     </section>
 </div>
 
-<script id="codeViewTemplate" type="text/template">
-    <ul class="nav nav-tabs">
-        <li class="active"><a href="#tab_{{id}}_html" data-toggle="tab">html</a></li>
-        <li><a href="#tab_{{id}}_css" data-toggle="tab">css</a></li>
-        <li><a href="#tab_{{id}}_js" data-toggle="tab">js</a></li>
-    </ul>
-    <div class="tab-content">
-        <div class="tab-pane active" id="tab_{{id}}_html">
-            <pre class="prettyprint linenums">{{html}}</pre>
-        </div>
-        <div class="tab-pane" id="tab_{{id}}_css">
-            <pre class="prettyprint linenums">{{css}}</pre>
-        </div>
-        <div class="tab-pane" id="tab_{{id}}_js">
-            <pre class="prettyprint linenums">{{js}}</pre>
-        </div>
-    </div>
-</script>
+
 <!-- bootstrap -->
 <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
 <script src="bootstrap/js/jquery.js"></script>
