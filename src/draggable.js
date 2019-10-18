@@ -3,7 +3,12 @@ import getDefaultParent from './utils/get-default-parent'
 import Event from './event'
 import getStyleProperty from 'desandro-get-style-property'
 import { boundToElement } from './bound'
-import { Geometry, Point, Rectangle } from './geometry'
+import Point from './geometry/point'
+import Rectangle from './geometry/rectangle'
+import {
+  getOffset,
+  getSizeOfElement
+} from './geometry/helpers'
 import { defaultScope } from './scope'
 
 const Dragee = { Event } //todo remove after refactore
@@ -85,7 +90,7 @@ class Draggable {
 
   init() {
     this._enable = true
-    this.offset = Geometry.getOffset(this.element, this.options.parent, true)
+    this.offset = getOffset(this.element, this.options.parent, true)
     this.fixPosition = this.offset
     this.position = this.offset
     if (this.options.position) {
@@ -107,7 +112,7 @@ class Draggable {
   }
 
   reinit() {
-    this.offset = Geometry.getOffset(this.element, this.options.parent, true)
+    this.offset = getOffset(this.element, this.options.parent, true)
     this.fixPosition = this.offset
     this.position = this.offset
     if (this.options.position) {
@@ -123,7 +128,7 @@ class Draggable {
   }
 
   getSize(_recalulate) {
-    return Geometry.getSizeOfElement(this.element, this.options.isContentBoxSize)
+    return getSizeOfElement(this.element, this.options.isContentBoxSize)
   }
 
   getPosition() {

@@ -1,6 +1,17 @@
 import createCanvas from './utils/create-canvas'
 import range from './utils/range'
-import { Geometry, Point } from './geometry'
+import Point from './geometry/point'
+import {
+  createRectangleFromElement,
+  getSizeOfElement,
+  toRadian,
+  getPointFromRadialSystem,
+  getOffset,
+  getAngle,
+  normalizeAngle,
+  getDistance
+
+} from './geometry/helpers'
 import { Draggable, events } from './draggable'
 import { boundToArc } from './bound'
 
@@ -33,7 +44,7 @@ function getArrayWithBoundIndexes(index, length) {
 
 class Chart {
   constructor (area, elements, options={}) {
-    const areaRectangle = Geometry.createRectangleFromElement(area, area)
+    const areaRectangle = createRectangleFromElement(area, area)
     this.options = Object.assign({
       center: areaRectangle.getCenter(),
       radius: areaRectangle.getMinSide() / 2,
@@ -41,7 +52,7 @@ class Chart {
       boundAngle: Math.PI / 9,
       fillStyles: range(0, elements.length).map(() => randomColor()),
       initAngles: range(-90, 270, 360 / elements.length).map((angle) => {
-        return Geometry.toRadian(angle)
+        return toRadian(angle)
       }),
       limitImg: null,
       limitImgOffset: new Point(0, 0),
@@ -59,8 +70,8 @@ class Chart {
     this.context = this.canvas.getContext('2d')
     this.draggables = elements.map((element, i) => {
       const angle = this.options.initAngles[i]
-      const halfSize = Geometry.getSizeOfElement(element).mult(0.5)
-      const position = Geometry.getPointFromRadialSystem(
+      const halfSize = getSizeOfElement(element).mult(0.5)
+      const position = getPointFromRadialSystem(
         angle,
         this.options.touchRadius,
         this.options.center.sub(halfSize)
@@ -100,7 +111,7 @@ class Chart {
       )
 
       if (!this.canvasOffset) {
-        this.canvasOffset = Geometry.getOffset(this.canvas)
+        this.canvasOffset = getOffset(this.canvas)
       }
 
       point = point.sub(this.canvasOffset)
@@ -114,7 +125,7 @@ class Chart {
   updateAngles() {
     this.angles = this.draggables.map((draggable) => {
       const halfSize = draggable.getSize().mult(0.5)
-      return Geometry.getAngle(this.options.center.sub(halfSize), draggable.position)
+      return getAngle(this.options.center.sub(halfSize), draggable.position)
     })
   }
 
@@ -126,7 +137,7 @@ class Chart {
       if (i < 0) {
         i += this.angles.length
       }
-      return Geometry.normalizeAngle(this.angles[i] - sign * this.options.boundAngle)
+      return normalizeAngle(this.angles[i] - sign * this.options.boundAngle)
     }
   }
 
@@ -159,7 +170,7 @@ class Chart {
     if (!this.isInit) {
       return
     }
-    const rectangle = Geometry.createRectangleFromElement(element, element)
+    const rectangle = createRectangleFromElement(element, element)
     const opts = Object.assign({
       center: rectangle.getCenter(),
       radius: rectangle.getMinSide() / 2,
@@ -208,7 +219,7 @@ class Chart {
     }
 
     if (img) {
-      const angle = Geometry.normalizeAngle(this.angles[index])
+      const angle = normalizeAngle(this.angles[index])
       point = new Point(0, -img.height / 2)
       point = point.add(this.options.limitImgOffset)
       this.context.translate(this.areaRectangle.size.x / 2, this.areaRectangle.size.y / 2)
@@ -224,7 +235,7 @@ class Chart {
 
     angles.push(baseAngle)
     return angles.map((angle) => {
-      const diffAngle = Geometry.normalizeAngle(angle - baseAngle)
+      const diffAngle = normalizeAngle(angle - baseAngle)
       baseAngle = angle
       return diffAngle
     })
@@ -236,13 +247,13 @@ class Chart {
 
   getArcBisectrixs() {
     return this.getAnglesDiff().map((diffAngle, i) => {
-      return Geometry.normalizeAngle(this.angles[i] + diffAngle / 2)
+      return normalizeAngle(this.angles[i] + diffAngle / 2)
     })
   }
 
   getArcOnPoint(point) {
-    const angle = Geometry.getAngle(this.options.center, point)
-    const radius = Geometry.getDistance(this.options.center, point)
+    const angle = getAngle(this.options.center, point)
+    const radius = getDistance(this.options.center, point)
 
     if (radius > this.options.radius) {
       return -1
@@ -270,7 +281,7 @@ class Chart {
     this.draggables.forEach((draggable, i) => {
       const angle = this.angles[i]
       const halfSize = draggable.getSize().mult(0.5)
-      const position = Geometry.getPointFromRadialSystem(
+      const position = getPointFromRadialSystem(
         angle,
         this.options.touchRadius,
         this.options.center.sub(halfSize)

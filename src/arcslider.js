@@ -1,11 +1,18 @@
-import { Geometry } from './geometry'
 import { Draggable } from './draggable'
 import { boundToArc } from './bound'
 
+import {
+  createRectangleFromElement,
+  getSizeOfElement,
+  getPointFromRadialSystem,
+  getAngle,
+  normalizeAngle
+} from './geometry/helpers'
+
 class ArcSlider {
   constructor(area, element, options={}) {
-    const areaRectangle = Geometry.createRectangleFromElement(area, area)
-    const halfSize = Geometry.getSizeOfElement(element).mult(0.5)
+    const areaRectangle = createRectangleFromElement(area, area)
+    const halfSize = getSizeOfElement(element).mult(0.5)
     this.options = Object.assign({
       center: areaRectangle.getCenter(),
       radius: areaRectangle.getMinSide() / 2,
@@ -24,7 +31,7 @@ class ArcSlider {
 
   init(element) {
     const angle = this.options.startAngle
-    const position = Geometry.getPointFromRadialSystem(
+    const position = getPointFromRadialSystem(
       angle,
       this.options.radius,
       this.shiftedCenter
@@ -49,7 +56,7 @@ class ArcSlider {
   }
 
   updateAngle() {
-    this.angle = Geometry.getAngle(this.shiftedCenter, this.draggable.position)
+    this.angle = getAngle(this.shiftedCenter, this.draggable.position)
   }
 
   change() {
@@ -60,12 +67,12 @@ class ArcSlider {
   }
 
   setAngle(angle, time) {
-    const position = Geometry.getPointFromRadialSystem(
+    const position = getPointFromRadialSystem(
       this.angle,
       this.options.radius,
       this.shiftedCenter
     )
-    this.angle = Geometry.normalizeAngle(angle, position)
+    this.angle = normalizeAngle(angle, position)
     this.draggable.move(position, time||0, true, true)
     this.onChange(this.angle)
   }

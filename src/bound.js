@@ -1,4 +1,14 @@
-import { Geometry, Point } from './geometry'
+import Point from './geometry/point'
+import {
+  createRectangleFromElement,
+  getPointInLineByLenght,
+  directCrossing,
+  boundToLine as boundToLineHelper,
+  getAngle,
+  normalizeAngle,
+  boundAngle,
+  getPointFromRadialSystem
+} from './geometry/helpers'
 
 export function boundToRectangle(rectangle) {
   return function(point, size) {
@@ -29,7 +39,7 @@ export function boundToElement(element, parent) {
   let bound
 
   retFunc.refresh = function() {
-    bound = boundToRectangle(Geometry.createRectangleFromElement(element, parent))
+    bound = boundToRectangle(createRectangleFromElement(element, parent))
   }
 
   retFunc.refresh()
@@ -74,17 +84,17 @@ export function boundToLine(start, end) {
 
   return function(point, size) {
     const point2 = new Point(point.x + someK * cosBeta, point.y + someK * sinBeta),
-      newEnd = Geometry.getPointInLineByLenght(end, start, size.x)
-    let pointCrossing = Geometry.directCrossing(start, end, point, point2)
+      newEnd = getPointInLineByLenght(end, start, size.x)
+    let pointCrossing = directCrossing(start, end, point, point2)
 
-    pointCrossing = Geometry.boundToLine(start, newEnd, pointCrossing)
+    pointCrossing = boundToLineHelper(start, newEnd, pointCrossing)
     return pointCrossing
   }
 }
 
 export function boundToCircle(center, radius) {
   return function(point, _size) {
-    const boundedPoint = Geometry.getPointInLineByLenght(center, point, radius)
+    const boundedPoint = getPointInLineByLenght(center, point, radius)
     return boundedPoint
   }
 }
@@ -94,9 +104,9 @@ export function boundToArc(center, radius, startAgle, endAngle) {
     const boundStartAngle = typeof startAgle === 'function' ? startAgle() : startAgle
     const boundEndtAngle = typeof startAgle === 'function' ? endAngle() : endAngle
 
-    let angle = Geometry.getAngle(center, point)
-    angle = Geometry.normalizeAngle(angle)
-    angle = Geometry.boundAngle(boundStartAngle, boundEndtAngle, angle)
-    return Geometry.getPointFromRadialSystem(angle, radius, center)
+    let angle = getAngle(center, point)
+    angle = normalizeAngle(angle)
+    angle = boundAngle(boundStartAngle, boundEndtAngle, angle)
+    return getPointFromRadialSystem(angle, radius, center)
   }
 }

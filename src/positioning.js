@@ -1,4 +1,9 @@
-import { Geometry, Point } from './geometry'
+import Point from './geometry/point'
+import {
+  getDistance,
+  addPointToBoundPoints,
+  indexOfNearestPoint
+} from './geometry/helpers'
 
 class BasicStrategy {
   constructor(rectangle, options={}) {
@@ -65,7 +70,7 @@ class FloatLeftStrategy extends BasicStrategy {
     this.paddingBottomRight = options.paddingBottomRight || new Point(0, 0)
     this.yGapBetweenDraggables = options.yGapBetweenDraggables || 0
 
-    this.getDistance = options.getDistance || Geometry.getDistance
+    this.getDistance = options.getDistance || getDistance
     this.getPosition = options.getPosition || ((draggable) => {
       return draggable.position
     })
@@ -103,7 +108,7 @@ class FloatLeftStrategy extends BasicStrategy {
         rect.removable = true
       }
 
-      boundaryPoints = Geometry.addPointToBoundPoints(boundaryPoints, rect.getP3().add(this.paddingBottomRight))
+      boundaryPoints = addPointToBoundPoints(boundaryPoints, rect.getP3().add(this.paddingBottomRight))
     })
     return rectangleList
   }
@@ -112,7 +117,7 @@ class FloatLeftStrategy extends BasicStrategy {
     const newList = odlDraggablesList.concat()
     const listOldPosition = odlDraggablesList.map((draggable) => draggable.getPosition())
     newDraggables.forEach((newDraggable) => {
-      let index = Geometry.indexOfNearestPoint(listOldPosition, this.getPosition(newDraggable), this.radius, this.getDistance)
+      let index = indexOfNearestPoint(listOldPosition, this.getPosition(newDraggable), this.radius, this.getDistance)
       if (index === -1) {
         index = newList.length
       } else {
@@ -164,7 +169,7 @@ class FloatRightStrategy extends FloatLeftStrategy {
       if (this.options.removable && rect.getLeftBottomPoint().y > boundRect.getP4().y) {
         rect.removable = true
       }
-      boundaryPoints = Geometry.addPointToBoundPoints(boundaryPoints, rect.getP4().add(this.paddingBottomNegLeft), true)
+      boundaryPoints = addPointToBoundPoints(boundaryPoints, rect.getP4().add(this.paddingBottomNegLeft), true)
     })
     return rectangleList
   }

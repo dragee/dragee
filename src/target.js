@@ -2,7 +2,10 @@ import range from './utils/range.js'
 import removeItem from './utils/remove-array-item'
 import getDefaultParent from './utils/get-default-parent'
 import Event from './event'
-import { Geometry } from './geometry'
+import {
+  transformedSpaceDistanceFactory,
+  createRectangleFromElement
+} from './geometry/helpers'
 import { scopes, defaultScope } from './scope'
 
 import { FloatLeftStrategy } from './positioning'
@@ -28,7 +31,7 @@ class Target {
       this.getRectangle.bind(this),
       {
         radius: 80,
-        getDistance: Geometry.transformedSpaceDistanceFactory({ x: 1, y: 4 }),
+        getDistance: transformedSpaceDistanceFactory({ x: 1, y: 4 }),
         removable: true
       }
     )
@@ -90,7 +93,7 @@ class Target {
   }
 
   getRectangle() {
-    return Geometry.createRectangleFromElement(
+    return createRectangleFromElement(
       this.element,
       this.options.parent,
       this.options.isContentBoxSize,

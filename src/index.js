@@ -1,5 +1,6 @@
 import './expandnative'
-import { Point, Rectangle, Geometry } from './geometry'
+import Point from './geometry/point'
+import Rectangle from './geometry/point'
 import { Draggable } from './draggable'
 import { List, listFactory } from './list'
 import { Sortable, sortableFactory } from './sortable'
@@ -30,8 +31,9 @@ const bound = {
   toArc: boundToArc
 }
 
-export { Draggable,
-  Point, Rectangle, Geometry,
+export {
+  Draggable,
+  Point, Rectangle,
   List, listFactory,
   Sortable, sortableFactory,
   Target,

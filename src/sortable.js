@@ -1,10 +1,10 @@
 import { List } from './list'
-import { Geometry } from './geometry'
+import { getYDifference } from './geometry/helpers'
 import { Draggable } from './draggable'
 
 class Sortable extends List {
   constructor(draggables, options={}) {
-    options.getDistance = options.getDistance || Geometry.getYDifference
+    options.getDistance = options.getDistance || getYDifference
     super(draggables, options)
   }
 

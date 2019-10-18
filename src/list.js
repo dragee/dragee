@@ -1,6 +1,9 @@
 import removeItem from './utils/remove-array-item'
 import Event from './event'
-import { Geometry } from './geometry'
+import {
+  getDistance,
+  indexOfNearestPoint
+} from './geometry/helpers'
 import { Draggable } from './draggable'
 
 const Dragee = { Event } //todo remove after refactore
@@ -11,7 +14,7 @@ class List {
       timeEnd: 200,
       timeExcange: 400,
       radius: 30,
-      getDistance: Geometry.getDistance,
+      getDistance: getDistance,
       isDisplacement: false,
       isSortable: true
     }, options)
@@ -69,7 +72,7 @@ class List {
   onEnd(draggable) {
     const fixPositions = this.getCurrentFixPosition()
     const currentIndex = this.draggables.indexOf(draggable)
-    const excangeIndex = Geometry.indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
+    const excangeIndex = indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
 
     if (excangeIndex === -1 || excangeIndex === currentIndex) {
       draggable.move(draggable.fixPosition, this.options.timeEnd, true)
@@ -113,7 +116,7 @@ class List {
     const fixPositions = sortedDraggables.map((draggable) => draggable.fixPosition)
 
     const currentIndex = sortedDraggables.indexOf(draggable)
-    const targetIndex = Geometry.indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
+    const targetIndex = indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
 
     if (targetIndex !== -1) {
       if (targetIndex < currentIndex) {

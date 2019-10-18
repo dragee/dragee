@@ -38,5 +38,6 @@
     "dragging",
     "draggable",
     "sortable"
-  ]
+  ],
+  "sideEffects": false
 }

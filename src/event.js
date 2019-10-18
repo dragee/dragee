@@ -1,5 +1,3 @@
-'use strict'
-
 function Event(context, options = {}) {
   this.funcs = []
   this.context = context

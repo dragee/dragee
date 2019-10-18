@@ -1,11 +1,15 @@
 import createCanvas from './utils/create-canvas'
-import { Geometry } from './geometry'
+import {
+  createRectangleFromElement,
+  getSizeOfElement,
+  getPointFromRadialSystem
+} from './geometry/helpers'
 import { boundToLine } from './bound'
 import { Draggable } from './draggable'
 
 class Spider {
   constructor(area, elements, options={}) {
-    const areaRectangle = Geometry.createRectangleFromElement(area, area)
+    const areaRectangle = createRectangleFromElement(area, area)
     this.options = Object.assign({
       angle: 0,
       dAngle: 2 * Math.PI / elements.length,
@@ -28,9 +32,9 @@ class Spider {
 
     this.draggables = elements.map((element, i) => {
       const angle = this.options.angle + i * this.options.dAngle
-      const halfSize = Geometry.getSizeOfElement(element).mult(0.5)
-      const start = Geometry.getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize)
-      const end = Geometry.getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize)
+      const halfSize = getSizeOfElement(element).mult(0.5)
+      const start = getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize)
+      const end = getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize)
       const bound = boundToLine(start, end)
 
       return new Draggable(element, {
