@@ -10,18 +10,17 @@ class Sortable extends List {
 
   initDraggable(draggable) {
     draggable.enable = this._enable
-    if (this.options.isSortable) {
-      draggable.onMove.add(() => {
-        if (draggable.isDragging) {
-          this.exchangeDraggableIfPossible(draggable)
-          return true
-        }
-      })
 
-      draggable.onEnd.add(() => {
-        draggable.move(draggable.fixPosition, this.options.timeEnd)
-      })
-    }
+    draggable.on('drag:move', () => {
+      if (draggable.isDragging) {
+        this.exchangeDraggableIfPossible(draggable)
+      }
+    })
+
+    draggable.prependOn('drag:end', () => {
+      draggable.move(draggable.fixPosition, this.options.timeEnd)
+      this.stopPropagation()
+    })
   }
 
   exchangeDraggableIfPossible(draggable) {

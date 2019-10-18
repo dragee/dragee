@@ -15,9 +15,9 @@ class ListSwitcher extends List {
   init() {
     this.draggables.forEach((draggable) => {
       draggable.isOn = false
-      draggable.onEnd.add(() => {
+      draggable.prependOn('end', () => {
         this.onEnd(draggable)
-        return true
+        this.stopPropagation()
       })
     })
   }
@@ -36,9 +36,8 @@ class ListSwitcher extends List {
         this.moveDraggableToOff(excangeIndex, fixPositions[currentIndex], this.options.timeExcange)
       }
       this.moveDraggable(currentIndex, draggable.position, fixPositions[excangeIndex], this.options.timeEnd)
-      this.onChange.fire()
+      this.emit('list:change')
     }
-    return true
   }
 
   moveDraggable(index, position, fixOffPosition, time) {
@@ -47,7 +46,7 @@ class ListSwitcher extends List {
 
     if (this.draggables[index].isOn !== !!isOn) {
       this.draggables[index].isOn = !!isOn
-      this.onChange.fire()
+      this.emit('list:change')
     }
 
     this.draggables[index].move(positions[isOn], time, true)

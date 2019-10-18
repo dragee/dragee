@@ -41,9 +41,8 @@ class Spider {
         parent: this.area,
         bound: bound,
         position: start,
-        onMove: () => {
-          this.draw()
-          return true
+        on: {
+          'drag:move': () => this.draw()
         }
       })
     })

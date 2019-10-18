@@ -14,8 +14,9 @@ const addToDefaultScope = function(target) {
   defaultScope.addTarget(target)
 }
 
-class Target {
+class Target extends EventEmitter {
   constructor(element, draggables, options = {}) {
+    super(undefined, options)
     const target = this
     const parent = options.parent || getDefaultParent(element)
 
@@ -37,23 +38,8 @@ class Target {
     this.element = element
     draggables.forEach((draggable) => draggable.targets.push(target))
     this.draggables = draggables
-    this.onAdd = new EventEmitter(this)
-    this.beforeAdd = new EventEmitter(this)
-    this.onRemove = new EventEmitter(this)
 
-    if (options.onRemove) {
-      this.onRemove.add(options.onRemove)
-    }
-
-    if (options.onAdd) {
-      this.onAdd.add(options.onAdd)
-    }
-
-    if (options.beforeAdd) {
-      this.beforeAdd.add(options.beforeAdd)
-    }
-
-    Target.onCreate.fire(this)
+    Target.emitter.emit('target:create', this)
 
     this.init()
   }
@@ -86,7 +72,7 @@ class Target {
         return draggable.getRectangle()
       }), indexesOfNew)
       this.setPosition(rectangles, indexesOfNew)
-      this.innerDraggables.forEach((draggable) => this.onAdd.fire(draggable))
+      this.innerDraggables.forEach((draggable) => this.emit('target:add', draggable))
     }
   }
 
@@ -142,7 +128,7 @@ class Target {
       }
     }
 
-    this.beforeAdd.fire(draggable)
+    this.emit('target:beforeAdd', draggable)
 
     this.innerDraggables = this.sorting(this.innerDraggables, [draggable], newDraggablesIndex)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
@@ -164,8 +150,7 @@ class Target {
       if (rect.removable) {
         draggable.move(draggable.initPosition, timeEnd, true, true)
         removeItem(this.innerDraggables, draggable)
-
-        this.onRemove.fire(draggable)
+        this.emit('target:remove', draggable)
       } else {
         draggable.move(rect.position, timeEnd, true, true)
       }
@@ -175,7 +160,7 @@ class Target {
   add(draggable, time) {
     const newDraggablesIndex = this.innerDraggables.length
 
-    this.beforeAdd.fire(draggable)
+    this.emit('target:beforeAdd', draggable)
 
     this.pushInnerDraggable(draggable)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
@@ -195,15 +180,15 @@ class Target {
   }
 
   addRemoveOnMove(draggable) {
-    draggable.onMove.add(this.removeHandler = () => {
+    draggable.on('drag:move', this.removeHandler = () => {
       this.remove(draggable)
     })
 
-    this.onAdd.fire(draggable)
+    this.emit('target:add', draggable)
   }
 
   remove(draggable) {
-    draggable.onMove.remove(this.removeHandler)
+    draggable.unsubscribe('drag:move', this.removeHandler)
 
     const index = this.innerDraggables.indexOf(draggable)
     if (index === -1) {
@@ -217,13 +202,13 @@ class Target {
     }), [])
 
     this.setPosition(rectangles, [])
-    this.onRemove.fire(draggable)
+    this.emit('target:remove', draggable)
   }
 
   reset() {
     this.innerDraggables.forEach((draggable) => {
       draggable.move(draggable.initPosition, 0, true, true)
-      this.onRemove.fire(draggable)
+      this.emit('target:remove', draggable)
     })
     this.innerDraggables = []
   }
@@ -233,7 +218,7 @@ class Target {
   }
 }
 
-Target.onCreate = new EventEmitter(Target, { isReverse: true, isStopOnTrue: true })
-Target.onCreate.add(addToDefaultScope)
+Target.emitter = new EventEmitter(Target)
+Target.emitter.on('target:create', addToDefaultScope)
 
 export { Target }

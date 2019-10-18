@@ -1,41 +1,61 @@
 export default class EventEmitter {
   constructor (context, options = {}) {
-    this.funcs = []
-    this.context = context
-    this.isReverse = options.isReverse || false
-    this.isStopOnTrue = options.isStopOnTrue || false
-  }
+    this.context = context || this
+    this.events = {}
 
-  fire() {
-    const args = [].slice.call(arguments)
-    const fs = this.isReverse ? this.funcs.slice().reverse() : this.funcs
-    let retValue
-
-    for (let i = 0; i < fs.length; i++) {
-      retValue = fs[i].apply(this.context, args)
-      if (this.isStopOnTrue && retValue) {
-        return true
+    if (options && options.on) {
+      for (const [eventName, fn] of Object.entries(options.on)) {
+        this.on(eventName, fn)
       }
     }
-    return !this.isStopOnTrue
   }
 
-  add(f) {
-    this.funcs.push(f)
-  }
+  emit(eventName) {
+    this.stopped = false
+    const args = [].slice.call(arguments, 1)
 
-  unshift(f) {
-    this.funcs.unshift(f)
-  }
+    if (!this.events[eventName]) return
 
-  remove(f) {
-    const index = this.funcs.indexOf(f)
-    if (index !== -1) {
-      this.funcs.splice(index, 1)
+    for (let i = 0; i < this.events[eventName].length; i++) {
+      this.events[eventName][i].apply(this.context, args)
+      if (this.stopped) {
+        return
+      }
     }
   }
 
-  reset() {
-    this.funcs = []
+  stopPropagation() {
+    this.stopped = true
+  }
+
+  on(eventName, fn) {
+    if (!this.events[eventName]) {
+      this.events[eventName] = []
+    }
+
+    this.events[eventName].push(fn)
+  }
+
+  prependOn(eventName, fn) {
+    if (!this.events[eventName]) {
+      this.events[eventName] = []
+    }
+
+    this.events[eventName].unshift(fn)
+  }
+
+  unsubscribe(eventName, fn) {
+    if (this.events[eventName]) {
+      const index = this.events[eventName].indexOf(fn)
+      this.events[eventName].splice(index, 1)
+    }
+  }
+
+  resetEmitter () {
+    this.events = {}
+  }
+
+  resetOn(eventName) {
+    this.events[eventName] = []
   }
 }

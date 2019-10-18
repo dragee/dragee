@@ -14,6 +14,7 @@ import {
 } from './geometry/helpers'
 import { Draggable, events } from './draggable'
 import { boundToArc } from './bound'
+import EventEmitter from './eventEmitter'
 
 const isTouch = 'ontouchstart' in window
 
@@ -42,8 +43,9 @@ function getArrayWithBoundIndexes(index, length) {
   return retIndexes
 }
 
-class Chart {
+class Chart extends EventEmitter {
   constructor (area, elements, options={}) {
+    super(undefined, options)
     const areaRectangle = createRectangleFromElement(area, area)
     this.options = Object.assign({
       center: areaRectangle.getCenter(),
@@ -59,7 +61,6 @@ class Chart {
       isSelectable: false
     }, options)
 
-    this.onDraw = this.options.onDraw || function() {}
     this.area = area
     this.areaRectangle = areaRectangle
     this.init(elements)
@@ -163,7 +164,8 @@ class Chart {
         this.drawLimitImg(index)
       }
     })
-    this.onDraw()
+
+    this.emit('chart:draw')
   }
 
   createClone(element, options = {}) {

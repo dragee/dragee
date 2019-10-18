@@ -46,8 +46,9 @@ function addToDefaultScope(draggable) {
   defaultScope.addDraggable(draggable)
 }
 
-class Draggable {
+class Draggable extends EventEmitter {
   constructor(element, options={}) {
+    super(undefined, options)
     const parent = options.parent || getDefaultParent(element)
     this.targets = []
     this.options = Object.assign({
@@ -64,25 +65,12 @@ class Draggable {
       this.handler = options.handler || element
     }
 
-    this.onEnd = new EventEmitter(this, { isReverse: true, isStopOnTrue: true })
-    this.onMove = new EventEmitter(this)
-    this.onStart = new EventEmitter(this)
+    this.on('drag:end', () => this.move(this.position, 0, true, true))
 
-    this.onEnd.add(() => this.move(this.position, 0, true, true))
-
-    if (options.onEnd) {
-      this.onEnd.add(options.onEnd)
-    }
-    if (options.onMove) {
-      this.onMove.add(options.onMove)
-    }
-    if (options.onStart) {
-      this.onStart.add(options.onStart)
-    }
     this.element = element
     this.bound = this.options.bound
     preventDoubleInit(this)
-    Draggable.onCreate.fire(this)
+    Draggable.emitter.emit('draggable:create', this)
     this.init()
   }
 
@@ -182,7 +170,7 @@ class Draggable {
 
     this._setTranslate(point.sub(this.offset))
     if (!isSilent) {
-      this.onMove.fire()
+      this.emit('drag:move')
     }
   }
 
@@ -244,9 +232,9 @@ class Draggable {
 
     this.isDragging = true
 
-    this.onStart.fire(event)
+    this.emit('drag:start')
     addClass(this.element, 'active')
-    this.onMove.fire(event)
+    this.emit('drag:move')
   }
 
   dragMove(event) {
@@ -280,7 +268,7 @@ class Draggable {
 
     event.stopPropagation()
     event.preventDefault()
-    this.onEnd.fire(event)
+    this.emit('drag:end')
 
     document.removeEventListener(touchEvents.move, this._dragMove)
     document.removeEventListener(mouseEvents.move, this._dragMove)
@@ -311,8 +299,7 @@ class Draggable {
     document.removeEventListener(touchEvents.end, this._dragEnd)
     document.removeEventListener(mouseEvents.end, this._dragEnd)
 
-    this.onEnd.reset()
-    this.onMove.reset()
+    this.resetEmitter()
   }
 
   get enable() {
@@ -330,7 +317,7 @@ class Draggable {
   }
 }
 
-Draggable.onCreate = new EventEmitter(Draggable, { isReverse: true, isStopOnTrue: true })
-Draggable.onCreate.add(addToDefaultScope)
+Draggable.emitter = new EventEmitter(Draggable)
+Draggable.emitter.on('draggable:create', addToDefaultScope)
 
 export { Draggable, events }

@@ -1,5 +1,6 @@
 import { Draggable } from './draggable'
 import { boundToArc } from './bound'
+import EventEmitter from './eventEmitter'
 
 import {
   createRectangleFromElement,
@@ -9,8 +10,9 @@ import {
   normalizeAngle
 } from './geometry/helpers'
 
-class ArcSlider {
+class ArcSlider extends EventEmitter {
   constructor(area, element, options={}) {
+    super(undefined, options)
     const areaRectangle = createRectangleFromElement(area, area)
     const halfSize = getSizeOfElement(element).mult(0.5)
     this.options = Object.assign({
@@ -19,12 +21,10 @@ class ArcSlider {
       startAngle: Math.PI,
       endAngle: 0,
       angles: [Math.PI, -Math.PI / 4, 0, Math.PI / 4, Math.PI / 2],
-      onChange: function() {},
       time: 500
     }, options)
 
     this.shiftedCenter = this.options.center.sub(halfSize)
-    this.onChange = this.options.onChange
     this.area = area
     this.init(element)
   }
@@ -63,7 +63,7 @@ class ArcSlider {
     this.updateAngle()
     //      var angle = Geometry.getNearestAngle(this.options.angles, this.angle);
     //      this.setAngle(angle,this.options.time);
-    this.onChange(this.angle)
+    this.emit('arcslider:change', { angle: this.angle })
   }
 
   setAngle(angle, time) {
@@ -74,7 +74,7 @@ class ArcSlider {
     )
     this.angle = normalizeAngle(angle, position)
     this.draggable.move(position, time||0, true, true)
-    this.onChange(this.angle)
+    this.emit('arcslider:change', { angle: this.angle })
   }
 }
 

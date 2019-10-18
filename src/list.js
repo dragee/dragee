@@ -6,8 +6,9 @@ import {
 } from './geometry/helpers'
 import { Draggable } from './draggable'
 
-class List {
+class List extends EventEmitter {
   constructor(draggables, options={}) {
+    super(undefined, options)
     this.options = Object.assign({
       timeEnd: 200,
       timeExcange: 400,
@@ -18,10 +19,6 @@ class List {
     }, options)
 
     this.draggables = draggables
-    this.onChange = new EventEmitter(this)
-    if (options.onChange) {
-      this.onChange.add(options.onChange)
-    }
     this.init()
   }
 
@@ -39,22 +36,22 @@ class List {
       moveHandler = function() {
         if (draggable.isDragging) {
           list.onStart(draggable)
-          draggable.onMove.remove(moveHandler)
+          draggable.unsubscribe('drag:move', moveHandler)
           return true
         }
       }
 
-      draggable.onEnd.add(() => {
+      draggable.prependOn('drag:end', () => {
         this.onEndDisplaycement(draggable)
-        draggable.onMove.add(moveHandler)
-        return true
+        draggable.on('drag:move', moveHandler)
+        this.stopPropagation()
       })
 
-      draggable.onMove.add(moveHandler)
+      draggable.on('drag:move', moveHandler)
     } else {
-      draggable.onEnd.add(() => {
+      draggable.prependOn('drag:end', () => {
         this.onEnd(draggable)
-        return true
+        this.stopPropagation()
       })
     }
   }
@@ -77,7 +74,7 @@ class List {
     } else {
       this.moveOrSave(this.draggables[excangeIndex], fixPositions[currentIndex], this.options.timeExcange)
       this.draggables[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true)
-      this.onChange.fire()
+      this.emit('list:change')
     }
     return true
   }
@@ -188,8 +185,8 @@ class List {
     }
 
     draggables.forEach((draggable) => {
-      draggable.onEnd.reset()
-      draggable.onMove.reset() //todo remove reset in future
+      draggable.resetOn('drag:end')
+      draggable.resetOn('drag:move')
       removeItem(this.draggables, draggable)
     })
 

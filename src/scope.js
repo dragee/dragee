@@ -5,8 +5,9 @@ import { Target } from './target'
 
 const scopes = []
 
-class Scope {
+class Scope extends EventEmitter {
   constructor(draggables, targets, options={}) {
+    super(undefined, options)
     scopes.forEach((scope) => {
       if (draggables) {
         draggables.forEach((draggable) => {
@@ -28,25 +29,23 @@ class Scope {
       timeEnd: (options.timeEnd) || 400
     }
 
-    this.onChange = new EventEmitter(this)
-    if (options.onChange) {
-      this.onChange.add(options.onChange)
-    }
     this.init()
   }
 
   init() {
     this.draggables.forEach((draggable) => {
-      draggable.onEnd.add(() => {
-        return this.onEnd(draggable)
+      draggable.prependOn('drag:end', () => {
+        this.onEnd(draggable)
+        this.stopPropagation()
       })
     })
   }
 
   addDraggable(draggable) {
     this.draggables.push(draggable)
-    draggable.onEnd.unshift(() => {
-      return this.onEnd(draggable)
+    draggable.prependOn('drag:end', () => {
+      this.onEnd(draggable)
+      this.stopPropagation()
     })
   }
 
@@ -68,8 +67,8 @@ class Scope {
     } else if (draggable.targets.length) {
       draggable.move(draggable.initPosition, this.options.timeEnd, true, true)
     }
-    this.onChange.fire()
-    return true
+
+    this.emit('scope:change')
   }
 
   reset() {
@@ -107,20 +106,22 @@ const defaultScope = new Scope()
 
 function scope(fn) {
   const currentScope = new Scope()
+
   const addDraggableToScope = function(draggable) {
     currentScope.addDraggable(draggable)
-    return true
-  }
-  const addTargetToScope = function(target) {
-    currentScope.addTarget(target)
-    return true
+    this.stopPropagation()
   }
 
-  Draggable.onCreate.add(addDraggableToScope)
-  Target.onCreate.add(addTargetToScope)
+  const addTargetToScope = function(target) {
+    currentScope.addTarget(target)
+    this.stopPropagation()
+  }
+
+  Draggable.emitter.prependOn('draggable:create', addDraggableToScope)
+  Target.emitter.prependOn('target:create', addTargetToScope)
   fn.call()
-  Draggable.onCreate.remove(addDraggableToScope)
-  Target.onCreate.remove(addTargetToScope)
+  Draggable.emitter.unsubscribe('draggable:create', addDraggableToScope)
+  Target.emitter.unsubscribe('target:create', addTargetToScope)
   return currentScope
 }
 
@@ -133,13 +134,8 @@ function scopeFactory(parentElement, draggableElements, targetElements, options=
   draggableElements = Array.prototype.slice.call(draggableElements)
   targetElements = Array.prototype.slice.call(targetElements)
 
-  const draggables = draggableElements.map((element) => {
-    return new Draggable(element, draggableOptions)
-  })
-
-  const targets = targetElements.map((element) => {
-    return new Target(element, draggables, targetOptions)
-  })
+  const draggables = draggableElements.map((element) => new Draggable(element, draggableOptions))
+  const targets = targetElements.map((element) => new Target(element, draggables, targetOptions))
   return new Scope(draggables, targets, scopeOptions)
 }
 
