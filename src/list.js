@@ -1,12 +1,10 @@
 import removeItem from './utils/remove-array-item'
-import Event from './event'
+import EventEmitter from './eventEmitter'
 import {
   getDistance,
   indexOfNearestPoint
 } from './geometry/helpers'
 import { Draggable } from './draggable'
-
-const Dragee = { Event } //todo remove after refactore
 
 class List {
   constructor(draggables, options={}) {
@@ -20,7 +18,7 @@ class List {
     }, options)
 
     this.draggables = draggables
-    this.onChange = new Dragee.Event(this)
+    this.onChange = new EventEmitter(this)
     if (options.onChange) {
       this.onChange.add(options.onChange)
     }

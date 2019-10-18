@@ -1,7 +1,7 @@
 import range from './utils/range.js'
 import removeItem from './utils/remove-array-item'
 import getDefaultParent from './utils/get-default-parent'
-import Event from './event'
+import EventEmitter from './eventEmitter'
 import {
   transformedSpaceDistanceFactory,
   createRectangleFromElement
@@ -9,8 +9,6 @@ import {
 import { scopes, defaultScope } from './scope'
 
 import { FloatLeftStrategy } from './positioning'
-
-const Dragee = { Event }//todo remove after refactore
 
 const addToDefaultScope = function(target) {
   defaultScope.addTarget(target)
@@ -39,9 +37,9 @@ class Target {
     this.element = element
     draggables.forEach((draggable) => draggable.targets.push(target))
     this.draggables = draggables
-    this.onAdd = new Dragee.Event(this)
-    this.beforeAdd = new Dragee.Event(this)
-    this.onRemove = new Dragee.Event(this)
+    this.onAdd = new EventEmitter(this)
+    this.beforeAdd = new EventEmitter(this)
+    this.onRemove = new EventEmitter(this)
 
     if (options.onRemove) {
       this.onRemove.add(options.onRemove)
@@ -235,7 +233,7 @@ class Target {
   }
 }
 
-Target.onCreate = new Dragee.Event(Target, { isReverse: true, isStopOnTrue: true })
+Target.onCreate = new EventEmitter(Target, { isReverse: true, isStopOnTrue: true })
 Target.onCreate.add(addToDefaultScope)
 
 export { Target }

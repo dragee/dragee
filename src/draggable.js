@@ -1,6 +1,6 @@
 import { addClass, removeClass } from './utils/classes'
 import getDefaultParent from './utils/get-default-parent'
-import Event from './event'
+import EventEmitter from './eventEmitter'
 import getStyleProperty from 'desandro-get-style-property'
 import { boundToElement } from './bound'
 import Point from './geometry/point'
@@ -10,8 +10,6 @@ import {
   getSizeOfElement
 } from './geometry/helpers'
 import { defaultScope } from './scope'
-
-const Dragee = { Event } //todo remove after refactore
 
 const isTouch = 'ontouchstart' in window, mouseEvents = {
     start: 'mousedown',
@@ -66,9 +64,9 @@ class Draggable {
       this.handler = options.handler || element
     }
 
-    this.onEnd = new Dragee.Event(this, { isReverse: true, isStopOnTrue: true })
-    this.onMove = new Dragee.Event(this)
-    this.onStart = new Dragee.Event(this)
+    this.onEnd = new EventEmitter(this, { isReverse: true, isStopOnTrue: true })
+    this.onMove = new EventEmitter(this)
+    this.onStart = new EventEmitter(this)
 
     this.onEnd.add(() => this.move(this.position, 0, true, true))
 
@@ -332,7 +330,7 @@ class Draggable {
   }
 }
 
-Draggable.onCreate = new Dragee.Event(Draggable, { isReverse: true, isStopOnTrue: true })
+Draggable.onCreate = new EventEmitter(Draggable, { isReverse: true, isStopOnTrue: true })
 Draggable.onCreate.add(addToDefaultScope)
 
 export { Draggable, events }

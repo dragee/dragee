@@ -1,9 +1,7 @@
 import removeItem from './utils/remove-array-item'
-import Event from './event'
+import EventEmitter from './eventEmitter'
 import { Draggable } from './draggable'
 import { Target } from './target'
-
-const Dragee = { Event } //todo remove after refactore
 
 const scopes = []
 
@@ -30,7 +28,7 @@ class Scope {
       timeEnd: (options.timeEnd) || 400
     }
 
-    this.onChange = new Dragee.Event(this)
+    this.onChange = new EventEmitter(this)
     if (options.onChange) {
       this.onChange.add(options.onChange)
     }
