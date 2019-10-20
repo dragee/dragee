@@ -65,8 +65,6 @@ class Draggable extends EventEmitter {
       this.handler = options.handler || element
     }
 
-    this.on('drag:end', () => this.move(this.position, 0, true, true))
-
     this.element = element
     this.bound = this.options.bound
     preventDoubleInit(this)
@@ -268,6 +266,7 @@ class Draggable extends EventEmitter {
 
     event.stopPropagation()
     event.preventDefault()
+    this.dragEndAction()
     this.emit('drag:end')
 
     document.removeEventListener(touchEvents.move, this._dragMove)
@@ -278,6 +277,10 @@ class Draggable extends EventEmitter {
 
     this.isDragging = false
     removeClass(this.element, 'active')
+  }
+
+  dragEndAction() {
+    this.move(this.position, 0, true, true)
   }
 
   getRectangle() {

@@ -11,21 +11,21 @@ export default class EventEmitter {
   }
 
   emit(eventName) {
-    this.stopped = false
+    this.interrupted = false
     const args = [].slice.call(arguments, 1)
 
     if (!this.events[eventName]) return
 
     for (let i = 0; i < this.events[eventName].length; i++) {
       this.events[eventName][i].apply(this.context, args)
-      if (this.stopped) {
+      if (this.interrupted) {
         return
       }
     }
   }
 
-  stopPropagation() {
-    this.stopped = true
+  interrupt() {
+    this.interrupted = true
   }
 
   on(eventName, fn) {

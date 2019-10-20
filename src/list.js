@@ -37,22 +37,17 @@ class List extends EventEmitter {
         if (draggable.isDragging) {
           list.onStart(draggable)
           draggable.unsubscribe('drag:move', moveHandler)
-          return true
         }
       }
 
-      draggable.prependOn('drag:end', () => {
+      draggable.dragEndAction = () => {
         this.onEndDisplaycement(draggable)
         draggable.on('drag:move', moveHandler)
-        this.stopPropagation()
-      })
+      }
 
       draggable.on('drag:move', moveHandler)
     } else {
-      draggable.prependOn('drag:end', () => {
-        this.onEnd(draggable)
-        this.stopPropagation()
-      })
+      draggable.dragEndAction = () => this.onEnd(draggable)
     }
   }
 

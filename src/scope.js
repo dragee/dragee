@@ -34,19 +34,13 @@ class Scope extends EventEmitter {
 
   init() {
     this.draggables.forEach((draggable) => {
-      draggable.prependOn('drag:end', () => {
-        this.onEnd(draggable)
-        this.stopPropagation()
-      })
+      draggable.dragEndAction = () => this.onEnd(draggable)
     })
   }
 
   addDraggable(draggable) {
     this.draggables.push(draggable)
-    draggable.prependOn('drag:end', () => {
-      this.onEnd(draggable)
-      this.stopPropagation()
-    })
+    draggable.dragEndAction = () => this.onEnd(draggable)
   }
 
   addTarget(target) {
@@ -109,12 +103,12 @@ function scope(fn) {
 
   const addDraggableToScope = function(draggable) {
     currentScope.addDraggable(draggable)
-    this.stopPropagation()
+    Draggable.emitter.interrupt()
   }
 
   const addTargetToScope = function(target) {
     currentScope.addTarget(target)
-    this.stopPropagation()
+    Draggable.emitter.interrupt()
   }
 
   Draggable.emitter.prependOn('draggable:create', addDraggableToScope)

@@ -15,10 +15,7 @@ class ListSwitcher extends List {
   init() {
     this.draggables.forEach((draggable) => {
       draggable.isOn = false
-      draggable.prependOn('end', () => {
-        this.onEnd(draggable)
-        this.stopPropagation()
-      })
+      draggable.dragEndAction = () => this.onEnd(draggable)
     })
   }
 

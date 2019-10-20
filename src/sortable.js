@@ -17,10 +17,9 @@ class Sortable extends List {
       }
     })
 
-    draggable.prependOn('drag:end', () => {
+    draggable.dragEndAction = () => {
       draggable.move(draggable.fixPosition, this.options.timeEnd)
-      this.stopPropagation()
-    })
+    }
   }
 
   exchangeDraggableIfPossible(draggable) {
