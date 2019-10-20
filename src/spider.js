@@ -1,9 +1,10 @@
 import createCanvas from './utils/create-canvas'
 import {
   createRectangleFromElement,
-  getSizeOfElement,
-  getPointFromRadialSystem
+  getSizeOfElement
 } from './geometry/helpers'
+
+import { getPointFromRadialSystem } from './geometry/angles'
 import { boundToLine } from './bound'
 import { Draggable } from './draggable'
 

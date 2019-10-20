@@ -4,11 +4,14 @@ import EventEmitter from './eventEmitter'
 
 import {
   createRectangleFromElement,
-  getSizeOfElement,
+  getSizeOfElement
+} from './geometry/helpers'
+
+import {
   getPointFromRadialSystem,
   getAngle,
   normalizeAngle
-} from './geometry/helpers'
+} from './geometry/angles'
 
 class ArcSlider extends EventEmitter {
   constructor(area, element, options={}) {

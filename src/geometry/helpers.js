@@ -101,48 +101,46 @@ export function boundToLine(A, B, P) {
   return new Point(A.x + AB.x * t, A.y + AB.y * t)
 }
 
-export function getPointInLine(LP1, LP2, percent) {
+export function getPointOnLine(LP1, LP2, percent) {
   const dx = LP2.x - LP1.x, dy = LP2.y - LP1.y
   return new Point(LP1.x + percent * dx, LP1.y + percent * dy)
 }
 
-export function getPointInLineByLenght(LP1, LP2, lenght) {
-  const dx = LP2.x - LP1.x, dy = LP2.y - LP1.y, percent = lenght / getDistance(LP1, LP2)
+export function getPointOnLineByLenght(LP1, LP2, lenght) {
+  const dx = LP2.x - LP1.x
+  const dy = LP2.y - LP1.y
+  const percent = lenght / getDistance(LP1, LP2)
   return new Point(LP1.x + percent * dx, LP1.y + percent * dy)
 }
 
-export function createRectangleFromElement(el, parent, isContentBoxSize, isConsiderTranslate) {
-  const size = getSizeOfElement(el, isContentBoxSize)
-  return new Rectangle(getOffset(el, parent || el.parentNode, isConsiderTranslate), size)
+export function createRectangleFromElement(element, parent, isContentBoxSize, isConsiderTranslate) {
+  const size = getSizeOfElement(element, isContentBoxSize)
+  return new Rectangle(getOffset(element, parent || element.parentNode, isConsiderTranslate), size)
 }
 
-export function getSumValueOfStyleRule(element, rules) {
+export function getSumValueOfStyleRules(element, rules) {
   return rules.reduce((sum, rule) => {
     return sum + parseInt(window.getComputedStyle(element)[rule]||0)
   }, 0)
 }
 
-export function getSizeOfElement(el, isContentBoxSize) {
-  let width = parseInt(window.getComputedStyle(el)['width']), height = parseInt(window.getComputedStyle(el)['height'])
+export function getSizeOfElement(element, isContentBoxSize) {
+  let width = parseInt(window.getComputedStyle(element)['width'])
+  let height = parseInt(window.getComputedStyle(element)['height'])
   if (!isContentBoxSize) {
-    width += getSumValueOfStyleRule(el, ['padding-left', 'padding-right', 'border-left-width', 'border-right-width'])
-    height += getSumValueOfStyleRule(el, ['padding-top', 'padding-bottom', 'border-top-width', 'border-bottom-width'])
+    width += getSumValueOfStyleRules(element, ['padding-left', 'padding-right', 'border-left-width', 'border-right-width'])
+    height += getSumValueOfStyleRules(element, ['padding-top', 'padding-bottom', 'border-top-width', 'border-bottom-width'])
   }
   return new Point(width, height)
 }
 
-export function getOffset(el, parent) {
-  const elRect = el.getBoundingClientRect()
+export function getOffset(element, parent) {
+  const elementRect = element.getBoundingClientRect()
   const parentRect = parent.getBoundingClientRect()
   return new Point(
-    elRect.left - parentRect.left,
-    elRect.top - parentRect.top
+    elementRect.left - parentRect.left,
+    elementRect.top - parentRect.top
   )
-}
-
-export function getPointFromRadialSystem(angle, length, center) {
-  center = center || new Point(0, 0)
-  return center.add(new Point(length * Math.cos(angle), length * Math.sin(angle)))
 }
 
 export function addPointToBoundPoints(boundpoints, point, isRight) {
@@ -158,62 +156,4 @@ export function addPointToBoundPoints(boundpoints, point, isRight) {
   }
   result.push(point)
   return result
-}
-
-export function getAngle(p1, p2) {
-  const diff = p2.sub(p1)
-  return normalizeAngle(Math.atan2(diff.y, diff.x))
-}
-
-export function toRadian(angle) {
-  return ((angle % 360) * Math.PI / 180)
-}
-
-export function toDegree(angle) {
-  return (angle * 180 / Math.PI) % 360
-}
-
-export function boundAngle(min, max, val) {
-  let dmin, dmax
-  if (min < max && val > min && val < max) {
-    return val
-  } else if (max < min && (val < max || val > min)) {
-    return val
-  } else {
-    dmin = getAngleDiff(min, val)
-    dmax = getAngleDiff(max, val)
-    if (dmin < dmax) {
-      return min
-    } else {
-      return max
-    }
-  }
-}
-
-export function getNearestAngle(arr, angle) {
-  let i, temp, diff = Math.PI * 2, value
-  for (i = 0; i < arr.length;i++) {
-    temp = getAngleDiff(arr[i], angle)
-    if (diff < temp) {
-      diff = temp
-      value = arr[i]
-    }
-  }
-  return value
-}
-
-export function getAngleDiff(alpha, beta) {
-  const minAngle = Math.min(alpha, beta),
-    maxAngle =  Math.max(alpha, beta)
-  return Math.min(maxAngle - minAngle, minAngle + Math.PI*2 - maxAngle)
-}
-
-export function normalizeAngle(val) {
-  while (val < 0) {
-    val += 2 * Math.PI
-  }
-  while (val > 2 * Math.PI) {
-    val -= 2 * Math.PI
-  }
-  return val
 }

@@ -4,14 +4,18 @@ import Point from './geometry/point'
 import {
   createRectangleFromElement,
   getSizeOfElement,
-  toRadian,
-  getPointFromRadialSystem,
   getOffset,
-  getAngle,
-  normalizeAngle,
   getDistance
 
 } from './geometry/helpers'
+
+import {
+  toRadian,
+  getPointFromRadialSystem,
+  getAngle,
+  normalizeAngle
+} from './geometry/angles'
+
 import { Draggable, events } from './draggable'
 import { boundToArc } from './bound'
 import EventEmitter from './eventEmitter'

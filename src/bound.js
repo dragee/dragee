@@ -1,14 +1,17 @@
 import Point from './geometry/point'
 import {
   createRectangleFromElement,
-  getPointInLineByLenght,
+  getPointOnLineByLenght,
   directCrossing,
-  boundToLine as boundToLineHelper,
+  boundToLine as boundToLineHelper
+} from './geometry/helpers'
+
+import {
   getAngle,
   normalizeAngle,
   boundAngle,
   getPointFromRadialSystem
-} from './geometry/helpers'
+} from './geometry/angles'
 
 export function boundToRectangle(rectangle) {
   return function(point, size) {
@@ -83,8 +86,8 @@ export function boundToLine(start, end) {
     sinBeta = Math.sin(beta)
 
   return function(point, size) {
-    const point2 = new Point(point.x + someK * cosBeta, point.y + someK * sinBeta),
-      newEnd = getPointInLineByLenght(end, start, size.x)
+    const point2 = new Point(point.x + someK * cosBeta, point.y + someK * sinBeta)
+    const newEnd = getPointOnLineByLenght(end, start, size.x)
     let pointCrossing = directCrossing(start, end, point, point2)
 
     pointCrossing = boundToLineHelper(start, newEnd, pointCrossing)
@@ -94,7 +97,7 @@ export function boundToLine(start, end) {
 
 export function boundToCircle(center, radius) {
   return function(point, _size) {
-    const boundedPoint = getPointInLineByLenght(center, point, radius)
+    const boundedPoint = getPointOnLineByLenght(center, point, radius)
     return boundedPoint
   }
 }
