@@ -6,10 +6,6 @@ export function getDistance(p1, p2) {
   return Math.sqrt(dx * dx + dy * dy)
 }
 
-export function distance(p1, p2) {
-  return getDistance(p1, p2)
-}
-
 export function getXDifference(p1, p2) {
   return Math.abs(p1.x - p2.x)
 }
@@ -117,7 +113,7 @@ export function getPointInLine(LP1, LP2, percent) {
 }
 
 export function getPointInLineByLenght(LP1, LP2, lenght) {
-  const dx = LP2.x - LP1.x, dy = LP2.y - LP1.y, percent = lenght / distance(LP1, LP2)
+  const dx = LP2.x - LP1.x, dy = LP2.y - LP1.y, percent = lenght / getDistance(LP1, LP2)
   return new Point(LP1.x + percent * dx, LP1.y + percent * dy)
 }
 
