@@ -71,9 +71,7 @@ class FloatLeftStrategy extends BasicStrategy {
     this.yGapBetweenDraggables = options.yGapBetweenDraggables || 0
 
     this.getDistance = options.getDistance || getDistance
-    this.getPosition = options.getPosition || ((draggable) => {
-      return draggable.position
-    })
+    this.getPosition = options.getPosition || ((draggable) => draggable.position)
   }
 
   positioning(rectangleList, _indexesOfNews) {

@@ -43,14 +43,8 @@ export function indexOfNearestPoint(arr, val, radius, getDistanceFunc) {
   return index
 }
 
-export function bound(min, max, val) {
+export function clamp(min, max, val) {
   return Math.max(min, Math.min(max, val))
-}
-
-export function boundPoint(min, max, val) {
-  const x = Math.max(min.x, Math.min(max.x, val.x))
-  const y = Math.max(min.y, Math.min(max.y, val.y))
-  return new Point(x, y)
 }
 
 //Return crossing point of two lines
@@ -83,13 +77,13 @@ export function directCrossing(L1P1, L1P2, L2P1, L2P2) {
 
 export function boundToSegment(LP1, LP2, P) {
   let x, y
-  x = bound(Math.min(LP1.x, LP2.x), Math.max(LP1.x, LP2.x), P.x)
+  x = clamp(Math.min(LP1.x, LP2.x), Math.max(LP1.x, LP2.x), P.x)
   if (x !== P.x) {
     y = (x === LP1.x) ? LP1.y : LP2.y
     P = new Point(x, y)
   }
 
-  y = bound(Math.min(LP1.y, LP2.y), Math.max(LP1.y, LP2.y), P.y)
+  y = clamp(Math.min(LP1.y, LP2.y), Math.max(LP1.y, LP2.y), P.y)
   if (y !== P.y) {
     x = (y === LP1.y) ? LP1.x : LP2.x
     P = new Point(x, y)
