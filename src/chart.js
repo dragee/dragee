@@ -17,7 +17,7 @@ import {
 } from './geometry/angles'
 
 import { Draggable, events } from './draggable'
-import { boundToArc } from './bound'
+import { BoundToArc } from './bounding'
 import EventEmitter from './eventEmitter'
 
 const isTouch = 'ontouchstart' in window
@@ -81,16 +81,15 @@ class Chart extends EventEmitter {
         this.options.touchRadius,
         this.options.center.sub(halfSize)
       )
-      const bound = boundToArc(
-        this.options.center.sub(halfSize),
-        this.options.touchRadius,
-        this.getBoundAngle(i, false),
-        this.getBoundAngle(i, true)
-      )
 
       return new Draggable(element, {
         parent: this.area,
-        bound: bound,
+        boundary: new BoundToArc(
+          this.options.center.sub(halfSize),
+          this.options.touchRadius,
+          this.getBoundAngle(i, false),
+          this.getBoundAngle(i, true)
+        ),
         position: position,
         on: {
           'drag:move': () => this.draw()

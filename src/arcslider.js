@@ -1,5 +1,5 @@
 import { Draggable } from './draggable'
-import { boundToArc } from './bound'
+import { BoundToArc } from './bounding'
 import EventEmitter from './eventEmitter'
 
 import {
@@ -39,17 +39,16 @@ class ArcSlider extends EventEmitter {
       this.options.radius,
       this.shiftedCenter
     )
-    const bound = boundToArc(
-      this.shiftedCenter,
-      this.options.radius,
-      this.options.startAngle,
-      this.options.endAngle
-    )
 
     this.angle = angle
     this.draggable = new Draggable(element, {
       parent: this.area,
-      bound: bound,
+      boundary: new BoundToArc(
+        this.shiftedCenter,
+        this.options.radius,
+        this.options.startAngle,
+        this.options.endAngle
+      ),
       position: position,
       on: {
         'drag:move': () => this.change()

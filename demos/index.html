@@ -196,7 +196,7 @@
                           draggableRadius = 25;
 
                       new Dragee.Draggable(draggableAElement, {
-                          bound: Dragee.bound.toCircle(new Dragee.Point(100, 90), 80),
+                          bounding: new Dragee.bound.BoundToCircle(new Dragee.Point(100, 90), 80),
                           position: new Dragee.Point(100, 10)
                       });
 
@@ -212,7 +212,9 @@
                       }
 
                       new Dragee.Draggable(draggableBElement, {
-                          bound: calculusBound,
+                          bounding: {
+                            bound: calculusBound
+                          },
                           position: new Dragee.Point(210, calculusFx(210))
                       });
 

@@ -5,7 +5,7 @@ import {
 } from './geometry/helpers'
 
 import { getPointFromRadialSystem } from './geometry/angles'
-import { boundToLine } from './bound'
+import { BoundToLine } from './bounding'
 import { Draggable } from './draggable'
 
 class Spider {
@@ -36,11 +36,10 @@ class Spider {
       const halfSize = getSizeOfElement(element).mult(0.5)
       const start = getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize)
       const end = getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize)
-      const bound = boundToLine(start, end)
 
       return new Draggable(element, {
         parent: this.area,
-        bound: bound,
+        boundary: new BoundToLine(start, end),
         position: start,
         on: {
           'drag:move': () => this.draw()

@@ -2,7 +2,7 @@ import { addClass, removeClass } from './utils/classes'
 import getDefaultParent from './utils/get-default-parent'
 import EventEmitter from './eventEmitter'
 import getStyleProperty from 'desandro-get-style-property'
-import { boundToElement } from './bound'
+import { BoundToElement } from './bounding'
 import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 import {
@@ -53,7 +53,7 @@ class Draggable extends EventEmitter {
     this.targets = []
     this.options = Object.assign({
       parent: parent,
-      bound: boundToElement(parent, parent),
+      bounding: new BoundToElement(parent, parent),
       startFilter: false,
       isContentBoxSize: false,
       position: false
@@ -66,7 +66,7 @@ class Draggable extends EventEmitter {
     }
 
     this.element = element
-    this.bound = this.options.bound
+    this.bounding = this.options.bounding
     preventDoubleInit(this)
     Draggable.emitter.emit('draggable:create', this)
     this.init()
@@ -90,8 +90,8 @@ class Draggable extends EventEmitter {
     this.handler.addEventListener(touchEvents.start, this._dragStart)
     this.handler.addEventListener(mouseEvents.start, this._dragStart)
 
-    if (this.bound.refresh) {
-      this.bound.refresh()
+    if (this.bounding.refresh) {
+      this.bounding.refresh()
     }
   }
 
@@ -106,8 +106,8 @@ class Draggable extends EventEmitter {
       this.initPosition = this.offset
     }
 
-    if (this.bound.refresh) {
-      this.bound.refresh()
+    if (this.bounding.refresh) {
+      this.bounding.refresh()
     }
   }
 
@@ -250,9 +250,13 @@ class Draggable extends EventEmitter {
 
     event.stopPropagation()
     event.preventDefault()
-    const touchPoint = new Point(isTouchEvent ? touch.pageX : event.clientX, isTouchEvent ? touch.pageY : event.clientY)
+    const touchPoint = new Point(
+      isTouchEvent ? touch.pageX : event.clientX,
+      isTouchEvent ? touch.pageY : event.clientY
+    )
+
     let point = this._startPosition.add(touchPoint.sub(this._startTouchPoint))
-    point = this.bound(point, this.getSize())
+    point = this.bounding.bound(point, this.getSize())
     this.touchPoint = touchPoint
     this.move(point, 0)
   }
@@ -289,8 +293,8 @@ class Draggable extends EventEmitter {
 
   refresh() {
     this.getSize(true)
-    if (this.bound.refresh) {
-      this.bound.refresh()
+    if (this.bounding.refresh) {
+      this.bounding.refresh()
     }
   }
 

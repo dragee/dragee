@@ -12,23 +12,23 @@ import { ArcSlider } from './arcslider'
 import { Chart } from './chart'
 import { listSwitcherFactory, ListSwitcher } from './listswitcher'
 import {
-  boundToRectangle,
-  boundToElement,
-  boundToLineX,
-  boundToLineY,
-  boundToLine,
-  boundToCircle,
-  boundToArc
-} from './bound'
+  BoundToRectangle,
+  BoundToElement,
+  BoundToLineX,
+  BoundToLineY,
+  BoundToLine,
+  BoundToCircle,
+  BoundToArc
+} from './bounding'
 
 const bound = {
-  toRectangle: boundToRectangle,
-  toElement: boundToElement,
-  toLineX: boundToLineX,
-  toLineY: boundToLineY,
-  toLine: boundToLine,
-  toCircle: boundToCircle,
-  toArc: boundToArc
+  BoundToRectangle,
+  BoundToElement,
+  BoundToLineX,
+  BoundToLineY,
+  BoundToLine,
+  BoundToCircle,
+  BoundToArc
 }
 
 export {
