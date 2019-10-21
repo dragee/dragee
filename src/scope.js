@@ -119,18 +119,4 @@ function scope(fn) {
   return currentScope
 }
 
-function scopeFactory(parentElement, draggableElements, targetElements, options={}) {
-  const draggableOptions = options.draggable || {}
-  const targetOptions = options.target || {}
-  const scopeOptions = options.scope || {}
-  draggableOptions.parent = draggableOptions.parent || parentElement
-  targetOptions.parent = targetOptions.parent || parentElement
-  draggableElements = Array.prototype.slice.call(draggableElements)
-  targetElements = Array.prototype.slice.call(targetElements)
-
-  const draggables = draggableElements.map((element) => new Draggable(element, draggableOptions))
-  const targets = targetElements.map((element) => new Target(element, draggables, targetOptions))
-  return new Scope(draggables, targets, scopeOptions)
-}
-
-export { scopes, defaultScope, Scope, scopeFactory, scope }
+export { scopes, defaultScope, Scope, scope }

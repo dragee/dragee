@@ -6,7 +6,7 @@ import {
 } from './geometry/helpers'
 import { Draggable } from './draggable'
 
-class List extends EventEmitter {
+export default class List extends EventEmitter {
   constructor(draggables, options={}) {
     super(undefined, options)
     this.options = Object.assign({
@@ -232,19 +232,14 @@ class List extends EventEmitter {
       draggable.enable = enable
     })
   }
+
+  static factory(parentElement, elements, options={}) {
+    elements = Array.prototype.slice.call(elements)
+    const draggables = elements.map((element) => {
+      return new Draggable(element, Object.assign({
+        parent: parentElement
+      }, options.draggable || {}))
+    })
+    return new List(draggables, options.list || {})
+  }
 }
-
-function listFactory(parentElement, elements, options={}) {
-  const draggableOptions = options.draggable || {}
-  const listOptions = options.list || {}
-  draggableOptions.parent = draggableOptions.parent || parentElement
-  elements = Array.prototype.slice.call(elements)
-
-  const draggables = elements.map((element) => {
-    return new Draggable(element, draggableOptions)
-  })
-
-  return new List(draggables, listOptions)
-}
-
-export { List, listFactory }

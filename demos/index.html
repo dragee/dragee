@@ -325,9 +325,8 @@
                             listBParentElement = root.getElementsByClassName("list-b")[0],
                             listBElements = listBParentElement.getElementsByTagName("li");
 
-                        listA = new Dragee.sortableFactory(listAParentElement, listAElements);
-
-                        listB = new Dragee.listFactory(listBParentElement, listBElements);
+                        listA = Dragee.Sortable.factory(listAParentElement, listAElements);
+                        listB = Dragee.List.factory(listBParentElement, listBElements);
                     });
                 </script>
             </div>

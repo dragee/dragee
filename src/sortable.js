@@ -1,8 +1,8 @@
-import { List } from './list'
+import List from './list'
 import { getYDifference } from './geometry/helpers'
 import { Draggable } from './draggable'
 
-class Sortable extends List {
+export default class Sortable extends List {
   constructor(draggables, options={}) {
     options.getDistance = options.getDistance || getYDifference
     super(draggables, options)
@@ -48,19 +48,14 @@ class Sortable extends List {
       }
     }
   }
+
+  static factory(parentElement, elements, options={}) {
+    elements = Array.prototype.slice.call(elements)
+    const draggables = elements.map((element) => {
+      return new Draggable(element, Object.assign({
+        parent: parentElement
+      }, options.draggable || {}))
+    })
+    return new Sortable(draggables, options.list || {})
+  }
 }
-
-function sortableFactory(parentElement, elements, options={}) {
-  const draggableOptions = options.draggable || {}
-  const listOptions = options.list || {}
-  draggableOptions.parent = draggableOptions.parent || parentElement
-  elements = Array.prototype.slice.call(elements)
-
-  const draggables = elements.map((element) => {
-    return new Draggable(element, draggableOptions)
-  })
-
-  return new Sortable(draggables, listOptions)
-}
-
-export { Sortable, sortableFactory }

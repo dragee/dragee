@@ -2,15 +2,15 @@ import './expandnative'
 import Point from './geometry/point'
 import Rectangle from './geometry/point'
 import { Draggable } from './draggable'
-import { List, listFactory } from './list'
-import { Sortable, sortableFactory } from './sortable'
+import List from './list'
+import Sortable from './sortable'
+import ListSwitcher from './listswitcher'
 import { Target } from './target'
-import { scopes, defaultScope, Scope, scopeFactory, scope } from './scope'
+import { scopes, defaultScope, Scope, scope } from './scope'
 import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './positioning'
 import { Spider } from './spider'
 import { ArcSlider } from './arcslider'
 import { Chart } from './chart'
-import { listSwitcherFactory, ListSwitcher } from './listswitcher'
 import {
   BoundToRectangle,
   BoundToElement,
@@ -34,14 +34,12 @@ const bound = {
 export {
   Draggable,
   Point, Rectangle,
-  List, listFactory,
-  Sortable, sortableFactory,
+  List, ListSwitcher, Sortable,
   Target,
-  scopes, defaultScope, Scope, scopeFactory, scope,
+  scopes, defaultScope, Scope, scope,
   NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy,
   Spider,
   ArcSlider,
   Chart,
-  listSwitcherFactory, ListSwitcher,
   bound
 }

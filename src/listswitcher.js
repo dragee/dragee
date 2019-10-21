@@ -4,9 +4,9 @@ import {
   getXDifference
 } from './geometry/helpers'
 import { Draggable } from './draggable'
-import { List } from './list'
+import List from './list'
 
-class ListSwitcher extends List {
+export default class ListSwitcher extends List {
   constructor(draggables, options={}) {
     options.stepOn = options.stepOn || new Point(-50, 0)
     super(draggables, options)
@@ -100,19 +100,14 @@ class ListSwitcher extends List {
       throw message
     }
   }
+
+  static factory(parentElement, elements, options={}) {
+    elements = Array.prototype.slice.call(elements)
+    const draggables = elements.map((element) => {
+      return new Draggable(element, Object.assign({
+        parent: parentElement
+      }, options.draggable || {}))
+    })
+    return new ListSwitcher(draggables, options.list || {})
+  }
 }
-
-function listSwitcherFactory(element, draggableElements, options={}) {
-  const draggableOptions = options.draggable || {}
-  const listOptions = options.list || {}
-
-  draggableOptions.parent = draggableOptions.parent || element
-  draggableElements = Array.prototype.slice.call(draggableElements)
-
-  const draggables = draggableElements.map((element) => {
-    return new Draggable(element, draggableOptions)
-  })
-  return new ListSwitcher(draggables, listOptions)
-}
-
-export { listSwitcherFactory, ListSwitcher }
