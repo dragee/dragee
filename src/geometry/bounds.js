@@ -1,47 +1,5 @@
 import Point from './point'
-import Rectangle from './rectangle'
-
-export function getDistance(p1, p2) {
-  const dx = p1.x - p2.x, dy = p1.y - p2.y
-  return Math.sqrt(dx * dx + dy * dy)
-}
-
-export function getXDifference(p1, p2) {
-  return Math.abs(p1.x - p2.x)
-}
-
-export function getYDifference(p1, p2) {
-  return Math.abs(p1.y - p2.y)
-}
-
-export function transformedSpaceDistanceFactory(options) {
-  return (p1, p2) => {
-    return Math.sqrt(
-      Math.pow(options.x * Math.abs(p1.x - p2.x), 2) +
-      Math.pow(options.y * Math.abs(p1.y - p2.y), 2)
-    )
-  }
-}
-
-export function indexOfNearestPoint(arr, val, radius, getDistanceFunc) {
-  let size, index = 0, i, temp
-  getDistanceFunc = getDistanceFunc || getDistance
-  if (arr.length === 0) {
-    return -1
-  }
-  size = getDistanceFunc(arr[0], val)
-  for (i = 0; i < arr.length; i++) {
-    temp = getDistanceFunc(arr[i], val)
-    if (temp < size) {
-      size = temp
-      index = i
-    }
-  }
-  if (radius >= 0 && size > radius) {
-    return -1
-  }
-  return index
-}
+import { getDistance } from './distances'
 
 export function clamp(min, max, val) {
   return Math.max(min, Math.min(max, val))
@@ -111,36 +69,6 @@ export function getPointOnLineByLenght(LP1, LP2, lenght) {
   const dy = LP2.y - LP1.y
   const percent = lenght / getDistance(LP1, LP2)
   return new Point(LP1.x + percent * dx, LP1.y + percent * dy)
-}
-
-export function createRectangleFromElement(element, parent, isContentBoxSize, isConsiderTranslate) {
-  const size = getSizeOfElement(element, isContentBoxSize)
-  return new Rectangle(getOffset(element, parent || element.parentNode, isConsiderTranslate), size)
-}
-
-export function getSumValueOfStyleRules(element, rules) {
-  return rules.reduce((sum, rule) => {
-    return sum + parseInt(window.getComputedStyle(element)[rule]||0)
-  }, 0)
-}
-
-export function getSizeOfElement(element, isContentBoxSize) {
-  let width = parseInt(window.getComputedStyle(element)['width'])
-  let height = parseInt(window.getComputedStyle(element)['height'])
-  if (!isContentBoxSize) {
-    width += getSumValueOfStyleRules(element, ['padding-left', 'padding-right', 'border-left-width', 'border-right-width'])
-    height += getSumValueOfStyleRules(element, ['padding-top', 'padding-bottom', 'border-top-width', 'border-bottom-width'])
-  }
-  return new Point(width, height)
-}
-
-export function getOffset(element, parent) {
-  const elementRect = element.getBoundingClientRect()
-  const parentRect = parent.getBoundingClientRect()
-  return new Point(
-    elementRect.left - parentRect.left,
-    elementRect.top - parentRect.top
-  )
 }
 
 export function addPointToBoundPoints(boundpoints, point, isRight) {

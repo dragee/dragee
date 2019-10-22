@@ -1,9 +1,10 @@
 import Point from './geometry/point'
+import { addPointToBoundPoints } from './geometry/bounds'
+
 import {
-  getDistance,
-  addPointToBoundPoints,
-  indexOfNearestPoint
-} from './geometry/helpers'
+  indexOfNearestPoint,
+  getDistance
+} from './geometry/distances'
 
 class BasicStrategy {
   constructor(rectangle, options={}) {

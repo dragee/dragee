@@ -3,7 +3,8 @@ import EventEmitter from './eventEmitter'
 import {
   getDistance,
   indexOfNearestPoint
-} from './geometry/helpers'
+} from './geometry/distances'
+
 import { Draggable } from './draggable'
 
 export default class List extends EventEmitter {

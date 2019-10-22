@@ -5,10 +5,6 @@ import getStyleProperty from 'desandro-get-style-property'
 import { BoundToElement } from './bounding'
 import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
-import {
-  getOffset,
-  getSizeOfElement
-} from './geometry/helpers'
 import { defaultScope } from './scope'
 
 const isTouch = 'ontouchstart' in window, mouseEvents = {
@@ -73,7 +69,7 @@ class Draggable extends EventEmitter {
 
   init() {
     this._enable = true
-    this.offset = getOffset(this.element, this.options.parent, true)
+    this.offset = Rectangle.getElementOffset(this.element, this.options.parent, true)
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
@@ -92,7 +88,7 @@ class Draggable extends EventEmitter {
   }
 
   reinit() {
-    this.offset = getOffset(this.element, this.options.parent, true)
+    this.offset = Rectangle.getElementOffset(this.element, this.options.parent, true)
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
@@ -104,7 +100,7 @@ class Draggable extends EventEmitter {
   }
 
   getSize(_recalulate) {
-    return getSizeOfElement(this.element, this.options.isContentBoxSize)
+    return Rectangle.getElementSize(this.element, this.options.isContentBoxSize)
   }
 
   getPosition() {

@@ -2,11 +2,7 @@ import { Draggable } from './draggable'
 import { BoundToArc } from './bounding'
 import EventEmitter from './eventEmitter'
 
-import {
-  createRectangleFromElement,
-  getSizeOfElement
-} from './geometry/helpers'
-
+import Rectangle from './geometry/rectangle'
 import {
   getPointFromRadialSystem,
   getAngle,
@@ -16,8 +12,8 @@ import {
 class ArcSlider extends EventEmitter {
   constructor(area, element, options={}) {
     super(undefined, options)
-    const areaRectangle = createRectangleFromElement(area, area)
-    const halfSize = getSizeOfElement(element).mult(0.5)
+    const areaRectangle = Rectangle.fromElement(area, area)
+    const halfSize = areaRectangle.size.mult(0.5)
     this.options = Object.assign({
       center: areaRectangle.getCenter(),
       radius: areaRectangle.getMinSide() / 2,

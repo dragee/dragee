@@ -1,13 +1,9 @@
 import createCanvas from './utils/create-canvas'
 import range from './utils/range'
 import Point from './geometry/point'
-import {
-  createRectangleFromElement,
-  getSizeOfElement,
-  getOffset,
-  getDistance
+import Rectangle from './geometry/rectangle'
 
-} from './geometry/helpers'
+import { getDistance } from './geometry/distances'
 
 import {
   toRadian,
@@ -50,7 +46,7 @@ function getArrayWithBoundIndexes(index, length) {
 class Chart extends EventEmitter {
   constructor (area, elements, options={}) {
     super(undefined, options)
-    const areaRectangle = createRectangleFromElement(area, area)
+    const areaRectangle = Rectangle.fromElement(area, area)
     this.options = Object.assign({
       center: areaRectangle.getCenter(),
       radius: areaRectangle.getMinSide() / 2,
@@ -75,7 +71,7 @@ class Chart extends EventEmitter {
     this.context = this.canvas.getContext('2d')
     this.draggables = elements.map((element, i) => {
       const angle = this.options.initAngles[i]
-      const halfSize = getSizeOfElement(element).mult(0.5)
+      const halfSize = Rectangle.getElementSize(element).mult(0.5)
       const position = getPointFromRadialSystem(
         angle,
         this.options.touchRadius,
@@ -114,7 +110,7 @@ class Chart extends EventEmitter {
       )
 
       if (!this.canvasOffset) {
-        this.canvasOffset = getOffset(this.canvas)
+        this.canvasOffset = Rectangle.getElementOffset(this.canvas)
       }
 
       point = point.sub(this.canvasOffset)
@@ -174,7 +170,7 @@ class Chart extends EventEmitter {
     if (!this.isInit) {
       return
     }
-    const rectangle = createRectangleFromElement(element, element)
+    const rectangle = Rectangle.fromElement(element, element)
     const opts = Object.assign({
       center: rectangle.getCenter(),
       radius: rectangle.getMinSide() / 2,

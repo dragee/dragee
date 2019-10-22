@@ -2,10 +2,8 @@ import range from './utils/range.js'
 import removeItem from './utils/remove-array-item'
 import getDefaultParent from './utils/get-default-parent'
 import EventEmitter from './eventEmitter'
-import {
-  transformedSpaceDistanceFactory,
-  createRectangleFromElement
-} from './geometry/helpers'
+import Rectangle from './geometry/rectangle'
+import { transformedSpaceDistanceFactory } from './geometry/distances'
 import { scopes, defaultScope } from './scope'
 
 import { FloatLeftStrategy } from './positioning'
@@ -77,7 +75,7 @@ class Target extends EventEmitter {
   }
 
   getRectangle() {
-    return createRectangleFromElement(
+    return Rectangle.fromElement(
       this.element,
       this.options.parent,
       this.options.isContentBoxSize,

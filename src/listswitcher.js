@@ -2,7 +2,7 @@ import Point from './geometry/point'
 import {
   indexOfNearestPoint,
   getXDifference
-} from './geometry/helpers'
+} from './geometry/distances'
 import { Draggable } from './draggable'
 import List from './list'
 

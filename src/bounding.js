@@ -1,10 +1,10 @@
 import Point from './geometry/point'
+import Rectangle from './geometry/rectangle'
 import {
-  createRectangleFromElement,
   getPointOnLineByLenght,
   directCrossing,
   boundToLine
-} from './geometry/helpers'
+} from './geometry/bounds'
 
 import {
   getAngle,
@@ -52,13 +52,13 @@ export class BoundToRectangle extends Bound {
 
 export class BoundToElement extends BoundToRectangle {
   constructor(element, parent) {
-    super(createRectangleFromElement(element, parent))
+    super(Rectangle.fromElement(element, parent))
     this.element = element
     this.parent = parent
   }
 
   refresh () {
-    this.rectangle = createRectangleFromElement(this.element, this.parent)
+    this.rectangle = Rectangle.fromElement(this.element, this.parent)
   }
 }
 

@@ -1,5 +1,11 @@
 import Point from './point'
 
+function getSumValueOfStyleRules(element, rules) {
+  return rules.reduce((sum, rule) => {
+    return sum + parseInt(window.getComputedStyle(element)[rule]||0)
+  }, 0)
+}
+
 export default class Rectangle {
   constructor(position, size) {
     this.position = position
@@ -87,5 +93,30 @@ export default class Rectangle {
 
   getMinSide() {
     return Math.min(this.size.x, this.size.y)
+  }
+
+  static fromElement(element, parent=undefined, isContentBoxSize=false, isConsiderTranslate=false) {
+    const position = Rectangle.getElementOffset(element, parent || element.parentNode, isConsiderTranslate)
+    const size = Rectangle.getElementSize(element, isContentBoxSize)
+    return new Rectangle(position, size)
+  }
+
+  static getElementOffset(element, parent) {
+    const elementRect = element.getBoundingClientRect()
+    const parentRect = parent.getBoundingClientRect()
+    return new Point(
+      elementRect.left - parentRect.left,
+      elementRect.top - parentRect.top
+    )
+  }
+
+  static getElementSize(element, isContentBoxSize=false) {
+    let width = parseInt(window.getComputedStyle(element)['width'])
+    let height = parseInt(window.getComputedStyle(element)['height'])
+    if (!isContentBoxSize) {
+      width += getSumValueOfStyleRules(element, ['padding-left', 'padding-right', 'border-left-width', 'border-right-width'])
+      height += getSumValueOfStyleRules(element, ['padding-top', 'padding-bottom', 'border-top-width', 'border-bottom-width'])
+    }
+    return new Point(width, height)
   }
 }
