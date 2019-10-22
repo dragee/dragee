@@ -13,9 +13,7 @@ export default class List extends EventEmitter {
       timeEnd: 200,
       timeExcange: 400,
       radius: 30,
-      getDistance: getDistance,
-      isDisplacement: false,
-      isSortable: true
+      getDistance: getDistance
     }, options)
 
     this.draggables = draggables
@@ -28,138 +26,52 @@ export default class List extends EventEmitter {
   }
 
   initDraggable(draggable) {
-    let moveHandler
-    const list = this
-
     draggable.enable = this._enable
-    if (this.options.isDisplacement) {
-      moveHandler = function() {
-        if (draggable.isDragging) {
-          list.onStart(draggable)
-          draggable.unsubscribe('drag:move', moveHandler)
-        }
-      }
-
-      draggable.dragEndAction = () => {
-        this.onEndDisplaycement(draggable)
-        draggable.on('drag:move', moveHandler)
-      }
-
-      draggable.on('drag:move', moveHandler)
-    } else {
-      draggable.dragEndAction = () => this.onEnd(draggable)
-    }
+    draggable.on('drag:move', () => this.onMove(draggable))
+    draggable.dragEndAction = () => draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
   }
 
-  moveOrSave(draggable, position, time) {
-    if (draggable.isDragging) {
-      draggable.fixPosition = position
-    } else {
-      draggable.move(position, time, true)
-    }
-  }
-
-  onEnd(draggable) {
-    const fixPositions = this.getCurrentFixPosition()
-    const currentIndex = this.draggables.indexOf(draggable)
-    const excangeIndex = indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
-
-    if (excangeIndex === -1 || excangeIndex === currentIndex) {
-      draggable.move(draggable.fixPosition, this.options.timeEnd, true)
-    } else {
-      this.moveOrSave(this.draggables[excangeIndex], fixPositions[currentIndex], this.options.timeExcange)
-      this.draggables[currentIndex].move(fixPositions[excangeIndex], this.options.timeEnd, true)
-      this.emit('list:change')
-    }
-    return true
-  }
-
-  sortIfPossible(draggable) {
-    const fixPosition = draggable.fixPosition
-    const currentIndex = this.draggables.indexOf(draggable)
-    const nextDraggable = this.draggables[currentIndex + 1]
-    const prevDraggable = this.draggables[currentIndex - 1]
-
-    if (draggable.downDirection && nextDraggable) {
-      const distance = this.options.getDistance(draggable.position, nextDraggable.position)
-      if (distance < this.options.radius) {
-        draggable.fixPosition = nextDraggable.fixPosition
-        this.moveOrSave(nextDraggable, fixPosition, this.options.timeExcange);
-        [this.draggables[currentIndex], this.draggables[currentIndex + 1]] = [this.draggables[currentIndex + 1], this.draggables[currentIndex]]
-        this.sortIfPossible(draggable)
-      }
-    }
-
-    if (draggable.upDirection && prevDraggable) {
-      const distance = this.options.getDistance(draggable.position, prevDraggable.position)
-      if (distance < this.options.radius) {
-        draggable.fixPosition = prevDraggable.fixPosition
-        this.moveOrSave(prevDraggable, fixPosition, this.options.timeExcange);
-        [this.draggables[currentIndex], this.draggables[currentIndex - 1]] = [this.draggables[currentIndex - 1], this.draggables[currentIndex]]
-        this.sortIfPossible(draggable)
-      }
-    }
-  }
-
-  onEndDisplaycement(draggable) {
+  onMove(draggable) {
     const sortedDraggables = this.getSortedDraggables()
-    const fixPositions = sortedDraggables.map((draggable) => draggable.fixPosition)
+    const pinnedPositions = sortedDraggables.map((draggable) => draggable.pinnedPosition)
 
     const currentIndex = sortedDraggables.indexOf(draggable)
-    const targetIndex = indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
+    const targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.options.getDistance)
 
-    if (targetIndex !== -1) {
+    if (targetIndex !== -1 && currentIndex !== targetIndex) {
       if (targetIndex < currentIndex) {
         for (let i=targetIndex; i<currentIndex; i++) {
-          this.moveOrSave(sortedDraggables[i], fixPositions[i+1], this.options.timeExcange)
+          sortedDraggables[i].pinPosition(pinnedPositions[i+1], this.options.timeExcange)
         }
       } else {
         for (let i=currentIndex; i<targetIndex; i++) {
-          this.moveOrSave(sortedDraggables[i+1], fixPositions[i], this.options.timeExcange)
+          sortedDraggables[i+1].pinPosition(pinnedPositions[i], this.options.timeExcange)
         }
       }
-      draggable.move(fixPositions[targetIndex], this.options.timeEnd, true)
-    } else {
-      draggable.move(draggable.fixPosition, this.options.timeEnd, true)
+      draggable.pinnedPosition = pinnedPositions[targetIndex]
     }
   }
 
-  onStart(draggable) {
-    let i
-    const sortedDraggables = this.getSortedDraggables()
-    const fixPositions = sortedDraggables.map((draggable) => draggable.fixPosition)
-
-    const currentIndex = sortedDraggables.indexOf(draggable)
-    for (i = currentIndex + 1; i < sortedDraggables.length; i++) {
-      this.moveOrSave(sortedDraggables[i], fixPositions[i - 1], this.options.timeExcange)
-    }
-    sortedDraggables[currentIndex].fixPosition = fixPositions[i - 1]
-  }
-
-  getCurrentFixPosition() {
-    return this.draggables.map((draggable) => draggable.fixPosition.clone())
+  getCurrentPinnedPositions() {
+    return this.draggables.map((draggable) => draggable.pinnedPosition.clone())
   }
 
   getSortedDraggables() {
-    const initPositions = this.draggables.map((draggable) => draggable.initPosition)
+    const initialPositions = this.draggables.map((draggable) => draggable.initialPosition)
 
-    const sortedDraggables = initPositions.map((position) => {
-      return this.draggables.filter((draggable) => draggable.fixPosition.compare(position))[0]
+    const sortedDraggables = initialPositions.map((position) => {
+      return this.draggables.filter((draggable) => draggable.pinnedPosition.compare(position))[0]
     })
 
     return sortedDraggables
   }
 
   reset() {
-    this.draggables.forEach((draggable) => {
-      draggable.move(draggable.initPosition, 0, true, false)
-    })
+    this.draggables.forEach((draggable) => draggable.resetPositionToInitial())
   }
 
   refresh() {
-    this.draggables.forEach((draggable) => {
-      draggable.refresh()
-    })
+    this.draggables.forEach((draggable) => draggable.refresh())
   }
 
   add(draggables) {
@@ -171,7 +83,7 @@ export default class List extends EventEmitter {
   }
 
   remove(draggables) {
-    const initPositions = this.draggables.map((draggable) => draggable.initPosition)
+    const initialPositions = this.draggables.map((draggable) => draggable.initialPosition)
     const list = []
     const sortedDraggables = this.getSortedDraggables()
 
@@ -188,10 +100,10 @@ export default class List extends EventEmitter {
     let j = 0
     sortedDraggables.forEach((draggable) => {
       if (this.draggables.indexOf(draggable) !== -1) {
-        if (draggable.fixPosition !== initPositions[j]) {
-          draggable.move(initPositions[j], this.options.timeExcange, true)
+        if (draggable.pinnedPosition !== initialPositions[j]) {
+          draggable.pinPosition(initialPositions[j], this.options.timeExcange)
         }
-        draggable.initPosition = initPositions[j]
+        draggable.initialPosition = initialPositions[j]
         j++
         list.push(draggable)
       }
@@ -208,15 +120,15 @@ export default class List extends EventEmitter {
   }
 
   get positions() {
-    return this.getCurrentFixPosition()
+    return this.getCurrentPinnedPositions()
   }
 
   set positions(positions) {
     const message = 'wrong array length'
     if (positions.length === this.draggables.length) {
       positions.forEach((point, i) => {
-        this.draggables[i].move(point, 0, true, true)
-      }, this)
+        this.draggables[i].pinPosition(point)
+      })
     } else {
       throw message
     }

@@ -3,7 +3,6 @@ import Point from './geometry/point'
 import Rectangle from './geometry/point'
 import { Draggable } from './draggable'
 import List from './list'
-import Sortable from './sortable'
 import ListSwitcher from './listswitcher'
 import { Target } from './target'
 import { scopes, defaultScope, Scope, scope } from './scope'
@@ -34,7 +33,7 @@ const bound = {
 export {
   Draggable,
   Point, Rectangle,
-  List, ListSwitcher, Sortable,
+  List, ListSwitcher,
   Target,
   scopes, defaultScope, Scope, scope,
   NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy,

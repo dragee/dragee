@@ -39,7 +39,7 @@ class Spider {
 
       return new Draggable(element, {
         parent: this.area,
-        boundary: new BoundToLine(start, end),
+        bounding: new BoundToLine(start, end),
         position: start,
         on: {
           'drag:move': () => this.draw()

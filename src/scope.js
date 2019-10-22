@@ -59,7 +59,7 @@ class Scope extends EventEmitter {
     if (shotTargets.length) {
       shotTargets[0].onEnd(draggable)
     } else if (draggable.targets.length) {
-      draggable.move(draggable.initPosition, this.options.timeEnd, true, true)
+      draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
     }
 
     this.emit('scope:change')

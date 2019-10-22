@@ -12,7 +12,6 @@ module.exports = {
     chart: './src/chart.js',
     list: './src/list.js',
     listswitcher: './src/listswitcher.js',
-    sortable: './src/sortable.js',
     spider: './src/spider.js'
   },
   devtool: 'inline-source-map',

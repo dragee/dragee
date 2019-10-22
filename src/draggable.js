@@ -55,8 +55,7 @@ class Draggable extends EventEmitter {
       parent: parent,
       bounding: new BoundToElement(parent, parent),
       startFilter: false,
-      isContentBoxSize: false,
-      position: false
+      isContentBoxSize: false
     }, options)
 
     if (typeof options.handler === 'string') {
@@ -75,14 +74,11 @@ class Draggable extends EventEmitter {
   init() {
     this._enable = true
     this.offset = getOffset(this.element, this.options.parent, true)
-    this.fixPosition = this.offset
+    this.pinnedPosition = this.offset
     this.position = this.offset
-    if (this.options.position) {
-      this.initPosition = this.options.position
-      this.move(this.initPosition, 0, true, true)
-    } else {
-      this.initPosition = this.offset
-    }
+    this.initialPosition = this.options.position || this.offset
+    this.pinPosition(this.initialPosition)
+
     this._dragStart = this.dragStart.bind(this)
     this._dragMove = this.dragMove.bind(this)
     this._dragEnd = this.dragEnd.bind(this)
@@ -97,14 +93,10 @@ class Draggable extends EventEmitter {
 
   reinit() {
     this.offset = getOffset(this.element, this.options.parent, true)
-    this.fixPosition = this.offset
+    this.pinnedPosition = this.offset
     this.position = this.offset
-    if (this.options.position) {
-      this.initPosition = this.options.position
-      this.move(this.initPosition, 0, true, true)
-    } else {
-      this.initPosition = this.offset
-    }
+    this.initialPosition = this.options.position || this.offset
+    this.pinPosition(this.initialPosition)
 
     if (this.bounding.refresh) {
       this.bounding.refresh()
@@ -128,14 +120,13 @@ class Draggable extends EventEmitter {
     this._transformPosition = point
 
     let transform = this.element.style[transformProperty]
-    const z = this.isDragging ? 1 : 0
-    let translateCss = ` translate3d(${point.x}px, ${point.y}px, ${z}px)`
+    let translateCss = ` translate3d(${point.x}px, ${point.y}px, 0px)`
 
     const ua = window.navigator.userAgent
-    const msie = ua.indexOf('MSIE ')
+    const msie = ua.indexOf('MSIE ') !== -1
 
     if (msie) {
-      translateCss = ' translate(' + point.x + 'px,' + point.y + 'px)'
+      translateCss = ` translate(${point.x}px,${point.y}px)`
       if (!/translate\([^)]+\)/.test(transform)) {
         transform += translateCss
       } else {
@@ -152,14 +143,10 @@ class Draggable extends EventEmitter {
     this.element.style[transformProperty] = transform
   }
 
-  move(point, time=0, isFix=false, isSilent=false) {
+  move(point, time=0, isSilent=false) {
     point = point.clone()
-    if (isFix) {
-      this.fixPosition = point
-    }
 
     this.determineDirection(point)
-
     this.position = point
 
     if (transitionProperty) {
@@ -167,9 +154,19 @@ class Draggable extends EventEmitter {
     }
 
     this._setTranslate(point.sub(this.offset))
+
     if (!isSilent) {
       this.emit('drag:move')
     }
+  }
+
+  pinPosition(point, time=0, silent=true) {
+    this.pinnedPosition = point.clone()
+    this.move(this.pinnedPosition, time, silent)
+  }
+
+  resetPositionToInitial () {
+    this.pinPosition(this.initialPosition)
   }
 
   refreshPosition () {
@@ -185,12 +182,6 @@ class Draggable extends EventEmitter {
     }
 
     this._setTranslate(point.sub(this.offset))
-  }
-
-  setZeroTransition() {
-    if (transitionProperty) {
-      this.element.style[transitionProperty] = '0ms'
-    }
   }
 
   determineDirection(point) {
@@ -258,7 +249,7 @@ class Draggable extends EventEmitter {
     let point = this._startPosition.add(touchPoint.sub(this._startTouchPoint))
     point = this.bounding.bound(point, this.getSize())
     this.touchPoint = touchPoint
-    this.move(point, 0)
+    this.move(point)
   }
 
   dragEnd(event) {
@@ -284,7 +275,7 @@ class Draggable extends EventEmitter {
   }
 
   dragEndAction() {
-    this.move(this.position, 0, true, true)
+    this.pinPosition(this.position)
   }
 
   getRectangle() {

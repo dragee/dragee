@@ -20,25 +20,25 @@ export default class ListSwitcher extends List {
   }
 
   onEnd(draggable) {
-    const fixPositions = this.getCurrentFixPositionWithOff()
+    const pinnedPositions = this.getCurrentPinnedPositionWithOff()
     const currentIndex = this.draggables.indexOf(draggable)
-    const excangeIndex = indexOfNearestPoint(fixPositions, draggable.position, this.options.radius, this.options.getDistance)
+    const exchangeIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.options.getDistance)
 
-    if (excangeIndex === -1 || excangeIndex === currentIndex) {
-      this.moveDraggable(currentIndex, draggable.position, fixPositions[currentIndex], this.options.timeEnd)
+    if (exchangeIndex === -1 || exchangeIndex === currentIndex) {
+      this.moveDraggable(currentIndex, draggable.position, pinnedPositions[currentIndex], this.options.timeEnd)
     } else {
-      if (this.draggables[excangeIndex].isDragging) {
-        this.fixToOff(excangeIndex, fixPositions[currentIndex])
+      if (this.draggables[exchangeIndex].isDragging) {
+        this.pinnedToOff(exchangeIndex, pinnedPositions[currentIndex])
       } else {
-        this.moveDraggableToOff(excangeIndex, fixPositions[currentIndex], this.options.timeExcange)
+        this.moveDraggableToOff(exchangeIndex, pinnedPositions[currentIndex], this.options.timeExcange)
       }
-      this.moveDraggable(currentIndex, draggable.position, fixPositions[excangeIndex], this.options.timeEnd)
+      this.moveDraggable(currentIndex, draggable.position, pinnedPositions[exchangeIndex], this.options.timeEnd)
       this.emit('list:change')
     }
   }
 
-  moveDraggable(index, position, fixOffPosition, time) {
-    const positions = [fixOffPosition, fixOffPosition.add(this.options.stepOn)]
+  moveDraggable(index, position, pinnedOffPosition, time) {
+    const positions = [pinnedOffPosition, pinnedOffPosition.add(this.options.stepOn)]
     const isOn = indexOfNearestPoint(positions, position, -1, getXDifference)
 
     if (this.draggables[index].isOn !== !!isOn) {
@@ -46,44 +46,44 @@ export default class ListSwitcher extends List {
       this.emit('list:change')
     }
 
-    this.draggables[index].move(positions[isOn], time, true)
+    this.draggables[index].pinPosition(positions[isOn], time)
   }
 
-  fixToOff(index, fixOffPosition) {
+  pinnedToOff(index, pinnedOffPosition) {
     this.draggables[index].isOn = false
-    this.draggables[index].fixPosition = fixOffPosition
+    this.draggables[index].pinnedPosition = pinnedOffPosition
   }
 
-  moveDraggableToOff(index, fixOffPosition, time) {
+  moveDraggableToOff(index, pinnedOffPosition, time) {
     this.draggables[index].isOn = false
-    this.draggables[index].move(fixOffPosition, time, true)
+    this.draggables[index].pinPosition(pinnedOffPosition, time)
   }
 
-  getCurrentFixPositionWithOff() {
+  getCurrentPinnedPositionWithOff() {
     return this.draggables.map((draggable) => {
-      return draggable.isOn ? draggable.fixPosition.sub(this.options.stepOn) : draggable.fixPosition.clone()
+      return draggable.isOn ? draggable.pinnedPosition.sub(this.options.stepOn) : draggable.pinnedPosition.clone()
     }, this)
   }
 
   getSortedDraggables() {
-    return this.draggables.map((draggable) => draggable.initPosition)
+    return this.draggables.map((draggable) => draggable.initialPosition)
                           .map((position) => {
                             return this.draggables.filter((draggable) => {
-                              return draggable.fixPosition.compare(position) || draggable.fixPosition.compare(position.add(this.options.stepOn))
+                              return draggable.pinnedPosition.compare(position) || draggable.pinnedPosition.compare(position.add(this.options.stepOn))
                             }, this)[0]
                           }, this)
   }
 
   reset() {
     this.draggables.forEach((draggable) => {
-      draggable.move(draggable.initPosition, 0, true, false)
+      draggable.resetPositionToInitial()
       draggable.isOn = false
     })
   }
 
   get positions() {
     return this.draggables.map((draggable) => {
-      const position = draggable.fixPosition.clone()
+      const position = draggable.pinnedPosition.clone()
       position.isOn = draggable.isOn
       return position
     })
@@ -94,7 +94,7 @@ export default class ListSwitcher extends List {
     if (positions.length === this.draggables.length) {
       positions.forEach((point, i) => {
         this.draggables[i].isOn = point.isOn
-        this.draggables[i].move(point, 0, true, true)
+        this.draggables[i].pinPosition(point, 0)
       }, this)
     } else {
       throw message

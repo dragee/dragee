@@ -148,7 +148,7 @@ class Target extends EventEmitter {
         timeEnd = time || time === 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExcange
 
       if (rect.removable) {
-        draggable.move(draggable.initPosition, timeEnd, true, true)
+        draggable.move(draggable.initialPosition, timeEnd, true, true)
         removeItem(this.innerDraggables, draggable)
         this.emit('target:remove', draggable)
       } else {
@@ -207,7 +207,7 @@ class Target extends EventEmitter {
 
   reset() {
     this.innerDraggables.forEach((draggable) => {
-      draggable.move(draggable.initPosition, 0, true, true)
+      draggable.move(draggable.initialPosition, 0, true, true)
       this.emit('target:remove', draggable)
     })
     this.innerDraggables = []

@@ -84,7 +84,7 @@ class Chart extends EventEmitter {
 
       return new Draggable(element, {
         parent: this.area,
-        boundary: new BoundToArc(
+        bounding: new BoundToArc(
           this.options.center.sub(halfSize),
           this.options.touchRadius,
           this.getBoundAngle(i, false),
@@ -291,7 +291,7 @@ class Chart extends EventEmitter {
         this.options.center.sub(halfSize)
       )
 
-      draggable.move(position, 0, true, true)
+      draggable.moveAndSave(position)
     })
     this.draw()
   }

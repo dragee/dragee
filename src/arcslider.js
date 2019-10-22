@@ -43,7 +43,7 @@ class ArcSlider extends EventEmitter {
     this.angle = angle
     this.draggable = new Draggable(element, {
       parent: this.area,
-      boundary: new BoundToArc(
+      bounding: new BoundToArc(
         this.shiftedCenter,
         this.options.radius,
         this.options.startAngle,
@@ -74,8 +74,8 @@ class ArcSlider extends EventEmitter {
       this.shiftedCenter
     )
     this.angle = normalizeAngle(angle, position)
-    this.draggable.move(position, time||0, true, true)
-    this.emit('arcslider:change', { angle: this.angle })
+    this.draggable.moveAndSave(position, time||0)
+    this.emit('arcslider:change', this.angle)
   }
 }
 
