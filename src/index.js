@@ -3,7 +3,6 @@ import Point from './geometry/point'
 import Rectangle from './geometry/point'
 import Draggable from './draggable'
 import List from './list'
-import ListSwitcher from './listswitcher'
 import { Target } from './target'
 import { scopes, defaultScope, Scope, scope } from './scope'
 import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './positioning'
@@ -40,7 +39,7 @@ const distance = {
 export {
   Draggable,
   Point, Rectangle,
-  List, ListSwitcher,
+  List,
   Target,
   scopes, defaultScope, Scope, scope,
   NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy,
