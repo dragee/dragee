@@ -13,24 +13,6 @@
     <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
-    <script>
-        function hasClass(element, c) {
-          const re = new RegExp('(^|\\s)' + c + '(\\s|$)', 'g')
-          return (re.test(element.className))
-        }
-
-        function addClass(element, c) {
-          if (!hasClass(element, c)) {
-            element.className = (element.className + ' ' + c).replace(/\s+/g, ' ').replace(/(^ | $)/g, '')
-          }
-        }
-
-        function removeClass(element, c) {
-          const re = new RegExp('(^|\\s)' + c + '(\\s|$)', 'g')
-          element.className = element.className.replace(re, '$1').replace(/\s+/g, ' ').replace(/(^ | $)/g, '')
-        }
-
-    </script>
 </head>
 
 <body data-spy="scroll" data-target=".subnav" data-offset="0">
@@ -501,10 +483,10 @@
                               parent: targetAreaElement,
                               on: {
                                 'target:add': function(draggable){
-                                  addClass(draggable.element, classForTargets[i]);
+                                  Dragee.addClass(draggable.element, classForTargets[i]);
                                 },
                                 'target:remove': function(draggable){
-                                  removeClass(draggable.element, classForTargets[i]);
+                                  Dragee.removeClass(draggable.element, classForTargets[i]);
                                 }
                               }
                             }
@@ -684,10 +666,10 @@
                                 }),
                                 on: {
                                   'target:add': function(draggable){
-                                    addClass(draggable.element, "ontarget");
+                                    Dragee.addClass(draggable.element, "ontarget");
                                   },
                                   'target:remove': function(draggable){
-                                    removeClass(draggable.element, "ontarget");
+                                    Dragee.removeClass(draggable.element, "ontarget");
                                   }
                                 }
                             });
