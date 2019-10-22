@@ -325,7 +325,7 @@
                             listBParentElement = root.getElementsByClassName("list-b")[0],
                             listBElements = listBParentElement.getElementsByTagName("li");
 
-                        listA = Dragee.List.factory(listAParentElement, listAElements);
+                        listA = Dragee.List.factory(listAParentElement, listAElements, { list: { getDistance: Dragee.distance.getYDifference } });
                         listB = Dragee.List.factory(listBParentElement, listBElements);
                     });
                 </script>

@@ -10,6 +10,7 @@ import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './po
 import { Spider } from './spider'
 import { ArcSlider } from './arcslider'
 import { Chart } from './chart'
+import { getDistance, getXDifference, getYDifference } from './geometry/distances'
 import {
   BoundToRectangle,
   BoundToElement,
@@ -30,6 +31,12 @@ const bound = {
   BoundToArc
 }
 
+const distance = {
+  getDistance,
+  getXDifference,
+  getYDifference
+}
+
 export {
   Draggable,
   Point, Rectangle,
@@ -40,5 +47,6 @@ export {
   Spider,
   ArcSlider,
   Chart,
-  bound
+  bound,
+  distance
 }
