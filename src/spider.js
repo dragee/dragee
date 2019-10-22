@@ -6,7 +6,7 @@ import { getPointFromRadialSystem } from './geometry/angles'
 import { BoundToLine } from './bounding'
 import Draggable from './draggable'
 
-class Spider {
+export default class Spider {
   constructor(area, elements, options={}) {
     const areaRectangle = Rectangle.fromElement(area, area)
     this.options = Object.assign({
@@ -71,5 +71,3 @@ class Spider {
     this.context.fill()
   }
 }
-
-export { Spider }

@@ -9,11 +9,10 @@ import {
   normalizeAngle
 } from './geometry/angles'
 
-class ArcSlider extends EventEmitter {
+export default class ArcSlider extends EventEmitter {
   constructor(area, element, options={}) {
     super(undefined, options)
     const areaRectangle = Rectangle.fromElement(area, area)
-    const halfSize = areaRectangle.size.mult(0.5)
     this.options = Object.assign({
       center: areaRectangle.getCenter(),
       radius: areaRectangle.getMinSide() / 2,
@@ -23,7 +22,7 @@ class ArcSlider extends EventEmitter {
       time: 500
     }, options)
 
-    this.shiftedCenter = this.options.center.sub(halfSize)
+    this.shiftedCenter = this.options.center
     this.area = area
     this.init(element)
   }
@@ -70,9 +69,7 @@ class ArcSlider extends EventEmitter {
       this.shiftedCenter
     )
     this.angle = normalizeAngle(angle, position)
-    this.draggable.moveAndSave(position, time||0)
+    this.draggable.pinPosition(position, time||0)
     this.emit('arcslider:change', this.angle)
   }
 }
-
-export { ArcSlider }

@@ -766,7 +766,6 @@
                     });
                 </script>
             </div>
-            <div class="span6 code-span"></div>
             <div class="span6 demo-span">
                 <div id="DemoChart" class="demo-html">
                   <div class="chart-wrapper">
@@ -836,6 +835,77 @@
                 </script>
             </div>
             <div class="span6 code-span"></div>
+        </div>
+    </section>
+
+    <section id="ArcSlider" >
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoArcSlider" class="demo-html">
+                    <div class="arc-area">
+                      <span class="arc-slider"></span>
+                    </ul>
+                </div>
+                <style>
+                    #DemoArcSlider{
+                      padding: 5%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: hidden;
+                      position: relative;
+                    }
+
+                    #DemoArcSlider .arc-area{
+                      margin: 0 auto;
+                      height: 200px;
+                      width: 200px;
+                      border-top: 5px solid #333;
+                      border-radius: 800px;
+                      border-bottom: 0;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: visible;
+                      list-style: none;
+                    }
+
+                    #DemoArcSlider .arc-area .arc-slider{
+                      position: relative;
+                      width: 1px;
+                      height: 1px;
+                      display: inline-block;
+                    }
+
+                    #DemoArcSlider .arc-area .arc-slider:after {
+                      position: absolute;
+                      left: -18px;
+                      top: -18px;
+                      content: "A";
+                      padding: 9px 14px;
+                      font-size: 15px;
+                      color: #333;
+                      cursor: move;
+                      border: 1px solid #333;
+                      border-radius: 25px;
+                      background: #f5f5f5;
+                    }
+
+                    #DemoArcSlider .arc-area .arc-slider.active:after{
+                      background: #ffc40d;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        var arcSlider,
+                            root = document.getElementById("DemoArcSlider"),
+                            areaElement = root.getElementsByClassName("arc-area")[0],
+                            slider = root.getElementsByClassName("arc-slider")[0];
+
+                        arcSlider = new Dragee.ArcSlider(areaElement, slider, {
+                          radius: 100,
+                        });
+                    });
+                </script>
+            </div>
         </div>
     </section>
 </div>
