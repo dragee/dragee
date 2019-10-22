@@ -2,18 +2,22 @@
 
 [dragee.github.io](http://dragee.github.io) - drag&drop library for desktop and touch devices
 
-# Dragee.Draggable
+# Draggable
 ```javascript
-Draggable(element[, options])
+new Draggable(element[, options])
 ```
 ##### Example:
 ```javascript
 function boundPoint(point, size){ return point; }
 
-that.draggable = new Dragee.Draggable(that.element, {
-    bound: boundPoint,
-    onMove: that.moveCorners.bind(this),
-    onEnd: onEnd
+this.draggable = new Draggable(that.element, {
+    bounding: {
+        bound: boundPoint
+    },
+    on: {
+        'drag:move': () => this.moveCorners(),
+        'drag:end': () => this.onEnd()
+    }
 });
 ```
 
@@ -24,26 +28,12 @@ Target(element, draggables[, options])
 
 ##### Example:
 ```javascript
-var target = new Dragee.Target(element, draggables, {
+this.target = new Dragee.Target(element, draggables, {
     parent: targetAreaElement,
-    positioning: Dragee.positionFactory(Dragee.positionType.notCrossing)(function(){
-        return target.getRectangle();
-    }),
-    sorting: Dragee.sortingFactory(Dragee.positionType.notCrossing)(),
-    onAdd: function(draggable){
-        draggable.element.addClass("ontarget");
-    },
-    onRemove: function(draggable){
-        draggable.element.removeClass("ontarget");
+    strategy: new Dragee.NotCrossingStrategy(() => target.getRectangle()),
+    on: {
+        'target:add': (draggable) => addClass(draggable.element, "ontarget"),
+        'target:remove': (draggable) => removeClass(draggable.element, "ontarget"),
     }
 });
 ```
-
-# Development
-
-## install
-`npm install`
-
-## commands
-`npm run build`
-`npm run dev`

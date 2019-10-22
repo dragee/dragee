@@ -498,12 +498,14 @@
                         targets = Array.prototype.slice.call(targetElements).map(
                           function(element, i){
                             return new Dragee.Target(element, draggables,{
-                              parent:targetAreaElement,
-                              onAdd: function(draggable){
-                                addClass(draggable.element, classForTargets[i]);
-                              },
-                              onRemove: function(draggable){
-                                removeClass(draggable.element, classForTargets[i]);
+                              parent: targetAreaElement,
+                              on: {
+                                'target:add': function(draggable){
+                                  addClass(draggable.element, classForTargets[i]);
+                                },
+                                'target:remove': function(draggable){
+                                  removeClass(draggable.element, classForTargets[i]);
+                                }
                               }
                             }
                           );
@@ -680,11 +682,13 @@
                                 strategy: new Dragee.NotCrossingStrategy(function(){
                                   return target.getRectangle();
                                 }),
-                                onAdd: function(draggable){
+                                on: {
+                                  'target:add': function(draggable){
                                     addClass(draggable.element, "ontarget");
-                                },
-                                onRemove: function(draggable){
+                                  },
+                                  'target:remove': function(draggable){
                                     removeClass(draggable.element, "ontarget");
+                                  }
                                 }
                             });
                             return target;
