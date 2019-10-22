@@ -69,7 +69,7 @@ class Draggable extends EventEmitter {
 
   init() {
     this._enable = true
-    this.offset = Rectangle.getElementOffset(this.element, this.options.parent, true)
+    this.offset = Point.elementOffset(this.element, this.options.parent, true)
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
@@ -88,7 +88,7 @@ class Draggable extends EventEmitter {
   }
 
   reinit() {
-    this.offset = Rectangle.getElementOffset(this.element, this.options.parent, true)
+    this.offset = Point.elementOffset(this.element, this.options.parent, true)
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
@@ -100,7 +100,7 @@ class Draggable extends EventEmitter {
   }
 
   getSize(_recalulate) {
-    return Rectangle.getElementSize(this.element, this.options.isContentBoxSize)
+    return Point.elementSize(this.element, this.options.isContentBoxSize)
   }
 
   getPosition() {

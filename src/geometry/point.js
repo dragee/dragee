@@ -1,3 +1,9 @@
+function getSumValueOfStyleRules(element, rules) {
+  return rules.reduce((sum, rule) => {
+    return sum + parseInt(window.getComputedStyle(element)[rule]||0)
+  }, 0)
+}
+
 export default class Point {
   constructor(x, y) {
     this.x = x
@@ -30,5 +36,24 @@ export default class Point {
 
   toString() {
     return `{x=${this.x},y=${this.y}`
+  }
+
+  static elementOffset(element, parent=element.parentNode) {
+    const elementRect = element.getBoundingClientRect()
+    const parentRect = parent.getBoundingClientRect()
+    return new Point(
+      elementRect.left - parentRect.left,
+      elementRect.top - parentRect.top
+    )
+  }
+
+  static elementSize(element, isContentBoxSize=false) {
+    let width = parseInt(window.getComputedStyle(element)['width'])
+    let height = parseInt(window.getComputedStyle(element)['height'])
+    if (!isContentBoxSize) {
+      width += getSumValueOfStyleRules(element, ['padding-left', 'padding-right', 'border-left-width', 'border-right-width'])
+      height += getSumValueOfStyleRules(element, ['padding-top', 'padding-bottom', 'border-top-width', 'border-bottom-width'])
+    }
+    return new Point(width, height)
   }
 }

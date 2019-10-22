@@ -71,7 +71,7 @@ class Chart extends EventEmitter {
     this.context = this.canvas.getContext('2d')
     this.draggables = elements.map((element, i) => {
       const angle = this.options.initAngles[i]
-      const halfSize = Rectangle.getElementSize(element).mult(0.5)
+      const halfSize = Point.elementSize(element).mult(0.5)
       const position = getPointFromRadialSystem(
         angle,
         this.options.touchRadius,
@@ -110,7 +110,7 @@ class Chart extends EventEmitter {
       )
 
       if (!this.canvasOffset) {
-        this.canvasOffset = Rectangle.getElementOffset(this.canvas)
+        this.canvasOffset = Point.elementOffset(this.canvas, this.canvas)
       }
 
       point = point.sub(this.canvasOffset)

@@ -1,4 +1,5 @@
 import createCanvas from './utils/create-canvas'
+import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 
 import { getPointFromRadialSystem } from './geometry/angles'
@@ -30,7 +31,7 @@ class Spider {
 
     this.draggables = elements.map((element, i) => {
       const angle = this.options.angle + i * this.options.dAngle
-      const halfSize = Rectangle.getElementSize(element).mult(0.5)
+      const halfSize = Point.elementSize(element).mult(0.5)
       const start = getPointFromRadialSystem(angle, this.options.startRadius, this.options.center).sub(halfSize)
       const end = getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize)
 
