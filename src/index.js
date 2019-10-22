@@ -10,6 +10,7 @@ import Spider from './spider'
 import ArcSlider from './arcslider'
 import Chart from './chart'
 import { getDistance, getXDifference, getYDifference } from './geometry/distances'
+import { addClass, removeClass } from './utils/classes'
 import {
   BoundToRectangle,
   BoundToElement,
@@ -47,5 +48,6 @@ export {
   ArcSlider,
   Chart,
   bound,
-  distance
+  distance,
+  addClass, removeClass
 }
