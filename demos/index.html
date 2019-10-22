@@ -695,7 +695,7 @@
         </div>
     </section>
 
-    <section id="Spider" >
+    <section id="SpiderAndChart" >
         <div class="row demo-row">
             <div class="span6 demo-span">
                 <div id="DemoSpider" class="demo-html">
@@ -763,6 +763,75 @@
                           strokeStyle: "#ff5533",
                           fillStyle: "rgba(100,255,220,0.8)"
                         });
+                    });
+                </script>
+            </div>
+            <div class="span6 code-span"></div>
+            <div class="span6 demo-span">
+                <div id="DemoChart" class="demo-html">
+                  <div class="chart-wrapper">
+                    <ul class="chart">
+                      <li>A</li>
+                      <li>B</li>
+                      <li>C</li>
+                      <li>D</li>
+                      <li>E</li>
+                      <li>F</li>
+                      <li>H</li>
+                    </ul>
+                  </div>
+                </div>
+                <style>
+                    #DemoChart{
+                      padding: 5%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: hidden;
+                      position: relative;
+                    }
+
+                    #DemoChart .chart-wrapper {
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: visible;
+                    }
+
+                    #DemoChart ul.chart{
+                      height: 400px;
+                      list-style: none;
+                    }
+
+                    #DemoChart ul.chart li{
+                      margin: 20px;
+                      display: block;
+                      float: left;
+                      padding: 9px 14px;
+                      font-size: 15px;
+                      color: #333;
+                      cursor: move;
+                      border: 1px solid #333;
+                      border-radius: 25px;
+                      background: #f5f5f5;
+                      position: relative;
+                    }
+
+                    #DemoChart ul.chart li.active{
+                      z-index: 2;
+                      background: #ffc40d;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        var chart,
+                            root = document.getElementById("DemoChart"),
+                            areaElement = root.getElementsByClassName("chart")[0],
+                            draggableElements = [];
+
+                        [].push.apply(draggableElements, areaElement.getElementsByTagName("li"))
+
+                        chart = new Dragee.Chart(areaElement, draggableElements, { boundAngle: 0, radius: 150, touchRadius: 150 });
                     });
                 </script>
             </div>

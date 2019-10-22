@@ -1,4 +1,4 @@
-import { Draggable } from './draggable'
+import Draggable from './draggable'
 import { BoundToArc } from './bounding'
 import EventEmitter from './eventEmitter'
 

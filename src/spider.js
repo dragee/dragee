@@ -4,7 +4,7 @@ import Rectangle from './geometry/rectangle'
 
 import { getPointFromRadialSystem } from './geometry/angles'
 import { BoundToLine } from './bounding'
-import { Draggable } from './draggable'
+import Draggable from './draggable'
 
 class Spider {
   constructor(area, elements, options={}) {

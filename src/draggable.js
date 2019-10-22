@@ -7,19 +7,20 @@ import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 import { defaultScope } from './scope'
 
-const isTouch = 'ontouchstart' in window, mouseEvents = {
-    start: 'mousedown',
-    move: 'mousemove',
-    end: 'mouseup'
-  }, touchEvents = {
-    start: 'touchstart',
-    move: 'touchmove',
-    end: 'touchend'
-  },
-  events = isTouch ? touchEvents : mouseEvents,
-  draggables = [],
-  transformProperty = getStyleProperty('transform'),
-  transitionProperty = getStyleProperty('transition')
+const isTouch = 'ontouchstart' in window
+const mouseEvents = {
+  start: 'mousedown',
+  move: 'mousemove',
+  end: 'mouseup'
+}
+const touchEvents = {
+  start: 'touchstart',
+  move: 'touchmove',
+  end: 'touchend'
+}
+const draggables = []
+const transformProperty = getStyleProperty('transform')
+const transitionProperty = getStyleProperty('transition')
 
 function getTouchByID(element, touchId) {
   for (let i = 0; i < element.changedTouches.length; i++) {
@@ -42,7 +43,7 @@ function addToDefaultScope(draggable) {
   defaultScope.addDraggable(draggable)
 }
 
-class Draggable extends EventEmitter {
+export default class Draggable extends EventEmitter {
   constructor(element, options={}) {
     super(undefined, options)
     const parent = options.parent || getDefaultParent(element)
@@ -195,7 +196,10 @@ class Draggable extends EventEmitter {
 
     const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
 
-    this._startTouchPoint = new Point(isTouchEvent ? event.changedTouches[0].pageX : event.clientX, isTouchEvent ? event.changedTouches[0].pageY : event.clientY)
+    this._startTouchPoint = new Point(
+      isTouchEvent ? event.changedTouches[0].pageX : event.clientX,
+      isTouchEvent ? event.changedTouches[0].pageY : event.clientY
+    )
 
     this._startPosition = this.getPosition()
     if (isTouchEvent) {
@@ -313,5 +317,3 @@ class Draggable extends EventEmitter {
 
 Draggable.emitter = new EventEmitter(Draggable)
 Draggable.emitter.on('draggable:create', addToDefaultScope)
-
-export { Draggable, events }

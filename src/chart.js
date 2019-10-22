@@ -12,25 +12,36 @@ import {
   normalizeAngle
 } from './geometry/angles'
 
-import { Draggable, events } from './draggable'
+import Draggable from './draggable'
 import { BoundToArc } from './bounding'
 import EventEmitter from './eventEmitter'
 
 const isTouch = 'ontouchstart' in window
+const mouseEvents = {
+  start: 'mousedown',
+  move: 'mousemove',
+  end: 'mouseup'
+}
+const touchEvents = {
+  start: 'touchstart',
+  move: 'touchmove',
+  end: 'touchend'
+}
+
+const rnd = function() {
+  return Math.round(Math.random()*255)
+}
+
+const toHexString = function(digit) {
+  let str = digit.toString(16)
+  while (str.length < 2) {
+    str = '0' + str
+  }
+  return str
+}
 
 function randomColor() {
-  const rnd = function() {
-    return Math.round(Math.random()*255)
-  }
-  const toHexString = function(digit) {
-    let str = digit.toString(16)
-    while (str.length < 2) {
-      str = '0' + str
-    }
-    return str
-  }
-
-  return '#' + toHexString(rnd()) + toHexString(rnd()) + toHexString(rnd())
+  return `#${toHexString(rnd())}${toHexString(rnd())}${toHexString(rnd())}`
 }
 
 function getArrayWithBoundIndexes(index, length) {
@@ -43,7 +54,7 @@ function getArrayWithBoundIndexes(index, length) {
   return retIndexes
 }
 
-class Chart extends EventEmitter {
+export default class Chart extends EventEmitter {
   constructor (area, elements, options={}) {
     super(undefined, options)
     const areaRectangle = Rectangle.fromElement(area, area)
@@ -53,9 +64,7 @@ class Chart extends EventEmitter {
       touchRadius: areaRectangle.getMinSide() / 2,
       boundAngle: Math.PI / 9,
       fillStyles: range(0, elements.length).map(() => randomColor()),
-      initAngles: range(-90, 270, 360 / elements.length).map((angle) => {
-        return toRadian(angle)
-      }),
+      initAngles: range(-90, 270, 360 / elements.length).map((angle) => toRadian(angle)),
       limitImg: null,
       limitImgOffset: new Point(0, 0),
       isSelectable: false
@@ -102,23 +111,27 @@ class Chart extends EventEmitter {
 
   initSelect() {
     this.setActiveArc(-1)
+    this.canvas.addEventListener(mouseEvents.start, (event) => this.onStart(event))
+    this.canvas.addEventListener(touchEvents.start, (event) => this.onStart(event))
+  }
 
-    this.canvas.addEventListener(events.start, (e) => {
-      let point = new Point(
-        isTouch ? e.changedTouches[0].pageX : e.clientX,
-        isTouch ? e.changedTouches[0].pageY : e.clientY
-      )
+  onStart(event) {
+    const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
 
-      if (!this.canvasOffset) {
-        this.canvasOffset = Point.elementOffset(this.canvas, this.canvas)
-      }
+    let point = new Point(
+      isTouchEvent ? event.changedTouches[0].pageX : event.clientX,
+      isTouchEvent ? event.changedTouches[0].pageY : event.clientY
+    )
 
-      point = point.sub(this.canvasOffset)
-      const index = this.getArcOnPoint(point)
-      if (index !== -1) {
-        this.setActiveArc((this.activeArcIndex !== index) ? index : -1)
-      }
-    })
+    if (!this.canvasOffset) {
+      this.canvasOffset = Point.elementOffset(this.canvas, this.canvas)
+    }
+
+    point = point.sub(this.canvasOffset)
+    const index = this.getArcOnPoint(point)
+    if (index !== -1) {
+      this.setActiveArc((this.activeArcIndex !== index) ? index : -1)
+    }
   }
 
   updateAngles() {
@@ -301,5 +314,3 @@ class Chart extends EventEmitter {
     this.draw()
   }
 }
-
-export { Chart }

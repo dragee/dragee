@@ -151,11 +151,11 @@ export class BoundToArc extends BoundToCircle {
   }
 
   startAngle() {
-    return this._startAngle === 'function' ? this._startAngle() : this._startAngle
+    return typeof this._startAngle === 'function' ? this._startAngle() : this._startAngle
   }
 
   endAngle() {
-    return this.andAngle === 'function' ? this.andAngle() : this.andAngle
+    return typeof this._endAngle === 'function' ? this._endAngle() : this._endAngle
   }
 
   bound(point, _size) {

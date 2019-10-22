@@ -3,7 +3,7 @@ import {
   indexOfNearestPoint,
   getXDifference
 } from './geometry/distances'
-import { Draggable } from './draggable'
+import Draggable from './draggable'
 import List from './list'
 
 export default class ListSwitcher extends List {

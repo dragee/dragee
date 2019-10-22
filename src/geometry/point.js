@@ -38,7 +38,8 @@ export default class Point {
     return `{x=${this.x},y=${this.y}`
   }
 
-  static elementOffset(element, parent=element.parentNode) {
+  static elementOffset(element, parent) {
+    parent = parent || element.parentNode
     const elementRect = element.getBoundingClientRect()
     const parentRect = parent.getBoundingClientRect()
     return new Point(

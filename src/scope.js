@@ -1,6 +1,6 @@
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
-import { Draggable } from './draggable'
+import Draggable from './draggable'
 import { Target } from './target'
 
 const scopes = []

@@ -5,7 +5,7 @@ import {
   indexOfNearestPoint
 } from './geometry/distances'
 
-import { Draggable } from './draggable'
+import Draggable from './draggable'
 
 export default class List extends EventEmitter {
   constructor(draggables, options={}) {
