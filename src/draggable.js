@@ -205,6 +205,7 @@ export default class Draggable extends EventEmitter {
     if (isTouchEvent) {
       this._touchId = event.changedTouches[0].identifier
     }
+
     event.stopPropagation()
     if (!(event.target instanceof window.HTMLInputElement ||
           event.target instanceof window.HTMLInputElement)) {

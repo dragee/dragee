@@ -50,6 +50,7 @@ export default class List extends EventEmitter {
         }
       }
       draggable.pinnedPosition = pinnedPositions[targetIndex]
+      this.emit('list:change')
     }
   }
 
@@ -147,8 +148,7 @@ export default class List extends EventEmitter {
   }
 
   static factory(parentElement, elements, options={}) {
-    elements = Array.prototype.slice.call(elements)
-    const draggables = elements.map((element) => {
+    const draggables = [...elements].map((element) => {
       return new Draggable(element, Object.assign({
         parent: parentElement
       }, options.draggable || {}))
