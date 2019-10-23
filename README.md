@@ -18,8 +18,6 @@ import { Draggable, List, ... } from Dragee
 
 # Usage
 
-## Dragee
-
 ## Draggable
 ```html
 <div class="area">
