@@ -9,7 +9,7 @@ import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './po
 import Spider from './spider'
 import ArcSlider from './arcslider'
 import Chart from './chart'
-import { getDistance, getXDifference, getYDifference } from './geometry/distances'
+import { getDistance, getXDifference, getYDifference, transformedSpaceDistanceFactory } from './geometry/distances'
 import { addClass, removeClass } from './utils/classes'
 import {
   BoundToRectangle,
@@ -34,7 +34,8 @@ const bound = {
 const distance = {
   getDistance,
   getXDifference,
-  getYDifference
+  getYDifference,
+  transformedSpaceDistanceFactory
 }
 
 export {

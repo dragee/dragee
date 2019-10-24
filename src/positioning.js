@@ -137,6 +137,7 @@ class FloatRightStrategy extends FloatLeftStrategy {
 
     this.paddingTopRight = options.paddingTopRight || new Point(5, 5)
     this.paddingBottomLeft = options.paddingBottomLeft || new Point(0, 0)
+    this.yGapBetweenDraggables = options.yGapBetweenDraggables || 0
 
     this.paddingTopNegRight = new Point(-this.paddingTopRight.x, this.paddingTopRight.y)
     this.paddingBottomNegLeft = new Point(-this.paddingBottomLeft.x, this.paddingBottomLeft.y)
@@ -144,13 +145,14 @@ class FloatRightStrategy extends FloatLeftStrategy {
 
   positioning(rectangleList, _indexesOfNews) {
     const boundRect = this.boundRect
-    let boundaryPoints = [boundRect.getRightTopPoint()]
-    rectangleList.forEach((rect, _index) => {
+    let boundaryPoints = [boundRect.getP2()]
+
+    rectangleList.forEach((rect) => {
       let position, isValid = false
       for (let i = 0; i < boundaryPoints.length; i++) {
         position = (new Point(
           boundaryPoints[i].x - rect.size.x,
-          i > 0 ? boundaryPoints[i - 1].y : boundRect.position.y)
+          i > 0 ? (boundaryPoints[i - 1].y + this.yGapBetweenDraggables) : boundRect.position.y)
         ).add(this.paddingTopNegRight)
 
         isValid = (position.x > rect.position.x)
@@ -159,13 +161,13 @@ class FloatRightStrategy extends FloatLeftStrategy {
         }
       }
       if (!isValid) {
-        position = new Point(
-          boundRect.getP2().x,
-          boundaryPoints[boundaryPoints.length - 1].y
-        )
+        position = (new Point(
+          boundRect.getP2().x - rect.size.x,
+          boundaryPoints[boundaryPoints.length - 1].y + this.yGapBetweenDraggables)
+        ).add(this.paddingTopNegRight)
       }
       rect.position = position
-      if (this.options.removable && rect.getLeftBottomPoint().y > boundRect.getP4().y) {
+      if (this.options.removable && rect.getP4().y > boundRect.getP4().y) {
         rect.removable = true
       }
       boundaryPoints = addPointToBoundPoints(boundaryPoints, rect.getP4().add(this.paddingBottomNegLeft), true)

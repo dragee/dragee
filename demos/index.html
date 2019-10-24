@@ -469,30 +469,35 @@
                             draggableElements = targetAreaElement.getElementsByClassName("draggable"),
                             classForTargets = ["green", "red", "blue"];
 
-                        draggables = Array.prototype.slice.call(draggableElements).map(
-                          function(element, i){
+                        draggables = [...draggableElements].map((element, i) => {
                             return new Dragee.Draggable(element, {
                               parent: targetAreaElement
-                            });
+                            })
                           }
-                        );
+                        )
 
-                        targets = Array.prototype.slice.call(targetElements).map(
-                          function(element, i){
-                            return new Dragee.Target(element, draggables,{
+                        targets = [...targetElements].map((element, i) => {
+                            const target = new Dragee.Target(element, draggables, {
                               parent: targetAreaElement,
+                              strategy: new Dragee.FloatRightStrategy(
+                                () => target.getRectangle(),
+                                {
+                                  radius: 80,
+                                  getDistance: Dragee.distance.transformedSpaceDistanceFactory({ x: 1, y: 4 }),
+                                  removable: true
+                                }
+                              ),
                               on: {
-                                'target:add': function(draggable){
+                                'target:add': (draggable) => {
                                   Dragee.addClass(draggable.element, classForTargets[i]);
                                 },
-                                'target:remove': function(draggable){
+                                'target:remove': (draggable) => {
                                   Dragee.removeClass(draggable.element, classForTargets[i]);
                                 }
                               }
-                            }
-                          );
-                        });
-                    });
+                            })
+                        })
+                    })
                 </script>
             </div>
 
