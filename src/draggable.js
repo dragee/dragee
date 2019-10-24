@@ -51,8 +51,8 @@ export default class Draggable extends EventEmitter {
     this.options = Object.assign({
       parent: parent,
       bounding: new BoundToElement(parent, parent),
-      startFilter: false,
-      isContentBoxSize: false
+      isContentBoxSize: false,
+      nativeDragging: false
     }, options)
 
     if (typeof options.handler === 'string') {
@@ -70,6 +70,7 @@ export default class Draggable extends EventEmitter {
 
   init() {
     this._enable = true
+    this._setDefaultTransition()
     this.offset = Point.elementOffset(this.element, this.options.parent, true)
     this.pinnedPosition = this.offset
     this.position = this.offset
@@ -79,6 +80,8 @@ export default class Draggable extends EventEmitter {
     this._dragStart = this.dragStart.bind(this)
     this._dragMove = this.dragMove.bind(this)
     this._dragEnd = this.dragEnd.bind(this)
+    this._nativeDragMove = this.nativeDragMove.bind(this)
+    this._nativeDragEnd = this.nativeDragEnd.bind(this)
 
     this.handler.addEventListener(touchEvents.start, this._dragStart)
     this.handler.addEventListener(mouseEvents.start, this._dragStart)
@@ -111,6 +114,27 @@ export default class Draggable extends EventEmitter {
 
   getCenter() {
     return this.position.add(this.getSize().mult(0.5))
+  }
+
+  _setDefaultTransition () {
+    this.element.style[transitionProperty] = window.getComputedStyle(this.element)[transitionProperty]
+  }
+
+  _setTransition(time) {
+    let transition = this.element.style[transitionProperty]
+    const transitionCss = `transform ${time}ms`
+
+    if (!/transform \d*m?s/.test(transition)) {
+      if (transition) {
+        transition += `, ${transitionCss}`
+      } else {
+        transition = transitionCss
+      }
+    } else {
+      transition = transition.replace(/transform \d*m?s/, transitionCss)
+    }
+
+    this.element.style[transitionProperty] = transition
   }
 
   _setTranslate(point) {
@@ -146,10 +170,7 @@ export default class Draggable extends EventEmitter {
     this.determineDirection(point)
     this.position = point
 
-    if (transitionProperty) {
-      this.element.style[transitionProperty] = time + 'ms'
-    }
-
+    this._setTransition(time)
     this._setTranslate(point.sub(this.offset))
 
     if (!isSilent) {
@@ -173,11 +194,7 @@ export default class Draggable extends EventEmitter {
   setPosition(point) {
     point = point.clone()
     this.position = point
-
-    if (transitionProperty) {
-      this.element.style[transitionProperty] = '0ms'
-    }
-
+    this._setTransition(0)
     this._setTranslate(point.sub(this.offset))
   }
 
@@ -190,7 +207,7 @@ export default class Draggable extends EventEmitter {
 
   dragStart(event) {
     this.currentEvent = event
-    if (!this._enable || (this.options.startFilter && !this.options.startFilter(event))) {
+    if (!this._enable) {
       return
     }
 
@@ -207,23 +224,33 @@ export default class Draggable extends EventEmitter {
     }
 
     event.stopPropagation()
-    if (!(event.target instanceof window.HTMLInputElement ||
-          event.target instanceof window.HTMLInputElement)) {
-      event.preventDefault()
-    } else {
+    if (event.target instanceof window.HTMLInputElement ||
+          event.target instanceof window.HTMLInputElement) {
       event.target.focus()
     }
 
-    document.addEventListener(touchEvents.move, this._dragMove)
-    document.addEventListener(mouseEvents.move, this._dragMove)
+    if (!(this.options.nativeDragging ||
+            event.target instanceof window.HTMLInputElement ||
+            event.target instanceof window.HTMLInputElement)) {
+      event.preventDefault()
+    }
 
-    document.addEventListener(touchEvents.end, this._dragEnd)
-    document.addEventListener(mouseEvents.end, this._dragEnd)
+    if (this.options.nativeDragging) {
+      this.element.draggable = true
+      document.addEventListener('drag', this._nativeDragMove)
+      document.addEventListener('dragend', this._nativeDragEnd)
+    } else {
+      document.addEventListener(touchEvents.move, this._dragMove)
+      document.addEventListener(mouseEvents.move, this._dragMove)
+
+      document.addEventListener(touchEvents.end, this._dragEnd)
+      document.addEventListener(mouseEvents.end, this._dragEnd)
+    }
 
     this.isDragging = true
 
     this.emit('drag:start')
-    addClass(this.element, 'active')
+    addClass(this.element, 'dragee-active')
     this.emit('drag:move')
   }
 
@@ -253,6 +280,21 @@ export default class Draggable extends EventEmitter {
     this.move(point)
   }
 
+  nativeDragMove(event) {
+    addClass(this.element, 'dragee-ghost')
+    this.currentEvent = event
+    if (event.clientX === 0 && event.clientY === 0) {
+      return
+    }
+
+    const touchPoint = new Point(event.clientX, event.clientY)
+    let point = this._startPosition.add(touchPoint.sub(this._startTouchPoint))
+    point = this.bounding.bound(point, this.getSize())
+    this.touchPoint = touchPoint
+    this.position = point
+    this.emit('drag:move')
+  }
+
   dragEnd(event) {
     const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
 
@@ -272,7 +314,18 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener(mouseEvents.end, this._dragEnd)
 
     this.isDragging = false
-    removeClass(this.element, 'active')
+    removeClass(this.element, 'dragee-active')
+  }
+
+  nativeDragEnd(_event) {
+    removeClass(this.element, 'dragee-ghost')
+    this.dragEndAction()
+    this.emit('drag:end')
+    document.removeEventListener('drag', this._nativeDragMove)
+    document.removeEventListener('dragend', this._nativeDragEnd)
+    this.isDragging = false
+    this.element.draggable = false
+    removeClass(this.element, 'dragee-active')
   }
 
   dragEndAction() {
@@ -307,9 +360,9 @@ export default class Draggable extends EventEmitter {
 
   set enable(enable) {
     if (enable) {
-      removeClass(this.element, 'disable')
+      removeClass(this.element, 'dragee-disable')
     } else {
-      addClass(this.element, 'disable')
+      addClass(this.element, 'dragee-disable')
     }
 
     return this._enable = enable

@@ -89,27 +89,25 @@
                         background: #f5f5f5;
                         position: relative;
                     }
-                    #DemoDraggable .area .draggable.active{
+                    #DemoDraggable .area .draggable.dragee-active{
                         z-index: 2;
                     }
-                    #DemoDraggable .area .draggable.draggable-b.active{
+                    #DemoDraggable .area .draggable.draggable-b.dragee-active{
                         background-color: rgb(75, 75, 75);
                         color: #fff;
                     }
-                    #DemoDraggable .area .draggable.draggable-b.active [class*="icon-"]{
-                        background-image: url("bootstrap/img/glyphicons-halflings-white.png");
-                    }
-                    #DemoDraggable .area .draggable.draggable-c.active{
+
+                    #DemoDraggable .area .draggable.draggable-c.dragee-active{
                         background-color: #ffc40d;
                     }
                 </style>
                 <script>
                     window.addEventListener("load", function(){
-                        var root = document.getElementById("DemoDraggable");
-                        root.querySelectorAll(".draggable").forEach(function(draggableElement){
+                        const root = document.getElementById("DemoDraggable");
+                        root.querySelectorAll(".draggable").forEach((draggableElement) => {
                             new Dragee.Draggable(draggableElement)
                         })
-                    });
+                    })
                 </script>
             </div>
             <div class="span6 demo-span">
@@ -166,7 +164,7 @@
                   background: red;
                 }
 
-                .draggable-area .draggable.active{
+                .draggable-area .draggable.dragee-active{
                   z-index: 2;
                 }
               </style>
@@ -282,19 +280,27 @@
                       border-radius: 5px;
                       background: #f5f5f5;
                       position: relative;
+                      transition: opacity 0ms;
                     }
-                    #DemoList ul.list li.active{
+                    #DemoList ul.list li.dragee-active{
                       z-index: 2;
                     }
 
-                    #DemoList ul.list.list-a{
+                    #DemoList ul.list.list-a {
                       width: 26%;
                     }
-                    #DemoList ul.list.list-b{
+                    #DemoList ul.list li.dragee-ghost {
+                      z-index: 0;
+                      opacity: 0.2;
+                      background: yellow;
+                      transition: opacity 0ms;
+                    }
+
+                    #DemoList ul.list.list-b {
                       width: 44%;
                     }
 
-                    #DemoList ul.list.list-b li{
+                    #DemoList ul.list.list-b li {
                       display: inline-block;
                     }
                 </style>
@@ -307,8 +313,19 @@
                             listBParentElement = root.getElementsByClassName("list-b")[0],
                             listBElements = listBParentElement.getElementsByTagName("li");
 
-                        listA = Dragee.List.factory(listAParentElement, listAElements, { list: { getDistance: Dragee.distance.getYDifference } });
-                        listB = Dragee.List.factory(listBParentElement, listBElements);
+                        listA = Dragee.List.factory(listAParentElement, listAElements, {
+                          list: {
+                            getDistance: Dragee.distance.getYDifference
+                          },
+                          draggable: {
+                            nativeDragging: true
+                          }
+                        });
+                        listB = Dragee.List.factory(listBParentElement, listBElements, {
+                          draggable: {
+                            nativeDragging: true
+                          }
+                        });
                     });
                 </script>
             </div>
@@ -425,7 +442,7 @@
                       float: left;
                     }
 
-                    #DemoTargetA ul.draggable-holder .draggable.active{
+                    #DemoTargetA ul.draggable-holder .draggable.dragee-active{
                       z-index: 2;
                       background: #ffc40d;
                     }
@@ -616,7 +633,7 @@
                       float: left;
                     }
 
-                    #DemoTargetB ul.draggable-holder .draggable.active{
+                    #DemoTargetB ul.draggable-holder .draggable.dragee-active{
                       z-index: 2;
                       background: #ffc40d;
                     }
@@ -735,7 +752,7 @@
                       position: relative;
                     }
 
-                    #DemoSpider ul.spider li.active{
+                    #DemoSpider ul.spider li.dragee-active{
                       z-index: 2;
                       background: #ffc40d;
                     }
@@ -809,7 +826,7 @@
                       position: relative;
                     }
 
-                    #DemoChart ul.chart li.active{
+                    #DemoChart ul.chart li.dragee-active{
                       z-index: 2;
                       background: #ffc40d;
                     }
@@ -882,7 +899,7 @@
                       background: #f5f5f5;
                     }
 
-                    #DemoArcSlider .arc-area .arc-slider.active:after{
+                    #DemoArcSlider .arc-area .arc-slider.dragee-active:after{
                       background: #ffc40d;
                     }
                 </style>
