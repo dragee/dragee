@@ -431,8 +431,8 @@
                     }
 
                     #DemoTargetA .area .target.target-b{
-                      padding-top: 40px;
-                      padding-bottom: 40px;
+                      padding-top: 60px;
+                      padding-bottom: 60px;
                     }
 
                     #DemoTargetA .area .target.target-c{
@@ -462,12 +462,12 @@
                 </style>
                 <script>
                     window.addEventListener("load", function(){
-                        var targetManger, draggables, targets,
-                            root = document.getElementById("DemoTargetA"),
-                            targetAreaElement = root.getElementsByClassName("area-a")[0],
-                            targetElements = targetAreaElement.getElementsByClassName("target"),
-                            draggableElements = targetAreaElement.getElementsByClassName("draggable"),
-                            classForTargets = ["green", "red", "blue"];
+                        const root = document.getElementById("DemoTargetA"),
+                              targetAreaElement = root.getElementsByClassName("area-a")[0],
+                              targetElements = targetAreaElement.getElementsByClassName("target"),
+                              draggableElements = targetAreaElement.getElementsByClassName("draggable"),
+                              classForTargets = ["green", "red", "blue"];
+                              strategies = [Dragee.FloatLeftStrategy, Dragee.FloatLeftStrategy, Dragee.FloatRightStrategy]
 
                         draggables = [...draggableElements].map((element, i) => {
                             return new Dragee.Draggable(element, {
@@ -479,12 +479,14 @@
                         targets = [...targetElements].map((element, i) => {
                             const target = new Dragee.Target(element, draggables, {
                               parent: targetAreaElement,
-                              strategy: new Dragee.FloatRightStrategy(
+                              strategy: new strategies[i](
                                 () => target.getRectangle(),
                                 {
                                   radius: 80,
                                   getDistance: Dragee.distance.transformedSpaceDistanceFactory({ x: 1, y: 4 }),
-                                  removable: true
+                                  removable: true,
+                                  paddingTopLeft: new Dragee.Point(5, 5),
+                                  yGapBetweenDraggables: 5
                                 }
                               ),
                               on: {

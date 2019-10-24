@@ -80,13 +80,13 @@ class FloatLeftStrategy extends BasicStrategy {
     const rectP2 = boundRect.getP2()
     let boundaryPoints = [boundRect.position]
 
-    rectangleList.forEach((rect) => {
+    rectangleList.forEach((rect, rectIndex) => {
       let position, isValid = false
       for (let i = 0; i < boundaryPoints.length; i++) {
-        position = (new Point(
-          boundaryPoints[i].x,
-          i > 0 ? (boundaryPoints[i - 1].y + this.yGapBetweenDraggables) : boundRect.position.y)
-        ).add(this.paddingTopLeft)
+        position = new Point(
+          boundaryPoints[i].x + this.paddingTopLeft.x,
+          i > 0 ? (boundaryPoints[i - 1].y + this.yGapBetweenDraggables) : (boundRect.position.y + this.paddingTopLeft.y)
+        )
 
         isValid = (position.x + rect.size.x < rectP2.x)
 
@@ -96,10 +96,10 @@ class FloatLeftStrategy extends BasicStrategy {
       }
 
       if (!isValid) {
-        position = (new Point(
-          boundRect.position.x,
-          boundaryPoints[boundaryPoints.length - 1].y + this.yGapBetweenDraggables)
-        ).add(this.paddingTopLeft)
+        position = new Point(
+          boundRect.position.x + this.paddingTopLeft.x,
+          boundaryPoints[boundaryPoints.length - 1].y + (rectIndex > 0 ? this.yGapBetweenDraggables : this.paddingTopLeft.y)
+        )
       }
 
       rect.position = position
@@ -139,7 +139,6 @@ class FloatRightStrategy extends FloatLeftStrategy {
     this.paddingBottomLeft = options.paddingBottomLeft || new Point(0, 0)
     this.yGapBetweenDraggables = options.yGapBetweenDraggables || 0
 
-    this.paddingTopNegRight = new Point(-this.paddingTopRight.x, this.paddingTopRight.y)
     this.paddingBottomNegLeft = new Point(-this.paddingBottomLeft.x, this.paddingBottomLeft.y)
   }
 
@@ -147,13 +146,13 @@ class FloatRightStrategy extends FloatLeftStrategy {
     const boundRect = this.boundRect
     let boundaryPoints = [boundRect.getP2()]
 
-    rectangleList.forEach((rect) => {
+    rectangleList.forEach((rect, rectIndex) => {
       let position, isValid = false
       for (let i = 0; i < boundaryPoints.length; i++) {
-        position = (new Point(
-          boundaryPoints[i].x - rect.size.x,
-          i > 0 ? (boundaryPoints[i - 1].y + this.yGapBetweenDraggables) : boundRect.position.y)
-        ).add(this.paddingTopNegRight)
+        position = new Point(
+          boundaryPoints[i].x - rect.size.x - this.paddingTopRight.x,
+          i > 0 ? (boundaryPoints[i - 1].y + this.yGapBetweenDraggables) : (boundRect.position.y + this.paddingTopRight.y)
+        )
 
         isValid = (position.x > rect.position.x)
         if (isValid) {
@@ -161,10 +160,10 @@ class FloatRightStrategy extends FloatLeftStrategy {
         }
       }
       if (!isValid) {
-        position = (new Point(
-          boundRect.getP2().x - rect.size.x,
-          boundaryPoints[boundaryPoints.length - 1].y + this.yGapBetweenDraggables)
-        ).add(this.paddingTopNegRight)
+        position = new Point(
+          boundRect.getP2().x  - rect.size.x - this.paddingTopRight.x,
+          boundaryPoints[boundaryPoints.length - 1].y + (rectIndex > 0 ? this.yGapBetweenDraggables : this.paddingTopRight.y)
+        )
       }
       rect.position = position
       if (this.options.removable && rect.getP4().y > boundRect.getP4().y) {
