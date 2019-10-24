@@ -80,11 +80,13 @@ export default class Draggable extends EventEmitter {
     this._dragStart = this.dragStart.bind(this)
     this._dragMove = this.dragMove.bind(this)
     this._dragEnd = this.dragEnd.bind(this)
+    this._nativeDragStart = this.nativeDragStart.bind(this)
     this._nativeDragMove = this.nativeDragMove.bind(this)
     this._nativeDragEnd = this.nativeDragEnd.bind(this)
 
     this.handler.addEventListener(touchEvents.start, this._dragStart)
     this.handler.addEventListener(mouseEvents.start, this._dragStart)
+    this.handler.addEventListener('dragstart', this._nativeDragStart)
 
     if (this.bounding.refresh) {
       this.bounding.refresh()
@@ -237,8 +239,6 @@ export default class Draggable extends EventEmitter {
 
     if (this.options.nativeDragging) {
       this.element.draggable = true
-      document.addEventListener('drag', this._nativeDragMove)
-      document.addEventListener('dragend', this._nativeDragEnd)
     } else {
       document.addEventListener(touchEvents.move, this._dragMove)
       document.addEventListener(mouseEvents.move, this._dragMove)
@@ -248,10 +248,15 @@ export default class Draggable extends EventEmitter {
     }
 
     this.isDragging = true
-
     this.emit('drag:start')
     addClass(this.element, 'dragee-active')
     this.emit('drag:move')
+  }
+
+  nativeDragStart(event) {
+    event.dataTransfer.setData('application/draggable', this)
+    document.addEventListener('dragover', this._nativeDragMove)
+    document.addEventListener('dragend', this._nativeDragEnd)
   }
 
   dragMove(event) {
@@ -321,7 +326,7 @@ export default class Draggable extends EventEmitter {
     removeClass(this.element, 'dragee-ghost')
     this.dragEndAction()
     this.emit('drag:end')
-    document.removeEventListener('drag', this._nativeDragMove)
+    document.removeEventListener('dragover', this._nativeDragMove)
     document.removeEventListener('dragend', this._nativeDragEnd)
     this.isDragging = false
     this.element.draggable = false
