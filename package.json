@@ -25,7 +25,8 @@
   "author": "Vitaliy Yarovuy, Volodymyr Myskov",
   "license": "ISC",
   "dependencies": {
-    "desandro-get-style-property": "^1.0.4"
+    "desandro-get-style-property": "^1.0.4",
+    "is-support-passive-events": "^1.1.0"
   },
   "module": "src/index.js",
   "main": "dist/index.bundle.js",

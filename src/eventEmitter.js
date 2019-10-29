@@ -16,8 +16,8 @@ export default class EventEmitter {
 
     if (!this.events[eventName]) return
 
-    for (let i = 0; i < this.events[eventName].length; i++) {
-      this.events[eventName][i].apply(this.context, args)
+    for (const func of this.events[eventName]) {
+      func.apply(this.context, args)
       if (this.interrupted) {
         return
       }

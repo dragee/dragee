@@ -49,7 +49,8 @@ export default class List extends EventEmitter {
           sortedDraggables[i+1].pinPosition(pinnedPositions[i], this.options.timeExcange)
         }
       }
-      if (draggable.options.nativeDragging) {
+
+      if (draggable.nativeDragAndDrop) {
         draggable.pinPosition(pinnedPositions[targetIndex])
       } else {
         draggable.pinnedPosition = pinnedPositions[targetIndex]

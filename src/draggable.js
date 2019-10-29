@@ -6,6 +6,7 @@ import { BoundToElement } from './bounding'
 import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 import { defaultScope } from './scope'
+import isSupportPassiveEvents from 'is-support-passive-events'
 
 const isTouch = 'ontouchstart' in window
 const mouseEvents = {
@@ -43,69 +44,62 @@ function addToDefaultScope(draggable) {
   defaultScope.addDraggable(draggable)
 }
 
+function copyStyles(source, destination) {
+  const cs = window.getComputedStyle(source)
+
+  for (let i = 0; i < cs.length; i++) {
+    const key = cs[i]
+    if ((key.indexOf('transition') < 0) && (key.indexOf('transform') < 0)) {
+      destination.style[key] = cs[key]
+    }
+  }
+
+  for (let i = 0; i < source.children.length; i++) {
+    copyStyles(source.children[i], destination.children[i])
+  }
+}
+
 export default class Draggable extends EventEmitter {
   constructor(element, options={}) {
     super(undefined, options)
-    const parent = options.parent || getDefaultParent(element)
     this.targets = []
-    this.options = Object.assign({
-      parent: parent,
-      bounding: new BoundToElement(parent, parent),
-      isContentBoxSize: false,
-      nativeDragging: false
-    }, options)
-
-    if (typeof options.handler === 'string') {
-      this.handler = element.querySelector(options.handler) || element
-    } else {
-      this.handler = options.handler || element
-    }
-
+    this.options = options
     this.element = element
-    this.bounding = this.options.bounding
     preventDoubleInit(this)
     Draggable.emitter.emit('draggable:create', this)
-    this.init()
-  }
-
-  init() {
     this._enable = true
+    this.startPositioning()
+    this.startListening()
+  }
+
+  startPositioning() {
     this._setDefaultTransition()
-    this.offset = Point.elementOffset(this.element, this.options.parent, true)
+    this.offset = Point.elementOffset(this.element, this.parent, true)
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
+
     this.pinPosition(this.initialPosition)
 
-    this._dragStart = this.dragStart.bind(this)
-    this._dragMove = this.dragMove.bind(this)
-    this._dragEnd = this.dragEnd.bind(this)
-    this._nativeDragStart = this.nativeDragStart.bind(this)
-    this._nativeDragMove = this.nativeDragMove.bind(this)
-    this._nativeDragEnd = this.nativeDragEnd.bind(this)
+    if (this.bounding.refresh) {
+      this.bounding.refresh()
+    }
+  }
 
-    this.handler.addEventListener(touchEvents.start, this._dragStart)
-    this.handler.addEventListener(mouseEvents.start, this._dragStart)
+  startListening() {
+    this._dragStart = (event) => this.dragStart(event)
+    this._dragMove = (event) => this.dragMove(event)
+    this._dragEnd = (event) => this.dragEnd(event)
+    this._nativeDragStart = (event) => this.nativeDragStart(event)
+    this._nativeDragMove = (event) => this.nativeDragMove(event)
+    this._nativeDragEnd = (event) => this.nativeDragEnd(event)
+
+    this.handler.addEventListener(touchEvents.start, this._dragStart, isSupportPassiveEvents ? { passive: false } : false)
+    this.handler.addEventListener(mouseEvents.start, this._dragStart, isSupportPassiveEvents ? { passive: false } : false)
     this.handler.addEventListener('dragstart', this._nativeDragStart)
-
-    if (this.bounding.refresh) {
-      this.bounding.refresh()
-    }
   }
 
-  reinit() {
-    this.offset = Point.elementOffset(this.element, this.options.parent, true)
-    this.pinnedPosition = this.offset
-    this.position = this.offset
-    this.initialPosition = this.options.position || this.offset
-    this.pinPosition(this.initialPosition)
-
-    if (this.bounding.refresh) {
-      this.bounding.refresh()
-    }
-  }
-
-  getSize(_recalulate) {
+  getSize() {
     return Point.elementSize(this.element, this.options.isContentBoxSize)
   }
 
@@ -231,20 +225,24 @@ export default class Draggable extends EventEmitter {
       event.target.focus()
     }
 
-    if (!(this.options.nativeDragging ||
+    if (!(this.nativeDragAndDrop ||
             event.target instanceof window.HTMLInputElement ||
             event.target instanceof window.HTMLInputElement)) {
       event.preventDefault()
     }
 
-    if (this.options.nativeDragging) {
-      this.element.draggable = true
+    if (this.nativeDragAndDrop) {
+      if (isTouchEvent && this.emulateNativeDragAndDropOnTouch) {
+        this.emulateNativeDragAndDrop(event)
+      } else {
+        this.element.draggable = true
+      }
     } else {
-      document.addEventListener(touchEvents.move, this._dragMove)
-      document.addEventListener(mouseEvents.move, this._dragMove)
+      document.addEventListener(touchEvents.move, this._dragMove, isSupportPassiveEvents ? { passive: false } : false)
+      document.addEventListener(mouseEvents.move, this._dragMove, isSupportPassiveEvents ? { passive: false } : false)
 
-      document.addEventListener(touchEvents.end, this._dragEnd)
-      document.addEventListener(mouseEvents.end, this._dragEnd)
+      document.addEventListener(touchEvents.end, this._dragEnd, isSupportPassiveEvents ? { passive: false } : false)
+      document.addEventListener(mouseEvents.end, this._dragEnd, isSupportPassiveEvents ? { passive: false } : false)
     }
 
     this.isDragging = true
@@ -253,10 +251,16 @@ export default class Draggable extends EventEmitter {
     this.emit('drag:move')
   }
 
-  nativeDragStart(event) {
-    event.dataTransfer.setData('application/draggable', this)
-    document.addEventListener('dragover', this._nativeDragMove)
-    document.addEventListener('dragend', this._nativeDragEnd)
+  stopDragging() {
+    document.removeEventListener(touchEvents.move, this._dragMove)
+    document.removeEventListener(mouseEvents.move, this._dragMove)
+    document.removeEventListener(touchEvents.end, this._dragEnd)
+    document.removeEventListener(mouseEvents.end, this._dragEnd)
+    document.removeEventListener('dragover', this._nativeDragMove)
+    document.removeEventListener('dragend', this._nativeDragEnd)
+    this.element.draggable = false
+    this.isDragging = false
+    removeClass(this.element, 'dragee-active')
   }
 
   dragMove(event) {
@@ -285,21 +289,6 @@ export default class Draggable extends EventEmitter {
     this.move(point)
   }
 
-  nativeDragMove(event) {
-    addClass(this.element, 'dragee-ghost')
-    this.currentEvent = event
-    if (event.clientX === 0 && event.clientY === 0) {
-      return
-    }
-
-    const touchPoint = new Point(event.clientX, event.clientY)
-    let point = this._startPosition.add(touchPoint.sub(this._startTouchPoint))
-    point = this.bounding.bound(point, this.getSize())
-    this.touchPoint = touchPoint
-    this.position = point
-    this.emit('drag:move')
-  }
-
   dragEnd(event) {
     const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
 
@@ -322,8 +311,29 @@ export default class Draggable extends EventEmitter {
     removeClass(this.element, 'dragee-active')
   }
 
+  nativeDragStart(event) {
+    event.dataTransfer.setData('application/draggable', this)
+    document.addEventListener('dragover', this._nativeDragMove)
+    document.addEventListener('dragend', this._nativeDragEnd)
+  }
+
+  nativeDragMove(event) {
+    addClass(this.element, 'dragee-placeholder')
+    this.currentEvent = event
+    if (event.clientX === 0 && event.clientY === 0) {
+      return
+    }
+
+    const touchPoint = new Point(event.clientX, event.clientY)
+    let point = this._startPosition.add(touchPoint.sub(this._startTouchPoint))
+    point = this.bounding.bound(point, this.getSize())
+    this.touchPoint = touchPoint
+    this.position = point
+    this.emit('drag:move')
+  }
+
   nativeDragEnd(_event) {
-    removeClass(this.element, 'dragee-ghost')
+    removeClass(this.element, 'dragee-placeholder')
     this.dragEndAction()
     this.emit('drag:end')
     document.removeEventListener('dragover', this._nativeDragMove)
@@ -331,6 +341,41 @@ export default class Draggable extends EventEmitter {
     this.isDragging = false
     this.element.draggable = false
     removeClass(this.element, 'dragee-active')
+  }
+
+  emulateNativeDragAndDrop(event) {
+    const parentRect = this.parent.getBoundingClientRect()
+    const clonedElement = this.element.cloneNode(true)
+    clonedElement.style[transformProperty] = ''
+    copyStyles(this.element, clonedElement)
+    clonedElement.style.position = 'absolute'
+    document.body.appendChild(clonedElement)
+    addClass(this.element, 'dragee-placeholder')
+
+    const emulationDraggable = new Draggable(clonedElement, {
+      on: {
+        'drag:move': () => {
+          this.position = new Point(
+            emulationDraggable.position.x - parentRect.left - window.scrollX,
+            emulationDraggable.position.y - parentRect.top - window.scrollY
+          )
+          this.emit('drag:move')
+        },
+        'drag:end': () => {
+          emulationDraggable.destroy()
+          document.body.removeChild(clonedElement)
+          removeClass(this.element, 'dragee-placeholder')
+          removeClass(this.element, 'dragee-active')
+        }
+      }
+    })
+
+    emulationDraggable.move(new Point(
+      this.pinnedPosition.x + parentRect.left + window.scrollX,
+      this.pinnedPosition.y + parentRect.top + window.scrollY
+    ))
+
+    emulationDraggable.dragStart(event)
   }
 
   dragEndAction() {
@@ -355,8 +400,43 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener(mouseEvents.move, this._dragMove)
     document.removeEventListener(touchEvents.end, this._dragEnd)
     document.removeEventListener(mouseEvents.end, this._dragEnd)
-
+    document.removeEventListener('dragstart', this._nativeDragStart)
+    document.removeEventListener('dragover', this._nativeDragMove)
+    document.removeEventListener('dragend', this._nativeDragEnd)
     this.resetEmitter()
+
+    const index = draggables.indexOf(this)
+    if (index > -1) {
+      draggables.splice(index, 1)
+    }
+  }
+
+  get parent() {
+    return (this._parent = this._parent || this.options.parent || getDefaultParent(this.element))
+  }
+
+  get bounding() {
+    return (this._bounding = this._bounding || this.options.bounding || new BoundToElement(this.parent, this.parent))
+  }
+
+  get handler() {
+    if (!this._handler) {
+      if (typeof this.options.handler === 'string') {
+        this._handler = this.element.querySelector(this.options.handler) || this.element
+      } else {
+        this._handler = this.options.handler || this.element
+      }
+    }
+
+    return this._handler
+  }
+
+  get nativeDragAndDrop() {
+    return this.options.nativeDragAndDrop || false
+  }
+
+  get emulateNativeDragAndDropOnTouch() {
+    return this.options.emulateNativeDragAndDropOnTouch || true
   }
 
   get enable() {

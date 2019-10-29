@@ -289,7 +289,7 @@
                     #DemoList ul.list.list-a {
                       width: 26%;
                     }
-                    #DemoList ul.list li.dragee-ghost {
+                    #DemoList ul.list li.dragee-placeholder {
                       z-index: 0;
                       opacity: 0.2;
                       background: yellow;
@@ -318,12 +318,12 @@
                             getDistance: Dragee.distance.getYDifference
                           },
                           draggable: {
-                            nativeDragging: true
+                            nativeDragAndDrop: true
                           }
                         });
                         listB = Dragee.List.factory(listBParentElement, listBElements, {
                           draggable: {
-                            nativeDragging: true
+                            // nativeDragAndDrop: true
                           }
                         });
                     });
