@@ -73,8 +73,7 @@ new Dragee.Draggable(draggableBElement, {
 
 ```javascript
 const container = document.getElementById("listA")
-let elements = container.querySelectorAll("li")
-elements = Array.prototype.slice.call(elements)
+const elements = [...container.querySelectorAll("li")]
 
 const draggables = elements.map((element) => {
   return new Draggable(element, {
