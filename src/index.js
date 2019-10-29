@@ -1,4 +1,3 @@
-import './expandnative'
 import Point from './geometry/point'
 import Rectangle from './geometry/point'
 import Draggable from './draggable'

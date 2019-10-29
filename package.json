@@ -33,12 +33,8 @@
   "homepage": "https://dragee.github.io/",
   "bugs": "https://github.com/dragee/dragee/issues",
   "keywords": [
-    "drag&drop",
     "drag",
-    "drop",
-    "dragging",
-    "draggable",
-    "sortable"
+    "drop"
   ],
   "sideEffects": false
 }

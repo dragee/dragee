@@ -86,7 +86,7 @@ export default class List extends EventEmitter {
     if (!(draggables instanceof Array)) {
       draggables = [draggables]
     }
-    draggables.forEach(this.initDraggable, this)
+    draggables.forEach((draggable) => this.initDraggable(draggable))
     this.draggables = this.draggables.concat(draggables)
   }
 
