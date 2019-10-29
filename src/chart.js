@@ -16,18 +16,6 @@ import Draggable from './draggable'
 import { BoundToArc } from './bounding'
 import EventEmitter from './eventEmitter'
 
-const isTouch = 'ontouchstart' in window
-const mouseEvents = {
-  start: 'mousedown',
-  move: 'mousemove',
-  end: 'mouseup'
-}
-const touchEvents = {
-  start: 'touchstart',
-  move: 'touchmove',
-  end: 'touchend'
-}
-
 const rnd = function() {
   return Math.round(Math.random()*255)
 }
@@ -66,8 +54,7 @@ export default class Chart extends EventEmitter {
       fillStyles: range(0, elements.length).map(() => randomColor()),
       initAngles: range(-90, 270, 360 / elements.length).map((angle) => toRadian(angle)),
       limitImg: null,
-      limitImgOffset: new Point(0, 0),
-      isSelectable: false
+      limitImgOffset: new Point(0, 0)
     }, options)
 
     this.area = area
@@ -103,35 +90,7 @@ export default class Chart extends EventEmitter {
     })
 
     this.isInit = true
-    if (this.options.isSelectable) {
-      this.initSelect()
-    }
     this.draw()
-  }
-
-  initSelect() {
-    this.setActiveArc(-1)
-    this.canvas.addEventListener(mouseEvents.start, (event) => this.onStart(event))
-    this.canvas.addEventListener(touchEvents.start, (event) => this.onStart(event))
-  }
-
-  onStart(event) {
-    const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
-
-    let point = new Point(
-      isTouchEvent ? event.changedTouches[0].pageX : event.clientX,
-      isTouchEvent ? event.changedTouches[0].pageY : event.clientY
-    )
-
-    if (!this.canvasOffset) {
-      this.canvasOffset = Point.elementOffset(this.canvas, this.canvas)
-    }
-
-    point = point.sub(this.canvasOffset)
-    const index = this.getArcOnPoint(point)
-    if (index !== -1) {
-      this.setActiveArc((this.activeArcIndex !== index) ? index : -1)
-    }
   }
 
   updateAngles() {
@@ -166,14 +125,7 @@ export default class Chart extends EventEmitter {
 
     this.draggables.forEach((_draggable, index) => {
       let enableIndexes
-      if (this.options.isSelectable) {
-        enableIndexes = getArrayWithBoundIndexes(this.activeArcIndex, this.draggables.length)
-        if (enableIndexes.indexOf(index) !== -1) {
-          this.drawLimitImg(index)
-        }
-      } else {
-        this.drawLimitImg(index)
-      }
+      this.drawLimitImg(index)
     })
 
     this.emit('chart:draw')

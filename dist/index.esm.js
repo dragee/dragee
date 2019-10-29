@@ -2557,18 +2557,6 @@ function (_EventEmitter) {
   return ArcSlider;
 }(EventEmitter);
 
-var isTouch$1 = 'ontouchstart' in window;
-var mouseEvents$1 = {
-  start: 'mousedown',
-  move: 'mousemove',
-  end: 'mouseup'
-};
-var touchEvents$1 = {
-  start: 'touchstart',
-  move: 'touchmove',
-  end: 'touchend'
-};
-
 var rnd = function rnd() {
   return Math.round(Math.random() * 255);
 };
@@ -2624,8 +2612,7 @@ function (_EventEmitter) {
         return toRadian(angle);
       }),
       limitImg: null,
-      limitImgOffset: new Point(0, 0),
-      isSelectable: false
+      limitImgOffset: new Point(0, 0)
     }, options);
     _this.area = area;
     _this.areaRectangle = areaRectangle;
@@ -2658,73 +2645,38 @@ function (_EventEmitter) {
         });
       });
       this.isInit = true;
-
-      if (this.options.isSelectable) {
-        this.initSelect();
-      }
-
       this.draw();
-    }
-  }, {
-    key: "initSelect",
-    value: function initSelect() {
-      var _this3 = this;
-
-      this.setActiveArc(-1);
-      this.canvas.addEventListener(mouseEvents$1.start, function (event) {
-        return _this3.onStart(event);
-      });
-      this.canvas.addEventListener(touchEvents$1.start, function (event) {
-        return _this3.onStart(event);
-      });
-    }
-  }, {
-    key: "onStart",
-    value: function onStart(event) {
-      var isTouchEvent = isTouch$1 && event instanceof window.TouchEvent;
-      var point = new Point(isTouchEvent ? event.changedTouches[0].pageX : event.clientX, isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
-
-      if (!this.canvasOffset) {
-        this.canvasOffset = Point.elementOffset(this.canvas, this.canvas);
-      }
-
-      point = point.sub(this.canvasOffset);
-      var index = this.getArcOnPoint(point);
-
-      if (index !== -1) {
-        this.setActiveArc(this.activeArcIndex !== index ? index : -1);
-      }
     }
   }, {
     key: "updateAngles",
     value: function updateAngles() {
-      var _this4 = this;
+      var _this3 = this;
 
       this.angles = this.draggables.map(function (draggable) {
         var halfSize = draggable.getSize().mult(0.5);
-        return getAngle(_this4.options.center.sub(halfSize), draggable.position);
+        return getAngle(_this3.options.center.sub(halfSize), draggable.position);
       });
     }
   }, {
     key: "getBoundAngle",
     value: function getBoundAngle(index, isClossing) {
-      var _this5 = this;
+      var _this4 = this;
 
       var sign = isClossing ? 1 : -1;
       return function () {
-        var i = (index + sign) % _this5.angles.length;
+        var i = (index + sign) % _this4.angles.length;
 
         if (i < 0) {
-          i += _this5.angles.length;
+          i += _this4.angles.length;
         }
 
-        return normalizeAngle(_this5.angles[i] - sign * _this5.options.boundAngle);
+        return normalizeAngle(_this4.angles[i] - sign * _this4.options.boundAngle);
       };
     }
   }, {
     key: "draw",
     value: function draw() {
-      var _this6 = this;
+      var _this5 = this;
 
       if (!this.isInit) {
         return;
@@ -2733,27 +2685,18 @@ function (_EventEmitter) {
       this.updateAngles();
       this.context.clearRect(0, 0, this.areaRectangle.size.x, this.areaRectangle.size.y);
       this.draggables.forEach(function (_draggable, index) {
-        _this6.drawArc(_this6.context, _this6.options.center, _this6.options.radius, index);
+        _this5.drawArc(_this5.context, _this5.options.center, _this5.options.radius, index);
       });
       this.draggables.forEach(function (_draggable, index) {
-        var enableIndexes;
 
-        if (_this6.options.isSelectable) {
-          enableIndexes = getArrayWithBoundIndexes(_this6.activeArcIndex, _this6.draggables.length);
-
-          if (enableIndexes.indexOf(index) !== -1) {
-            _this6.drawLimitImg(index);
-          }
-        } else {
-          _this6.drawLimitImg(index);
-        }
+        _this5.drawLimitImg(index);
       });
       this.emit('chart:draw');
     }
   }, {
     key: "createClone",
     value: function createClone(element) {
-      var _this7 = this;
+      var _this6 = this;
 
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -2773,8 +2716,8 @@ function (_EventEmitter) {
         draw: function draw() {
           context.clearRect(0, 0, rectangle.size.x, rectangle.size.y);
 
-          _this7.draggables.forEach(function (_draggable, index) {
-            _this7.drawArc(context, opts.center, opts.radius, index);
+          _this6.draggables.forEach(function (_draggable, index) {
+            _this6.drawArc(context, opts.center, opts.radius, index);
           });
         }
       };
@@ -2845,10 +2788,10 @@ function (_EventEmitter) {
   }, {
     key: "getArcBisectrixs",
     value: function getArcBisectrixs() {
-      var _this8 = this;
+      var _this7 = this;
 
       return this.getAnglesDiff().map(function (diffAngle, i) {
-        return normalizeAngle(_this8.angles[i] + diffAngle / 2);
+        return normalizeAngle(_this7.angles[i] + diffAngle / 2);
       });
     }
   }, {
@@ -2886,13 +2829,13 @@ function (_EventEmitter) {
   }, {
     key: "setAngles",
     value: function setAngles(angles) {
-      var _this9 = this;
+      var _this8 = this;
 
       this.angles = angles;
       this.draggables.forEach(function (draggable, i) {
-        var angle = _this9.angles[i];
+        var angle = _this8.angles[i];
         var halfSize = draggable.getSize().mult(0.5);
-        var position = getPointFromRadialSystem(angle, _this9.options.touchRadius, _this9.options.center.sub(halfSize));
+        var position = getPointFromRadialSystem(angle, _this8.options.touchRadius, _this8.options.center.sub(halfSize));
         draggable.moveAndSave(position);
       });
       this.draw();
