@@ -23,8 +23,8 @@
   "dependencies": {
     "desandro-get-style-property": "^1.0.4"
   },
-  "module": "dist/esm/index.js",
-  "main": "dist/umd/index.js",
+  "module": "dist/index.esm.js",
+  "main": "dist/index.umd.js",
   "homepage": "https://dragee.github.io/",
   "bugs": "https://github.com/dragee/dragee/issues",
   "keywords": [

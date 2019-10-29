@@ -7,7 +7,7 @@ export default [{
   input: 'src/index.js',
   output: [
     {
-      file: 'dist/esm/index.js',
+      file: 'dist/index.esm.js',
       format: 'esm',
       name: 'Dragee'
     }

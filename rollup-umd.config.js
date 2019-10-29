@@ -8,7 +8,7 @@ export default [{
   input: 'src/index.js',
   output: [
     {
-      file: 'dist/umd/index.js',
+      file: 'dist/index.umd.js',
       format: 'umd',
       name: 'Dragee'
     }
