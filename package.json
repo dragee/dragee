@@ -3,33 +3,28 @@
   "version": "0.9.0",
   "description": "Dragee(drag&drop) library",
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
-    "start": "webpack-dev-server --open --config webpack.dev.js",
+    "build": "rollup --config rollup-esm.config.js && rollup --config rollup-umd.config.js",
     "eslint": "eslint --ext .js ."
   },
   "devDependencies": {
-    "@babel/core": "^7.6.2",
-    "@babel/preset-env": "^7.6.2",
-    "babel-eslint": "^10.0.3",
-    "babel-loader": "^8.0.6",
-    "clean-webpack-plugin": "^3.0.0",
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
     "eslint": "^6.5.1",
-    "eslint-loader": "^3.0.2",
-    "webpack": "^4.41.0",
-    "webpack-cli": "^3.3.9",
-    "webpack-dev-server": "^3.8.2",
-    "webpack-merge": "^4.2.2",
-    "yargs": "3.32.0"
+    "rollup": "^1.26.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-size-snapshot": "^0.10.0",
+    "rollup-plugin-uglify": "^6.0.3"
   },
   "repository": "github:dragee/dragee",
   "author": "Vitaliy Yarovuy, Volodymyr Myskov",
   "license": "ISC",
   "dependencies": {
-    "desandro-get-style-property": "^1.0.4",
-    "is-support-passive-events": "^1.1.0"
+    "desandro-get-style-property": "^1.0.4"
   },
-  "module": "src/index.js",
-  "main": "dist/index.bundle.js",
+  "module": "dist/esm/index.js",
+  "main": "dist/umd/index.js",
   "homepage": "https://dragee.github.io/",
   "bugs": "https://github.com/dragee/dragee/issues",
   "keywords": [

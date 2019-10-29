@@ -6,7 +6,7 @@ import { BoundToElement } from './bounding'
 import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 import { defaultScope } from './scope'
-import isSupportPassiveEvents from 'is-support-passive-events'
+import isSupportPassiveEvents from './utils/is-support-passive-events'
 
 const isTouch = 'ontouchstart' in window
 const mouseEvents = {
