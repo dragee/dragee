@@ -1,27 +1,53 @@
-import './expandnative'
-import {Point, Rectangle, Geometry} from './geometry'
-import {Draggable} from './draggable'
-import {List, listFactory} from './list'
-import {targets, Target} from './target'
-import {scopes, defaultScope, Scope, scopeFactory, scope} from './scope'
-import {positionType, sortingFactory, positionFactory } from './positioning'
-import {bound} from './bound'
-import {spiders, Spider} from './spider'
-import {arcSliders, ArcSlider} from './arcslider'
-import {charts, Chart} from './chart'
-import {listSwitcherFactory, ListSwitcher} from './listswitcher'
+import Point from './geometry/point'
+import Rectangle from './geometry/point'
+import Draggable from './draggable'
+import List from './list'
+import Target from './target'
+import { scopes, defaultScope, Scope, scope } from './scope'
+import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './positioning'
+import Spider from './spider'
+import ArcSlider from './arcslider'
+import Chart from './chart'
+import { getDistance, getXDifference, getYDifference, transformedSpaceDistanceFactory } from './geometry/distances'
+import { addClass, removeClass } from './utils/classes'
+import {
+  BoundToRectangle,
+  BoundToElement,
+  BoundToLineX,
+  BoundToLineY,
+  BoundToLine,
+  BoundToCircle,
+  BoundToArc
+} from './bounding'
 
-global.Point = Point
+const bound = {
+  BoundToRectangle,
+  BoundToElement,
+  BoundToLineX,
+  BoundToLineY,
+  BoundToLine,
+  BoundToCircle,
+  BoundToArc
+}
 
-export { Draggable,
-  Point, Rectangle, Geometry,
-  List, listFactory,
-  targets, Target,
-  scopes, defaultScope, Scope, scopeFactory, scope,
-  positionType, sortingFactory, positionFactory,
+const distance = {
+  getDistance,
+  getXDifference,
+  getYDifference,
+  transformedSpaceDistanceFactory
+}
+
+export {
+  Draggable,
+  Point, Rectangle,
+  List,
+  Target,
+  scopes, defaultScope, Scope, scope,
+  NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy,
+  Spider,
+  ArcSlider,
+  Chart,
   bound,
-  spiders, Spider,
-  arcSliders, ArcSlider,
-  charts, Chart,
-  listSwitcherFactory, ListSwitcher,
+  distance,
+  addClass, removeClass
 }

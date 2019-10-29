@@ -1,25 +1,35 @@
 {
   "name": "dragee",
-  "version": "0.8.0",
-  "description": "drag&drop framework",
+  "version": "0.9.0",
+  "description": "Dragee(drag&drop) library",
   "scripts": {
-    "build": "webpack --mode=build",
-    "dev": "webpack --progress --colors --watch --mode=dev"
+    "build": "rollup --config rollup-esm.config.js && rollup --config rollup-umd.config.js",
+    "eslint": "eslint --ext .js ."
   },
   "devDependencies": {
-    "babel": "6.3.13",
-    "babel-core": "6.1.18",
-    "babel-loader": "6.1.0",
-    "babel-plugin-add-module-exports": "0.1.2",
-    "babel-preset-es2015": "6.3.13",
-    "webpack": "1.12.9",
-    "yargs": "3.32.0",
-    "desandro-get-style-property": "1.0.4"
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "eslint": "^6.5.1",
+    "rollup": "^1.26.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-size-snapshot": "^0.10.0",
+    "rollup-plugin-uglify": "^6.0.3"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:dragee/dragee.git"
-  },
+  "repository": "github:dragee/dragee",
   "author": "Vitaliy Yarovuy, Volodymyr Myskov",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "desandro-get-style-property": "^1.0.4"
+  },
+  "module": "dist/index.esm.js",
+  "main": "dist/index.umd.js",
+  "homepage": "https://dragee.github.io/",
+  "bugs": "https://github.com/dragee/dragee/issues",
+  "keywords": [
+    "drag",
+    "drop"
+  ],
+  "sideEffects": false
 }

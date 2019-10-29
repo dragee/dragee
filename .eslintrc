@@ -1,0 +1,131 @@
+{
+  "parserOptions": {
+    "parser": "babel-eslint",
+    "ecmaVersion": 6,
+    "sourceType": "module",
+  },
+  "rules": {
+    // redundant
+    "no-console": "off",
+    "no-extra-boolean-cast": "off",
+    "no-prototype-builtins": "off",
+    // text safe
+    "eol-last": [ "warn", "always" ],
+    "indent": "off",
+    "indent-legacy": [ "warn", 2 ],
+    "linebreak-style": [ "warn", "unix" ],
+    "no-trailing-spaces": "warn",
+    "no-multiple-empty-lines": [ "warn", { "max": 1 }],
+    // spacing safe
+    "key-spacing": [ "warn", { "mode": "minimum" }],
+    "arrow-spacing": "warn",
+    "block-spacing": [ "warn", "always" ],
+    "comma-spacing": "warn",
+    "keyword-spacing": "warn",
+    "space-in-parens": "warn",
+    "space-unary-ops": "warn",
+    "func-call-spacing": [ "warn", "never" ],
+    "rest-spread-spacing": "warn",
+    "space-before-blocks": "warn",
+    "object-curly-spacing": [ "warn", "always" ],
+    "array-bracket-spacing": [ "warn", "never", {
+      "arraysInArrays": false,
+      "objectsInArrays": false
+    }],
+    "computed-property-spacing": "warn",
+    "space-before-function-paren": [ "warn", {
+        "anonymous": "never",
+        "named": "ignore",
+        "asyncArrow": "always"
+    }],
+    "no-whitespace-before-property": "warn",
+    // vars safe
+    "prefer-const": "warn",
+    "no-var": "warn",
+    "no-unused-vars": [ "warn", {
+      "args": "all",
+      "argsIgnorePattern": "^_",
+      "caughtErrors": "all",
+      "caughtErrorsIgnorePattern": "^_"
+    }],
+    "no-unused-expressions": [ "warn", {
+      "allowTernary": true
+    }],
+    // vars unsafe
+    "no-shadow-restricted-names": "error",
+    // code-style safe
+    "semi": [ "warn", "never" ],
+    "curly": [ "warn", "multi-line", "consistent" ],
+    "eqeqeq": [ "warn", "always" ],
+    "quotes": [ "warn", "single", { "avoidEscape": true }],
+    "wrap-iife": "warn",
+    "brace-style": "warn",
+    "comma-style": "warn",
+    "quote-props": [ "warn", "as-needed" ],
+    "comma-dangle": [ "warn", "never"],
+    "no-extra-parens": [ "warn", "functions" ],
+    "no-new-wrappers": "warn",
+    "no-useless-call": "warn",
+    "no-throw-literal": "warn",
+    "no-empty-function": "off", // warn
+    "no-useless-escape": "warn",
+    "no-useless-rename": "warn",
+    "no-useless-computed-key": "warn",
+    "no-template-curly-in-string": "warn",
+    "no-misleading-character-class": "warn",
+    // code-style unsafe
+    "new-parens": "error",
+    "guard-for-in": "error",
+    "array-callback-return": "error",
+    "no-eval": "error",
+    "no-void": "error",
+    "no-with": "error",
+    "no-labels": "error",
+    "no-bitwise": "error",
+    "no-loop-func": "error",
+    "no-multi-str": "error",
+    "no-sequences": "error",
+    "no-lone-blocks": "error",
+    "no-implied-eval": "error",
+    "no-octal-escape": "error",
+    "no-self-compare": "error",
+    "no-useless-catch": "error",
+    "no-useless-return": "error",
+    "no-floating-decimal": "error",
+    "no-use-before-define": [ "error", {
+      "classes": false,
+      "variables": false,
+      "functions": false
+    }],
+    "no-unmodified-loop-condition": "error",
+    // code-style unsafe, but may be necessary during development
+    "no-alert": "warn",
+    "no-debugger": "warn"
+  },
+  "env": {
+    "node": true,
+    "jasmine": true,
+    "jest": true,
+    "browser": false // browser env allows using "length" variable
+                      // and many other variables with common names
+                      // defined in global object
+  },
+  "globals": {
+    "Node": true,
+    "window": true,
+    "NodeList": true,
+    "document": true,
+    "console": true,
+    "setInterval": true,
+    "setTimeout": true,
+    "setImmediate": true,
+    "clearInterval": true,
+    "clearTimeout": true,
+    "clearImmediate": true,
+    "cancelIdleCallback": true,
+    "requestIdleCallback": true,
+    "cancelAnimationFrame": true,
+    "requestAnimationFrame": true
+  },
+  "extends": ["eslint:recommended"]
+}

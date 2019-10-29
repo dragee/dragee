@@ -1,49 +1,98 @@
-# Dragee
+# Getting Started
 
-[dragee.github.io](http://dragee.github.io) - drag&drop library for desktop and touch devices
+Install with npm
 
-# Dragee.Draggable
-```javascript
-Draggable(element[, options])
 ```
-##### Example:
-```javascript
-function boundPoint(point, size){ return point; }
+npm install dragee
+```
 
-that.draggable = new Dragee.Draggable(that.element, {
-    bound: boundPoint,
-    onMove: that.moveCorners.bind(this),
-    onEnd: onEnd
+Install with yarn
+```
+yarn add dragee
+```
+
+Import to you project
+```javascript
+import { Draggable, List, ... } from Dragee
+```
+
+# Usage
+
+## Draggable
+```html
+<div class="area">
+    <div id="draggable">
+        <i class="icon-move"></i> A
+    </div>
+</div>
+```
+
+```javascript
+var element = document.getElementById('draggable')
+new Draggable(element)
+```
+
+## Bounding
+
+We can describe bounding for `Draggable` movements. We can restrict to move inside parent, using line description, circle description, etc.
+
+```javascript
+new Draggable(draggableAElement, {
+    bounding: Dragee.bound.BoundToCircle(new Point(100, 90), 80),
+    position: new Point(100, 10)
+})
+
+function calculusFx(x) {
+    x = x/100;
+    return (x*Math.sin(x*x)+1)*10 + 80;
+}
+
+new Dragee.Draggable(draggableBElement, {
+    bounding: {
+        bound: (point, size) => {
+            const retPoint = point.clone()
+            retPoint.y = calculusFx(point.x)
+            return retPoint
+        }
+    },
+    position: new Point(210, calculusFx(210))
 });
 ```
 
-# Dragee.Target
-```javascript
-Target(element, draggables[, options])
+## List
+```html
+<ul id="listA" class="list">
+    <li>↔ A</li>
+    <li>↔ B</li>
+    <li>↔ C</li>
+    <li>↔ D</li>
+    <li>↔ E</li>
+    <li>↔ F</li>
+</ul>
 ```
 
-##### Example:
 ```javascript
-var target = new Dragee.Target(element, draggables, {
-    parent: targetAreaElement,
-    positioning: Dragee.positionFactory(Dragee.positionType.notCrossing)(function(){
-        return target.getRectangle();
-    }),
-    sorting: Dragee.sortingFactory(Dragee.positionType.notCrossing)(),
-    onAdd: function(draggable){
-        draggable.element.addClass("ontarget");
-    },
-    onRemove: function(draggable){
-        draggable.element.removeClass("ontarget");
+const container = document.getElementById("listA")
+let elements = container.querySelectorAll("li")
+elements = Array.prototype.slice.call(elements)
+
+const draggables = elements.map((element) => {
+  return new Draggable(element, {
+    parent: container
+  })
+})
+
+const new List(draggables, {
+    getDistance: Dragee.distance.getYDifference
+})
+````
+
+or
+
+```javascript
+List.factory(listAParentElement, listAElements, {
+    list: {
+        getDistance: Dragee.distance.getYDifference
     }
 });
 ```
-
-# Development
-
-## install
-`npm install`
-
-## commands
-`npm run build`
-`npm run dev`

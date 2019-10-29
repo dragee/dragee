@@ -1,158 +1,122 @@
-'use strict';
+import removeItem from './utils/remove-array-item'
+import EventEmitter from './eventEmitter'
+import Draggable from './draggable'
+import Target from './target'
 
-import util from './util'
-import Event from './event'
-import {Draggable} from './draggable'
-import {targets, Target} from './target'
+const scopes = []
 
-var Dragee = { util, Draggable,  Target, Event };//todo remove after refactore
+class Scope extends EventEmitter {
+  constructor(draggables, targets, options={}) {
+    super(undefined, options)
+    scopes.forEach((scope) => {
+      if (draggables) {
+        draggables.forEach((draggable) => {
+          removeItem(scope.draggables, draggable)
+        })
+      }
 
-var scopes = [], defaultScope;
+      if (targets) {
+        targets.forEach((target) => {
+          removeItem(scope.targets, target)
+        })
+      }
+    })
 
-function Scope(draggables, targets, options){
-    scopes.forEach(function(scope){
-        draggables && draggables.forEach(function(draggable){
-            scope.draggables.removeItem(draggable);
-        });
-        targets && targets.forEach(function(target){
-            scope.targets.removeItem(target);
-        });
-    });
-
-    this.draggables = draggables || [];
-    this.targets = targets || [];
-    scopes.push(this);
+    this.draggables = draggables || []
+    this.targets = targets || []
+    scopes.push(this)
     this.options = {
-        timeEnd: (options && options.timeEnd) || 400
-    };
-
-    this.onChange = new Dragee.Event(this);
-    if(options && options.onChange){
-        this.onChange.add(options.onChange);
+      timeEnd: (options.timeEnd) || 400
     }
-    this.init();
+
+    this.init()
+  }
+
+  init() {
+    this.draggables.forEach((draggable) => {
+      draggable.dragEndAction = () => this.onEnd(draggable)
+    })
+  }
+
+  addDraggable(draggable) {
+    this.draggables.push(draggable)
+    draggable.dragEndAction = () => this.onEnd(draggable)
+  }
+
+  addTarget(target) {
+    this.targets.push(target)
+  }
+
+  onEnd(draggable) {
+    const shotTargets = this.targets.filter((target) => {
+      return target.draggables.indexOf(draggable) !== -1
+    }).filter((target) => {
+      return target.catchDraggable(draggable)
+    }).sort((a, b) => {
+      return a.getRectangle().getSquare() - b.getRectangle().getSquare()
+    })
+
+    if (shotTargets.length) {
+      shotTargets[0].onEnd(draggable)
+    } else if (draggable.targets.length) {
+      draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
+    }
+
+    this.emit('scope:change')
+  }
+
+  reset() {
+    this.targets.forEach((target) => target.reset())
+  }
+
+  refresh() {
+    this.draggables.forEach((draggable) => draggable.refresh())
+    this.targets.forEach((target) => target.refresh())
+  }
+
+  get positions() {
+    return this.targets.map((target) => {
+      return target.innerDraggables.map((draggable) => this.draggables.indexOf(draggable))
+    })
+  }
+
+  set positions(positions) {
+    const message = 'wrong array length'
+    if (positions.length === this.targets.length) {
+      this.targets.forEach((target) => target.reset())
+
+      positions.forEach((targetIndexes, i) => {
+        targetIndexes.forEach((index) => {
+          this.targets[i].add(this.draggables[index])
+        })
+      })
+    } else {
+      throw message
+    }
+  }
 }
 
-Scope.prototype.init = function(){
-    var that = this;
-    this.draggables.forEach(function(draggable){
-        draggable.onEnd.add(function(){
-            return that.onEnd(this);
-        });
-    });
-};
+const defaultScope = new Scope()
 
-Scope.prototype.addDraggable = function(draggable){
-    var that = this;
+function scope(fn) {
+  const currentScope = new Scope()
 
-    this.draggables.push(draggable);
-    draggable.onEnd.unshift(function(){
-        return that.onEnd(this);
-    });
-};
+  const addDraggableToScope = function(draggable) {
+    currentScope.addDraggable(draggable)
+    Draggable.emitter.interrupt()
+  }
 
-Scope.prototype.addTarget = function(target){
-    this.targets.push(target);
-};
+  const addTargetToScope = function(target) {
+    currentScope.addTarget(target)
+    Draggable.emitter.interrupt()
+  }
 
-Scope.prototype.onEnd = function(draggable){
-    var shotTargets = this.targets.filter(function(target){
-        return target.draggables.indexOf(draggable) !== -1;
-    }).filter(function(target){
-        return target.catchDraggable(draggable);
-    }).sort(function(a, b){
-        return a.getRectangle().getSquare() - b.getRectangle().getSquare();
-    });
-
-    if(shotTargets.length){
-        shotTargets[0].onEnd(draggable);
-    } else if(draggable.targets.length) {
-        draggable.move(draggable.initPosition, this.options.timeEnd, true, true);
-    }
-    this.onChange.fire();
-    return true;
-};
-
-Scope.prototype.reset = function(){
-    this.targets.forEach(function(target){
-        target.reset();
-    });
-};
-
-Scope.prototype.refresh = function(){
-    this.draggables.forEach(function(draggable){
-        draggable.refresh();
-    });
-    this.targets.forEach(function(target){
-        target.refresh();
-    });
-};
-
-Scope.prototype.__defineGetter__("positions", function(){
-    return this.targets.map(function(target){
-        return target.innerDraggables.map(function(draggable){
-            return this.draggables.indexOf(draggable);
-        }, this);
-    }, this);
-});
-
-Scope.prototype.__defineSetter__("positions", function(positions){
-    var message = "wrong array length";
-    if(positions.length === this.targets.length){
-        this.targets.forEach(function(target){
-            target.reset();
-        }, this);
-        positions.forEach(function(targetIndexes, i){
-            targetIndexes.forEach(function(index){
-                this.targets[i].add(this.draggables[index]);
-            }, this);
-        }, this);
-    }else{
-        alert(message);
-        throw message;
-    }
-});
-
-defaultScope = new Scope();
-
-function scope(fn){
-    var currentScope = new Scope(),
-        addDraggableToScope = function(draggable){
-            currentScope.addDraggable(draggable);
-            return true;
-        },
-        addTargetToScope = function(target){
-            currentScope.addTarget(target);
-            return true;
-        };
-
-    Draggable.onCreate.add(addDraggableToScope);
-    Target.onCreate.add(addTargetToScope);
-    fn.call();
-    Draggable.onCreate.remove(addDraggableToScope);
-    Target.onCreate.remove(addTargetToScope);
-    return currentScope;
+  Draggable.emitter.prependOn('draggable:create', addDraggableToScope)
+  Target.emitter.prependOn('target:create', addTargetToScope)
+  fn.call()
+  Draggable.emitter.unsubscribe('draggable:create', addDraggableToScope)
+  Target.emitter.unsubscribe('target:create', addTargetToScope)
+  return currentScope
 }
 
-function scopeFactory(parentElement, draggableElements, targetElements, options){
-    var draggables, targets, draggableOptions, targetOptions, scopeOptions;
-    options = options || {};
-    draggableOptions = options.draggable || {};
-    targetOptions = options.target || {};
-    scopeOptions = options.scope || {};
-    draggableOptions.parent = draggableOptions.parent || parentElement;
-    targetOptions.parent = targetOptions.parent || parentElement;
-    draggableElements = Array.prototype.slice.call(draggableElements);
-    targetElements = Array.prototype.slice.call(targetElements);
-
-    draggables = draggableElements.map(function(element){
-        return new Dragee.Draggable(element, draggableOptions);
-    });
-
-    targets = targetElements.map(function(el){
-        return new Dragee.Target(element, draggables, targetOptions);
-    });
-    return new Scope(draggables, targets, scopeOptions);
-}
-
-export {scopes, defaultScope, Scope, scopeFactory, scope};
+export { scopes, defaultScope, Scope, scope }

@@ -1,223 +1,220 @@
-'use strict';
+import range from './utils/range.js'
+import removeItem from './utils/remove-array-item'
+import getDefaultParent from './utils/get-default-parent'
+import EventEmitter from './eventEmitter'
+import Rectangle from './geometry/rectangle'
+import { transformedSpaceDistanceFactory } from './geometry/distances'
+import { scopes, defaultScope } from './scope'
 
-import util from './util'
-import Event from './event'
-import {Geometry} from './geometry'
-import {positionType, sortingFactory, positionFactory} from './positioning'
-import {scopes, defaultScope} from './scope'
+import { FloatLeftStrategy } from './positioning'
 
-var Dragee = { util, positionType,  positionFactory, sortingFactory, scopes, Event };//todo remove after refactore
-
-var targets = [],
-		addToDefaultScope = function(target){
-			defaultScope.addTarget(target)
-		};
-
-function Target(element, draggables, options){
-	options = options || {};
-	var target = this, i, parent = options.parent || Dragee.util.getDefaultParent(element);
-	this.options = {
-		timeEnd: 200,
-		timeExcange: 400,
-		parent: parent,
-		sorting: Dragee.sortingFactory(Dragee.positionType.floatLeft)(80, Geometry.transformedSpaceDistanceFactory({x: 1, y: 4})),
-		positioning: Dragee.positionFactory(Dragee.positionType.floatLeft)(this.getRectangle.bind(this), {removable: true})
-	};
-	for(i in options){
-		this.options[i] = options[i];
-	}
-	targets.push(this);
-	this.element = element;
-	draggables.forEach(function(draggable){
-		draggable.targets.push(target);
-	})
-	this.draggables = draggables;
-	this.onAdd = new Dragee.Event(this);
-	this.beforeAdd = new Dragee.Event(this);
-	this.onRemove = new Dragee.Event(this);
-
-	options.onRemove && this.onRemove.add(options.onRemove);
-	options.onAdd && this.onAdd.add(options.onAdd);
-	options.beforeAdd && this.beforeAdd.add(options.beforeAdd);
-	Target.onCreate.fire(this);
-
-	this.init();
-};
-
-Target.onCreate = new Dragee.Event(Target, {isReverse: true, isStopOnTrue: true});
-Target.onCreate.add(addToDefaultScope);
-
-Target.prototype.getRectangle = function(){
-	return Geometry.createRectangleFromElement(
-		this.element,
-		this.options.parent,
-		this.options.isContentBoxSize,
-		true
-	);
-};
-
-Target.prototype.catchDraggable = function(draggable){
-	if(this.options.catchDraggable) {
-		return this.options.catchDraggable(this, draggable);
-	} else {
-		var targetRectangle = this.getRectangle(),
-			draggableSquare = draggable.getRectangle().getSquare();
-
-		return draggableSquare < targetRectangle.getSquare()
-			&& targetRectangle.includePoint(draggable.getCenter());
-	}
-};
-
-Target.prototype.getPosition = function(){
-	return this.getRectangle().position;
-};
-
-Target.prototype.getSize = function(){
-	return this.getRectangle().size;
-};
-
-Target.prototype.init = function(){
-	var rectangles, indexesOfNew;
-
-	this.innerDraggables = this.draggables.filter(function(draggable){
-		var element = draggable.element.parentNode;
-		while(element){
-			if(element === this.element){
-				return true;
-			}
-			element = element.parentNode;
-		}
-		return false;
-	}, this);
-
-	if(this.innerDraggables.length){
-		indexesOfNew = Dragee.util.range(this.innerDraggables.length);
-		rectangles = this.options.positioning(this.innerDraggables.map(function(draggable){
-			return draggable.getRectangle();
-		}), indexesOfNew);
-		this.setPosition(rectangles, indexesOfNew);
-		this.innerDraggables.forEach(function(draggable){
-			this.onAdd.fire(draggable);
-		}, this);
-	}
-};
-
-Target.prototype.destroy = function(){
-	Dragee.scopes.forEach(function(scope){
-		scope.targets.removeItem(this);
-	}, this);
+const addToDefaultScope = function(target) {
+  defaultScope.addTarget(target)
 }
 
-Target.prototype.refresh = function(){
-	var rectangles = this.options.positioning(this.innerDraggables.map(function(draggable){
-		return draggable.getRectangle();
-	}), []);
-	this.setPosition(rectangles, [], 0);
-};
+export default class Target extends EventEmitter {
+  constructor(element, draggables, options = {}) {
+    super(undefined, options)
+    const target = this
+    const parent = options.parent || getDefaultParent(element)
 
-Target.prototype.onEnd = function(draggable){
-	var newDraggablesIndex = [],
-		rectangles,
-		includePoint = this.getRectangle().includePoint(draggable.getPosition());
+    this.options = Object.assign({
+      timeEnd: 200,
+      timeExcange: 400,
+      parent: parent
+    }, options)
 
-	if(!includePoint){
-		if(this.getRectangle().includePoint(draggable.getCenter())) {
-			draggable.position = draggable.getCenter().clone();
-		} else {
-			return false;
-		}
-	}
+    this.positioningStrategy = options.strategy || new FloatLeftStrategy(
+      this.getRectangle.bind(this),
+      {
+        radius: 80,
+        getDistance: transformedSpaceDistanceFactory({ x: 1, y: 4 }),
+        removable: true
+      }
+    )
 
-	this.beforeAdd.fire(draggable);
+    this.element = element
+    draggables.forEach((draggable) => draggable.targets.push(target))
+    this.draggables = draggables
 
-	this.innerDraggables = this.options.sorting(this.innerDraggables, [draggable], newDraggablesIndex);
-	rectangles = this.options.positioning(this.innerDraggables.map(function(draggable){
-		return draggable.getRectangle();
-	}), newDraggablesIndex, draggable);
+    Target.emitter.emit('target:create', this)
 
-	this.setPosition(rectangles, newDraggablesIndex);
-	if(this.innerDraggables.indexOf(draggable) !== -1){
-		this.addRemoveOnMove(draggable);
-	}
-	return true;
-};
+    this.init()
+  }
 
-Target.prototype.setPosition = function(rectangles, indexesOfNew, time){
-	this.innerDraggables.slice(0).forEach(function(draggable, i){
-		var rect = rectangles[i],
-			timeEnd = time || time == 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExcange;
+  positioning (draggables, indexesOfNew) {
+    return this.positioningStrategy.positioning(draggables, indexesOfNew)
+  }
 
-		if(rect.removable){
-			draggable.move(draggable.initPosition, timeEnd, true, true);
-			this.innerDraggables.removeItem(draggable);
+  sorting (oldDraggables, newDraggables, indexOfNews) {
+    return this.positioningStrategy.sorting(oldDraggables, newDraggables, indexOfNews)
+  }
 
-			this.onRemove.fire(draggable);
-		} else {
-			draggable.move(rect.position, timeEnd, true, true);
-		}
-	}, this);
-};
+  init() {
+    let rectangles, indexesOfNew
 
-Target.prototype.add = function(draggable, time){
-	var rectangles, newDraggablesIndex = this.innerDraggables.length;
+    this.innerDraggables = this.draggables.filter((draggable) => {
+      let element = draggable.element.parentNode
+      while (element) {
+        if (element === this.element) {
+          return true
+        }
+        element = element.parentNode
+      }
+      return false
+    })
 
-	this.beforeAdd.fire(draggable);
+    if (this.innerDraggables.length) {
+      indexesOfNew = range(this.innerDraggables.length)
+      rectangles = this.positioning(this.innerDraggables.map((draggable) => {
+        return draggable.getRectangle()
+      }), indexesOfNew)
+      this.setPosition(rectangles, indexesOfNew)
+      this.innerDraggables.forEach((draggable) => this.emit('target:add', draggable))
+    }
+  }
 
-	this.pushInnerDraggable(draggable);
-	rectangles = this.options.positioning(this.innerDraggables.map(function(draggable){
-		return draggable.getRectangle();
-	}), newDraggablesIndex, draggable);
-	this.setPosition(rectangles, [newDraggablesIndex], time || 0);
-	if(this.innerDraggables.indexOf(draggable) !== -1){
-		this.addRemoveOnMove(draggable);
-	}
-};
+  getRectangle() {
+    return Rectangle.fromElement(
+      this.element,
+      this.options.parent,
+      this.options.isContentBoxSize,
+      true
+    )
+  }
 
-Target.prototype.pushInnerDraggable = function(draggable){
-	if(this.innerDraggables.indexOf(draggable)===-1){
-		this.innerDraggables.push(draggable);
-	}
-};
+  catchDraggable(draggable) {
+    if (this.options.catchDraggable) {
+      return this.options.catchDraggable(this, draggable)
+    } else {
+      const targetRectangle = this.getRectangle()
+      const draggableSquare = draggable.getRectangle().getSquare()
 
-Target.prototype.addRemoveOnMove = function(draggable){
-	var that = this;
+      return draggableSquare < targetRectangle.getSquare()
+              && targetRectangle.includePoint(draggable.getCenter())
+    }
+  }
 
-	draggable.onMove.add(this.removeHandler = function(){
-		that.remove(draggable)
-	});
+  getPosition() {
+    return this.getRectangle().position
+  }
 
-	this.onAdd.fire(draggable);
-};
+  getSize() {
+    return this.getRectangle().size
+  }
 
-Target.prototype.remove = function(draggable){
-	var index, rectangles;
-	draggable.onMove.remove(this.removeHandler);
+  destroy() {
+    scopes.forEach((scope) => removeItem(scope.targets, this))
+  }
 
-	index = this.innerDraggables.indexOf(draggable);
-	if(index === -1){
-		return;
-	}
+  refresh() {
+    const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
+      return draggable.getRectangle()
+    }), [])
+    this.setPosition(rectangles, [], 0)
+  }
 
-	this.innerDraggables.splice(index, 1);
+  onEnd(draggable) {
+    const newDraggablesIndex = []
+    const includePoint = this.getRectangle().includePoint(draggable.getPosition())
 
-	rectangles = this.options.positioning(this.innerDraggables.map(function(draggable){
-		return draggable.getRectangle();
-	}), []);
+    if (!includePoint) {
+      if (this.getRectangle().includePoint(draggable.getCenter())) {
+        draggable.position = draggable.getCenter().clone()
+      } else {
+        return false
+      }
+    }
 
-	this.setPosition(rectangles, []);
-	this.onRemove.fire(draggable);
-};
+    this.emit('target:beforeAdd', draggable)
 
-Target.prototype.reset = function(){
-	this.innerDraggables.forEach(function(draggable){
-		draggable.move(draggable.initPosition, 0, true, true);
-		this.onRemove.fire(draggable);
-	}, this);
-	this.innerDraggables = [];
-};
+    this.innerDraggables = this.sorting(this.innerDraggables, [draggable], newDraggablesIndex)
+    const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
+      return draggable.getRectangle()
+    }), newDraggablesIndex)
 
-Target.prototype.getSortedDraggables = function(){
-	this.innerDraggables.slice();
+    this.setPosition(rectangles, newDraggablesIndex)
+    if (this.innerDraggables.indexOf(draggable) !== -1) {
+      this.addRemoveOnMove(draggable)
+    }
+    return true
+  }
+
+  setPosition(rectangles, indexesOfNew, time) {
+    this.innerDraggables.slice(0).forEach((draggable, i) => {
+      const rect = rectangles[i],
+        timeEnd = time || time === 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExcange
+
+      if (rect.removable) {
+        draggable.move(draggable.initialPosition, timeEnd, true, true)
+        removeItem(this.innerDraggables, draggable)
+        this.emit('target:remove', draggable)
+      } else {
+        draggable.move(rect.position, timeEnd, true, true)
+      }
+    })
+  }
+
+  add(draggable, time) {
+    const newDraggablesIndex = this.innerDraggables.length
+
+    this.emit('target:beforeAdd', draggable)
+
+    this.pushInnerDraggable(draggable)
+    const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
+      return draggable.getRectangle()
+    }), newDraggablesIndex, draggable)
+
+    this.setPosition(rectangles, [newDraggablesIndex], time || 0)
+    if (this.innerDraggables.indexOf(draggable) !== -1) {
+      this.addRemoveOnMove(draggable)
+    }
+  }
+
+  pushInnerDraggable(draggable) {
+    if (this.innerDraggables.indexOf(draggable)===-1) {
+      this.innerDraggables.push(draggable)
+    }
+  }
+
+  addRemoveOnMove(draggable) {
+    draggable.on('drag:move', this.removeHandler = () => {
+      this.remove(draggable)
+    })
+
+    this.emit('target:add', draggable)
+  }
+
+  remove(draggable) {
+    draggable.unsubscribe('drag:move', this.removeHandler)
+
+    const index = this.innerDraggables.indexOf(draggable)
+    if (index === -1) {
+      return
+    }
+
+    this.innerDraggables.splice(index, 1)
+
+    const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
+      return draggable.getRectangle()
+    }), [])
+
+    this.setPosition(rectangles, [])
+    this.emit('target:remove', draggable)
+  }
+
+  reset() {
+    this.innerDraggables.forEach((draggable) => {
+      draggable.move(draggable.initialPosition, 0, true, true)
+      this.emit('target:remove', draggable)
+    })
+    this.innerDraggables = []
+  }
+
+  getSortedDraggables() {
+    this.innerDraggables.slice()
+  }
 }
 
-export {targets, Target};
+Target.emitter = new EventEmitter(Target)
+Target.emitter.on('target:create', addToDefaultScope)
