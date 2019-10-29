@@ -31,5 +31,6 @@
     "drag",
     "drop"
   ],
-  "sideEffects": false
+  "sideEffects": false,
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" }
 }
