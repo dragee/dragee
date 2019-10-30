@@ -93,6 +93,7 @@ export default class Draggable extends EventEmitter {
     this._nativeDragStart = (event) => this.nativeDragStart(event)
     this._nativeDragMove = (event) => this.nativeDragMove(event)
     this._nativeDragEnd = (event) => this.nativeDragEnd(event)
+    this._nativeDrop = (event) => this.nativeDrop(event)
 
     this.handler.addEventListener(touchEvents.start, this._dragStart, isSupportPassiveEvents ? { passive: false } : false)
     this.handler.addEventListener(mouseEvents.start, this._dragStart, isSupportPassiveEvents ? { passive: false } : false)
@@ -236,6 +237,7 @@ export default class Draggable extends EventEmitter {
         this.emulateNativeDragAndDrop(event)
       } else {
         this.element.draggable = true
+        document.addEventListener(mouseEvents.end, this._nativeDragEnd, isSupportPassiveEvents ? { passive: false } : false)
       }
     } else {
       document.addEventListener(touchEvents.move, this._dragMove, isSupportPassiveEvents ? { passive: false } : false)
@@ -256,8 +258,10 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener(mouseEvents.move, this._dragMove)
     document.removeEventListener(touchEvents.end, this._dragEnd)
     document.removeEventListener(mouseEvents.end, this._dragEnd)
+    document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
     document.removeEventListener('dragover', this._nativeDragMove)
     document.removeEventListener('dragend', this._nativeDragEnd)
+    document.removeEventListener('drop', this._nativeDrop)
     this.element.draggable = false
     this.isDragging = false
     removeClass(this.element, 'dragee-active')
@@ -313,11 +317,13 @@ export default class Draggable extends EventEmitter {
 
   nativeDragStart(event) {
     event.dataTransfer.setData('application/draggable', this)
+    document.addEventListener('drop', this._nativeDrop)
     document.addEventListener('dragover', this._nativeDragMove)
     document.addEventListener('dragend', this._nativeDragEnd)
   }
 
   nativeDragMove(event) {
+    event.preventDefault()
     addClass(this.element, 'dragee-placeholder')
     this.currentEvent = event
     if (event.clientX === 0 && event.clientY === 0) {
@@ -332,12 +338,19 @@ export default class Draggable extends EventEmitter {
     this.emit('drag:move')
   }
 
+  nativeDrop(event) {
+    event.stopPropagation()
+    event.preventDefault()
+  }
+
   nativeDragEnd(_event) {
     removeClass(this.element, 'dragee-placeholder')
     this.dragEndAction()
     this.emit('drag:end')
     document.removeEventListener('dragover', this._nativeDragMove)
     document.removeEventListener('dragend', this._nativeDragEnd)
+    document.removeEventListener('drop', this._nativeDrop)
+    document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
     this.isDragging = false
     this.element.draggable = false
     removeClass(this.element, 'dragee-active')
