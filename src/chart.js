@@ -124,7 +124,6 @@ export default class Chart extends EventEmitter {
     })
 
     this.draggables.forEach((_draggable, index) => {
-      let enableIndexes
       this.drawLimitImg(index)
     })
 

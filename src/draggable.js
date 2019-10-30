@@ -353,6 +353,7 @@ export default class Draggable extends EventEmitter {
     addClass(this.element, 'dragee-placeholder')
 
     const emulationDraggable = new Draggable(clonedElement, {
+      parent: document.body,
       on: {
         'drag:move': () => {
           this.position = new Point(

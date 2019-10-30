@@ -4,6 +4,7 @@
   "description": "Dragee(drag&drop) library",
   "scripts": {
     "build": "rollup --config rollup-esm.config.js && rollup --config rollup-umd.config.js",
+    "build-dev": "rollup --config rollup-umd-dev.config.js",
     "eslint": "eslint --ext .js ."
   },
   "devDependencies": {
