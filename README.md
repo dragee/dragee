@@ -81,7 +81,7 @@ const draggables = elements.map((element) => {
   })
 })
 
-const new List(draggables, {
+new List(draggables, {
     getDistance: Dragee.distance.getYDifference
 })
 ````
