@@ -15,7 +15,16 @@ export default [{
   ],
   plugins: [
     babel({
-      exclude: 'node_modules/**'
+      exclude: 'node_modules/**',
+      babelrc: false,
+      presets: [
+        [
+          '@babel/env', {
+            useBuiltIns: "usage",
+            corejs: '3'
+          }
+        ]
+      ]
     }),
     resolve(),
     commonjs(),

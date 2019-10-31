@@ -224,7 +224,7 @@ function removeClass(element, c) {
 function getDefaultParent(element) {
   var parent = element.parentNode;
 
-  while (parent.parentNode && window.getComputedStyle(parent)['position'] === 'static') {
+  while (parent.parentNode && window.getComputedStyle(parent)['position'] === 'static' && parent.tagName !== 'BODY') {
     parent = parent.parentNode;
   }
 
@@ -1606,7 +1606,7 @@ function checkSupportPassiveEvents() {
     });
     window.addEventListener('test', options, options);
     window.removeEventListener('test', options, options);
-  } catch (err) {
+  } catch (_err) {
     passiveSupported = false;
   }
 
@@ -1898,10 +1898,15 @@ function (_EventEmitter) {
       }
 
       if (this.nativeDragAndDrop) {
-        if (isTouchEvent && this.emulateNativeDragAndDropOnTouch) {
+        var isSafari = /version\/(\d+).+?safari/i.test(window.navigator.userAgent);
+
+        if (isTouchEvent && this.emulateNativeDragAndDropOnTouch || isSafari) {
           this.emulateNativeDragAndDrop(event);
         } else {
           this.element.draggable = true;
+          document.addEventListener(mouseEvents.end, this._nativeDragEnd, isSupportPassiveEvents ? {
+            passive: false
+          } : false);
         }
       } else {
         document.addEventListener(touchEvents.move, this._dragMove, isSupportPassiveEvents ? {
@@ -1930,6 +1935,7 @@ function (_EventEmitter) {
       document.removeEventListener(mouseEvents.move, this._dragMove);
       document.removeEventListener(touchEvents.end, this._dragEnd);
       document.removeEventListener(mouseEvents.end, this._dragEnd);
+      document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
       document.removeEventListener('dragover', this._nativeDragMove);
       document.removeEventListener('dragend', this._nativeDragEnd);
       this.element.draggable = false;
@@ -1979,18 +1985,20 @@ function (_EventEmitter) {
       document.removeEventListener(touchEvents.end, this._dragEnd);
       document.removeEventListener(mouseEvents.end, this._dragEnd);
       this.isDragging = false;
+      this.element.removeAttribute('draggable');
       removeClass(this.element, 'dragee-active');
     }
   }, {
     key: "nativeDragStart",
     value: function nativeDragStart(event) {
-      event.dataTransfer.setData('application/draggable', this);
+      event.dataTransfer.setData('text', 'FireFox fix');
       document.addEventListener('dragover', this._nativeDragMove);
       document.addEventListener('dragend', this._nativeDragEnd);
     }
   }, {
     key: "nativeDragMove",
     value: function nativeDragMove(event) {
+      event.preventDefault();
       addClass(this.element, 'dragee-placeholder');
       this.currentEvent = event;
 
@@ -2015,8 +2023,9 @@ function (_EventEmitter) {
       this.emit('drag:end');
       document.removeEventListener('dragover', this._nativeDragMove);
       document.removeEventListener('dragend', this._nativeDragEnd);
+      document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
       this.isDragging = false;
-      this.element.draggable = false;
+      this.element.removeAttribute('draggable');
       removeClass(this.element, 'dragee-active');
     }
   }, {
@@ -2032,6 +2041,7 @@ function (_EventEmitter) {
       document.body.appendChild(clonedElement);
       addClass(this.element, 'dragee-placeholder');
       var emulationDraggable = new Draggable(clonedElement, {
+        parent: document.body,
         on: {
           'drag:move': function dragMove() {
             _this3.position = new Point(emulationDraggable.position.x - parentRect.left - window.scrollX, emulationDraggable.position.y - parentRect.top - window.scrollY);
@@ -2688,7 +2698,6 @@ function (_EventEmitter) {
         _this5.drawArc(_this5.context, _this5.options.center, _this5.options.radius, index);
       });
       this.draggables.forEach(function (_draggable, index) {
-
         _this5.drawLimitImg(index);
       });
       this.emit('chart:draw');
