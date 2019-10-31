@@ -6,24 +6,15 @@ export default [{
   input: 'src/index.js',
   output: [
     {
-      file: 'dist/index-dev.umd.js',
-      format: 'umd',
+      file: `dist/index.dev.js`,
+      format: 'iife',
       name: 'Dragee',
       sourcemap: 'inline'
     }
   ],
   plugins: [
     babel({
-      exclude: 'node_modules/**',
-      babelrc: false,
-      presets: [
-        [
-          '@babel/env', {
-            useBuiltIns: "usage",
-            corejs: '3'
-          }
-        ]
-      ]
+      exclude: 'node_modules/**'
     }),
     resolve(),
     commonjs()

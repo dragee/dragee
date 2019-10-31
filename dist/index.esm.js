@@ -1,3 +1,25 @@
+import 'core-js/modules/es.array.concat';
+import 'core-js/modules/es.array.splice';
+import 'core-js/modules/es.string.replace';
+import 'core-js/modules/es.string.sub';
+import 'core-js/modules/es.regexp.constructor';
+import 'core-js/modules/es.regexp.to-string';
+import 'core-js/modules/es.symbol';
+import 'core-js/modules/es.symbol.description';
+import 'core-js/modules/es.symbol.iterator';
+import 'core-js/modules/es.array.iterator';
+import 'core-js/modules/es.array.slice';
+import 'core-js/modules/es.object.entries';
+import 'core-js/modules/es.object.to-string';
+import 'core-js/modules/es.string.iterator';
+import 'core-js/modules/web.dom-collections.iterator';
+import 'core-js/modules/es.array.filter';
+import 'core-js/modules/es.array.map';
+import 'core-js/modules/web.dom-collections.for-each';
+import 'core-js/modules/es.object.assign';
+import 'core-js/modules/es.array.from';
+import 'core-js/modules/es.array.fill';
+
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -71,24 +93,8 @@ function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
 }
 
-function _toConsumableArray(arr) {
-  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
-}
-
-function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  }
-}
-
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
-}
-
-function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
@@ -119,10 +125,6 @@ function _iterableToArrayLimit(arr, i) {
   }
 
   return _arr;
-}
-
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
 }
 
 function _nonIterableRest() {
@@ -277,8 +279,8 @@ function () {
         _iteratorError = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-            _iterator["return"]();
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
           }
         } finally {
           if (_didIteratorError) {
@@ -2356,13 +2358,11 @@ function (_EventEmitter) {
     key: "factory",
     value: function factory(parentElement, elements) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-      var draggables = _toConsumableArray(elements).map(function (element) {
+      var draggables = Array.from(elements).map(function (element) {
         return new Draggable(element, Object.assign({
           parent: parentElement
         }, options.draggable || {}));
       });
-
       return new List(draggables, options.list || {});
     }
   }]);

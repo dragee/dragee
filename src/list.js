@@ -154,7 +154,7 @@ export default class List extends EventEmitter {
   }
 
   static factory(parentElement, elements, options={}) {
-    const draggables = [...elements].map((element) => {
+    const draggables = Array.from(elements).map((element) => {
       return new Draggable(element, Object.assign({
         parent: parentElement
       }, options.draggable || {}))

@@ -3,12 +3,13 @@
   "version": "0.9.0",
   "description": "Dragee(drag&drop) library",
   "scripts": {
-    "build": "rollup --config rollup-esm.config.js && rollup --config rollup-umd.config.js",
-    "build-dev": "rollup --config rollup-umd-dev.config.js",
+    "build": "rollup --config rollup.config.js",
+    "build-dev": "rollup --config rollup.dev.config.js ",
     "eslint": "eslint --ext .js ."
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
+    "@babel/plugin-transform-for-of": "^7.4.4",
     "@babel/preset-env": "^7.6.3",
     "eslint": "^6.5.1",
     "rollup": "^1.26.0",
@@ -16,7 +17,8 @@
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-size-snapshot": "^0.10.0",
-    "rollup-plugin-uglify": "^6.0.3"
+    "rollup-plugin-uglify": "^6.0.3",
+    "rollup-plugin-visualizer": "^2.6.0"
   },
   "repository": "github:dragee/dragee",
   "author": "Vitaliy Yarovuy, Volodymyr Myskov",

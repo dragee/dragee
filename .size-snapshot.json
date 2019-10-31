@@ -19,22 +19,65 @@
     "gzipped": 10356
   },
   "dist/index.esm.js": {
-    "bundled": 82742,
-    "minified": 46597,
-    "gzipped": 10887,
+    "bundled": 83079,
+    "minified": 47007,
+    "gzipped": 10942,
     "treeshaked": {
       "rollup": {
-        "code": 25655,
-        "import_statements": 0
+        "code": 26538,
+        "import_statements": 883
       },
       "webpack": {
-        "code": 26624
+        "code": 28212
       }
     }
   },
   "dist/index.umd.js": {
-    "bundled": 43505,
-    "minified": 43599,
-    "gzipped": 10580
+    "bundled": 54929,
+    "minified": 55047,
+    "gzipped": 11809
+  },
+  "dist/index.dev.js": {
+    "bundled": 87553,
+    "minified": 41104,
+    "gzipped": 10344
+  },
+  "dist/index.esm${suffix}.js": {
+    "bundled": 82185,
+    "minified": 46147,
+    "gzipped": 10821,
+    "treeshaked": {
+      "rollup": {
+        "code": 25678,
+        "import_statements": 23
+      },
+      "webpack": {
+        "code": 26680
+      }
+    }
+  },
+  "dist/index.esm.dev.js": {
+    "bundled": 83104,
+    "minified": 47030,
+    "gzipped": 10948,
+    "treeshaked": {
+      "rollup": {
+        "code": 26561,
+        "import_statements": 906
+      },
+      "webpack": {
+        "code": 28269
+      }
+    }
+  },
+  "dist/index.iife.dev.js": {
+    "bundled": 87547,
+    "minified": 41104,
+    "gzipped": 10344
+  },
+  "dist/index.min.js": {
+    "bundled": 40554,
+    "minified": 40646,
+    "gzipped": 10158
   }
 }
