@@ -1,5 +1,5 @@
 {
-  "name": "@dragee/dragee",
+  "name": "dragee",
   "version": "0.9.1",
   "description": "Dragee(drag&drop) library",
   "scripts": {
