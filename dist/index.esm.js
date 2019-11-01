@@ -1755,7 +1755,7 @@ function (_EventEmitter) {
       this.handler.addEventListener(mouseEvents.start, this._dragStart, isSupportPassiveEvents ? {
         passive: false
       } : false);
-      this.handler.addEventListener('dragstart', this._nativeDragStart);
+      this.element.addEventListener('dragstart', this._nativeDragStart);
     }
   }, {
     key: "getSize",
@@ -2100,11 +2100,11 @@ function (_EventEmitter) {
     value: function destroy() {
       this.handler.removeEventListener(touchEvents.start, this._dragStart);
       this.handler.removeEventListener(mouseEvents.start, this._dragStart);
+      this.element.removeEventListener('dragstart', this._nativeDragStart);
       document.removeEventListener(touchEvents.move, this._dragMove);
       document.removeEventListener(mouseEvents.move, this._dragMove);
       document.removeEventListener(touchEvents.end, this._dragEnd);
       document.removeEventListener(mouseEvents.end, this._dragEnd);
-      document.removeEventListener('dragstart', this._nativeDragStart);
       document.removeEventListener('dragover', this._nativeDragOver);
       document.removeEventListener('dragend', this._nativeDragEnd);
       document.removeEventListener(mouseEvents.end, this._nativeDragEnd);

@@ -19,16 +19,16 @@
     "gzipped": 10356
   },
   "dist/index.esm.js": {
-    "bundled": 83913,
-    "minified": 47632,
-    "gzipped": 11027,
+    "bundled": 83917,
+    "minified": 47636,
+    "gzipped": 11034,
     "treeshaked": {
       "rollup": {
-        "code": 27149,
+        "code": 27153,
         "import_statements": 883
       },
       "webpack": {
-        "code": 28823
+        "code": 28827
       }
     }
   },
@@ -76,8 +76,8 @@
     "gzipped": 10344
   },
   "dist/index.min.js": {
-    "bundled": 41165,
-    "minified": 41257,
-    "gzipped": 10247
+    "bundled": 41169,
+    "minified": 41261,
+    "gzipped": 10256
   }
 }

@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+### Added
+- Fix handler + native drag&drop issue
+
 ## 0.9.1
 ### Added
 - Fix html5 drag and drop issues
