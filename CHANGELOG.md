@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+## 0.9.1
 ### Added
 - Fix html5 drag and drop issues
 - Emulate html5 drag and drop on desktop safari
