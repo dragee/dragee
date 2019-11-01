@@ -32,7 +32,8 @@
   "bugs": "https://github.com/dragee/dragee/issues",
   "keywords": [
     "drag",
-    "drop"
+    "drop",
+    "draggable"
   ],
   "sideEffects": false,
   "publishConfig": {

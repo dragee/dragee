@@ -234,7 +234,9 @@ export default class Draggable extends EventEmitter {
 
     if (this.nativeDragAndDrop) {
       const isSafari =/version\/(\d+).+?safari/i.test(window.navigator.userAgent)
-      if ((isTouchEvent && this.emulateNativeDragAndDropOnTouch) || isSafari) {
+      if ((isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
+             isSafari ||
+             this.emulateNativeDragAndDropForAll) {
         this.emulateNativeDragAndDrop(event)
       } else {
         this.element.draggable = true
@@ -457,6 +459,10 @@ export default class Draggable extends EventEmitter {
 
   get emulateNativeDragAndDropOnTouch() {
     return this.options.emulateNativeDragAndDropOnTouch || true
+  }
+
+  get emulateNativeDragAndDropForAll() {
+    return this.options.emulateNativeDragAndDropForAll || false
   }
 
   get enable() {

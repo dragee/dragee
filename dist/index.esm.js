@@ -1906,7 +1906,7 @@ function (_EventEmitter) {
       if (this.nativeDragAndDrop) {
         var isSafari = /version\/(\d+).+?safari/i.test(window.navigator.userAgent);
 
-        if (isTouchEvent && this.emulateNativeDragAndDropOnTouch || isSafari) {
+        if (isTouchEvent && this.emulateNativeDragAndDropOnTouch || isSafari || this.emulateNativeDragAndDropForAll) {
           this.emulateNativeDragAndDrop(event);
         } else {
           this.element.draggable = true;
@@ -2148,6 +2148,11 @@ function (_EventEmitter) {
     key: "emulateNativeDragAndDropOnTouch",
     get: function get() {
       return this.options.emulateNativeDragAndDropOnTouch || true;
+    }
+  }, {
+    key: "emulateNativeDragAndDropForAll",
+    get: function get() {
+      return this.options.emulateNativeDragAndDropForAll || false;
     }
   }, {
     key: "enable",
