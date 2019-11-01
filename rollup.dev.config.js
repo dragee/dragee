@@ -6,7 +6,7 @@ export default [{
   input: 'src/index.js',
   output: [
     {
-      file: `dist/index.dev.js`,
+      file: 'dist/index.dev.js',
       format: 'iife',
       name: 'Dragee',
       sourcemap: 'inline'

@@ -1737,12 +1737,16 @@ function (_EventEmitter) {
         return _this2.nativeDragStart(event);
       };
 
-      this._nativeDragMove = function (event) {
-        return _this2.nativeDragMove(event);
+      this._nativeDragOver = function (event) {
+        return _this2.nativeDragOver(event);
       };
 
       this._nativeDragEnd = function (event) {
         return _this2.nativeDragEnd(event);
+      };
+
+      this._nativeDrop = function (event) {
+        return _this2.nativeDrop(event);
       };
 
       this.handler.addEventListener(touchEvents.start, this._dragStart, isSupportPassiveEvents ? {
@@ -1937,9 +1941,10 @@ function (_EventEmitter) {
       document.removeEventListener(mouseEvents.move, this._dragMove);
       document.removeEventListener(touchEvents.end, this._dragEnd);
       document.removeEventListener(mouseEvents.end, this._dragEnd);
-      document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
-      document.removeEventListener('dragover', this._nativeDragMove);
+      document.removeEventListener('dragover', this._nativeDragOver);
       document.removeEventListener('dragend', this._nativeDragEnd);
+      document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
+      document.removeEventListener('drop', this._nativeDrop);
       this.element.draggable = false;
       this.isDragging = false;
       removeClass(this.element, 'dragee-active');
@@ -1994,13 +1999,16 @@ function (_EventEmitter) {
     key: "nativeDragStart",
     value: function nativeDragStart(event) {
       event.dataTransfer.setData('text', 'FireFox fix');
-      document.addEventListener('dragover', this._nativeDragMove);
+      event.dataTransfer.effectAllowed = 'move';
+      document.addEventListener('dragover', this._nativeDragOver);
       document.addEventListener('dragend', this._nativeDragEnd);
+      document.addEventListener('drop', this._nativeDrop);
     }
   }, {
-    key: "nativeDragMove",
-    value: function nativeDragMove(event) {
+    key: "nativeDragOver",
+    value: function nativeDragOver(event) {
       event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
       addClass(this.element, 'dragee-placeholder');
       this.currentEvent = event;
 
@@ -2023,12 +2031,19 @@ function (_EventEmitter) {
       removeClass(this.element, 'dragee-placeholder');
       this.dragEndAction();
       this.emit('drag:end');
-      document.removeEventListener('dragover', this._nativeDragMove);
+      document.removeEventListener('dragover', this._nativeDragOver);
       document.removeEventListener('dragend', this._nativeDragEnd);
       document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
+      document.removeEventListener('drop', this._nativeDrop);
       this.isDragging = false;
       this.element.removeAttribute('draggable');
       removeClass(this.element, 'dragee-active');
+    }
+  }, {
+    key: "nativeDrop",
+    value: function nativeDrop(event) {
+      event.stopPropagation();
+      event.preventDefault();
     }
   }, {
     key: "emulateNativeDragAndDrop",
@@ -2090,8 +2105,10 @@ function (_EventEmitter) {
       document.removeEventListener(touchEvents.end, this._dragEnd);
       document.removeEventListener(mouseEvents.end, this._dragEnd);
       document.removeEventListener('dragstart', this._nativeDragStart);
-      document.removeEventListener('dragover', this._nativeDragMove);
+      document.removeEventListener('dragover', this._nativeDragOver);
       document.removeEventListener('dragend', this._nativeDragEnd);
+      document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
+      document.removeEventListener('drop', this._nativeDrop);
       this.resetEmitter();
       var index = draggables.indexOf(this);
 

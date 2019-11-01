@@ -9,7 +9,7 @@ export default [{
   input: 'src/index.js',
   output: [
     {
-      file: `dist/index.esm.js`,
+      file: 'dist/index.esm.js',
       format: 'esm',
       name: 'Dragee'
     }
@@ -27,7 +27,7 @@ export default [{
   input: 'src/index.js',
   output: [
     {
-      file: `dist/index.min.js`,
+      file: 'dist/index.min.js',
       format: 'iife',
       name: 'Dragee'
     }
