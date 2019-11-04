@@ -26,7 +26,7 @@ It should at least have `bound` method that got point and size of Draggable as a
 ```javascript
 import { bound } from 'dragee'
 import { Point, Rectangle } from 'dragee'
-const BoundToElement = bound.BoundToRectangle
+const BoundToRectangle = bound.BoundToRectangle
 
 const settings = {
   cellSize: 60,
@@ -34,7 +34,7 @@ const settings = {
   colNumber: 8
 }
 
-class BoundToCells extends BoundToElement {
+class BoundToCells extends BoundToRectangle {
     constructor(settings) {
         this.settings = settings
         const rectangle = new Rectangle(
