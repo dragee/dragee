@@ -1,4 +1,4 @@
-# Bounding
+## Bounding
 
 ```javascript
 import bound from 'dragee'

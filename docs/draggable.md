@@ -1,5 +1,3 @@
-# Dragee.Draggable
-
 ## Draggable
 ```html
 <div class="area">

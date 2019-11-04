@@ -18,8 +18,6 @@ import { Draggable, List, Chart, ... } from Dragee
 
 # Usage
 
-# Dragee.Draggable
-
 ## Draggable
 ```html
 <div class="area">
@@ -71,7 +69,7 @@ Start positioning. By default we automatically calculate position inside `parent
 ### isContentBoxSize
 You can identify  that we should take into account element borders and paddings when we calculate draggable size
 
-## List options:
+### List options:
 ### nativeDragAndDrop
 There can be situations where we need to use html5 drag&drop instead of `dragee` realization. Example: table>tr have a lot of issues, so it's easier to fix them using html5 drag&drop realization or emulation
 
@@ -84,7 +82,7 @@ There can be situations where we need to use html5 drag&drop instead of `dragee`
 
 
 
-# Bounding
+## Bounding
 
 ```javascript
 import bound from 'dragee'
@@ -169,7 +167,7 @@ new Dragee.bound.BoundToArc(center, radius, startAgle, endAngle)
 ```
 
 
-# List
+## List
 
 During dragging we search nearest `Draggable` from list and if distance between them is less than radius, we excange their positions
 
