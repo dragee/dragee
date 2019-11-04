@@ -1,7 +1,7 @@
 import 'core-js/modules/es.array.concat';
+import 'core-js/modules/es.string.sub';
 import 'core-js/modules/es.array.splice';
 import 'core-js/modules/es.string.replace';
-import 'core-js/modules/es.string.sub';
 import 'core-js/modules/es.regexp.constructor';
 import 'core-js/modules/es.regexp.to-string';
 import 'core-js/modules/es.symbol';
@@ -209,6 +209,134 @@ function () {
   return Point;
 }();
 
+var Rectangle =
+/*#__PURE__*/
+function () {
+  function Rectangle(position, size) {
+    _classCallCheck(this, Rectangle);
+
+    this.position = position;
+    this.size = size;
+  }
+
+  _createClass(Rectangle, [{
+    key: "getP1",
+    value: function getP1() {
+      return this.position;
+    }
+  }, {
+    key: "getP2",
+    value: function getP2() {
+      return new Point(this.position.x + this.size.x, this.position.y);
+    }
+  }, {
+    key: "getP3",
+    value: function getP3() {
+      return this.position.add(this.size);
+    }
+  }, {
+    key: "getP4",
+    value: function getP4() {
+      return new Point(this.position.x, this.position.y + this.size.y);
+    }
+  }, {
+    key: "getCenter",
+    value: function getCenter() {
+      return this.position.add(this.size.mult(0.5));
+    }
+  }, {
+    key: "or",
+    value: function or(rect) {
+      var position = new Point(Math.min(this.position.x, rect.position.x), Math.min(this.position.y, rect.position.y));
+      var size = new Point(Math.max(this.position.x + this.size.x, rect.position.x + rect.size.x), Math.max(this.position.y + this.size.y, rect.position.y + rect.size.y)).sub(position);
+      return new Rectangle(position, size);
+    }
+  }, {
+    key: "and",
+    value: function and(rect) {
+      var position = new Point(Math.max(this.position.x, rect.position.x), Math.max(this.position.y, rect.position.y));
+      var size = new Point(Math.min(this.position.x + this.size.x, rect.position.x + rect.size.x), Math.min(this.position.y + this.size.y, rect.position.y + rect.size.y)).sub(position);
+
+      if (size.x <= 0 || size.y <= 0) {
+        return null;
+      }
+
+      return new Rectangle(position, size);
+    }
+  }, {
+    key: "includePoint",
+    value: function includePoint(p) {
+      return !(this.position.x > p.x || this.position.x + this.size.x < p.x || this.position.y > p.y || this.position.y + this.size.y < p.y);
+    }
+  }, {
+    key: "includeRectangle",
+    value: function includeRectangle(rectangle) {
+      return this.includePoint(rectangle.position) && this.includePoint(rectangle.getP3());
+    }
+  }, {
+    key: "moveToBound",
+    value: function moveToBound(rect, axis) {
+      var selAxis, crossRectangle;
+
+      if (axis) {
+        selAxis = axis;
+      } else {
+        crossRectangle = this.and(rect);
+
+        if (!crossRectangle) {
+          return rect;
+        }
+
+        selAxis = crossRectangle.size.x > crossRectangle.size.y ? 'y' : 'x';
+      }
+
+      var thisCenter = this.getCenter();
+      var rectCenter = rect.getCenter();
+      var sign = thisCenter[selAxis] > rectCenter[selAxis] ? -1 : 1;
+      var offset = sign > 0 ? this.position[selAxis] + this.size[selAxis] - rect.position[selAxis] : this.position[selAxis] - (rect.position[selAxis] + rect.size[selAxis]);
+      rect.position[selAxis] = rect.position[selAxis] + offset;
+      return rect;
+    }
+  }, {
+    key: "getSquare",
+    value: function getSquare() {
+      return this.size.x * this.size.y;
+    }
+  }, {
+    key: "styleApply",
+    value: function styleApply(el) {
+      el = el || document.querySelector('ind');
+      el.style.left = this.position.x + 'px';
+      el.style.top = this.position.y + 'px';
+      el.style.width = this.size.x + 'px';
+      el.style.height = this.size.y + 'px';
+    }
+  }, {
+    key: "growth",
+    value: function growth(size) {
+      this.size = this.size.add(size);
+      this.position = this.position.add(size.mult(-0.5));
+    }
+  }, {
+    key: "getMinSide",
+    value: function getMinSide() {
+      return Math.min(this.size.x, this.size.y);
+    }
+  }], [{
+    key: "fromElement",
+    value: function fromElement(element) {
+      var parent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : element.parentNode;
+      var isContentBoxSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var isConsiderTranslate = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var position = Point.elementOffset(element, parent, isConsiderTranslate);
+      var size = Point.elementSize(element, isContentBoxSize);
+      return new Rectangle(position, size);
+    }
+  }]);
+
+  return Rectangle;
+}();
+
 function hasClass(element, c) {
   var re = new RegExp('(^|\\s)' + c + '(\\s|$)', 'g');
   return re.test(element.className);
@@ -386,134 +514,6 @@ function getStyleProperty( propName ) {
 
 })();
 });
-
-var Rectangle =
-/*#__PURE__*/
-function () {
-  function Rectangle(position, size) {
-    _classCallCheck(this, Rectangle);
-
-    this.position = position;
-    this.size = size;
-  }
-
-  _createClass(Rectangle, [{
-    key: "getP1",
-    value: function getP1() {
-      return this.position;
-    }
-  }, {
-    key: "getP2",
-    value: function getP2() {
-      return new Point(this.position.x + this.size.x, this.position.y);
-    }
-  }, {
-    key: "getP3",
-    value: function getP3() {
-      return this.position.add(this.size);
-    }
-  }, {
-    key: "getP4",
-    value: function getP4() {
-      return new Point(this.position.x, this.position.y + this.size.y);
-    }
-  }, {
-    key: "getCenter",
-    value: function getCenter() {
-      return this.position.add(this.size.mult(0.5));
-    }
-  }, {
-    key: "or",
-    value: function or(rect) {
-      var position = new Point(Math.min(this.position.x, rect.position.x), Math.min(this.position.y, rect.position.y));
-      var size = new Point(Math.max(this.position.x + this.size.x, rect.position.x + rect.size.x), Math.max(this.position.y + this.size.y, rect.position.y + rect.size.y)).sub(position);
-      return new Rectangle(position, size);
-    }
-  }, {
-    key: "and",
-    value: function and(rect) {
-      var position = new Point(Math.max(this.position.x, rect.position.x), Math.max(this.position.y, rect.position.y));
-      var size = new Point(Math.min(this.position.x + this.size.x, rect.position.x + rect.size.x), Math.min(this.position.y + this.size.y, rect.position.y + rect.size.y)).sub(position);
-
-      if (size.x <= 0 || size.y <= 0) {
-        return null;
-      }
-
-      return new Rectangle(position, size);
-    }
-  }, {
-    key: "includePoint",
-    value: function includePoint(p) {
-      return !(this.position.x > p.x || this.position.x + this.size.x < p.x || this.position.y > p.y || this.position.y + this.size.y < p.y);
-    }
-  }, {
-    key: "includeRectangle",
-    value: function includeRectangle(rectangle) {
-      return this.includePoint(rectangle.position) && this.includePoint(rectangle.getP3());
-    }
-  }, {
-    key: "moveToBound",
-    value: function moveToBound(rect, axis) {
-      var selAxis, crossRectangle;
-
-      if (axis) {
-        selAxis = axis;
-      } else {
-        crossRectangle = this.and(rect);
-
-        if (!crossRectangle) {
-          return rect;
-        }
-
-        selAxis = crossRectangle.size.x > crossRectangle.size.y ? 'y' : 'x';
-      }
-
-      var thisCenter = this.getCenter();
-      var rectCenter = rect.getCenter();
-      var sign = thisCenter[selAxis] > rectCenter[selAxis] ? -1 : 1;
-      var offset = sign > 0 ? this.position[selAxis] + this.size[selAxis] - rect.position[selAxis] : this.position[selAxis] - (rect.position[selAxis] + rect.size[selAxis]);
-      rect.position[selAxis] = rect.position[selAxis] + offset;
-      return rect;
-    }
-  }, {
-    key: "getSquare",
-    value: function getSquare() {
-      return this.size.x * this.size.y;
-    }
-  }, {
-    key: "styleApply",
-    value: function styleApply(el) {
-      el = el || document.querySelector('ind');
-      el.style.left = this.position.x + 'px';
-      el.style.top = this.position.y + 'px';
-      el.style.width = this.size.x + 'px';
-      el.style.height = this.size.y + 'px';
-    }
-  }, {
-    key: "growth",
-    value: function growth(size) {
-      this.size = this.size.add(size);
-      this.position = this.position.add(size.mult(-0.5));
-    }
-  }, {
-    key: "getMinSide",
-    value: function getMinSide() {
-      return Math.min(this.size.x, this.size.y);
-    }
-  }], [{
-    key: "fromElement",
-    value: function fromElement(element) {
-      var parent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : element.parentNode;
-      var isContentBoxSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      var isConsiderTranslate = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-      var position = Point.elementOffset(element, parent, isConsiderTranslate);
-      var size = Point.elementSize(element, isContentBoxSize);
-      return new Rectangle(position, size);
-    }
-  }]);
-
-  return Rectangle;
-}();
 
 function getDistance(p1, p2) {
   var dx = p1.x - p2.x,
@@ -2887,6 +2887,7 @@ function (_EventEmitter) {
 }(EventEmitter);
 
 var bound = {
+  Bound: Bound,
   BoundToRectangle: BoundToRectangle,
   BoundToElement: BoundToElement,
   BoundToLineX: BoundToLineX,
@@ -2902,4 +2903,4 @@ var distance = {
   transformedSpaceDistanceFactory: transformedSpaceDistanceFactory
 };
 
-export { ArcSlider, Chart, Draggable, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Point as Rectangle, Scope, Spider, Target, addClass, bound, defaultScope, distance, removeClass, scope, scopes };
+export { ArcSlider, Chart, Draggable, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Rectangle, Scope, Spider, Target, addClass, bound, defaultScope, distance, removeClass, scope, scopes };

@@ -1,5 +1,5 @@
 import Point from './geometry/point'
-import Rectangle from './geometry/point'
+import Rectangle from './geometry/rectangle'
 import Draggable from './draggable'
 import List from './list'
 import Target from './target'
@@ -11,6 +11,7 @@ import Chart from './chart'
 import { getDistance, getXDifference, getYDifference, transformedSpaceDistanceFactory } from './geometry/distances'
 import { addClass, removeClass } from './utils/classes'
 import {
+  Bound,
   BoundToRectangle,
   BoundToElement,
   BoundToLineX,
@@ -21,6 +22,7 @@ import {
 } from './bounding'
 
 const bound = {
+  Bound,
   BoundToRectangle,
   BoundToElement,
   BoundToLineX,

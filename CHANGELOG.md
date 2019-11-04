@@ -1,6 +1,8 @@
 ## [Unreleased]
+- Fix Rectangle import/export
+- Improve docs
 
-### Added
+### 0.9.2
 - Fix handler + native drag&drop issue
 
 ## 0.9.1
