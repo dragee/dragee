@@ -86,6 +86,7 @@ Example: `table > tr` have a lot of issues, so it's easier to fix them using htm
 
 
 ## Bounding
+![Скриншот 2019-11-04 20 10 03](https://user-images.githubusercontent.com/244409/68145781-36dd3500-ff3f-11e9-8ab2-5f0d22b1d448.png)
 
 ```javascript
 import bound from 'dragee'
