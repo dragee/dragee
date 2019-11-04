@@ -1,7 +1,18 @@
 # Dragee.Draggable
 
+## Draggable
+```html
+<div class="area">
+    <div id="draggable">
+        <i class="icon-move"></i> A
+    </div>
+</div>
+```
+
 ```javascript
 import { Draggable } from 'dragee'
+
+element = document.getElementById('draggable')
 new Draggable(element[, options])
 ```
 
@@ -11,7 +22,7 @@ new Draggable(element[, options])
 
 ```javascript
 new Draggable(element, {
-	handler: 'my-handle'
+    handler: '.icon-move'
 })
 ```
 

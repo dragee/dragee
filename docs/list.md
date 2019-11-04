@@ -1,10 +1,31 @@
 # List
 
+During dragging we search nearest `Draggable` from list and if distance between them is less than radius, we excange their positions
+
 ```javascript
 Dragee.List(draggables[, options])
 ```
 
-During dragging we search nearest `Draggable` from list and if distance between them is less than radius, we excange their positions
+## Example:
+
+```html
+<ul id="listA" class="list">
+    <li>↔ A</li>
+    <li>↔ B</li>
+    ...
+    <li>↔ Z</li>
+</ul>
+```
+
+```javascript
+const container = document.getElementById("listA")
+const elements = [...container.querySelectorAll("li")]
+const draggables = elements.map((element) => new Draggable(element, { parent: container})
+
+new List(draggables, {
+    getDistance: distance.getYDifference
+})
+````
 
 ## Options:
 
