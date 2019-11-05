@@ -1,7 +1,9 @@
 ## [Unreleased]
+
+### 0.9.3
 - Fix Rectangle import/export
 - Improve docs
-- Improve sorting of draggables in list. Make it customizable
+- Improve sorting of draggables in list. Make it customizable. It also fix vue issue, when we add draggable in the middle of the list
 
 ### 0.9.2
 - Fix handler + native drag&drop issue
