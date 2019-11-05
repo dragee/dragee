@@ -47,6 +47,10 @@ new List(draggables, {
 })
 ```
 
+### sorting
+
+By default we sort by `y` value. If it's equal, then by `x`. But it's possible to customize this behaviour
+
 ### radius
 radius that determine if we can excange two `Draggable`.
 Default: 30px

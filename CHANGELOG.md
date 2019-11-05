@@ -1,6 +1,7 @@
 ## [Unreleased]
 - Fix Rectangle import/export
 - Improve docs
+- Improve sorting of draggables in list. Make it customizable
 
 ### 0.9.2
 - Fix handler + native drag&drop issue

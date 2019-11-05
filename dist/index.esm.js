@@ -2191,8 +2191,7 @@ function (_EventEmitter) {
     _this.options = Object.assign({
       timeEnd: 200,
       timeExcange: 400,
-      radius: 30,
-      getDistance: getDistance
+      radius: 30
     }, options);
     _this.draggables = draggables;
 
@@ -2229,7 +2228,7 @@ function (_EventEmitter) {
         return draggable.pinnedPosition;
       });
       var currentIndex = sortedDraggables.indexOf(draggable);
-      var targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.options.getDistance);
+      var targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.distanceFunc);
 
       if (targetIndex !== -1 && currentIndex !== targetIndex) {
         if (targetIndex < currentIndex) {
@@ -2261,17 +2260,7 @@ function (_EventEmitter) {
   }, {
     key: "getSortedDraggables",
     value: function getSortedDraggables() {
-      var _this3 = this;
-
-      var initialPositions = this.draggables.map(function (draggable) {
-        return draggable.initialPosition;
-      });
-      var sortedDraggables = initialPositions.map(function (position) {
-        return _this3.draggables.filter(function (draggable) {
-          return draggable.pinnedPosition.compare(position);
-        })[0];
-      });
-      return sortedDraggables;
+      return this.draggables.sort(this.sorting.bind(this));
     }
   }, {
     key: "reset",
@@ -2290,21 +2279,21 @@ function (_EventEmitter) {
   }, {
     key: "add",
     value: function add(draggables) {
-      var _this4 = this;
+      var _this3 = this;
 
       if (!(draggables instanceof Array)) {
         draggables = [draggables];
       }
 
       draggables.forEach(function (draggable) {
-        return _this4.initDraggable(draggable);
+        return _this3.initDraggable(draggable);
       });
       this.draggables = this.draggables.concat(draggables);
     }
   }, {
     key: "remove",
     value: function remove(draggables) {
-      var _this5 = this;
+      var _this4 = this;
 
       var initialPositions = this.draggables.map(function (draggable) {
         return draggable.initialPosition;
@@ -2319,13 +2308,13 @@ function (_EventEmitter) {
       draggables.forEach(function (draggable) {
         draggable.resetOn('drag:end');
         draggable.resetOn('drag:move');
-        removeItem(_this5.draggables, draggable);
+        removeItem(_this4.draggables, draggable);
       });
       var j = 0;
       sortedDraggables.forEach(function (draggable) {
-        if (_this5.draggables.indexOf(draggable) !== -1) {
+        if (_this4.draggables.indexOf(draggable) !== -1) {
           if (draggable.pinnedPosition !== initialPositions[j]) {
-            draggable.pinPosition(initialPositions[j], _this5.options.timeExcange);
+            draggable.pinPosition(initialPositions[j], _this4.options.timeExcange);
           }
 
           draggable.initialPosition = initialPositions[j];
@@ -2348,18 +2337,36 @@ function (_EventEmitter) {
       });
     }
   }, {
+    key: "sorting",
+    value: function sorting(draggableA, draggableB) {
+      if (this.options.sorting) {
+        return this.options.sorting(draggableA, draggableB);
+      } else {
+        if (draggableA.pinnedPosition.y < draggableB.pinnedPosition.y) return -1;
+        if (draggableA.pinnedPosition.y > draggableB.pinnedPosition.y) return 1;
+        if (draggableA.pinnedPosition.x < draggableB.pinnedPosition.x) return -1;
+        if (draggableA.pinnedPosition.x > draggableB.pinnedPosition.x) return 1;
+        return 0;
+      }
+    }
+  }, {
+    key: "distanceFunc",
+    get: function get() {
+      return this.options.getDistance || getDistance;
+    }
+  }, {
     key: "positions",
     get: function get() {
       return this.getCurrentPinnedPositions();
     },
     set: function set(positions) {
-      var _this6 = this;
+      var _this5 = this;
 
       var message = 'wrong array length';
 
       if (positions.length === this.draggables.length) {
         positions.forEach(function (point, i) {
-          _this6.draggables[i].pinPosition(point);
+          _this5.draggables[i].pinPosition(point);
         });
       } else {
         throw message;

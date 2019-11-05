@@ -13,8 +13,7 @@ export default class List extends EventEmitter {
     this.options = Object.assign({
       timeEnd: 200,
       timeExcange: 400,
-      radius: 30,
-      getDistance: getDistance
+      radius: 30
     }, options)
 
     this.draggables = draggables
@@ -37,7 +36,7 @@ export default class List extends EventEmitter {
     const pinnedPositions = sortedDraggables.map((draggable) => draggable.pinnedPosition)
 
     const currentIndex = sortedDraggables.indexOf(draggable)
-    const targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.options.getDistance)
+    const targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.distanceFunc)
 
     if (targetIndex !== -1 && currentIndex !== targetIndex) {
       if (targetIndex < currentIndex) {
@@ -65,13 +64,7 @@ export default class List extends EventEmitter {
   }
 
   getSortedDraggables() {
-    const initialPositions = this.draggables.map((draggable) => draggable.initialPosition)
-
-    const sortedDraggables = initialPositions.map((position) => {
-      return this.draggables.filter((draggable) => draggable.pinnedPosition.compare(position))[0]
-    })
-
-    return sortedDraggables
+    return this.draggables.sort(this.sorting.bind(this))
   }
 
   reset() {
@@ -125,6 +118,22 @@ export default class List extends EventEmitter {
 
   destroy() {
     this.draggables.forEach((draggable) => draggable.destroy())
+  }
+
+  sorting(draggableA, draggableB) {
+    if(this.options.sorting) {
+      return this.options.sorting(draggableA, draggableB)
+    } else {
+      if(draggableA.pinnedPosition.y < draggableB.pinnedPosition.y) return -1
+      if(draggableA.pinnedPosition.y > draggableB.pinnedPosition.y) return 1
+      if(draggableA.pinnedPosition.x < draggableB.pinnedPosition.x) return -1
+      if(draggableA.pinnedPosition.x > draggableB.pinnedPosition.x) return 1
+      return 0
+    }
+  }
+
+  get distanceFunc() {
+    return this.options.getDistance || getDistance
   }
 
   get positions() {
