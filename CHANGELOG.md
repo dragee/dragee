@@ -1,5 +1,7 @@
 ## [Unreleased]
-- Add build to umd format
+
+### 0.9.4
+- Add build to umd format(for jest)
 
 ### 0.9.3
 - Fix Rectangle import/export
