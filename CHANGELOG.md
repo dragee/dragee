@@ -1,4 +1,5 @@
 ## [Unreleased]
+- Add build to umd format
 
 ### 0.9.3
 - Fix Rectangle import/export

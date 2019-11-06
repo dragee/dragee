@@ -42,4 +42,23 @@ export default [{
     sizeSnapshot(),
     visualizer()
   ]
+}, {
+  input: 'src/index.js',
+  output: [
+    {
+      file: 'dist/index.umd.js',
+      format: 'umd',
+      name: 'Dragee'
+    }
+  ],
+  plugins: [
+    babel({
+      exclude: 'node_modules/**'
+    }),
+    resolve(),
+    commonjs(),
+    uglify(),
+    sizeSnapshot(),
+    visualizer()
+  ]
 }]
