@@ -121,13 +121,13 @@ export default class List extends EventEmitter {
   }
 
   sorting(draggableA, draggableB) {
-    if(this.options.sorting) {
+    if (this.options.sorting) {
       return this.options.sorting(draggableA, draggableB)
     } else {
-      if(draggableA.pinnedPosition.y < draggableB.pinnedPosition.y) return -1
-      if(draggableA.pinnedPosition.y > draggableB.pinnedPosition.y) return 1
-      if(draggableA.pinnedPosition.x < draggableB.pinnedPosition.x) return -1
-      if(draggableA.pinnedPosition.x > draggableB.pinnedPosition.x) return 1
+      if (draggableA.pinnedPosition.y < draggableB.pinnedPosition.y) return -1
+      if (draggableA.pinnedPosition.y > draggableB.pinnedPosition.y) return 1
+      if (draggableA.pinnedPosition.x < draggableB.pinnedPosition.x) return -1
+      if (draggableA.pinnedPosition.x > draggableB.pinnedPosition.x) return 1
       return 0
     }
   }

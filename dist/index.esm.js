@@ -1749,6 +1749,10 @@ function (_EventEmitter) {
         return _this2.nativeDrop(event);
       };
 
+      this._scroll = function (event) {
+        return _this2.onScroll(event);
+      };
+
       this.handler.addEventListener(touchEvents.start, this._dragStart, isSupportPassiveEvents ? {
         passive: false
       } : false);
@@ -1886,13 +1890,14 @@ function (_EventEmitter) {
       }
 
       var isTouchEvent = isTouch && event instanceof window.TouchEvent;
-      this._startTouchPoint = new Point(isTouchEvent ? event.changedTouches[0].pageX : event.clientX, isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
+      this.touchPoint = this._startTouchPoint = new Point(isTouchEvent ? event.changedTouches[0].pageX : event.clientX, isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
       this._startPosition = this.getPosition();
 
       if (isTouchEvent) {
         this._touchId = event.changedTouches[0].identifier;
       }
 
+      this._startScrollPoint = new Point(window.scrollX, window.scrollY);
       event.stopPropagation();
 
       if (event.target instanceof window.HTMLInputElement || event.target instanceof window.HTMLInputElement) {
@@ -1929,6 +1934,7 @@ function (_EventEmitter) {
         } : false);
       }
 
+      window.addEventListener('scroll', this._scroll);
       this.isDragging = true;
       this.emit('drag:start');
       addClass(this.element, 'dragee-active');
@@ -1945,6 +1951,8 @@ function (_EventEmitter) {
       document.removeEventListener('dragend', this._nativeDragEnd);
       document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
       document.removeEventListener('drop', this._nativeDrop);
+      document.removeEventListener('drop', this._nativeDrop);
+      window.removeEventListener('scroll', this._scroll);
       this.element.draggable = false;
       this.isDragging = false;
       removeClass(this.element, 'dragee-active');
@@ -1966,12 +1974,11 @@ function (_EventEmitter) {
 
       event.stopPropagation();
       event.preventDefault();
-      var touchPoint = new Point(isTouchEvent ? touch.pageX : event.clientX, isTouchEvent ? touch.pageY : event.clientY);
+      this.touchPoint = new Point(isTouchEvent ? touch.pageX : event.clientX, isTouchEvent ? touch.pageY : event.clientY);
 
-      var point = this._startPosition.add(touchPoint.sub(this._startTouchPoint));
+      var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
       point = this.bounding.bound(point, this.getSize());
-      this.touchPoint = touchPoint;
       this.move(point);
     }
   }, {
@@ -1991,9 +1998,21 @@ function (_EventEmitter) {
       document.removeEventListener(mouseEvents.move, this._dragMove);
       document.removeEventListener(touchEvents.end, this._dragEnd);
       document.removeEventListener(mouseEvents.end, this._dragEnd);
+      window.removeEventListener('scroll', this._scroll);
       this.isDragging = false;
       this.element.removeAttribute('draggable');
       removeClass(this.element, 'dragee-active');
+    }
+  }, {
+    key: "onScroll",
+    value: function onScroll(_event) {
+      var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
+
+      point = this.bounding.bound(point, this.getSize());
+
+      if (!this.nativeDragAndDrop) {
+        this.move(point);
+      }
     }
   }, {
     key: "nativeDragStart",
@@ -2016,12 +2035,11 @@ function (_EventEmitter) {
         return;
       }
 
-      var touchPoint = new Point(event.clientX, event.clientY);
+      this.touchPoint = new Point(event.clientX, event.clientY);
 
-      var point = this._startPosition.add(touchPoint.sub(this._startTouchPoint));
+      var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
       point = this.bounding.bound(point, this.getSize());
-      this.touchPoint = touchPoint;
       this.position = point;
       this.emit('drag:move');
     }
@@ -2035,6 +2053,7 @@ function (_EventEmitter) {
       document.removeEventListener('dragend', this._nativeDragEnd);
       document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
       document.removeEventListener('drop', this._nativeDrop);
+      window.removeEventListener('scroll', this._scroll);
       this.isDragging = false;
       this.element.removeAttribute('draggable');
       removeClass(this.element, 'dragee-active');
@@ -2061,7 +2080,8 @@ function (_EventEmitter) {
         parent: document.body,
         on: {
           'drag:move': function dragMove() {
-            _this3.position = new Point(emulationDraggable.position.x - parentRect.left - window.scrollX, emulationDraggable.position.y - parentRect.top - window.scrollY);
+            var parentRectPoint = new Point(parentRect.left, parentRect.top);
+            _this3.position = emulationDraggable.position.sub(parentRectPoint).sub(_this3._startScrollPoint);
 
             _this3.emit('drag:move');
           },
@@ -2073,8 +2093,13 @@ function (_EventEmitter) {
           }
         }
       });
-      emulationDraggable.move(new Point(this.pinnedPosition.x + parentRect.left + window.scrollX, this.pinnedPosition.y + parentRect.top + window.scrollY));
-      emulationDraggable.dragStart(event);
+      var parentRectPoint = new Point(parentRect.left, parentRect.top);
+      emulationDraggable._startScrollPoint = this._startScrollPoint;
+      emulationDraggable.move(this.pinnedPosition.add(parentRectPoint).add(new Point(window.scrollX, window.scrollY)));
+      emulationDraggable.dragStart(event); // new Point(
+      //   this.pinnedPosition.x + parentRect.left + window.scrollX,
+      //   this.pinnedPosition.y + parentRect.top + window.scrollY
+      // ))
     }
   }, {
     key: "dragEndAction",
@@ -2153,6 +2178,11 @@ function (_EventEmitter) {
     key: "emulateNativeDragAndDropForAll",
     get: function get() {
       return this.options.emulateNativeDragAndDropForAll || false;
+    }
+  }, {
+    key: "scrollPoint",
+    get: function get() {
+      return new Point(window.scrollX, window.scrollY);
     }
   }, {
     key: "enable",

@@ -94,6 +94,7 @@ export default class Draggable extends EventEmitter {
     this._nativeDragOver = (event) => this.nativeDragOver(event)
     this._nativeDragEnd = (event) => this.nativeDragEnd(event)
     this._nativeDrop = (event) => this.nativeDrop(event)
+    this._scroll = (event) => this.onScroll(event)
 
     this.handler.addEventListener(touchEvents.start, this._dragStart, isSupportPassiveEvents ? { passive: false } : false)
     this.handler.addEventListener(mouseEvents.start, this._dragStart, isSupportPassiveEvents ? { passive: false } : false)
@@ -210,7 +211,7 @@ export default class Draggable extends EventEmitter {
 
     const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
 
-    this._startTouchPoint = new Point(
+    this.touchPoint = this._startTouchPoint = new Point(
       isTouchEvent ? event.changedTouches[0].pageX : event.clientX,
       isTouchEvent ? event.changedTouches[0].pageY : event.clientY
     )
@@ -219,6 +220,8 @@ export default class Draggable extends EventEmitter {
     if (isTouchEvent) {
       this._touchId = event.changedTouches[0].identifier
     }
+
+    this._startScrollPoint = new Point(window.scrollX, window.scrollY)
 
     event.stopPropagation()
     if (event.target instanceof window.HTMLInputElement ||
@@ -233,7 +236,7 @@ export default class Draggable extends EventEmitter {
     }
 
     if (this.nativeDragAndDrop) {
-      const isSafari =/version\/(\d+).+?safari/i.test(window.navigator.userAgent)
+      const isSafari = /version\/(\d+).+?safari/i.test(window.navigator.userAgent)
       if ((isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
              isSafari ||
              this.emulateNativeDragAndDropForAll) {
@@ -250,6 +253,8 @@ export default class Draggable extends EventEmitter {
       document.addEventListener(mouseEvents.end, this._dragEnd, isSupportPassiveEvents ? { passive: false } : false)
     }
 
+    window.addEventListener('scroll', this._scroll)
+
     this.isDragging = true
     this.emit('drag:start')
     addClass(this.element, 'dragee-active')
@@ -265,6 +270,8 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener('dragend', this._nativeDragEnd)
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
     document.removeEventListener('drop', this._nativeDrop)
+    document.removeEventListener('drop', this._nativeDrop)
+    window.removeEventListener('scroll', this._scroll)
     this.element.draggable = false
     this.isDragging = false
     removeClass(this.element, 'dragee-active')
@@ -285,14 +292,15 @@ export default class Draggable extends EventEmitter {
 
     event.stopPropagation()
     event.preventDefault()
-    const touchPoint = new Point(
+    this.touchPoint = new Point(
       isTouchEvent ? touch.pageX : event.clientX,
       isTouchEvent ? touch.pageY : event.clientY
     )
 
-    let point = this._startPosition.add(touchPoint.sub(this._startTouchPoint))
+    let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
+                                   .add(this.scrollPoint.sub(this._startScrollPoint))
+
     point = this.bounding.bound(point, this.getSize())
-    this.touchPoint = touchPoint
     this.move(point)
   }
 
@@ -314,9 +322,21 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener(touchEvents.end, this._dragEnd)
     document.removeEventListener(mouseEvents.end, this._dragEnd)
 
+    window.removeEventListener('scroll', this._scroll)
+
     this.isDragging = false
     this.element.removeAttribute('draggable')
     removeClass(this.element, 'dragee-active')
+  }
+
+  onScroll(_event) {
+    let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
+                                   .add(this.scrollPoint.sub(this._startScrollPoint))
+
+    point = this.bounding.bound(point, this.getSize())
+    if (!this.nativeDragAndDrop) {
+      this.move(point)
+    }
   }
 
   nativeDragStart(event) {
@@ -336,10 +356,10 @@ export default class Draggable extends EventEmitter {
       return
     }
 
-    const touchPoint = new Point(event.clientX, event.clientY)
-    let point = this._startPosition.add(touchPoint.sub(this._startTouchPoint))
+    this.touchPoint = new Point(event.clientX, event.clientY)
+    let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
+                                   .add(this.scrollPoint.sub(this._startScrollPoint))
     point = this.bounding.bound(point, this.getSize())
-    this.touchPoint = touchPoint
     this.position = point
     this.emit('drag:move')
   }
@@ -352,6 +372,7 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener('dragend', this._nativeDragEnd)
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
     document.removeEventListener('drop', this._nativeDrop)
+    window.removeEventListener('scroll', this._scroll)
     this.isDragging = false
     this.element.removeAttribute('draggable')
     removeClass(this.element, 'dragee-active')
@@ -375,10 +396,9 @@ export default class Draggable extends EventEmitter {
       parent: document.body,
       on: {
         'drag:move': () => {
-          this.position = new Point(
-            emulationDraggable.position.x - parentRect.left - window.scrollX,
-            emulationDraggable.position.y - parentRect.top - window.scrollY
-          )
+          const parentRectPoint = new Point(parentRect.left, parentRect.top)
+          this.position = emulationDraggable.position.sub(parentRectPoint)
+                                                     .sub(this._startScrollPoint)
           this.emit('drag:move')
         },
         'drag:end': () => {
@@ -390,12 +410,19 @@ export default class Draggable extends EventEmitter {
       }
     })
 
-    emulationDraggable.move(new Point(
-      this.pinnedPosition.x + parentRect.left + window.scrollX,
-      this.pinnedPosition.y + parentRect.top + window.scrollY
-    ))
+    const parentRectPoint = new Point(parentRect.left, parentRect.top)
+    emulationDraggable._startScrollPoint = this._startScrollPoint
+
+    emulationDraggable.move(
+      this.pinnedPosition.add(parentRectPoint).add(new Point(window.scrollX, window.scrollY))
+    )
 
     emulationDraggable.dragStart(event)
+
+    // new Point(
+    //   this.pinnedPosition.x + parentRect.left + window.scrollX,
+    //   this.pinnedPosition.y + parentRect.top + window.scrollY
+    // ))
   }
 
   dragEndAction() {
@@ -463,6 +490,10 @@ export default class Draggable extends EventEmitter {
 
   get emulateNativeDragAndDropForAll() {
     return this.options.emulateNativeDragAndDropForAll || false
+  }
+
+  get scrollPoint() {
+    return new Point(window.scrollX, window.scrollY)
   }
 
   get enable() {
