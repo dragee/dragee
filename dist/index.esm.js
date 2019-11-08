@@ -89,6 +89,36 @@ function _possibleConstructorReturn(self, call) {
   return _assertThisInitialized(self);
 }
 
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = _getPrototypeOf(object);
+    if (object === null) break;
+  }
+
+  return object;
+}
+
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    _get = Reflect.get;
+  } else {
+    _get = function _get(target, property, receiver) {
+      var base = _superPropBase(target, property);
+
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+
+      return desc.value;
+    };
+  }
+
+  return _get(target, property, receiver || target);
+}
+
 function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
 }
@@ -2078,6 +2108,11 @@ function (_EventEmitter) {
       addClass(this.element, 'dragee-placeholder');
       var emulationDraggable = new Draggable(clonedElement, {
         parent: document.body,
+        bounding: {
+          bound: function bound(point) {
+            return point;
+          }
+        },
         on: {
           'drag:move': function dragMove() {
             var parentRectPoint = new Point(parentRect.left, parentRect.top);
@@ -2428,6 +2463,101 @@ function (_EventEmitter) {
 
   return List;
 }(EventEmitter);
+
+var BubblingList =
+/*#__PURE__*/
+function (_List) {
+  _inherits(BubblingList, _List);
+
+  function BubblingList(draggables) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, BubblingList);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(BubblingList).call(this, draggables, options));
+  }
+
+  _createClass(BubblingList, [{
+    key: "initDraggable",
+    value: function initDraggable(draggable) {
+      var _this = this;
+
+      draggable.on('drag:start', function () {
+        return _this.autoDetectVerticalGap(draggable);
+      });
+
+      _get(_getPrototypeOf(BubblingList.prototype), "initDraggable", this).call(this, draggable);
+    }
+  }, {
+    key: "autoDetectVerticalGap",
+    value: function autoDetectVerticalGap() {
+      if (this.draggables.length >= 2) {
+        var sorted = this.getSortedDraggables();
+        this.verticalGap = sorted[1].pinnedPosition.y - sorted[0].pinnedPosition.y - sorted[0].getSize().y;
+      } else {
+        this.verticalGap = 0;
+      }
+
+      if (this.draggables.length >= 1) {
+        this.startPosition = this.draggables[0].pinnedPosition;
+      }
+    }
+  }, {
+    key: "onMove",
+    value: function onMove(draggable) {
+      var sortedDraggables = this.getSortedDraggables();
+      var pinnedPositions = sortedDraggables.map(function (draggable) {
+        return draggable.pinnedPosition;
+      });
+      var currentIndex = sortedDraggables.indexOf(draggable);
+      var targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.distanceFunc);
+
+      if (targetIndex !== -1 && currentIndex !== targetIndex) {
+        var _ref = [sortedDraggables[targetIndex], sortedDraggables[currentIndex]];
+        sortedDraggables[currentIndex] = _ref[0];
+        sortedDraggables[targetIndex] = _ref[1];
+        this.bubling(sortedDraggables, draggable);
+        this.emit('list:change');
+      }
+    }
+  }, {
+    key: "bubling",
+    value: function bubling(sortedDraggables, currentDraggable) {
+      var _this2 = this;
+
+      var currentPosition = this.startPosition.clone();
+      sortedDraggables.forEach(function (draggable, index) {
+        if (!draggable.pinnedPosition.compare(currentPosition)) {
+          if (draggable === currentDraggable && !currentDraggable.nativeDragAndDrop) {
+            draggable.pinnedPosition = currentPosition.clone();
+          } else {
+            draggable.pinPosition(currentPosition, draggable === currentDraggable ? 0 : _this2.options.timeExcange);
+          }
+        }
+
+        currentPosition.y = currentPosition.y + draggable.getSize().y + _this2.verticalGap;
+      });
+    }
+  }, {
+    key: "distanceFunc",
+    get: function get() {
+      return this.options.getDistance || getYDifference;
+    }
+  }], [{
+    key: "factory",
+    value: function factory(parentElement, elements) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var draggables = Array.from(elements).map(function (element) {
+        return new Draggable(element, Object.assign({
+          parent: parentElement
+        }, options.draggable || {}));
+      });
+      return new BubblingList(draggables, options.list || {});
+    }
+  }]);
+
+  return BubblingList;
+}(List);
 
 function setStyle(element, style) {
   style = style || {};
@@ -2937,7 +3067,8 @@ var distance = {
   getDistance: getDistance,
   getXDifference: getXDifference,
   getYDifference: getYDifference,
-  transformedSpaceDistanceFactory: transformedSpaceDistanceFactory
+  transformedSpaceDistanceFactory: transformedSpaceDistanceFactory,
+  indexOfNearestPoint: indexOfNearestPoint
 };
 
-export { ArcSlider, Chart, Draggable, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Rectangle, Scope, Spider, Target, addClass, bound, defaultScope, distance, removeClass, scope, scopes };
+export { ArcSlider, BubblingList, Chart, Draggable, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Rectangle, Scope, Spider, Target, addClass, bound, defaultScope, distance, removeClass, scope, scopes };

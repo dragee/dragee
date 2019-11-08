@@ -348,12 +348,12 @@
                 <div id="DemoList" class="demo-html">
                     <div id="DemoList" class="demo-html">
                       <ul class="list list-a">
-                        <li><span class='handler'>↔</span> A</li>
-                        <li><span class='handler'>↔</span> B</li>
-                        <li><span class='handler'>↔</span> C</li>
-                        <li><span class='handler'>↔</span> D</li>
-                        <li><span class='handler'>↔</span> E</li>
-                        <li><span class='handler'>↔</span> F</li>
+                        <li style="height: 188px"><span class='handler'>↔</span> A</li>
+                        <li style="height: 38px"><span class='handler'>↔</span> B</li>
+                        <li style="height: 48px"><span class='handler'>↔</span> C</li>
+                        <li style="height: 58px"><span class='handler'>↔</span> D</li>
+                        <li style="height: 18px"><span class='handler'>↔</span> E</li>
+                        <li style="height: 48px"><span class='handler'>↔</span> F</li>
                       </ul>
                       <ul class="list list-b">
                         <li>⇔ 1</li>
@@ -433,12 +433,11 @@
                             listBParentElement = root.getElementsByClassName("list-b")[0],
                             listBElements = listBParentElement.getElementsByTagName("li");
 
-                        listA = Dragee.List.factory(listAParentElement, listAElements, {
-                          list: {
-                            getDistance: Dragee.distance.getYDifference
-                          },
+                        listA = Dragee.BubblingList.factory(listAParentElement, listAElements, {
                           draggable: {
                             nativeDragAndDrop: true,
+                            radius: 10,
+                            parent: document.body
                             // emulateNativeDragAndDropForAll: true
                           }
                         });
@@ -468,13 +467,13 @@
                       dropzone C
                     </div>
                     <ul class="draggable-holder">
-                      <li class="draggable draggable-a">
+                      <li style="height: 48px" class="draggable draggable-a">
                         ✈ A<small>(origin)</small>
                       </li>
                       <li class="draggable draggable-b">
                         ✈ B<small>(clone)</small>
                       </li>
-                      <li class="draggable draggable-b">
+                      <li style="height: 48px" class="draggable draggable-b">
                         ✈ B<small>(clone)</small>
                       </li>
                       <li class="draggable draggable-b">
@@ -483,7 +482,7 @@
                       <li class="draggable draggable-b">
                         ✈ B<small>(clone)</small>
                       </li>
-                      <li class="draggable draggable-c">
+                      <li style="height: 48px" class="draggable draggable-c">
                         ✈ C<small>(origin)</small>
                       </li>
                       <li class="draggable draggable-d">

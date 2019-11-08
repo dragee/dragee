@@ -2,6 +2,7 @@
 
 ### Added
 - Take window scrolling into account
+- Implement basic BubblingList. Now it work only vertically. It's help as to sort draggables of different sizes
 
 ## 0.9.4
 - Add build to umd format(for jest)

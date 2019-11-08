@@ -394,6 +394,9 @@ export default class Draggable extends EventEmitter {
 
     const emulationDraggable = new Draggable(clonedElement, {
       parent: document.body,
+      bounding: {
+        bound(point) { return point }
+      },
       on: {
         'drag:move': () => {
           const parentRectPoint = new Point(parentRect.left, parentRect.top)
