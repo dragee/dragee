@@ -22,9 +22,7 @@ const container = document.getElementById("listA")
 const elements = [...container.querySelectorAll("li")]
 const draggables = elements.map((element) => new Draggable(element, { parent: container})
 
-new List(draggables, {
-    getDistance: distance.getYDifference
-})
+new List(draggables)
 ````
 
 ## Options:
@@ -36,7 +34,7 @@ We already implemented `getDistance`, `getXDifference` and `getYDifference` func
 By default we use `getDistance` function.
 
 ```javascript
-import { distance, List } from 'dragee'
+import { getYDifference, List } from 'dragee'
 
 new List(draggables, {
     getDistance: getYDifference
