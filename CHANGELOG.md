@@ -1,6 +1,6 @@
 ## [Unreleased]
 
-### Added
+### 0.9.5
 - Take window scrolling into account
 - Implement basic BubblingList. Now it work only vertically. It's help as to sort draggables of different sizes
 - Simplify bounding conception

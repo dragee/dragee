@@ -13,7 +13,7 @@ yarn add dragee
 
 Import to you project
 ```javascript
-import { Draggable, List, Chart, ... } from Dragee
+import { Draggable, List, Chart } from Dragee
 ```
 
 # Usage
