@@ -76,7 +76,7 @@ export default class Chart extends EventEmitter {
 
       return new Draggable(element, {
         parent: this.area,
-        bounding: new BoundToArc(
+        bound: BoundToArc.bounding(
           this.options.center.sub(halfSize),
           this.options.touchRadius,
           this.getBoundAngle(i, false),

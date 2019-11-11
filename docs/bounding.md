@@ -2,33 +2,28 @@
 ![Скриншот 2019-11-04 20 10 03](https://user-images.githubusercontent.com/244409/68145781-36dd3500-ff3f-11e9-8ab2-5f0d22b1d448.png)
 
 ```javascript
-import bound from 'dragee'
+import { boundToCircle } from 'dragee'
 
 new Draggable(element, {
-    bounding: {
-        bound: (point, size) => {
-            const retPoint = point.clone()
-            retPoint.y = calculusFx(point.x)
-            return retPoint
-        }
+    bound(point, size) {
+        const retPoint = point.clone()
+        retPoint.y = calculusFx(point.x)
+        return retPoint
     }
 })
 
 new Draggable(element, {
-    bounding: new Dragee.bound.BoundToCircle(new Dragee.Point(100, 90), 80)
+    bound: BoundToCircle.bounding(new Dragee.Point(100, 90), 80)
 })
 ```
 
-`bounding` is object that describe bounding for `Draggable`.
-It should at least have `bound` method that got point and size of Draggable as arguments when dragging and return bounded point.
+`bound` is function that restrict movements of `Draggable`.
 
 ### Bounding class example
 
 ```javascript
-import { bound } from 'dragee'
+import { BoundToRecangle } from 'dragee'
 import { Point, Rectangle } from 'dragee'
-const BoundToRectangle = bound.BoundToRectangle
-
 const settings = {
   cellSize: 60,
   rowNumber: 8,
@@ -68,17 +63,17 @@ class BoundToCells extends BoundToRectangle {
 }
 
 new Draggable(element, {
-    bounding: new BoundToBoard(settings)
+    bound: BoundToBoard.bounding(settings)
 })
 ```
 
 There is preset of predefined bounding classes
 ```javascript
-new Dragee.bound.BoundToElement(element, parent)
-new Dragee.bound.BoundToRectangle(rectangle)
-new Dragee.bound.BoundTolineX(x, startY, endY)
-new Dragee.bound.BoundTolineY(y, startX, endX)
-new Dragee.bound.BoundToLine(startPoint, endPoint)
-new Dragee.bound.BoundToCircle(center, radius)
-new Dragee.bound.BoundToArc(center, radius, startAgle, endAngle)
+BoundToElemen.bounding(element, parent)
+BoundToRectangle.bounding(rectangle)
+BoundTolineX.bounding(x, startY, endY)
+BoundTolineY.bounding(y, startX, endX)
+BoundToLine.bounding(startPoint, endPoint)
+BoundToCircle.bounding(center, radius)
+BoundToArc.bounding(center, radius, startAgle, endAngle)
 ```

@@ -37,7 +37,7 @@ export default class Spider {
 
       return new Draggable(element, {
         parent: this.area,
-        bounding: new BoundToLine(start, end),
+        bound: BoundToLine.bounding(start, end),
         position: start,
         on: {
           'drag:move': () => this.draw()

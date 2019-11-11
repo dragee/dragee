@@ -73,6 +73,36 @@ function _setPrototypeOf(o, p) {
   return _setPrototypeOf(o, p);
 }
 
+function isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _construct(Parent, args, Class) {
+  if (isNativeReflectConstruct()) {
+    _construct = Reflect.construct;
+  } else {
+    _construct = function _construct(Parent, args, Class) {
+      var a = [null];
+      a.push.apply(a, args);
+      var Constructor = Function.bind.apply(Parent, a);
+      var instance = new Constructor();
+      if (Class) _setPrototypeOf(instance, Class.prototype);
+      return instance;
+    };
+  }
+
+  return _construct.apply(null, arguments);
+}
+
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -709,6 +739,13 @@ function () {
   }, {
     key: "refresh",
     value: function refresh() {}
+  }], [{
+    key: "bounding",
+    value: function bounding() {
+      var instance = _construct(this, Array.prototype.slice.call(arguments));
+
+      return instance.bound.bind(instance);
+    }
   }]);
 
   return Bound;
@@ -1724,6 +1761,8 @@ function (_EventEmitter) {
     Draggable.emitter.emit('draggable:create', _assertThisInitialized(_this));
     _this._enable = true;
 
+    _this.startBounding();
+
     _this.startPositioning();
 
     _this.startListening();
@@ -1732,6 +1771,11 @@ function (_EventEmitter) {
   }
 
   _createClass(Draggable, [{
+    key: "startBounding",
+    value: function startBounding() {
+      this.bound = this.options.bound || BoundToElement.bounding(this.parent, this.parent);
+    }
+  }, {
     key: "startPositioning",
     value: function startPositioning() {
       this._setDefaultTransition();
@@ -1742,8 +1786,8 @@ function (_EventEmitter) {
       this.initialPosition = this.options.position || this.offset;
       this.pinPosition(this.initialPosition);
 
-      if (this.bounding.refresh) {
-        this.bounding.refresh();
+      if (this.bound.refresh) {
+        this.bound.refresh();
       }
     }
   }, {
@@ -2008,7 +2052,7 @@ function (_EventEmitter) {
 
       var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
-      point = this.bounding.bound(point, this.getSize());
+      point = this.bound(point, this.getSize());
       this.move(point);
     }
   }, {
@@ -2038,7 +2082,7 @@ function (_EventEmitter) {
     value: function onScroll(_event) {
       var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
-      point = this.bounding.bound(point, this.getSize());
+      point = this.bound(point, this.getSize());
 
       if (!this.nativeDragAndDrop) {
         this.move(point);
@@ -2069,7 +2113,7 @@ function (_EventEmitter) {
 
       var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
-      point = this.bounding.bound(point, this.getSize());
+      point = this.bound(point, this.getSize());
       this.position = point;
       this.emit('drag:move');
     }
@@ -2108,10 +2152,8 @@ function (_EventEmitter) {
       addClass(this.element, 'dragee-placeholder');
       var emulationDraggable = new Draggable(clonedElement, {
         parent: document.body,
-        bounding: {
-          bound: function bound(point) {
-            return point;
-          }
+        bound: function bound(point) {
+          return point;
         },
         on: {
           'drag:move': function dragMove() {
@@ -2131,10 +2173,7 @@ function (_EventEmitter) {
       var parentRectPoint = new Point(parentRect.left, parentRect.top);
       emulationDraggable._startScrollPoint = this._startScrollPoint;
       emulationDraggable.move(this.pinnedPosition.add(parentRectPoint).add(new Point(window.scrollX, window.scrollY)));
-      emulationDraggable.dragStart(event); // new Point(
-      //   this.pinnedPosition.x + parentRect.left + window.scrollX,
-      //   this.pinnedPosition.y + parentRect.top + window.scrollY
-      // ))
+      emulationDraggable.dragStart(event);
     }
   }, {
     key: "dragEndAction",
@@ -2149,10 +2188,8 @@ function (_EventEmitter) {
   }, {
     key: "refresh",
     value: function refresh() {
-      this.getSize(true);
-
-      if (this.bounding.refresh) {
-        this.bounding.refresh();
+      if (this.bound.refresh) {
+        this.bound.refresh();
       }
     }
   }, {
@@ -2180,11 +2217,6 @@ function (_EventEmitter) {
     key: "parent",
     get: function get() {
       return this._parent = this._parent || this.options.parent || getDefaultParent(this.element);
-    }
-  }, {
-    key: "bounding",
-    get: function get() {
-      return this._bounding = this._bounding || this.options.bounding || new BoundToElement(this.parent, this.parent);
     }
   }, {
     key: "handler",
@@ -2638,7 +2670,7 @@ function () {
         var end = getPointFromRadialSystem(angle, _this.options.endRadius, _this.options.center).sub(halfSize);
         return new Draggable(element, {
           parent: _this.area,
-          bounding: new BoundToLine(start, end),
+          bound: BoundToLine.bounding(start, end),
           position: start,
           on: {
             'drag:move': function dragMove() {
@@ -2719,7 +2751,7 @@ function (_EventEmitter) {
       this.angle = angle;
       this.draggable = new Draggable(element, {
         parent: this.area,
-        bounding: new BoundToArc(this.shiftedCenter, this.options.radius, this.options.startAngle, this.options.endAngle),
+        bound: BoundToArc.bounding(this.shiftedCenter, this.options.radius, this.options.startAngle, this.options.endAngle),
         position: position,
         on: {
           'drag:move': function dragMove() {
@@ -2834,7 +2866,7 @@ function (_EventEmitter) {
         var position = getPointFromRadialSystem(angle, _this2.options.touchRadius, _this2.options.center.sub(halfSize));
         return new Draggable(element, {
           parent: _this2.area,
-          bounding: new BoundToArc(_this2.options.center.sub(halfSize), _this2.options.touchRadius, _this2.getBoundAngle(i, false), _this2.getBoundAngle(i, true)),
+          bound: BoundToArc.bounding(_this2.options.center.sub(halfSize), _this2.options.touchRadius, _this2.getBoundAngle(i, false), _this2.getBoundAngle(i, true)),
           position: position,
           on: {
             'drag:move': function dragMove() {
@@ -3053,22 +3085,4 @@ function (_EventEmitter) {
   return Chart;
 }(EventEmitter);
 
-var bound = {
-  Bound: Bound,
-  BoundToRectangle: BoundToRectangle,
-  BoundToElement: BoundToElement,
-  BoundToLineX: BoundToLineX,
-  BoundToLineY: BoundToLineY,
-  BoundToLine: BoundToLine,
-  BoundToCircle: BoundToCircle,
-  BoundToArc: BoundToArc
-};
-var distance = {
-  getDistance: getDistance,
-  getXDifference: getXDifference,
-  getYDifference: getYDifference,
-  transformedSpaceDistanceFactory: transformedSpaceDistanceFactory,
-  indexOfNearestPoint: indexOfNearestPoint
-};
-
-export { ArcSlider, BubblingList, Chart, Draggable, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Rectangle, Scope, Spider, Target, addClass, bound, defaultScope, distance, removeClass, scope, scopes };
+export { ArcSlider, Bound, BoundToArc, BoundToCircle, BoundToElement, BoundToLine, BoundToLineX, BoundToLineY, BoundToRectangle, BubblingList, Chart, Draggable, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Rectangle, Scope, Spider, Target, addClass, defaultScope, getDistance, getXDifference, getYDifference, indexOfNearestPoint, removeClass, scope, scopes, transformedSpaceDistanceFactory };

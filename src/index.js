@@ -9,7 +9,13 @@ import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './po
 import Spider from './spider'
 import ArcSlider from './arcslider'
 import Chart from './chart'
-import { getDistance, getXDifference, getYDifference, transformedSpaceDistanceFactory, indexOfNearestPoint } from './geometry/distances'
+import {
+  getDistance,
+  getXDifference,
+  getYDifference,
+  transformedSpaceDistanceFactory,
+  indexOfNearestPoint
+} from './geometry/distances'
 import { addClass, removeClass } from './utils/classes'
 import {
   Bound,
@@ -21,17 +27,6 @@ import {
   BoundToCircle,
   BoundToArc
 } from './bounding'
-
-const bound = {
-  Bound,
-  BoundToRectangle,
-  BoundToElement,
-  BoundToLineX,
-  BoundToLineY,
-  BoundToLine,
-  BoundToCircle,
-  BoundToArc
-}
 
 const distance = {
   getDistance,
@@ -52,7 +47,11 @@ export {
   Spider,
   ArcSlider,
   Chart,
-  bound,
-  distance,
+  Bound, BoundToRectangle, BoundToElement,
+  BoundToLineX, BoundToLineY, BoundToLine,
+  BoundToCircle, BoundToArc,
+  getDistance, getXDifference, getYDifference,
+  transformedSpaceDistanceFactory,
+  indexOfNearestPoint,
   addClass, removeClass
 }

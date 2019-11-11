@@ -21,6 +21,11 @@ export class Bound {
   }
 
   refresh () {}
+
+  static bounding() {
+    const instance = new this(...arguments)
+    return instance.bound.bind(instance)
+  }
 }
 
 export class BoundToRectangle extends Bound {

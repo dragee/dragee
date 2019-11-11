@@ -180,7 +180,7 @@
                           draggableRadius = 25;
 
                       new Dragee.Draggable(draggableAElement, {
-                          bounding: new Dragee.bound.BoundToCircle(new Dragee.Point(100, 90), 80),
+                          bound: Dragee.BoundToCircle.bounding(new Dragee.Point(100, 90), 80),
                           position: new Dragee.Point(100, 10)
                       });
 
@@ -189,15 +189,11 @@
                           return x * Math.sin(x * x) * 10 + 80;
                       }
 
-                      function calculusBound(point, size){
-                          var retPoint = point.clone();
-                          retPoint.y = calculusFx(point.x);
-                          return retPoint;
-                      }
-
                       new Dragee.Draggable(draggableBElement, {
-                          bounding: {
-                            bound: calculusBound
+                          bound(point, size) {
+                            var retPoint = point.clone()
+                            retPoint.y = calculusFx(point.x)
+                            return retPoint;
                           },
                           position: new Dragee.Point(210, calculusFx(210))
                       });
@@ -287,7 +283,7 @@
                         colNumber: 8
                       }
 
-                      class BoundToCells extends Dragee.bound.BoundToRectangle {
+                      class BoundToCells extends Dragee.BoundToRectangle {
                           constructor(settings) {
                               const rectangle = new Rectangle(
                                   new Point(0, 0),
@@ -321,7 +317,7 @@
 
                       new Dragee.Draggable(draggableAElement, {
                           position: new Dragee.Point(180, 0),
-                          bounding: new BoundToCells(settings)
+                          bound: BoundToCells.bounding(settings)
                       })
 
                       var canvas = document.getElementById("chessCanvas")
@@ -620,7 +616,7 @@
                                 () => target.getRectangle(),
                                 {
                                   radius: 80,
-                                  getDistance: Dragee.distance.transformedSpaceDistanceFactory({ x: 1, y: 4 }),
+                                  getDistance: Dragee.transformedSpaceDistanceFactory({ x: 1, y: 4 }),
                                   removable: true,
                                   paddingTopLeft: new Dragee.Point(5, 5),
                                   yGapBetweenDraggables: 5

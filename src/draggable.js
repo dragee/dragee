@@ -68,8 +68,13 @@ export default class Draggable extends EventEmitter {
     preventDoubleInit(this)
     Draggable.emitter.emit('draggable:create', this)
     this._enable = true
+    this.startBounding()
     this.startPositioning()
     this.startListening()
+  }
+
+  startBounding() {
+    this.bound = this.options.bound || BoundToElement.bounding(this.parent, this.parent)
   }
 
   startPositioning() {
@@ -81,8 +86,8 @@ export default class Draggable extends EventEmitter {
 
     this.pinPosition(this.initialPosition)
 
-    if (this.bounding.refresh) {
-      this.bounding.refresh()
+    if (this.bound.refresh) {
+      this.bound.refresh()
     }
   }
 
@@ -300,7 +305,7 @@ export default class Draggable extends EventEmitter {
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.scrollPoint.sub(this._startScrollPoint))
 
-    point = this.bounding.bound(point, this.getSize())
+    point = this.bound(point, this.getSize())
     this.move(point)
   }
 
@@ -333,7 +338,7 @@ export default class Draggable extends EventEmitter {
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.scrollPoint.sub(this._startScrollPoint))
 
-    point = this.bounding.bound(point, this.getSize())
+    point = this.bound(point, this.getSize())
     if (!this.nativeDragAndDrop) {
       this.move(point)
     }
@@ -359,7 +364,7 @@ export default class Draggable extends EventEmitter {
     this.touchPoint = new Point(event.clientX, event.clientY)
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.scrollPoint.sub(this._startScrollPoint))
-    point = this.bounding.bound(point, this.getSize())
+    point = this.bound(point, this.getSize())
     this.position = point
     this.emit('drag:move')
   }
@@ -394,9 +399,7 @@ export default class Draggable extends EventEmitter {
 
     const emulationDraggable = new Draggable(clonedElement, {
       parent: document.body,
-      bounding: {
-        bound(point) { return point }
-      },
+      bound(point) { return point },
       on: {
         'drag:move': () => {
           const parentRectPoint = new Point(parentRect.left, parentRect.top)
@@ -421,11 +424,6 @@ export default class Draggable extends EventEmitter {
     )
 
     emulationDraggable.dragStart(event)
-
-    // new Point(
-    //   this.pinnedPosition.x + parentRect.left + window.scrollX,
-    //   this.pinnedPosition.y + parentRect.top + window.scrollY
-    // ))
   }
 
   dragEndAction() {
@@ -437,9 +435,8 @@ export default class Draggable extends EventEmitter {
   }
 
   refresh() {
-    this.getSize(true)
-    if (this.bounding.refresh) {
-      this.bounding.refresh()
+    if (this.bound.refresh) {
+      this.bound.refresh()
     }
   }
 
@@ -465,10 +462,6 @@ export default class Draggable extends EventEmitter {
 
   get parent() {
     return (this._parent = this._parent || this.options.parent || getDefaultParent(this.element))
-  }
-
-  get bounding() {
-    return (this._bounding = this._bounding || this.options.bounding || new BoundToElement(this.parent, this.parent))
   }
 
   get handler() {

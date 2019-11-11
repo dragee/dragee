@@ -34,12 +34,10 @@ By default we will resctrict movements inside parent rectangle
 
 ```javascript
 new Draggable(element, {
-    bounding: {
-        bound: (point, size) => {
-            const retPoint = point.clone()
-            retPoint.y = calculusFx(point.x)
-            return retPoint
-        }
+    bound(point, size) {
+        const retPoint = point.clone()
+        retPoint.y = calculusFx(point.x)
+        return retPoint
     }
 )
 ```
