@@ -1,7 +1,8 @@
 ## [Unreleased]
 
-### Added
+## 0.9.6
 - Improve Bubbling List sorting on scroll.
+- Update docs
 
 ## 0.9.5
 - Take window scrolling into account
