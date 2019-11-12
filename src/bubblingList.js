@@ -3,6 +3,10 @@ import { indexOfNearestPoint, getYDifference } from './geometry/distances'
 
 import Draggable from './draggable'
 
+const arrayMove = (array, from, to) => {
+  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
+}
+
 export default class BubblingList extends List {
   constructor(draggables, options={}) {
     super(draggables, options)
@@ -35,7 +39,7 @@ export default class BubblingList extends List {
     const targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.distanceFunc)
 
     if (targetIndex !== -1 && currentIndex !== targetIndex) {
-      [sortedDraggables[currentIndex], sortedDraggables[targetIndex]] = [sortedDraggables[targetIndex], sortedDraggables[currentIndex]]
+      arrayMove(sortedDraggables, currentIndex, targetIndex)
       this.bubling(sortedDraggables, draggable)
       this.emit('list:change')
     }

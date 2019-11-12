@@ -1,6 +1,9 @@
 ## [Unreleased]
 
-### 0.9.5
+### Added
+- Improve Bubbling List sorting on scroll.
+
+## 0.9.5
 - Take window scrolling into account
 - Implement basic BubblingList. Now it work only vertically. It's help as to sort draggables of different sizes
 - Simplify bounding conception
@@ -17,7 +20,6 @@
 - Fix handler + native drag&drop issue
 
 ## 0.9.1
-### Added
 - Fix html5 drag and drop issues
 - Emulate html5 drag and drop on desktop safari
 - Add posibility to emulate native drag and drop on all devices

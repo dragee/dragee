@@ -2496,6 +2496,10 @@ function (_EventEmitter) {
   return List;
 }(EventEmitter);
 
+var arrayMove = function arrayMove(array, from, to) {
+  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
+};
+
 var BubblingList =
 /*#__PURE__*/
 function (_List) {
@@ -2545,9 +2549,7 @@ function (_List) {
       var targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.distanceFunc);
 
       if (targetIndex !== -1 && currentIndex !== targetIndex) {
-        var _ref = [sortedDraggables[targetIndex], sortedDraggables[currentIndex]];
-        sortedDraggables[currentIndex] = _ref[0];
-        sortedDraggables[targetIndex] = _ref[1];
+        arrayMove(sortedDraggables, currentIndex, targetIndex);
         this.bubling(sortedDraggables, draggable);
         this.emit('list:change');
       }
