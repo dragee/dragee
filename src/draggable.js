@@ -146,7 +146,9 @@ export default class Draggable extends EventEmitter {
 
     let transform = this.element.style[transformProperty]
 
-    if (!/translate3d\([^)]+\)/.test(transform)) {
+    if (this.shouldRemoveZeroTranslate && point.x === 0 && point.y === 0) {
+      transform = transform.replace(/translate3d\([^)]+\)/, '')
+    } else if (!/translate3d\([^)]+\)/.test(transform)) {
       transform += ` ${translateCss}`
     } else {
       transform = transform.replace(/translate3d\([^)]+\)/, translateCss)
@@ -476,6 +478,10 @@ export default class Draggable extends EventEmitter {
 
   get emulateNativeDragAndDropForAll() {
     return this.options.emulateNativeDragAndDropForAll || false
+  }
+
+  get shouldRemoveZeroTranslate() {
+    return this.options.shouldRemoveZeroTranslate || false
   }
 
   get scrollPoint() {

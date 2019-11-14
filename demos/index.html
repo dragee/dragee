@@ -105,7 +105,9 @@
                     window.addEventListener("load", function(){
                         const root = document.getElementById("DemoDraggable");
                         root.querySelectorAll(".draggable").forEach((draggableElement) => {
-                            new Dragee.Draggable(draggableElement)
+                            new Dragee.Draggable(draggableElement, {
+                              shouldRemoveZeroTranslate: true
+                            })
                         })
                     })
                 </script>
@@ -433,7 +435,8 @@
                           draggable: {
                             nativeDragAndDrop: true,
                             radius: 10,
-                            parent: document.body
+                            parent: document.body,
+                            // shouldRemoveZeroTranslate: true
                             // emulateNativeDragAndDropForAll: true
                           }
                         });

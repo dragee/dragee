@@ -1881,7 +1881,9 @@ function (_EventEmitter) {
       var translateCss = "translate3d(".concat(point.x, "px, ").concat(point.y, "px, 0px)");
       var transform = this.element.style[transformProperty];
 
-      if (!/translate3d\([^)]+\)/.test(transform)) {
+      if (this.shouldRemoveZeroTranslate && point.x === 0 && point.y === 0) {
+        transform = transform.replace(/translate3d\([^)]+\)/, '');
+      } else if (!/translate3d\([^)]+\)/.test(transform)) {
         transform += " ".concat(translateCss);
       } else {
         transform = transform.replace(/translate3d\([^)]+\)/, translateCss);
@@ -2233,6 +2235,11 @@ function (_EventEmitter) {
     key: "emulateNativeDragAndDropForAll",
     get: function get() {
       return this.options.emulateNativeDragAndDropForAll || false;
+    }
+  }, {
+    key: "shouldRemoveZeroTranslate",
+    get: function get() {
+      return this.options.shouldRemoveZeroTranslate || false;
     }
   }, {
     key: "scrollPoint",
