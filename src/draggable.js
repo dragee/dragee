@@ -142,26 +142,14 @@ export default class Draggable extends EventEmitter {
 
   _setTranslate(point) {
     this._transformPosition = point
+    const translateCss = `translate3d(${point.x}px, ${point.y}px, 0px)`
 
     let transform = this.element.style[transformProperty]
-    let translateCss = ` translate3d(${point.x}px, ${point.y}px, 0px)`
 
-    const ua = window.navigator.userAgent
-    const msie = ua.indexOf('MSIE ') !== -1
-
-    if (msie) {
-      translateCss = ` translate(${point.x}px,${point.y}px)`
-      if (!/translate\([^)]+\)/.test(transform)) {
-        transform += translateCss
-      } else {
-        transform = transform.replace(/translate\([^)]+\)/, translateCss)
-      }
+    if (!/translate3d\([^)]+\)/.test(transform)) {
+      transform += ` ${translateCss}`
     } else {
-      if (!/translate3d\([^)]+\)/.test(transform)) {
-        transform += translateCss
-      } else {
-        transform = transform.replace(/translate3d\([^)]+\)/, translateCss)
-      }
+      transform = transform.replace(/translate3d\([^)]+\)/, translateCss)
     }
 
     this.element.style[transformProperty] = transform
@@ -399,7 +387,9 @@ export default class Draggable extends EventEmitter {
 
     const emulationDraggable = new Draggable(clonedElement, {
       parent: document.body,
-      bound(point) { return point },
+      bound(point) {
+        return point
+      },
       on: {
         'drag:move': () => {
           const parentRectPoint = new Point(parentRect.left, parentRect.top)

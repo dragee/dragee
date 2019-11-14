@@ -1878,25 +1878,13 @@ function (_EventEmitter) {
     key: "_setTranslate",
     value: function _setTranslate(point) {
       this._transformPosition = point;
+      var translateCss = "translate3d(".concat(point.x, "px, ").concat(point.y, "px, 0px)");
       var transform = this.element.style[transformProperty];
-      var translateCss = " translate3d(".concat(point.x, "px, ").concat(point.y, "px, 0px)");
-      var ua = window.navigator.userAgent;
-      var msie = ua.indexOf('MSIE ') !== -1;
 
-      if (msie) {
-        translateCss = " translate(".concat(point.x, "px,").concat(point.y, "px)");
-
-        if (!/translate\([^)]+\)/.test(transform)) {
-          transform += translateCss;
-        } else {
-          transform = transform.replace(/translate\([^)]+\)/, translateCss);
-        }
+      if (!/translate3d\([^)]+\)/.test(transform)) {
+        transform += " ".concat(translateCss);
       } else {
-        if (!/translate3d\([^)]+\)/.test(transform)) {
-          transform += translateCss;
-        } else {
-          transform = transform.replace(/translate3d\([^)]+\)/, translateCss);
-        }
+        transform = transform.replace(/translate3d\([^)]+\)/, translateCss);
       }
 
       this.element.style[transformProperty] = transform;
@@ -2560,7 +2548,7 @@ function (_List) {
       var _this2 = this;
 
       var currentPosition = this.startPosition.clone();
-      sortedDraggables.forEach(function (draggable, index) {
+      sortedDraggables.forEach(function (draggable) {
         if (!draggable.pinnedPosition.compare(currentPosition)) {
           if (draggable === currentDraggable && !currentDraggable.nativeDragAndDrop) {
             draggable.pinnedPosition = currentPosition.clone();

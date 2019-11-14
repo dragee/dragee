@@ -28,14 +28,6 @@ import {
   BoundToArc
 } from './bounding'
 
-const distance = {
-  getDistance,
-  getXDifference,
-  getYDifference,
-  transformedSpaceDistanceFactory,
-  indexOfNearestPoint
-}
-
 export {
   Draggable,
   Point, Rectangle,

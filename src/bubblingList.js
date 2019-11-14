@@ -4,7 +4,7 @@ import { indexOfNearestPoint, getYDifference } from './geometry/distances'
 import Draggable from './draggable'
 
 const arrayMove = (array, from, to) => {
-  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
+  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0])
 }
 
 export default class BubblingList extends List {
@@ -18,7 +18,7 @@ export default class BubblingList extends List {
   }
 
   autoDetectVerticalGap() {
-    if(this.draggables.length >= 2) {
+    if (this.draggables.length >= 2) {
       const sorted = this.getSortedDraggables()
 
       this.verticalGap = sorted[1].pinnedPosition.y - sorted[0].pinnedPosition.y - sorted[0].getSize().y
@@ -26,7 +26,7 @@ export default class BubblingList extends List {
       this.verticalGap = 0
     }
 
-    if(this.draggables.length >= 1) {
+    if (this.draggables.length >= 1) {
       this.startPosition = this.draggables[0].pinnedPosition
     }
   }
@@ -48,9 +48,9 @@ export default class BubblingList extends List {
   bubling(sortedDraggables, currentDraggable) {
     const currentPosition = this.startPosition.clone()
 
-    sortedDraggables.forEach((draggable, index) => {
-      if(!draggable.pinnedPosition.compare(currentPosition)) {
-        if(draggable === currentDraggable && !currentDraggable.nativeDragAndDrop) {
+    sortedDraggables.forEach((draggable) => {
+      if (!draggable.pinnedPosition.compare(currentPosition)) {
+        if (draggable === currentDraggable && !currentDraggable.nativeDragAndDrop) {
           draggable.pinnedPosition = currentPosition.clone()
         } else {
           draggable.pinPosition(currentPosition, (draggable === currentDraggable) ? 0 : this.options.timeExcange)
