@@ -1,13 +1,23 @@
 {
   "presets": [
-    [
-      "@babel/env",
-      {
-        "modules": false,
-        "useBuiltIns": "usage",
-        "corejs": 3,
-        "targets": "ie 10"
-      }
-    ]
-  ]
+    "@babel/env"
+  ],
+  "env": {
+    "development": {
+      "presets": [
+        ["@babel/env", {
+          targets: "> 0.25%, not dead"
+        }]
+      ]
+    },
+    "test": {
+      "presets": [
+        ["@babel/env", {
+          targets: {
+            node: "current"
+          }
+        }]
+      ]
+    }
+  }
 }

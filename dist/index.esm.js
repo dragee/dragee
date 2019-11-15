@@ -1,25 +1,3 @@
-import 'core-js/modules/es.array.concat';
-import 'core-js/modules/es.string.sub';
-import 'core-js/modules/es.array.splice';
-import 'core-js/modules/es.string.replace';
-import 'core-js/modules/es.regexp.constructor';
-import 'core-js/modules/es.regexp.to-string';
-import 'core-js/modules/es.symbol';
-import 'core-js/modules/es.symbol.description';
-import 'core-js/modules/es.symbol.iterator';
-import 'core-js/modules/es.array.iterator';
-import 'core-js/modules/es.array.slice';
-import 'core-js/modules/es.object.entries';
-import 'core-js/modules/es.object.to-string';
-import 'core-js/modules/es.string.iterator';
-import 'core-js/modules/web.dom-collections.iterator';
-import 'core-js/modules/es.array.filter';
-import 'core-js/modules/es.array.map';
-import 'core-js/modules/web.dom-collections.for-each';
-import 'core-js/modules/es.object.assign';
-import 'core-js/modules/es.array.from';
-import 'core-js/modules/es.array.fill';
-
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -1884,7 +1862,11 @@ function (_EventEmitter) {
       if (this.shouldRemoveZeroTranslate && point.x === 0 && point.y === 0) {
         transform = transform.replace(/translate3d\([^)]+\)/, '');
       } else if (!/translate3d\([^)]+\)/.test(transform)) {
-        transform += " ".concat(translateCss);
+        if (transform) {
+          transform += ' ';
+        }
+
+        transform += translateCss;
       } else {
         transform = transform.replace(/translate3d\([^)]+\)/, translateCss);
       }
