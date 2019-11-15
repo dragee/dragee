@@ -19,28 +19,37 @@ import { Draggable, List, Chart } from Dragee
 # Usage
 
 ## Draggable
-```html
-<div class="area">
-    <div id="draggable">
-        <i class="icon-move"></i> A
-    </div>
-</div>
-```
 
 ```javascript
 import { Draggable } from 'dragee'
-
-element = document.getElementById('draggable')
 new Draggable(element[, options])
 ```
 
 ## Options
 
+### Listeners
+```javascript
+new Draggable(element, {
+    on: {
+        'drag:start': () => addClass(element, 'is-dragging')
+        'drag:move': () => console.log('drag:move')
+        'drag:end': () => removeClass(element, 'is-dragging')
+    }
+})
+```
+
 ### handler
+```html
+<div class="area">
+    <div id="draggable">
+        <i class="handles"></i> A
+    </div>
+</div>
+```
 
 ```javascript
 new Draggable(element, {
-    handler: '.icon-move'
+    handler: '.handles'
 })
 ```
 
