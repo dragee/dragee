@@ -1,6 +1,6 @@
 {
   "name": "dragee",
-  "version": "0.9.6",
+  "version": "1.0.0",
   "description": "Dragee(drag&drop) library",
   "scripts": {
     "build": "rollup --config rollup.config.js",
@@ -36,8 +36,9 @@
   "bugs": "https://github.com/dragee/dragee/issues",
   "keywords": [
     "drag",
-    "drop",
-    "draggable"
+    "drag&drop",
+    "draggable",
+    "restrict-movements"
   ],
   "sideEffects": false
 }

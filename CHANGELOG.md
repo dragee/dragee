@@ -1,10 +1,12 @@
 ## [Unreleased]
 
+## 1.0.0
 ### Remove
 - Remove IE9 support
 
 ### Added
 - shouldRemoveZeroTranslate option for draggable
+- cover with basic specs
 
 ## 0.9.6
 - Improve Bubbling List sorting on scroll.
