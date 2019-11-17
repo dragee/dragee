@@ -4,7 +4,13 @@ function getSumValueOfStyleRules(element, rules) {
   }, 0)
 }
 
+/** Class representing a point. */
 export default class Point {
+  /**
+  * Create a point.
+  * @param {number} x - The x value.
+  * @param {number} y - The y value.
+  */
   constructor(x, y) {
     this.x = x
     this.y = y
