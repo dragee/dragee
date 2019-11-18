@@ -54,7 +54,7 @@ new Draggable(element, {
 ### Other Options
 | **Option** | **Type** | **Default** | **Description** |
 | --- | :---: | :---: | --- |
-| `handler` | `string|element` | null | specifies on what element the drag interaction starts. |
+| `handler` | `string/element` | null | specifies on what element the drag interaction starts. |
 | `parent` | `element` | auto | HTMLElement that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate parent(container) automatically by finding first parent that have non `static` positioning. |
 
 | `position` | `Point` | auto | Start positioning. By default we automatically calculate position inside `parent` element. |
