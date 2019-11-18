@@ -37,34 +37,11 @@ new Draggable(element, {
 })
 ```
 
-### bounding
+### bound
+`bound` is function that restrict movements of `Draggable`.
 Bounding conception can help us to restrict `draggable` movements. We can set to move it insite rectangle, by circle, by line, etc.
-By default we will resctrict movements inside parent rectangle
+By default we will resctrict movements inside parent rectangle.
 
-```javascript
-new Draggable(element, {
-    bound(point, size) {
-        const retPoint = point.clone()
-        retPoint.y = calculusFx(point.x)
-        return retPoint
-    }
-)
-```
-
-### Other Options
-| **Option** | **Type** | **Default** | **Description** |
-| --- | :---: | :---: | --- |
-| `handler` | `string/element` | null | specifies on what element the drag interaction starts. |
-| `parent` | `element` | auto | HTMLElement that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate parent(container) automatically by finding first parent that have non `static` positioning. |
-
-| `position` | `Point` | auto | Start positioning. By default we automatically calculate position inside `parent` element. |
-| `isContentBoxSize` | `Boolean` | `true` | You can identify  that we should take into account element borders and paddings when we calculate draggable size. |
-| `nativeDragAndDrop` | `Boolean` | `false` | There can be situations where we need to use html5 drag&drop instead of `dragee` realization. Example: `table>tr` have a lot of issues, so it's easier to fix them using html5 drag&drop realization or emulation. |
-| `emulateNativeDragAndDropOnTouch` | `Boolean` | `true` | Emulate native drag&drop on touch devices. |
-| `emulateNativeDragAndDropForAll` | `Boolean` | `false` | Emulate native drag&drop on all browsers. |
-
-
-## Bounding
 ![Скриншот 2019-11-04 20 10 03](https://user-images.githubusercontent.com/244409/68145781-36dd3500-ff3f-11e9-8ab2-5f0d22b1d448.png)
 
 ```javascript
@@ -83,9 +60,7 @@ new Draggable(element, {
 })
 ```
 
-`bound` is function that restrict movements of `Draggable`.
-
-There is preset of predefined bounding classes
+Preset of predefined boundings:
 ```javascript
 BoundToElemen.bounding(element, parent)
 BoundToRectangle.bounding(rectangle)
@@ -95,6 +70,18 @@ BoundToLine.bounding(startPoint, endPoint)
 BoundToCircle.bounding(center, radius)
 BoundToArc.bounding(center, radius, startAgle, endAngle)
 ```
+
+
+### Other Options
+| **Option** | **Type** | **Default** | **Description** |
+| --- | :---: | :---: | --- |
+| `handler` | `string/element` | null | specifies on what element the drag interaction starts. |
+| `parent` | `element` | auto | HTMLElement that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate parent(container) automatically by finding first parent that have non `static` positioning. |
+| `position` | `Point` | auto | Start positioning. By default we automatically calculate position inside `parent` element. |
+| `isContentBoxSize` | `Boolean` | `true` | You can identify  that we should take into account element borders and paddings when we calculate draggable size. |
+| `nativeDragAndDrop` | `Boolean` | `false` | There can be situations where we need to use html5 drag&drop instead of `dragee` realization. Example: `table>tr` have a lot of issues, so it's easier to fix them using html5 drag&drop realization or emulation. |
+| `emulateNativeDragAndDropOnTouch` | `Boolean` | `true` | Emulate native drag&drop on touch devices. |
+| `emulateNativeDragAndDropForAll` | `Boolean` | `false` | Emulate native drag&drop on all browsers. |
 
 ## List
 
