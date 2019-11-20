@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## 1.0.1
+- Improve docs and specs
 - Rename parent to container
 
 ## 1.0.0
