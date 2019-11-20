@@ -11,11 +11,6 @@ Install with yarn
 yarn add dragee
 ```
 
-Import to you project
-```javascript
-import { Draggable, List, Chart } from Dragee
-```
-
 # Usage
 
 ## Draggable
@@ -25,7 +20,6 @@ import { Draggable } from 'dragee'
 new Draggable(element[, options])
 ```
 
-## Options
 
 ### Listeners
 ```javascript
@@ -38,25 +32,8 @@ new Draggable(element, {
 })
 ```
 
-### handler
-```html
-<div class="area">
-    <div id="draggable">
-        <i class="handles"></i> A
-    </div>
-</div>
-```
-
-```javascript
-new Draggable(element, {
-    handler: '.handles'
-})
-```
-
-### container
-HTMLElement that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate `container` automatically by finding first `parentNode` that have non `static` positioning
-
-### bounding
+### bound
+`bound` is function that restrict movements of `Draggable`.
 Bounding conception can help us to restrict `draggable` movements. We can set to move it insite rectangle, by circle, by line, etc.
 By default we will resctrict movements inside `container` rectangle
 
@@ -111,57 +88,7 @@ new Draggable(element, {
 })
 ```
 
-`bound` is function that restrict movements of `Draggable`.
-
-### Bounding class example
-
-```javascript
-import { BoundToRecangle } from 'dragee'
-import { Point, Rectangle } from 'dragee'
-const settings = {
-  cellSize: 60,
-  rowNumber: 8,
-  colNumber: 8
-}
-
-class BoundToCells extends BoundToRectangle {
-    constructor(settings) {
-        this.settings = settings
-        const rectangle = new Rectangle(
-            new Point(0, 0),
-            new Point(
-                settings.cellSize * settings.rowNumber,
-                settings.cellSize * settings.colNumber,
-            )
-        )
-        super(rectangle)
-    }
-
-    bound (point, size) {
-        point = new Dragee.Point(
-            Math.round(point.x / this.cellSize) * this.cellSize,
-            Math.round(point.y / this.cellSize) * this.cellSize
-        )
-        return super.bound(point, size)
-    }
-
-    refresh () {
-        this.rectangle = new Rectangle(
-            new Point(0, 0),
-            new Point(
-                this.settings.cellSize * this.settings.rowNumber,
-                this.settings.cellSize * this.settings.colNumber,
-            )
-        )
-    }
-}
-
-new Draggable(element, {
-    bound: BoundToBoard.bounding(settings)
-})
-```
-
-There is preset of predefined bounding classes
+Preset of predefined boundings:
 ```javascript
 BoundToElemen.bounding(element, container)
 BoundToRectangle.bounding(rectangle)
@@ -172,6 +99,17 @@ BoundToCircle.bounding(center, radius)
 BoundToArc.bounding(center, radius, startAgle, endAngle)
 ```
 
+
+### Other Options
+| **Option** | **Type** | **Default** | **Description** |
+| --- | :---: | :---: | --- |
+| `handler` | `string/element` | null | specifies on what element the drag interaction starts. |
+| `container` | `element` | auto | HTMLElement that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate `container` automatically by finding first `parentNode` that have non `static` positioning. |
+| `position` | `Point` | auto | Start positioning. By default we automatically calculate position inside `container` element. |
+| `isContentBoxSize` | `Boolean` | `true` | You can identify  that we should take into account element borders and paddings when we calculate draggable size. |
+| `nativeDragAndDrop` | `Boolean` | `false` | There can be situations where we need to use html5 drag&drop instead of `dragee` realization. Example: `table>tr` have a lot of issues, so it's easier to fix them using html5 drag&drop realization or emulation. |
+| `emulateNativeDragAndDropOnTouch` | `Boolean` | `true` | Emulate native drag&drop on touch devices. |
+| `emulateNativeDragAndDropForAll` | `Boolean` | `false` | Emulate native drag&drop on all browsers. |
 
 ## List
 
