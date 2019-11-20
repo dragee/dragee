@@ -174,10 +174,17 @@ function getSumValueOfStyleRules(element, rules) {
     return sum + parseInt(window.getComputedStyle(element)[rule] || 0);
   }, 0);
 }
+/** Class representing a point. */
+
 
 var Point =
 /*#__PURE__*/
 function () {
+  /**
+  * Create a point.
+  * @param {number} x - The x value.
+  * @param {number} y - The y value.
+  */
   function Point(x, y) {
     _classCallCheck(this, Point);
 
@@ -389,14 +396,14 @@ function removeClass(element, c) {
   element.className = element.className.replace(re, '$1').replace(/\s+/g, ' ').replace(/(^ | $)/g, '');
 }
 
-function getDefaultParent(element) {
-  var parent = element.parentNode;
+function getDefaultContainer(element) {
+  var container = element.parentNode;
 
-  while (parent.parentNode && window.getComputedStyle(parent)['position'] === 'static' && parent.tagName !== 'BODY') {
-    parent = parent.parentNode;
+  while (container.parentNode && window.getComputedStyle(container)['position'] === 'static' && container.tagName !== 'BODY') {
+    container = container.parentNode;
   }
 
-  return parent;
+  return container;
 }
 
 var EventEmitter =
@@ -776,21 +783,21 @@ var BoundToElement =
 function (_BoundToRectangle) {
   _inherits(BoundToElement, _BoundToRectangle);
 
-  function BoundToElement(element, parent) {
+  function BoundToElement(element, container) {
     var _this2;
 
     _classCallCheck(this, BoundToElement);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(BoundToElement).call(this, Rectangle.fromElement(element, parent)));
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(BoundToElement).call(this, Rectangle.fromElement(element, container)));
     _this2.element = element;
-    _this2.parent = parent;
+    _this2.container = container;
     return _this2;
   }
 
   _createClass(BoundToElement, [{
     key: "refresh",
     value: function refresh() {
-      this.rectangle = Rectangle.fromElement(this.element, this.parent);
+      this.rectangle = Rectangle.fromElement(this.element, this.container);
     }
   }]);
 
@@ -1253,11 +1260,9 @@ function (_EventEmitter) {
 
     var target = _assertThisInitialized(_this);
 
-    var parent = options.parent || getDefaultParent(element);
     _this.options = Object.assign({
       timeEnd: 200,
-      timeExcange: 400,
-      parent: parent
+      timeExcange: 400
     }, options);
     _this.positioningStrategy = options.strategy || new FloatLeftStrategy(_this.getRectangle.bind(_assertThisInitialized(_this)), {
       radius: 80,
@@ -1323,7 +1328,7 @@ function (_EventEmitter) {
   }, {
     key: "getRectangle",
     value: function getRectangle() {
-      return Rectangle.fromElement(this.element, this.options.parent, this.options.isContentBoxSize, true);
+      return Rectangle.fromElement(this.element, this.container, this.options.isContentBoxSize, true);
     }
   }, {
     key: "catchDraggable",
@@ -1474,6 +1479,11 @@ function (_EventEmitter) {
     key: "getSortedDraggables",
     value: function getSortedDraggables() {
       this.innerDraggables.slice();
+    }
+  }, {
+    key: "container",
+    get: function get() {
+      return this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element);
     }
   }]);
 
@@ -1751,14 +1761,14 @@ function (_EventEmitter) {
   _createClass(Draggable, [{
     key: "startBounding",
     value: function startBounding() {
-      this.bound = this.options.bound || BoundToElement.bounding(this.parent, this.parent);
+      this.bound = this.options.bound || BoundToElement.bounding(this.container, this.container);
     }
   }, {
     key: "startPositioning",
     value: function startPositioning() {
       this._setDefaultTransition();
 
-      this.offset = Point.elementOffset(this.element, this.parent, true);
+      this.offset = Point.elementOffset(this.element, this.container, true);
       this.pinnedPosition = this.offset;
       this.position = this.offset;
       this.initialPosition = this.options.position || this.offset;
@@ -2115,7 +2125,7 @@ function (_EventEmitter) {
     value: function emulateNativeDragAndDrop(event) {
       var _this3 = this;
 
-      var parentRect = this.parent.getBoundingClientRect();
+      var containerRect = this.container.getBoundingClientRect();
       var clonedElement = this.element.cloneNode(true);
       clonedElement.style[transformProperty] = '';
       copyStyles(this.element, clonedElement);
@@ -2123,14 +2133,14 @@ function (_EventEmitter) {
       document.body.appendChild(clonedElement);
       addClass(this.element, 'dragee-placeholder');
       var emulationDraggable = new Draggable(clonedElement, {
-        parent: document.body,
+        container: document.body,
         bound: function bound(point) {
           return point;
         },
         on: {
           'drag:move': function dragMove() {
-            var parentRectPoint = new Point(parentRect.left, parentRect.top);
-            _this3.position = emulationDraggable.position.sub(parentRectPoint).sub(_this3._startScrollPoint);
+            var containerRectPoint = new Point(containerRect.left, containerRect.top);
+            _this3.position = emulationDraggable.position.sub(containerRectPoint).sub(_this3._startScrollPoint);
 
             _this3.emit('drag:move');
           },
@@ -2142,9 +2152,9 @@ function (_EventEmitter) {
           }
         }
       });
-      var parentRectPoint = new Point(parentRect.left, parentRect.top);
+      var containerRectPoint = new Point(containerRect.left, containerRect.top);
       emulationDraggable._startScrollPoint = this._startScrollPoint;
-      emulationDraggable.move(this.pinnedPosition.add(parentRectPoint).add(new Point(window.scrollX, window.scrollY)));
+      emulationDraggable.move(this.pinnedPosition.add(containerRectPoint).add(new Point(window.scrollX, window.scrollY)));
       emulationDraggable.dragStart(event);
     }
   }, {
@@ -2186,9 +2196,9 @@ function (_EventEmitter) {
       }
     }
   }, {
-    key: "parent",
+    key: "container",
     get: function get() {
-      return this._parent = this._parent || this.options.parent || getDefaultParent(this.element);
+      return this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element);
     }
   }, {
     key: "handler",
@@ -2459,11 +2469,11 @@ function (_EventEmitter) {
     }
   }], [{
     key: "factory",
-    value: function factory(parentElement, elements) {
+    value: function factory(containerElement, elements) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
       var draggables = Array.from(elements).map(function (element) {
         return new Draggable(element, Object.assign({
-          parent: parentElement
+          container: containerElement
         }, options.draggable || {}));
       });
       return new List(draggables, options.list || {});
@@ -2556,11 +2566,11 @@ function (_List) {
     }
   }], [{
     key: "factory",
-    value: function factory(parentElement, elements) {
+    value: function factory(containerElement, elements) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
       var draggables = Array.from(elements).map(function (element) {
         return new Draggable(element, Object.assign({
-          parent: parentElement
+          container: containerElement
         }, options.draggable || {}));
       });
       return new BubblingList(draggables, options.list || {});
@@ -2648,7 +2658,7 @@ function () {
         var start = getPointFromRadialSystem(angle, _this.options.startRadius, _this.options.center).sub(halfSize);
         var end = getPointFromRadialSystem(angle, _this.options.endRadius, _this.options.center).sub(halfSize);
         return new Draggable(element, {
-          parent: _this.area,
+          container: _this.area,
           bound: BoundToLine.bounding(start, end),
           position: start,
           on: {
@@ -2729,7 +2739,7 @@ function (_EventEmitter) {
       var position = getPointFromRadialSystem(angle, this.options.radius, this.shiftedCenter);
       this.angle = angle;
       this.draggable = new Draggable(element, {
-        parent: this.area,
+        container: this.area,
         bound: BoundToArc.bounding(this.shiftedCenter, this.options.radius, this.options.startAngle, this.options.endAngle),
         position: position,
         on: {
@@ -2844,7 +2854,7 @@ function (_EventEmitter) {
         var halfSize = Point.elementSize(element).mult(0.5);
         var position = getPointFromRadialSystem(angle, _this2.options.touchRadius, _this2.options.center.sub(halfSize));
         return new Draggable(element, {
-          parent: _this2.area,
+          container: _this2.area,
           bound: BoundToArc.bounding(_this2.options.center.sub(halfSize), _this2.options.touchRadius, _this2.getBoundAngle(i, false), _this2.getBoundAngle(i, true)),
           position: position,
           on: {

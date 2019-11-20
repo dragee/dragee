@@ -69,7 +69,7 @@ new Draggable(element, {
 
 There is preset of predefined bounding classes
 ```javascript
-BoundToElemen.bounding(element, parent)
+BoundToElemen.bounding(element, container)
 BoundToRectangle.bounding(rectangle)
 BoundTolineX.bounding(x, startY, endY)
 BoundTolineY.bounding(y, startX, endX)

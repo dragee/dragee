@@ -1,5 +1,5 @@
 import { addClass, removeClass } from './utils/classes'
-import getDefaultParent from './utils/get-default-parent'
+import getDefaultContainer from './utils/get-default-container'
 import EventEmitter from './eventEmitter'
 import getStyleProperty from 'desandro-get-style-property'
 import { BoundToElement } from './bounding'
@@ -74,12 +74,12 @@ export default class Draggable extends EventEmitter {
   }
 
   startBounding() {
-    this.bound = this.options.bound || BoundToElement.bounding(this.parent, this.parent)
+    this.bound = this.options.bound || BoundToElement.bounding(this.container, this.container)
   }
 
   startPositioning() {
     this._setDefaultTransition()
-    this.offset = Point.elementOffset(this.element, this.parent, true)
+    this.offset = Point.elementOffset(this.element, this.container, true)
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
@@ -382,7 +382,7 @@ export default class Draggable extends EventEmitter {
   }
 
   emulateNativeDragAndDrop(event) {
-    const parentRect = this.parent.getBoundingClientRect()
+    const containerRect = this.container.getBoundingClientRect()
     const clonedElement = this.element.cloneNode(true)
     clonedElement.style[transformProperty] = ''
     copyStyles(this.element, clonedElement)
@@ -391,14 +391,14 @@ export default class Draggable extends EventEmitter {
     addClass(this.element, 'dragee-placeholder')
 
     const emulationDraggable = new Draggable(clonedElement, {
-      parent: document.body,
+      container: document.body,
       bound(point) {
         return point
       },
       on: {
         'drag:move': () => {
-          const parentRectPoint = new Point(parentRect.left, parentRect.top)
-          this.position = emulationDraggable.position.sub(parentRectPoint)
+          const containerRectPoint = new Point(containerRect.left, containerRect.top)
+          this.position = emulationDraggable.position.sub(containerRectPoint)
                                                      .sub(this._startScrollPoint)
           this.emit('drag:move')
         },
@@ -411,11 +411,11 @@ export default class Draggable extends EventEmitter {
       }
     })
 
-    const parentRectPoint = new Point(parentRect.left, parentRect.top)
+    const containerRectPoint = new Point(containerRect.left, containerRect.top)
     emulationDraggable._startScrollPoint = this._startScrollPoint
 
     emulationDraggable.move(
-      this.pinnedPosition.add(parentRectPoint).add(new Point(window.scrollX, window.scrollY))
+      this.pinnedPosition.add(containerRectPoint).add(new Point(window.scrollX, window.scrollY))
     )
 
     emulationDraggable.dragStart(event)
@@ -455,8 +455,8 @@ export default class Draggable extends EventEmitter {
     }
   }
 
-  get parent() {
-    return (this._parent = this._parent || this.options.parent || getDefaultParent(this.element))
+  get container() {
+    return (this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element))
   }
 
   get handler() {

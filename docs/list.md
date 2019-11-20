@@ -20,7 +20,7 @@ Dragee.List(draggables[, options])
 ```javascript
 const container = document.getElementById("listA")
 const elements = [...container.querySelectorAll("li")]
-const draggables = elements.map((element) => new Draggable(element, { parent: container})
+const draggables = elements.map((element) => new Draggable(element, { container })
 
 new List(draggables)
 ````

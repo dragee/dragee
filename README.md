@@ -53,13 +53,12 @@ new Draggable(element, {
 })
 ```
 
-### parent
-HTMLElement that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate parent(container) automatically by finding first parent that have non `static` positioning
-
+### container
+HTMLElement that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate `container` automatically by finding first `parentNode` that have non `static` positioning
 
 ### bounding
 Bounding conception can help us to restrict `draggable` movements. We can set to move it insite rectangle, by circle, by line, etc.
-By default we will resctrict movements inside parent rectangle
+By default we will resctrict movements inside `container` rectangle
 
 ```javascript
 new Draggable(element, {
@@ -72,7 +71,7 @@ new Draggable(element, {
 ```
 
 ### position
-Start positioning. By default we automatically calculate position inside `parent` element
+Start positioning. By default we automatically calculate position inside `container`
 
 ### isContentBoxSize
 You can identify  that we should take into account element borders and paddings when we calculate draggable size
@@ -164,7 +163,7 @@ new Draggable(element, {
 
 There is preset of predefined bounding classes
 ```javascript
-BoundToElemen.bounding(element, parent)
+BoundToElemen.bounding(element, container)
 BoundToRectangle.bounding(rectangle)
 BoundTolineX.bounding(x, startY, endY)
 BoundTolineY.bounding(y, startX, endX)
@@ -196,7 +195,7 @@ Dragee.List(draggables[, options])
 ```javascript
 const container = document.getElementById("listA")
 const elements = [...container.querySelectorAll("li")]
-const draggables = elements.map((element) => new Draggable(element, { parent: container})
+const draggables = elements.map((element) => new Draggable(element, { container })
 
 new List(draggables)
 ````

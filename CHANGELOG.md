@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Rename parent to container
+
 ## 1.0.0
 ### Remove
 - Remove IE9 support

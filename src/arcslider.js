@@ -37,7 +37,7 @@ export default class ArcSlider extends EventEmitter {
 
     this.angle = angle
     this.draggable = new Draggable(element, {
-      parent: this.area,
+      container: this.area,
       bound: BoundToArc.bounding(
         this.shiftedCenter,
         this.options.radius,

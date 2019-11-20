@@ -1,6 +1,6 @@
 import range from './utils/range.js'
 import removeItem from './utils/remove-array-item'
-import getDefaultParent from './utils/get-default-parent'
+import getDefaultContainer from './utils/get-default-container'
 import EventEmitter from './eventEmitter'
 import Rectangle from './geometry/rectangle'
 import { transformedSpaceDistanceFactory } from './geometry/distances'
@@ -16,12 +16,10 @@ export default class Target extends EventEmitter {
   constructor(element, draggables, options = {}) {
     super(undefined, options)
     const target = this
-    const parent = options.parent || getDefaultParent(element)
 
     this.options = Object.assign({
       timeEnd: 200,
-      timeExcange: 400,
-      parent: parent
+      timeExcange: 400
     }, options)
 
     this.positioningStrategy = options.strategy || new FloatLeftStrategy(
@@ -77,7 +75,7 @@ export default class Target extends EventEmitter {
   getRectangle() {
     return Rectangle.fromElement(
       this.element,
-      this.options.parent,
+      this.container,
       this.options.isContentBoxSize,
       true
     )
@@ -213,6 +211,10 @@ export default class Target extends EventEmitter {
 
   getSortedDraggables() {
     this.innerDraggables.slice()
+  }
+
+  get container() {
+    return (this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element))
   }
 }
 

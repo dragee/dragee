@@ -65,10 +65,10 @@ export default class BubblingList extends List {
     return this.options.getDistance || getYDifference
   }
 
-  static factory(parentElement, elements, options={}) {
+  static factory(containerElement, elements, options={}) {
     const draggables = Array.from(elements).map((element) => {
       return new Draggable(element, Object.assign({
-        parent: parentElement
+        container: containerElement
       }, options.draggable || {}))
     })
     return new BubblingList(draggables, options.list || {})

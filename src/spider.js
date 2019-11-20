@@ -36,7 +36,7 @@ export default class Spider {
       const end = getPointFromRadialSystem(angle, this.options.endRadius, this.options.center).sub(halfSize)
 
       return new Draggable(element, {
-        parent: this.area,
+        container: this.area,
         bound: BoundToLine.bounding(start, end),
         position: start,
         on: {

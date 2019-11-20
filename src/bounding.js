@@ -56,14 +56,14 @@ export class BoundToRectangle extends Bound {
 }
 
 export class BoundToElement extends BoundToRectangle {
-  constructor(element, parent) {
-    super(Rectangle.fromElement(element, parent))
+  constructor(element, container) {
+    super(Rectangle.fromElement(element, container))
     this.element = element
-    this.parent = parent
+    this.container = container
   }
 
   refresh () {
-    this.rectangle = Rectangle.fromElement(this.element, this.parent)
+    this.rectangle = Rectangle.fromElement(this.element, this.container)
   }
 }
 

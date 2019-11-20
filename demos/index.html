@@ -435,7 +435,7 @@
                           draggable: {
                             nativeDragAndDrop: true,
                             radius: 10,
-                            parent: document.body,
+                            container: document.body,
                             // shouldRemoveZeroTranslate: true
                             // emulateNativeDragAndDropForAll: true
                           }
@@ -607,14 +607,14 @@
 
                         draggables = [...draggableElements].map((element, i) => {
                             return new Dragee.Draggable(element, {
-                              parent: targetAreaElement
+                              container: targetAreaElement
                             })
                           }
                         )
 
                         targets = [...targetElements].map((element, i) => {
                             const target = new Dragee.Target(element, draggables, {
-                              parent: targetAreaElement,
+                              container: targetAreaElement,
                               strategy: new strategies[i](
                                 () => target.getRectangle(),
                                 {
@@ -797,13 +797,13 @@
 
                         draggables = Array.prototype.slice.call(draggableElements).map(function(element, i){
                             return new Dragee.Draggable(element, {
-                              parent: targetAreaElement
+                              container: targetAreaElement
                             });
                         });
 
                         targets = Array.prototype.slice.call(targetElements).map(function(element, i){
                             var target = new Dragee.Target(element, draggables, {
-                                parent: targetAreaElement,
+                                container: targetAreaElement,
                                 strategy: new Dragee.NotCrossingStrategy(function(){
                                   return target.getRectangle();
                                 }),
