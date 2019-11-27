@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.2
+- Move Chart, Spider and ArcSlider to separate repo
+
 ## 1.0.1
 - Improve docs and specs
 - Rename parent to container

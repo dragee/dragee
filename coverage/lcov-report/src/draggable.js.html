@@ -25,9 +25,9 @@
         <span class='fraction'>84/266</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">32.26% </span>
+        <span class="strong">32.8% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>40/124</span>
+        <span class='fraction'>41/125</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">32.73% </span>
@@ -1067,7 +1067,7 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { addClass, removeClass } from './utils/classes'
-import getDefaultParent from './utils/get-default-parent'
+import getDefaultContainer from './utils/get-default-container'
 import EventEmitter from './eventEmitter'
 import getStyleProperty from 'desandro-get-style-property'
 import { BoundToElement } from './bounding'
@@ -1142,12 +1142,12 @@ export default class Draggable extends EventEmitter {
   }
 &nbsp;
   startBounding() {
-    this.bound = this.options.bound || BoundToElement.bounding(this.parent, this.parent)
+    this.bound = this.options.bound || BoundToElement.bounding(this.container, this.container)
   }
 &nbsp;
   startPositioning() {
     this._setDefaultTransition()
-    this.offset = Point.elementOffset(this.element, this.parent, true)
+    this.offset = Point.elementOffset(this.element, this.container, true)
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
@@ -1450,7 +1450,7 @@ export default class Draggable extends EventEmitter {
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  em</span>ulateNativeDragAndDrop(event) {
-    const parentRect = <span class="cstat-no" title="statement not covered" >this.parent.getBoundingClientRect()</span>
+    const containerRect = <span class="cstat-no" title="statement not covered" >this.container.getBoundingClientRect()</span>
     const clonedElement = <span class="cstat-no" title="statement not covered" >this.element.cloneNode(true)</span>
 <span class="cstat-no" title="statement not covered" >    clonedElement.style[transformProperty] = ''</span>
 <span class="cstat-no" title="statement not covered" >    copyStyles(this.element, clonedElement)</span>
@@ -1459,14 +1459,14 @@ export default class Draggable extends EventEmitter {
 <span class="cstat-no" title="statement not covered" >    addClass(this.element, 'dragee-placeholder')</span>
 &nbsp;
     const emulationDraggable = <span class="cstat-no" title="statement not covered" >new Draggable(clonedElement, {</span>
-      parent: document.body,
+      container: document.body,
 <span class="fstat-no" title="function not covered" >      bo</span>und(point) {
 <span class="cstat-no" title="statement not covered" >        return point</span>
       },
       on: {
         'drag:move': <span class="fstat-no" title="function not covered" >()</span> =&gt; {
-          const parentRectPoint = <span class="cstat-no" title="statement not covered" >new Point(parentRect.left, parentRect.top)</span>
-<span class="cstat-no" title="statement not covered" >          this.position = emulationDraggable.position.sub(parentRectPoint)</span>
+          const containerRectPoint = <span class="cstat-no" title="statement not covered" >new Point(containerRect.left, containerRect.top)</span>
+<span class="cstat-no" title="statement not covered" >          this.position = emulationDraggable.position.sub(containerRectPoint)</span>
                                                      .sub(this._startScrollPoint)
 <span class="cstat-no" title="statement not covered" >          this.emit('drag:move')</span>
         },
@@ -1479,11 +1479,11 @@ export default class Draggable extends EventEmitter {
       }
     })
 &nbsp;
-    const parentRectPoint = <span class="cstat-no" title="statement not covered" >new Point(parentRect.left, parentRect.top)</span>
+    const containerRectPoint = <span class="cstat-no" title="statement not covered" >new Point(containerRect.left, containerRect.top)</span>
 <span class="cstat-no" title="statement not covered" >    emulationDraggable._startScrollPoint = this._startScrollPoint</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    emulationDraggable.move(</span>
-      this.pinnedPosition.add(parentRectPoint).add(new Point(window.scrollX, window.scrollY))
+      this.pinnedPosition.add(containerRectPoint).add(new Point(window.scrollX, window.scrollY))
     )
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    emulationDraggable.dragStart(event)</span>
@@ -1523,8 +1523,8 @@ export default class Draggable extends EventEmitter {
     }
   }
 &nbsp;
-  get parent() {
-    return (this._parent = this._parent || this.options.parent || getDefaultParent(this.element))
+  get container() {
+    return (this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element))
   }
 &nbsp;
   get handler() {
@@ -1582,7 +1582,7 @@ Draggable.emitter.on('draggable:create', addToDefaultScope)
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Sun Nov 17 2019 15:29:47 GMT+0200 (за східноєвропейським стандартним часом)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Wed Nov 27 2019 16:25:30 GMT+0200 (за східноєвропейським стандартним часом)
 </div>
 </div>
 <script src="../prettify.js"></script>

@@ -27,12 +27,12 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/35</span>
+        <span class='fraction'>0/37</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/31</span>
+        <span class='fraction'>0/32</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">3.33% </span>
@@ -266,7 +266,9 @@
 <a name='L218'></a><a href='#L218'>218</a>
 <a name='L219'></a><a href='#L219'>219</a>
 <a name='L220'></a><a href='#L220'>220</a>
-<a name='L221'></a><a href='#L221'>221</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -284,14 +286,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -472,9 +472,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -488,7 +492,7 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import range from './utils/range.js'
 import removeItem from './utils/remove-array-item'
-import getDefaultParent from './utils/get-default-parent'
+import getDefaultContainer from './utils/get-default-container'
 import EventEmitter from './eventEmitter'
 import Rectangle from './geometry/rectangle'
 import { transformedSpaceDistanceFactory } from './geometry/distances'
@@ -504,12 +508,10 @@ export default class Target extends EventEmitter {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(element, draggables, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >    super(undefined, options)</span>
     const target = <span class="cstat-no" title="statement not covered" >this</span>
-    const parent = <span class="cstat-no" title="statement not covered" >options.parent || getDefaultParent(element)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    this.options = Object.assign({</span>
       timeEnd: 200,
-      timeExcange: 400,
-      parent: parent
+      timeExcange: 400
     }, options)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    this.positioningStrategy = options.strategy || new FloatLeftStrategy(</span>
@@ -565,7 +567,7 @@ export default class Target extends EventEmitter {
 <span class="fstat-no" title="function not covered" >  ge</span>tRectangle() {
 <span class="cstat-no" title="statement not covered" >    return Rectangle.fromElement(</span>
       this.element,
-      this.options.parent,
+      this.container,
       this.options.isContentBoxSize,
       true
     )
@@ -702,6 +704,10 @@ export default class Target extends EventEmitter {
 <span class="fstat-no" title="function not covered" >  ge</span>tSortedDraggables() {
 <span class="cstat-no" title="statement not covered" >    this.innerDraggables.slice()</span>
   }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  ge</span>t container() {
+<span class="cstat-no" title="statement not covered" >    return (this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element))</span>
+  }
 }
 &nbsp;
 Target.emitter = new EventEmitter(Target)
@@ -712,7 +718,7 @@ Target.emitter.on('target:create', addToDefaultScope)
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Sun Nov 17 2019 15:29:47 GMT+0200 (за східноєвропейським стандартним часом)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Wed Nov 27 2019 16:25:30 GMT+0200 (за східноєвропейським стандартним часом)
 </div>
 </div>
 <script src="../prettify.js"></script>

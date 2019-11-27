@@ -6,9 +6,6 @@ import BubblingList from './bubblingList'
 import Target from './target'
 import { scopes, defaultScope, Scope, scope } from './scope'
 import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './positioning'
-import Spider from './spider'
-import ArcSlider from './arcslider'
-import Chart from './chart'
 import {
   getDistance,
   getXDifference,
@@ -36,9 +33,6 @@ export {
   Target,
   scopes, defaultScope, Scope, scope,
   NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy,
-  Spider,
-  ArcSlider,
-  Chart,
   Bound, BoundToRectangle, BoundToElement,
   BoundToLineX, BoundToLineY, BoundToLine,
   BoundToCircle, BoundToArc,
