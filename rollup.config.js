@@ -1,8 +1,6 @@
 import babel from 'rollup-plugin-babel'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
-import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
-import visualizer from 'rollup-plugin-visualizer'
 import { uglify } from 'rollup-plugin-uglify'
 
 export default [{
@@ -19,9 +17,7 @@ export default [{
       exclude: 'node_modules/**'
     }),
     resolve(),
-    commonjs(),
-    sizeSnapshot(),
-    visualizer()
+    commonjs()
   ]
 }, {
   input: 'src/index.js',
@@ -38,9 +34,7 @@ export default [{
     }),
     resolve(),
     commonjs(),
-    uglify(),
-    sizeSnapshot(),
-    visualizer()
+    uglify()
   ]
 }, {
   input: 'src/index.js',
@@ -57,8 +51,6 @@ export default [{
     }),
     resolve(),
     commonjs(),
-    uglify(),
-    sizeSnapshot(),
-    visualizer()
+    uglify()
   ]
 }]
