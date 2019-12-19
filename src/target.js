@@ -7,6 +7,7 @@ import { transformedSpaceDistanceFactory } from './geometry/distances'
 import { scopes, defaultScope } from './scope'
 
 import { FloatLeftStrategy } from './positioning'
+import { BoundToElement } from './bounding'
 
 const addToDefaultScope = function(target) {
   defaultScope.addTarget(target)
@@ -37,7 +38,12 @@ export default class Target extends EventEmitter {
 
     Target.emitter.emit('target:create', this)
 
+    this.startBounding()
     this.init()
+  }
+
+  startBounding() {
+    this.bound = this.options.bound || BoundToElement.bounding(this.element)
   }
 
   positioning (draggables, indexesOfNew) {
@@ -114,14 +120,11 @@ export default class Target extends EventEmitter {
 
   onEnd(draggable) {
     const newDraggablesIndex = []
-    const includePoint = this.getRectangle().includePoint(draggable.getPosition())
 
-    if (!includePoint) {
-      if (this.getRectangle().includePoint(draggable.getCenter())) {
-        draggable.position = draggable.getCenter().clone()
-      } else {
-        return false
-      }
+    if (this.getRectangle().includePoint(draggable.getCenter())) {
+      draggable.position = this.bound(draggable.position, draggable.getSize())
+    } else {
+      return false
     }
 
     this.emit('target:beforeAdd', draggable)

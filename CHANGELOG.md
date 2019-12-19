@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+- Improved initial catch of Draggable by Target
+
+## 1.0.3
+
 ## 1.0.2
 - Move Chart, Spider and ArcSlider to separate repo
 

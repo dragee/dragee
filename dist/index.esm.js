@@ -1276,12 +1276,19 @@ function (_EventEmitter) {
     _this.draggables = draggables;
     Target.emitter.emit('target:create', _assertThisInitialized(_this));
 
+    _this.startBounding();
+
     _this.init();
 
     return _this;
   }
 
   _createClass(Target, [{
+    key: "startBounding",
+    value: function startBounding() {
+      this.bound = this.options.bound || BoundToElement.bounding(this.element);
+    }
+  }, {
     key: "positioning",
     value: function positioning(draggables, indexesOfNew) {
       return this.positioningStrategy.positioning(draggables, indexesOfNew);
@@ -1369,14 +1376,11 @@ function (_EventEmitter) {
     key: "onEnd",
     value: function onEnd(draggable) {
       var newDraggablesIndex = [];
-      var includePoint = this.getRectangle().includePoint(draggable.getPosition());
 
-      if (!includePoint) {
-        if (this.getRectangle().includePoint(draggable.getCenter())) {
-          draggable.position = draggable.getCenter().clone();
-        } else {
-          return false;
-        }
+      if (this.getRectangle().includePoint(draggable.getCenter())) {
+        draggable.position = this.bound(draggable.position, draggable.getSize());
+      } else {
+        return false;
       }
 
       this.emit('target:beforeAdd', draggable);
