@@ -77,6 +77,7 @@ BoundToArc.bounding(center, radius, startAgle, endAngle)
 | `nativeDragAndDrop` | `Boolean` | `false` | There can be situations where we need to use html5 drag&drop instead of `dragee` realization. Example: `table>tr` have a lot of issues, so it's easier to fix them using html5 drag&drop realization or emulation. |
 | `emulateNativeDragAndDropOnTouch` | `Boolean` | `true` | Emulate native drag&drop on touch devices. |
 | `emulateNativeDragAndDropForAll` | `Boolean` | `false` | Emulate native drag&drop on all browsers. |
+| `moveBackOnEnd` | `Boolean` | `false` | Move draggable to initial position on dragend |
 
 ## List
 

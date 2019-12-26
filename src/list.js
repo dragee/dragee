@@ -9,7 +9,7 @@ import Draggable from './draggable'
 
 export default class List extends EventEmitter {
   constructor(draggables, options={}) {
-    super(undefined, options)
+    super(options)
     this.options = Object.assign({
       timeEnd: 200,
       timeExcange: 400,
@@ -93,8 +93,8 @@ export default class List extends EventEmitter {
     }
 
     draggables.forEach((draggable) => {
-      draggable.resetOn('drag:end')
-      draggable.resetOn('drag:move')
+      draggable.off('drag:end')
+      draggable.off('drag:move')
       removeItem(this.draggables, draggable)
     })
 

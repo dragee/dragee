@@ -61,8 +61,7 @@ function copyStyles(source, destination) {
 
 export default class Draggable extends EventEmitter {
   constructor(element, options={}) {
-    super(undefined, options)
-    this.targets = []
+    super(options)
     this.options = options
     this.element = element
     preventDoubleInit(this)
@@ -422,7 +421,11 @@ export default class Draggable extends EventEmitter {
   }
 
   dragEndAction() {
-    this.pinPosition(this.position)
+    if(this.options.moveBackOnEnd) {
+      this.pinPosition(this.initialPosition, this.options.timeEnd)
+    } else {
+      this.pinPosition(this.position)
+    }
   }
 
   getRectangle() {
@@ -447,7 +450,7 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener('dragend', this._nativeDragEnd)
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
     document.removeEventListener('drop', this._nativeDrop)
-    this.resetEmitter()
+    this.emitter.reset()
 
     const index = draggables.indexOf(this)
     if (index > -1) {
@@ -506,5 +509,5 @@ export default class Draggable extends EventEmitter {
   }
 }
 
-Draggable.emitter = new EventEmitter(Draggable)
+Draggable.emitter = new EventEmitter({ context: Draggable })
 Draggable.emitter.on('draggable:create', addToDefaultScope)

@@ -7,7 +7,7 @@ const scopes = []
 
 class Scope extends EventEmitter {
   constructor(draggables, targets, options={}) {
-    super(undefined, options)
+    super(options)
     scopes.forEach((scope) => {
       if (draggables) {
         draggables.forEach((draggable) => {
@@ -58,7 +58,7 @@ class Scope extends EventEmitter {
 
     if (shotTargets.length) {
       shotTargets[0].onEnd(draggable)
-    } else if (draggable.targets.length) {
+    } else {
       draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
     }
 
@@ -114,8 +114,8 @@ function scope(fn) {
   Draggable.emitter.prependOn('draggable:create', addDraggableToScope)
   Target.emitter.prependOn('target:create', addTargetToScope)
   fn.call()
-  Draggable.emitter.unsubscribe('draggable:create', addDraggableToScope)
-  Target.emitter.unsubscribe('target:create', addTargetToScope)
+  Draggable.emitter.off('draggable:create', addDraggableToScope)
+  Target.emitter.off('target:create', addTargetToScope)
   return currentScope
 }
 

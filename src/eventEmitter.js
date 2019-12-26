@@ -1,9 +1,9 @@
 export default class EventEmitter {
-  constructor (context, options = {}) {
-    this.context = context || this
+  constructor (options = {}) {
+    this.context = options.context || this
     this.events = {}
 
-    if (options && options.on) {
+    if (options.on) {
       for (const [eventName, fn] of Object.entries(options.on)) {
         this.on(eventName, fn)
       }
@@ -29,11 +29,23 @@ export default class EventEmitter {
   }
 
   on(eventName, fn) {
+    if (!this.events) this.events = {}
     if (!this.events[eventName]) {
       this.events[eventName] = []
     }
 
     this.events[eventName].push(fn)
+  }
+
+  off(eventName, fn) {
+    if (this.events[eventName]) {
+      if (fn) {
+        const index = this.events[eventName].indexOf(fn)
+        this.events[eventName].splice(index, 1)
+      } else {
+        this.events[eventName] = []
+      }
+    }
   }
 
   prependOn(eventName, fn) {
@@ -44,18 +56,11 @@ export default class EventEmitter {
     this.events[eventName].unshift(fn)
   }
 
-  unsubscribe(eventName, fn) {
-    if (this.events[eventName]) {
-      const index = this.events[eventName].indexOf(fn)
-      this.events[eventName].splice(index, 1)
-    }
-  }
-
-  resetEmitter () {
+  reset () {
     this.events = {}
   }
 
-  resetOn(eventName) {
-    this.events[eventName] = []
+  get emitter () {
+    return this
   }
 }

@@ -15,8 +15,7 @@ const addToDefaultScope = function(target) {
 
 export default class Target extends EventEmitter {
   constructor(element, draggables, options = {}) {
-    super(undefined, options)
-    const target = this
+    super(options)
 
     this.options = Object.assign({
       timeEnd: 200,
@@ -33,7 +32,6 @@ export default class Target extends EventEmitter {
     )
 
     this.element = element
-    draggables.forEach((draggable) => draggable.targets.push(target))
     this.draggables = draggables
 
     Target.emitter.emit('target:create', this)
@@ -187,7 +185,7 @@ export default class Target extends EventEmitter {
   }
 
   remove(draggable) {
-    draggable.unsubscribe('drag:move', this.removeHandler)
+    draggable.off('drag:move', this.removeHandler)
 
     const index = this.innerDraggables.indexOf(draggable)
     if (index === -1) {
@@ -221,5 +219,5 @@ export default class Target extends EventEmitter {
   }
 }
 
-Target.emitter = new EventEmitter(Target)
+Target.emitter = new EventEmitter({ context: Target })
 Target.emitter.on('target:create', addToDefaultScope)
