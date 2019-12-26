@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 - Improved initial catch of Draggable by Target
+- Added moveBackOnEnd option. Changed default behaviour for draggable when there present target
 
 ## 1.0.3
 
