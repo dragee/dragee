@@ -10,18 +10,18 @@
     "test-debug": "TZ=UTC NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.4",
-    "@babel/plugin-transform-for-of": "^7.4.4",
-    "@babel/preset-env": "^7.6.3",
-    "babel-jest": "^24.9.0",
-    "eslint": "^6.5.1",
-    "jest": "^24.9.0",
-    "rollup": "^1.26.0",
-    "rollup-plugin-babel": "^4.3.3",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-transform-for-of": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "babel-jest": "^25.3.0",
+    "eslint": "^6.8.0",
+    "jest": "^25.3.0",
+    "rollup": "^2.3.4",
+    "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify": "^6.0.3",
-    "rollup-plugin-visualizer": "^2.6.0"
+    "rollup-plugin-visualizer": "^4.0.4"
   },
   "repository": "github:dragee/dragee",
   "author": "Vitaliy Yarovuy, Volodymyr Myskov",
