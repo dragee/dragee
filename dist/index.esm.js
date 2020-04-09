@@ -51,7 +51,7 @@ function _setPrototypeOf(o, p) {
   return _setPrototypeOf(o, p);
 }
 
-function isNativeReflectConstruct() {
+function _isNativeReflectConstruct() {
   if (typeof Reflect === "undefined" || !Reflect.construct) return false;
   if (Reflect.construct.sham) return false;
   if (typeof Proxy === "function") return true;
@@ -65,7 +65,7 @@ function isNativeReflectConstruct() {
 }
 
 function _construct(Parent, args, Class) {
-  if (isNativeReflectConstruct()) {
+  if (_isNativeReflectConstruct()) {
     _construct = Reflect.construct;
   } else {
     _construct = function _construct(Parent, args, Class) {
@@ -95,6 +95,23 @@ function _possibleConstructorReturn(self, call) {
   }
 
   return _assertThisInitialized(self);
+}
+
+function _createSuper(Derived) {
+  return function () {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (_isNativeReflectConstruct()) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
 }
 
 function _superPropBase(object, property) {
@@ -128,7 +145,7 @@ function _get(target, property, receiver) {
 }
 
 function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
 function _arrayWithHoles(arr) {
@@ -136,10 +153,7 @@ function _arrayWithHoles(arr) {
 }
 
 function _iterableToArrayLimit(arr, i) {
-  if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
-    return;
-  }
-
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
   var _arr = [];
   var _n = true;
   var _d = false;
@@ -165,8 +179,80 @@ function _iterableToArrayLimit(arr, i) {
   return _arr;
 }
 
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(n);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
 function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+function _createForOfIteratorHelper(o) {
+  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+    if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) {
+      var i = 0;
+
+      var F = function () {};
+
+      return {
+        s: F,
+        n: function () {
+          if (i >= o.length) return {
+            done: true
+          };
+          return {
+            done: false,
+            value: o[i++]
+          };
+        },
+        e: function (e) {
+          throw e;
+        },
+        f: F
+      };
+    }
+
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+
+  var it,
+      normalCompletion = true,
+      didErr = false,
+      err;
+  return {
+    s: function () {
+      it = o[Symbol.iterator]();
+    },
+    n: function () {
+      var step = it.next();
+      normalCompletion = step.done;
+      return step;
+    },
+    e: function (e) {
+      didErr = true;
+      err = e;
+    },
+    f: function () {
+      try {
+        if (!normalCompletion && it.return != null) it.return();
+      } finally {
+        if (didErr) throw err;
+      }
+    }
+  };
 }
 
 function getSumValueOfStyleRules(element, rules) {
@@ -177,9 +263,7 @@ function getSumValueOfStyleRules(element, rules) {
 /** Class representing a point. */
 
 
-var Point =
-/*#__PURE__*/
-function () {
+var Point = /*#__PURE__*/function () {
   /**
   * Create a point.
   * @param {number} x - The x value.
@@ -254,9 +338,7 @@ function () {
   return Point;
 }();
 
-var Rectangle =
-/*#__PURE__*/
-function () {
+var Rectangle = /*#__PURE__*/function () {
   function Rectangle(position, size) {
     _classCallCheck(this, Rectangle);
 
@@ -406,9 +488,7 @@ function getDefaultContainer(element) {
   return container;
 }
 
-var EventEmitter =
-/*#__PURE__*/
-function () {
+var EventEmitter = /*#__PURE__*/function () {
   function EventEmitter(context) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -434,12 +514,12 @@ function () {
       this.interrupted = false;
       var args = [].slice.call(arguments, 1);
       if (!this.events[eventName]) return;
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+
+      var _iterator = _createForOfIteratorHelper(this.events[eventName]),
+          _step;
 
       try {
-        for (var _iterator = this.events[eventName][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var func = _step.value;
           func.apply(this.context, args);
 
@@ -448,18 +528,9 @@ function () {
           }
         }
       } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
+        _iterator.e(err);
       } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
+        _iterator.f();
       }
     }
   }, {
@@ -706,9 +777,7 @@ function getPointFromRadialSystem(angle, length, center) {
   return center.add(new Point(length * Math.cos(angle), length * Math.sin(angle)));
 }
 
-var Bound =
-/*#__PURE__*/
-function () {
+var Bound = /*#__PURE__*/function () {
   function Bound() {
     _classCallCheck(this, Bound);
   }
@@ -732,17 +801,17 @@ function () {
 
   return Bound;
 }();
-var BoundToRectangle =
-/*#__PURE__*/
-function (_Bound) {
+var BoundToRectangle = /*#__PURE__*/function (_Bound) {
   _inherits(BoundToRectangle, _Bound);
+
+  var _super = _createSuper(BoundToRectangle);
 
   function BoundToRectangle(rectangle) {
     var _this;
 
     _classCallCheck(this, BoundToRectangle);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(BoundToRectangle).call(this));
+    _this = _super.call(this);
     _this.rectangle = rectangle;
     return _this;
   }
@@ -775,17 +844,17 @@ function (_Bound) {
 
   return BoundToRectangle;
 }(Bound);
-var BoundToElement =
-/*#__PURE__*/
-function (_BoundToRectangle) {
+var BoundToElement = /*#__PURE__*/function (_BoundToRectangle) {
   _inherits(BoundToElement, _BoundToRectangle);
+
+  var _super2 = _createSuper(BoundToElement);
 
   function BoundToElement(element, container) {
     var _this2;
 
     _classCallCheck(this, BoundToElement);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(BoundToElement).call(this, Rectangle.fromElement(element, container)));
+    _this2 = _super2.call(this, Rectangle.fromElement(element, container));
     _this2.element = element;
     _this2.container = container;
     return _this2;
@@ -800,17 +869,17 @@ function (_BoundToRectangle) {
 
   return BoundToElement;
 }(BoundToRectangle);
-var BoundToLineX =
-/*#__PURE__*/
-function (_Bound2) {
+var BoundToLineX = /*#__PURE__*/function (_Bound2) {
   _inherits(BoundToLineX, _Bound2);
+
+  var _super3 = _createSuper(BoundToLineX);
 
   function BoundToLineX(x, startY, endY) {
     var _this3;
 
     _classCallCheck(this, BoundToLineX);
 
-    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(BoundToLineX).call(this));
+    _this3 = _super3.call(this);
     _this3.x = x;
     _this3.startY = startY;
     _this3.endY = endY;
@@ -837,17 +906,17 @@ function (_Bound2) {
 
   return BoundToLineX;
 }(Bound);
-var BoundToLineY =
-/*#__PURE__*/
-function (_Bound3) {
+var BoundToLineY = /*#__PURE__*/function (_Bound3) {
   _inherits(BoundToLineY, _Bound3);
+
+  var _super4 = _createSuper(BoundToLineY);
 
   function BoundToLineY(y, startX, endX) {
     var _this4;
 
     _classCallCheck(this, BoundToLineY);
 
-    _this4 = _possibleConstructorReturn(this, _getPrototypeOf(BoundToLineY).call(this));
+    _this4 = _super4.call(this);
     _this4.y = y;
     _this4.startX = startX;
     _this4.endX = endX;
@@ -874,17 +943,17 @@ function (_Bound3) {
 
   return BoundToLineY;
 }(Bound);
-var BoundToLine =
-/*#__PURE__*/
-function (_Bound4) {
+var BoundToLine = /*#__PURE__*/function (_Bound4) {
   _inherits(BoundToLine, _Bound4);
+
+  var _super5 = _createSuper(BoundToLine);
 
   function BoundToLine(startPoint, endPoint) {
     var _this5;
 
     _classCallCheck(this, BoundToLine);
 
-    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(BoundToLine).call(this));
+    _this5 = _super5.call(this);
     _this5.startPoint = startPoint;
     _this5.endPoint = endPoint;
     var alpha = Math.atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x);
@@ -907,17 +976,17 @@ function (_Bound4) {
 
   return BoundToLine;
 }(Bound);
-var BoundToCircle =
-/*#__PURE__*/
-function (_Bound5) {
+var BoundToCircle = /*#__PURE__*/function (_Bound5) {
   _inherits(BoundToCircle, _Bound5);
+
+  var _super6 = _createSuper(BoundToCircle);
 
   function BoundToCircle(center, radius) {
     var _this6;
 
     _classCallCheck(this, BoundToCircle);
 
-    _this6 = _possibleConstructorReturn(this, _getPrototypeOf(BoundToCircle).call(this));
+    _this6 = _super6.call(this);
     _this6.center = center;
     _this6.radius = radius;
     return _this6;
@@ -932,17 +1001,17 @@ function (_Bound5) {
 
   return BoundToCircle;
 }(Bound);
-var BoundToArc =
-/*#__PURE__*/
-function (_BoundToCircle) {
+var BoundToArc = /*#__PURE__*/function (_BoundToCircle) {
   _inherits(BoundToArc, _BoundToCircle);
+
+  var _super7 = _createSuper(BoundToArc);
 
   function BoundToArc(center, radius, startAngle, endAngle) {
     var _this7;
 
     _classCallCheck(this, BoundToArc);
 
-    _this7 = _possibleConstructorReturn(this, _getPrototypeOf(BoundToArc).call(this, center, radius));
+    _this7 = _super7.call(this, center, radius);
     _this7._startAngle = startAngle;
     _this7._endAngle = endAngle;
     return _this7;
@@ -1005,9 +1074,7 @@ function range(start, stop, step) {
   return result;
 }
 
-var BasicStrategy =
-/*#__PURE__*/
-function () {
+var BasicStrategy = /*#__PURE__*/function () {
   function BasicStrategy(rectangle) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -1027,15 +1094,15 @@ function () {
   return BasicStrategy;
 }();
 
-var NotCrossingStrategy =
-/*#__PURE__*/
-function (_BasicStrategy) {
+var NotCrossingStrategy = /*#__PURE__*/function (_BasicStrategy) {
   _inherits(NotCrossingStrategy, _BasicStrategy);
+
+  var _super = _createSuper(NotCrossingStrategy);
 
   function NotCrossingStrategy() {
     _classCallCheck(this, NotCrossingStrategy);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(NotCrossingStrategy).apply(this, arguments));
+    return _super.apply(this, arguments);
   }
 
   _createClass(NotCrossingStrategy, [{
@@ -1084,10 +1151,10 @@ function (_BasicStrategy) {
   return NotCrossingStrategy;
 }(BasicStrategy);
 
-var FloatLeftStrategy =
-/*#__PURE__*/
-function (_BasicStrategy2) {
+var FloatLeftStrategy = /*#__PURE__*/function (_BasicStrategy2) {
   _inherits(FloatLeftStrategy, _BasicStrategy2);
+
+  var _super2 = _createSuper(FloatLeftStrategy);
 
   function FloatLeftStrategy(rectangle) {
     var _this2;
@@ -1096,7 +1163,7 @@ function (_BasicStrategy2) {
 
     _classCallCheck(this, FloatLeftStrategy);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(FloatLeftStrategy).call(this, rectangle, options));
+    _this2 = _super2.call(this, rectangle, options);
     _this2.options = Object.assign({
       removable: true
     }, options);
@@ -1178,10 +1245,10 @@ function (_BasicStrategy2) {
   return FloatLeftStrategy;
 }(BasicStrategy);
 
-var FloatRightStrategy =
-/*#__PURE__*/
-function (_FloatLeftStrategy) {
+var FloatRightStrategy = /*#__PURE__*/function (_FloatLeftStrategy) {
   _inherits(FloatRightStrategy, _FloatLeftStrategy);
+
+  var _super3 = _createSuper(FloatRightStrategy);
 
   function FloatRightStrategy(rectangle) {
     var _this5;
@@ -1190,7 +1257,7 @@ function (_FloatLeftStrategy) {
 
     _classCallCheck(this, FloatRightStrategy);
 
-    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(FloatRightStrategy).call(this, rectangle, options));
+    _this5 = _super3.call(this, rectangle, options);
     _this5.paddingTopRight = options.paddingTopRight || new Point(5, 5);
     _this5.paddingBottomLeft = options.paddingBottomLeft || new Point(0, 0);
     _this5.yGapBetweenDraggables = options.yGapBetweenDraggables || 0;
@@ -1241,10 +1308,10 @@ var addToDefaultScope = function addToDefaultScope(target) {
   defaultScope.addTarget(target);
 };
 
-var Target =
-/*#__PURE__*/
-function (_EventEmitter) {
+var Target = /*#__PURE__*/function (_EventEmitter) {
   _inherits(Target, _EventEmitter);
+
+  var _super = _createSuper(Target);
 
   function Target(element, draggables) {
     var _this;
@@ -1253,7 +1320,7 @@ function (_EventEmitter) {
 
     _classCallCheck(this, Target);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Target).call(this, undefined, options));
+    _this = _super.call(this, undefined, options);
 
     var target = _assertThisInitialized(_this);
 
@@ -1495,10 +1562,10 @@ Target.emitter.on('target:create', addToDefaultScope);
 
 var scopes = [];
 
-var Scope =
-/*#__PURE__*/
-function (_EventEmitter) {
+var Scope = /*#__PURE__*/function (_EventEmitter) {
   _inherits(Scope, _EventEmitter);
+
+  var _super = _createSuper(Scope);
 
   function Scope(draggables, targets) {
     var _this;
@@ -1507,7 +1574,7 @@ function (_EventEmitter) {
 
     _classCallCheck(this, Scope);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Scope).call(this, undefined, options));
+    _this = _super.call(this, undefined, options);
     scopes.forEach(function (scope) {
       if (draggables) {
         draggables.forEach(function (draggable) {
@@ -1653,27 +1720,7 @@ function scope(fn) {
   return currentScope;
 }
 
-function checkSupportPassiveEvents() {
-  var passiveSupported = false;
-
-  try {
-    var options = Object.defineProperty({}, 'passive', {
-      get: function get() {
-        return passiveSupported = true;
-      }
-    });
-    window.addEventListener('test', options, options);
-    window.removeEventListener('test', options, options);
-  } catch (_err) {
-    passiveSupported = false;
-  }
-
-  return passiveSupported;
-}
-
-var isSupportPassiveEvents = checkSupportPassiveEvents();
-
-var isTouch = 'ontouchstart' in window;
+var isTouch = ('ontouchstart' in window);
 var mouseEvents = {
   start: 'mousedown',
   move: 'mousemove',
@@ -1730,10 +1777,10 @@ function copyStyles(source, destination) {
   }
 }
 
-var Draggable =
-/*#__PURE__*/
-function (_EventEmitter) {
+var Draggable = /*#__PURE__*/function (_EventEmitter) {
   _inherits(Draggable, _EventEmitter);
+
+  var _super = _createSuper(Draggable);
 
   function Draggable(element) {
     var _this;
@@ -1742,7 +1789,7 @@ function (_EventEmitter) {
 
     _classCallCheck(this, Draggable);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Draggable).call(this, undefined, options));
+    _this = _super.call(this, undefined, options);
     _this.targets = [];
     _this.options = options;
     _this.element = element;
@@ -1816,12 +1863,8 @@ function (_EventEmitter) {
         return _this2.onScroll(event);
       };
 
-      this.handler.addEventListener(touchEvents.start, this._dragStart, isSupportPassiveEvents ? {
-        passive: false
-      } : false);
-      this.handler.addEventListener(mouseEvents.start, this._dragStart, isSupportPassiveEvents ? {
-        passive: false
-      } : false);
+      this.handler.addEventListener(touchEvents.start, this._dragStart,  false);
+      this.handler.addEventListener(mouseEvents.start, this._dragStart,  false);
       this.element.addEventListener('dragstart', this._nativeDragStart);
     }
   }, {
@@ -1972,23 +2015,13 @@ function (_EventEmitter) {
           this.emulateNativeDragAndDrop(event);
         } else {
           this.element.draggable = true;
-          document.addEventListener(mouseEvents.end, this._nativeDragEnd, isSupportPassiveEvents ? {
-            passive: false
-          } : false);
+          document.addEventListener(mouseEvents.end, this._nativeDragEnd,  false);
         }
       } else {
-        document.addEventListener(touchEvents.move, this._dragMove, isSupportPassiveEvents ? {
-          passive: false
-        } : false);
-        document.addEventListener(mouseEvents.move, this._dragMove, isSupportPassiveEvents ? {
-          passive: false
-        } : false);
-        document.addEventListener(touchEvents.end, this._dragEnd, isSupportPassiveEvents ? {
-          passive: false
-        } : false);
-        document.addEventListener(mouseEvents.end, this._dragEnd, isSupportPassiveEvents ? {
-          passive: false
-        } : false);
+        document.addEventListener(touchEvents.move, this._dragMove,  false);
+        document.addEventListener(mouseEvents.move, this._dragMove,  false);
+        document.addEventListener(touchEvents.end, this._dragEnd,  false);
+        document.addEventListener(mouseEvents.end, this._dragEnd,  false);
       }
 
       window.addEventListener('scroll', this._scroll);
@@ -2260,10 +2293,10 @@ function (_EventEmitter) {
 Draggable.emitter = new EventEmitter(Draggable);
 Draggable.emitter.on('draggable:create', addToDefaultScope$1);
 
-var List =
-/*#__PURE__*/
-function (_EventEmitter) {
+var List = /*#__PURE__*/function (_EventEmitter) {
   _inherits(List, _EventEmitter);
+
+  var _super = _createSuper(List);
 
   function List(draggables) {
     var _this;
@@ -2272,7 +2305,7 @@ function (_EventEmitter) {
 
     _classCallCheck(this, List);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(List).call(this, undefined, options));
+    _this = _super.call(this, undefined, options);
     _this.options = Object.assign({
       timeEnd: 200,
       timeExcange: 400,
@@ -2488,17 +2521,17 @@ var arrayMove = function arrayMove(array, from, to) {
   array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
 };
 
-var BubblingList =
-/*#__PURE__*/
-function (_List) {
+var BubblingList = /*#__PURE__*/function (_List) {
   _inherits(BubblingList, _List);
+
+  var _super = _createSuper(BubblingList);
 
   function BubblingList(draggables) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     _classCallCheck(this, BubblingList);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(BubblingList).call(this, draggables, options));
+    return _super.call(this, draggables, options);
   }
 
   _createClass(BubblingList, [{

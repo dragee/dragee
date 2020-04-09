@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+## 1.0.4
 - Improved initial catch of Draggable by Target
 
 ## 1.0.3
