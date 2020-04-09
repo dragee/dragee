@@ -9,7 +9,7 @@ import Draggable from './draggable'
 
 export default class List extends EventEmitter {
   constructor(draggables, options={}) {
-    super(undefined, options)
+    super(options)
     this.options = Object.assign({
       timeEnd: 200,
       timeExcange: 400,

@@ -1,6 +1,5 @@
 export default class EventEmitter {
-  constructor (context, options = {}) {
-    this.context = context || this
+  constructor (options = {}) {
     this.events = {}
 
     if (options && options.on) {
@@ -17,7 +16,7 @@ export default class EventEmitter {
     if (!this.events[eventName]) return
 
     for (const func of this.events[eventName]) {
-      func.apply(this.context, args)
+      func(...args)
       if (this.interrupted) {
         return
       }

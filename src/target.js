@@ -15,7 +15,7 @@ const addToDefaultScope = function(target) {
 
 export default class Target extends EventEmitter {
   constructor(element, draggables, options = {}) {
-    super(undefined, options)
+    super(options)
     const target = this
 
     this.options = Object.assign({
@@ -221,5 +221,5 @@ export default class Target extends EventEmitter {
   }
 }
 
-Target.emitter = new EventEmitter(Target)
+Target.emitter = new EventEmitter()
 Target.emitter.on('target:create', addToDefaultScope)

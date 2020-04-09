@@ -7,7 +7,7 @@ const scopes = []
 
 class Scope extends EventEmitter {
   constructor(draggables, targets, options={}) {
-    super(undefined, options)
+    super(options)
     scopes.forEach((scope) => {
       if (draggables) {
         draggables.forEach((draggable) => {

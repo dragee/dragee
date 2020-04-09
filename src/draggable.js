@@ -61,7 +61,7 @@ function copyStyles(source, destination) {
 
 export default class Draggable extends EventEmitter {
   constructor(element, options={}) {
-    super(undefined, options)
+    super(options)
     this.targets = []
     this.options = options
     this.element = element
@@ -506,5 +506,5 @@ export default class Draggable extends EventEmitter {
   }
 }
 
-Draggable.emitter = new EventEmitter(Draggable)
+Draggable.emitter = new EventEmitter()
 Draggable.emitter.on('draggable:create', addToDefaultScope)

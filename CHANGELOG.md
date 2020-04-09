@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Improved EventEmiter. Remove `context` property. From now we should use arrow functions instead of `context`
+
 ## 1.0.4
 - Improved initial catch of Draggable by Target
 
