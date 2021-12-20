@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## 1.0.5
+
 - Improved EventEmiter. Remove `context` property. From now we should use arrow functions instead of `context`
 
 ## 1.0.4

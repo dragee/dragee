@@ -502,7 +502,7 @@ export default class Draggable extends EventEmitter {
       addClass(this.element, 'dragee-disable')
     }
 
-    return this._enable = enable
+    this._enable = enable
   }
 }
 

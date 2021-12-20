@@ -148,8 +148,20 @@ function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+}
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+}
+
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArray(iter) {
+  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
@@ -194,6 +206,10 @@ function _arrayLikeToArray(arr, len) {
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
 
   return arr2;
+}
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 function _nonIterableRest() {
@@ -489,12 +505,11 @@ function getDefaultContainer(element) {
 }
 
 var EventEmitter = /*#__PURE__*/function () {
-  function EventEmitter(context) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  function EventEmitter() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
     _classCallCheck(this, EventEmitter);
 
-    this.context = context || this;
     this.events = {};
 
     if (options && options.on) {
@@ -521,7 +536,7 @@ var EventEmitter = /*#__PURE__*/function () {
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var func = _step.value;
-          func.apply(this.context, args);
+          func.apply(void 0, _toConsumableArray(args));
 
           if (this.interrupted) {
             return;
@@ -1320,7 +1335,7 @@ var Target = /*#__PURE__*/function (_EventEmitter) {
 
     _classCallCheck(this, Target);
 
-    _this = _super.call(this, undefined, options);
+    _this = _super.call(this, options);
 
     var target = _assertThisInitialized(_this);
 
@@ -1557,7 +1572,7 @@ var Target = /*#__PURE__*/function (_EventEmitter) {
 
   return Target;
 }(EventEmitter);
-Target.emitter = new EventEmitter(Target);
+Target.emitter = new EventEmitter();
 Target.emitter.on('target:create', addToDefaultScope);
 
 var scopes = [];
@@ -1574,7 +1589,7 @@ var Scope = /*#__PURE__*/function (_EventEmitter) {
 
     _classCallCheck(this, Scope);
 
-    _this = _super.call(this, undefined, options);
+    _this = _super.call(this, options);
     scopes.forEach(function (scope) {
       if (draggables) {
         draggables.forEach(function (draggable) {
@@ -1789,7 +1804,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
     _classCallCheck(this, Draggable);
 
-    _this = _super.call(this, undefined, options);
+    _this = _super.call(this, options);
     _this.targets = [];
     _this.options = options;
     _this.element = element;
@@ -2290,7 +2305,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
   return Draggable;
 }(EventEmitter);
-Draggable.emitter = new EventEmitter(Draggable);
+Draggable.emitter = new EventEmitter();
 Draggable.emitter.on('draggable:create', addToDefaultScope$1);
 
 var List = /*#__PURE__*/function (_EventEmitter) {
@@ -2305,7 +2320,7 @@ var List = /*#__PURE__*/function (_EventEmitter) {
 
     _classCallCheck(this, List);
 
-    _this = _super.call(this, undefined, options);
+    _this = _super.call(this, options);
     _this.options = Object.assign({
       timeEnd: 200,
       timeExcange: 400,
