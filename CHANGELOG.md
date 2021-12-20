@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.6
+- 'Draggable' should not fire `drag:move` event on dragStart
+
 ## 1.0.5
 
 - Improved EventEmiter. Remove `context` property. From now we should use arrow functions instead of `context`
