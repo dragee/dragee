@@ -256,7 +256,6 @@ export default class Draggable extends EventEmitter {
     this.isDragging = true
     this.emit('drag:start')
     addClass(this.element, 'dragee-active')
-    this.emit('drag:move')
   }
 
   stopDragging() {
