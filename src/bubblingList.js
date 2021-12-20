@@ -40,12 +40,12 @@ export default class BubblingList extends List {
 
     if (targetIndex !== -1 && currentIndex !== targetIndex) {
       arrayMove(sortedDraggables, currentIndex, targetIndex)
-      this.bubling(sortedDraggables, draggable)
+      this.bubbling(sortedDraggables, draggable)
       this.emit('list:change')
     }
   }
 
-  bubling(sortedDraggables, currentDraggable) {
+  bubbling(sortedDraggables, currentDraggable) {
     const currentPosition = this.startPosition.clone()
 
     sortedDraggables.forEach((draggable) => {
