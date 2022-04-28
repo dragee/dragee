@@ -2,6 +2,9 @@
 
 ## 1.0.6
 - 'Draggable' should not fire `drag:move` event on dragStart
+- Remove `addClass` and `removeClass` utils
+- Support `reorderOnChange` for `BubblingList.factory`
+- Refresh `List` when draggable element change it size
 
 ## 1.0.5
 
