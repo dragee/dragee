@@ -1,4 +1,3 @@
-import { addClass, removeClass } from './utils/classes'
 import getDefaultContainer from './utils/get-default-container'
 import EventEmitter from './eventEmitter'
 import getStyleProperty from 'desandro-get-style-property'
@@ -275,7 +274,7 @@ export default class Draggable extends EventEmitter {
     window.removeEventListener('scroll', this._scroll)
     this.element.draggable = false
     this.isDragging = false
-    removeClass(this.element, 'dragee-active')
+    this.element.classList.remove('dragee-active')
   }
 
   dragMove(event) {
@@ -303,7 +302,7 @@ export default class Draggable extends EventEmitter {
 
     point = this.bounding.bound(point, this.getSize())
     this.move(point)
-    addClass(this.element, 'dragee-active')
+    this.element.classList.add('dragee-active')
   }
 
   dragEnd(event) {
@@ -328,7 +327,7 @@ export default class Draggable extends EventEmitter {
 
     this.isDragging = false
     this.element.removeAttribute('draggable')
-    setTimeout(() => removeClass(this.element, 'dragee-active'))
+    setTimeout(() => this.element.classList.remove('dragee-active'))
   }
 
   onScroll(_event) {
@@ -352,7 +351,7 @@ export default class Draggable extends EventEmitter {
   nativeDragOver(event) {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'move'
-    addClass(this.element, 'dragee-placeholder')
+    this.element.classList.add('dragee-placeholder')
     this.currentEvent = event
     if (event.clientX === 0 && event.clientY === 0) {
       return
@@ -367,7 +366,7 @@ export default class Draggable extends EventEmitter {
   }
 
   nativeDragEnd(_event) {
-    removeClass(this.element, 'dragee-placeholder')
+    this.element.classList.remove('dragee-placeholder')
     this.dragEndAction()
     this.emit('drag:end')
     document.removeEventListener('dragover', this._nativeDragOver)
@@ -377,7 +376,7 @@ export default class Draggable extends EventEmitter {
     window.removeEventListener('scroll', this._scroll)
     this.isDragging = false
     this.element.removeAttribute('draggable')
-    removeClass(this.element, 'dragee-active')
+    this.element.classList.remove('dragee-active')
   }
 
   nativeDrop(event) {
@@ -392,7 +391,7 @@ export default class Draggable extends EventEmitter {
     copyStyles(this.element, clonedElement)
     clonedElement.style.position = 'absolute'
     document.body.appendChild(clonedElement)
-    addClass(this.element, 'dragee-placeholder')
+    this.element.classList.add('dragee-placeholder')
 
     const emulationDraggable = new Draggable(clonedElement, {
       container: document.body,
@@ -409,8 +408,8 @@ export default class Draggable extends EventEmitter {
         'drag:end': () => {
           emulationDraggable.destroy()
           document.body.removeChild(clonedElement)
-          removeClass(this.element, 'dragee-placeholder')
-          removeClass(this.element, 'dragee-active')
+          this.element.classList.remove('dragee-placeholder')
+          this.element.classList.remove('dragee-active')
         }
       }
     })
@@ -501,9 +500,9 @@ export default class Draggable extends EventEmitter {
 
   set enable(enable) {
     if (enable) {
-      removeClass(this.element, 'dragee-disable')
+      this.element.classList.remove('dragee-disable')
     } else {
-      addClass(this.element, 'dragee-disable')
+      this.element.classList.add('dragee-disable')
     }
 
     this._enable = enable

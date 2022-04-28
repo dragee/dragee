@@ -681,10 +681,10 @@
                               ),
                               on: {
                                 'target:add': (draggable) => {
-                                  Dragee.addClass(draggable.element, classForTargets[i]);
+                                  draggable.element.classList.add(classForTargets[i]);
                                 },
                                 'target:remove': (draggable) => {
-                                  Dragee.removeClass(draggable.element, classForTargets[i]);
+                                  draggable.element.classList.remove(classForTargets[i]);
                                 }
                               }
                             })
@@ -862,11 +862,11 @@
                                   return target.getRectangle();
                                 }),
                                 on: {
-                                  'target:add': function(draggable){
-                                    Dragee.addClass(draggable.element, "ontarget");
+                                  'target:add': function(draggable) {
+                                    draggable.element.classList.add("ontarget")
                                   },
-                                  'target:remove': function(draggable){
-                                    Dragee.removeClass(draggable.element, "ontarget");
+                                  'target:remove': function(draggable) {
+                                    draggable.element.classList.remove("ontarget")
                                   }
                                 }
                             });

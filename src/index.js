@@ -6,6 +6,7 @@ import BubblingList from './bubblingList'
 import Target from './target'
 import { scopes, defaultScope, Scope, scope } from './scope'
 import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './positioning'
+
 import {
   getDistance,
   getXDifference,
@@ -13,7 +14,7 @@ import {
   transformedSpaceDistanceFactory,
   indexOfNearestPoint
 } from './geometry/distances'
-import { addClass, removeClass } from './utils/classes'
+
 import {
   Bound,
   BoundToRectangle,
@@ -38,6 +39,5 @@ export {
   BoundToCircle, BoundToArc,
   getDistance, getXDifference, getYDifference,
   transformedSpaceDistanceFactory,
-  indexOfNearestPoint,
-  addClass, removeClass
+  indexOfNearestPoint
 }
