@@ -17,6 +17,9 @@ function _defineProperties(target, props) {
 function _createClass(Constructor, protoProps, staticProps) {
   if (protoProps) _defineProperties(Constructor.prototype, protoProps);
   if (staticProps) _defineProperties(Constructor, staticProps);
+  Object.defineProperty(Constructor, "prototype", {
+    writable: false
+  });
   return Constructor;
 }
 
@@ -31,6 +34,9 @@ function _inherits(subClass, superClass) {
       writable: true,
       configurable: true
     }
+  });
+  Object.defineProperty(subClass, "prototype", {
+    writable: false
   });
   if (superClass) _setPrototypeOf(subClass, superClass);
 }
@@ -57,7 +63,7 @@ function _isNativeReflectConstruct() {
   if (typeof Proxy === "function") return true;
 
   try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
     return true;
   } catch (e) {
     return false;
@@ -92,17 +98,21 @@ function _assertThisInitialized(self) {
 function _possibleConstructorReturn(self, call) {
   if (call && (typeof call === "object" || typeof call === "function")) {
     return call;
+  } else if (call !== void 0) {
+    throw new TypeError("Derived constructors may only return object or undefined");
   }
 
   return _assertThisInitialized(self);
 }
 
 function _createSuper(Derived) {
-  return function () {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+  return function _createSuperInternal() {
     var Super = _getPrototypeOf(Derived),
         result;
 
-    if (_isNativeReflectConstruct()) {
+    if (hasNativeReflectConstruct) {
       var NewTarget = _getPrototypeOf(this).constructor;
 
       result = Reflect.construct(Super, arguments, NewTarget);
@@ -123,7 +133,7 @@ function _superPropBase(object, property) {
   return object;
 }
 
-function _get(target, property, receiver) {
+function _get() {
   if (typeof Reflect !== "undefined" && Reflect.get) {
     _get = Reflect.get;
   } else {
@@ -134,14 +144,14 @@ function _get(target, property, receiver) {
       var desc = Object.getOwnPropertyDescriptor(base, property);
 
       if (desc.get) {
-        return desc.get.call(receiver);
+        return desc.get.call(arguments.length < 3 ? target : receiver);
       }
 
       return desc.value;
     };
   }
 
-  return _get(target, property, receiver || target);
+  return _get.apply(this, arguments);
 }
 
 function _slicedToArray(arr, i) {
@@ -161,18 +171,21 @@ function _arrayWithHoles(arr) {
 }
 
 function _iterableToArray(iter) {
-  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+  if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
-  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
+  var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+
+  if (_i == null) return;
   var _arr = [];
   var _n = true;
   var _d = false;
-  var _e = undefined;
+
+  var _s, _e;
 
   try {
-    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
       _arr.push(_s.value);
 
       if (i && _arr.length === i) break;
@@ -196,7 +209,7 @@ function _unsupportedIterableToArray(o, minLen) {
   if (typeof o === "string") return _arrayLikeToArray(o, minLen);
   var n = Object.prototype.toString.call(o).slice(8, -1);
   if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(n);
+  if (n === "Map" || n === "Set") return Array.from(o);
   if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
 }
 
@@ -216,9 +229,12 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
-function _createForOfIteratorHelper(o) {
-  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
-    if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) {
+function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
+
+  if (!it) {
+    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (it) o = it;
       var i = 0;
 
       var F = function () {};
@@ -244,13 +260,12 @@ function _createForOfIteratorHelper(o) {
     throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
-  var it,
-      normalCompletion = true,
+  var normalCompletion = true,
       didErr = false,
       err;
   return {
     s: function () {
-      it = o[Symbol.iterator]();
+      it = it.call(o);
     },
     n: function () {
       var step = it.next();
@@ -479,20 +494,6 @@ var Rectangle = /*#__PURE__*/function () {
 
   return Rectangle;
 }();
-
-function hasClass(element, c) {
-  var re = new RegExp('(^|\\s)' + c + '(\\s|$)', 'g');
-  return re.test(element.className);
-}
-function addClass(element, c) {
-  if (!hasClass(element, c)) {
-    element.className = (element.className + ' ' + c).replace(/\s+/g, ' ').replace(/(^ | $)/g, '');
-  }
-}
-function removeClass(element, c) {
-  var re = new RegExp('(^|\\s)' + c + '(\\s|$)', 'g');
-  element.className = element.className.replace(re, '$1').replace(/\s+/g, ' ').replace(/(^ | $)/g, '');
-}
 
 function getDefaultContainer(element) {
   var container = element.parentNode;
@@ -1319,7 +1320,7 @@ var FloatRightStrategy = /*#__PURE__*/function (_FloatLeftStrategy) {
   return FloatRightStrategy;
 }(FloatLeftStrategy);
 
-var addToDefaultScope = function addToDefaultScope(target) {
+var addToDefaultScope$1 = function addToDefaultScope(target) {
   defaultScope.addTarget(target);
 };
 
@@ -1573,7 +1574,7 @@ var Target = /*#__PURE__*/function (_EventEmitter) {
   return Target;
 }(EventEmitter);
 Target.emitter = new EventEmitter();
-Target.emitter.on('target:create', addToDefaultScope);
+Target.emitter.on('target:create', addToDefaultScope$1);
 
 var scopes = [];
 
@@ -1735,6 +1736,27 @@ function scope(fn) {
   return currentScope;
 }
 
+function checkSupportPassiveEvents() {
+  var passiveSupported = false;
+
+  try {
+    var options = Object.defineProperty({}, 'passive', {
+      get: function get() {
+        return passiveSupported = true;
+      }
+    });
+    window.addEventListener('test', options, options);
+    window.removeEventListener('test', options, options);
+  } catch (_err) {
+    passiveSupported = false;
+  }
+
+  return passiveSupported;
+}
+
+var isSupportPassiveEvents = checkSupportPassiveEvents();
+var isSupportPassiveEvents$1 = isSupportPassiveEvents;
+
 var isTouch = ('ontouchstart' in window);
 var mouseEvents = {
   start: 'mousedown',
@@ -1772,7 +1794,7 @@ function preventDoubleInit(draggable) {
   draggables.push(draggable);
 }
 
-function addToDefaultScope$1(draggable) {
+function addToDefaultScope(draggable) {
   defaultScope.addDraggable(draggable);
 }
 
@@ -1824,7 +1846,13 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   _createClass(Draggable, [{
     key: "startBounding",
     value: function startBounding() {
-      this.bound = this.options.bound || BoundToElement.bounding(this.container, this.container);
+      if (this.options.bound) {
+        this.bounding = {
+          bound: this.options.bound
+        };
+      } else {
+        this.bounding = new BoundToElement(this.container, this.container);
+      }
     }
   }, {
     key: "startPositioning",
@@ -1837,8 +1865,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       this.initialPosition = this.options.position || this.offset;
       this.pinPosition(this.initialPosition);
 
-      if (this.bound.refresh) {
-        this.bound.refresh();
+      if (this.bounding.refresh) {
+        this.bounding.refresh();
       }
     }
   }, {
@@ -1878,8 +1906,12 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         return _this2.onScroll(event);
       };
 
-      this.handler.addEventListener(touchEvents.start, this._dragStart,  false);
-      this.handler.addEventListener(mouseEvents.start, this._dragStart,  false);
+      this.handler.addEventListener(touchEvents.start, this._dragStart, isSupportPassiveEvents$1 ? {
+        passive: false
+      } : false);
+      this.handler.addEventListener(mouseEvents.start, this._dragStart, isSupportPassiveEvents$1 ? {
+        passive: false
+      } : false);
       this.element.addEventListener('dragstart', this._nativeDragStart);
     }
   }, {
@@ -2030,20 +2062,28 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
           this.emulateNativeDragAndDrop(event);
         } else {
           this.element.draggable = true;
-          document.addEventListener(mouseEvents.end, this._nativeDragEnd,  false);
+          document.addEventListener(mouseEvents.end, this._nativeDragEnd, isSupportPassiveEvents$1 ? {
+            passive: false
+          } : false);
         }
       } else {
-        document.addEventListener(touchEvents.move, this._dragMove,  false);
-        document.addEventListener(mouseEvents.move, this._dragMove,  false);
-        document.addEventListener(touchEvents.end, this._dragEnd,  false);
-        document.addEventListener(mouseEvents.end, this._dragEnd,  false);
+        document.addEventListener(touchEvents.move, this._dragMove, isSupportPassiveEvents$1 ? {
+          passive: false
+        } : false);
+        document.addEventListener(mouseEvents.move, this._dragMove, isSupportPassiveEvents$1 ? {
+          passive: false
+        } : false);
+        document.addEventListener(touchEvents.end, this._dragEnd, isSupportPassiveEvents$1 ? {
+          passive: false
+        } : false);
+        document.addEventListener(mouseEvents.end, this._dragEnd, isSupportPassiveEvents$1 ? {
+          passive: false
+        } : false);
       }
 
       window.addEventListener('scroll', this._scroll);
       this.isDragging = true;
       this.emit('drag:start');
-      addClass(this.element, 'dragee-active');
-      this.emit('drag:move');
     }
   }, {
     key: "stopDragging",
@@ -2060,7 +2100,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       window.removeEventListener('scroll', this._scroll);
       this.element.draggable = false;
       this.isDragging = false;
-      removeClass(this.element, 'dragee-active');
+      this.element.classList.remove('dragee-active');
     }
   }, {
     key: "dragMove",
@@ -2083,12 +2123,15 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
       var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
-      point = this.bound(point, this.getSize());
+      point = this.bounding.bound(point, this.getSize());
       this.move(point);
+      this.element.classList.add('dragee-active');
     }
   }, {
     key: "dragEnd",
     value: function dragEnd(event) {
+      var _this3 = this;
+
       var isTouchEvent = isTouch && event instanceof window.TouchEvent;
 
       if (isTouchEvent && !getTouchByID(event, this._touchId)) {
@@ -2106,14 +2149,16 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       window.removeEventListener('scroll', this._scroll);
       this.isDragging = false;
       this.element.removeAttribute('draggable');
-      removeClass(this.element, 'dragee-active');
+      setTimeout(function () {
+        return _this3.element.classList.remove('dragee-active');
+      });
     }
   }, {
     key: "onScroll",
     value: function onScroll(_event) {
       var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
-      point = this.bound(point, this.getSize());
+      point = this.bounding.bound(point, this.getSize());
 
       if (!this.nativeDragAndDrop) {
         this.move(point);
@@ -2133,7 +2178,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     value: function nativeDragOver(event) {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
-      addClass(this.element, 'dragee-placeholder');
+      this.element.classList.add('dragee-placeholder');
       this.currentEvent = event;
 
       if (event.clientX === 0 && event.clientY === 0) {
@@ -2144,14 +2189,14 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
       var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
-      point = this.bound(point, this.getSize());
+      point = this.bounding.bound(point, this.getSize());
       this.position = point;
       this.emit('drag:move');
     }
   }, {
     key: "nativeDragEnd",
     value: function nativeDragEnd(_event) {
-      removeClass(this.element, 'dragee-placeholder');
+      this.element.classList.remove('dragee-placeholder');
       this.dragEndAction();
       this.emit('drag:end');
       document.removeEventListener('dragover', this._nativeDragOver);
@@ -2161,7 +2206,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       window.removeEventListener('scroll', this._scroll);
       this.isDragging = false;
       this.element.removeAttribute('draggable');
-      removeClass(this.element, 'dragee-active');
+      this.element.classList.remove('dragee-active');
     }
   }, {
     key: "nativeDrop",
@@ -2172,7 +2217,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "emulateNativeDragAndDrop",
     value: function emulateNativeDragAndDrop(event) {
-      var _this3 = this;
+      var _this4 = this;
 
       var containerRect = this.container.getBoundingClientRect();
       var clonedElement = this.element.cloneNode(true);
@@ -2180,7 +2225,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       copyStyles(this.element, clonedElement);
       clonedElement.style.position = 'absolute';
       document.body.appendChild(clonedElement);
-      addClass(this.element, 'dragee-placeholder');
+      this.element.classList.add('dragee-placeholder');
       var emulationDraggable = new Draggable(clonedElement, {
         container: document.body,
         bound: function bound(point) {
@@ -2189,15 +2234,17 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         on: {
           'drag:move': function dragMove() {
             var containerRectPoint = new Point(containerRect.left, containerRect.top);
-            _this3.position = emulationDraggable.position.sub(containerRectPoint).sub(_this3._startScrollPoint);
+            _this4.position = emulationDraggable.position.sub(containerRectPoint).sub(_this4._startScrollPoint);
 
-            _this3.emit('drag:move');
+            _this4.emit('drag:move');
           },
           'drag:end': function dragEnd() {
             emulationDraggable.destroy();
             document.body.removeChild(clonedElement);
-            removeClass(_this3.element, 'dragee-placeholder');
-            removeClass(_this3.element, 'dragee-active');
+
+            _this4.element.classList.remove('dragee-placeholder');
+
+            _this4.element.classList.remove('dragee-active');
           }
         }
       });
@@ -2219,8 +2266,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "refresh",
     value: function refresh() {
-      if (this.bound.refresh) {
-        this.bound.refresh();
+      if (this.bounding.refresh) {
+        this.bounding.refresh();
       }
     }
   }, {
@@ -2294,19 +2341,520 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     },
     set: function set(enable) {
       if (enable) {
-        removeClass(this.element, 'dragee-disable');
+        this.element.classList.remove('dragee-disable');
       } else {
-        addClass(this.element, 'dragee-disable');
+        this.element.classList.add('dragee-disable');
       }
 
-      return this._enable = enable;
+      this._enable = enable;
     }
   }]);
 
   return Draggable;
 }(EventEmitter);
 Draggable.emitter = new EventEmitter();
-Draggable.emitter.on('draggable:create', addToDefaultScope$1);
+Draggable.emitter.on('draggable:create', addToDefaultScope);
+
+var resizeObservers = [];
+
+var hasActiveObservations = function () {
+    return resizeObservers.some(function (ro) { return ro.activeTargets.length > 0; });
+};
+
+var hasSkippedObservations = function () {
+    return resizeObservers.some(function (ro) { return ro.skippedTargets.length > 0; });
+};
+
+var msg = 'ResizeObserver loop completed with undelivered notifications.';
+var deliverResizeLoopError = function () {
+    var event;
+    if (typeof ErrorEvent === 'function') {
+        event = new ErrorEvent('error', {
+            message: msg
+        });
+    }
+    else {
+        event = document.createEvent('Event');
+        event.initEvent('error', false, false);
+        event.message = msg;
+    }
+    window.dispatchEvent(event);
+};
+
+var ResizeObserverBoxOptions;
+(function (ResizeObserverBoxOptions) {
+    ResizeObserverBoxOptions["BORDER_BOX"] = "border-box";
+    ResizeObserverBoxOptions["CONTENT_BOX"] = "content-box";
+    ResizeObserverBoxOptions["DEVICE_PIXEL_CONTENT_BOX"] = "device-pixel-content-box";
+})(ResizeObserverBoxOptions || (ResizeObserverBoxOptions = {}));
+
+var freeze = function (obj) { return Object.freeze(obj); };
+
+var ResizeObserverSize = (function () {
+    function ResizeObserverSize(inlineSize, blockSize) {
+        this.inlineSize = inlineSize;
+        this.blockSize = blockSize;
+        freeze(this);
+    }
+    return ResizeObserverSize;
+}());
+
+var DOMRectReadOnly = (function () {
+    function DOMRectReadOnly(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.top = this.y;
+        this.left = this.x;
+        this.bottom = this.top + this.height;
+        this.right = this.left + this.width;
+        return freeze(this);
+    }
+    DOMRectReadOnly.prototype.toJSON = function () {
+        var _a = this, x = _a.x, y = _a.y, top = _a.top, right = _a.right, bottom = _a.bottom, left = _a.left, width = _a.width, height = _a.height;
+        return { x: x, y: y, top: top, right: right, bottom: bottom, left: left, width: width, height: height };
+    };
+    DOMRectReadOnly.fromRect = function (rectangle) {
+        return new DOMRectReadOnly(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+    };
+    return DOMRectReadOnly;
+}());
+
+var isSVG = function (target) { return target instanceof SVGElement && 'getBBox' in target; };
+var isHidden = function (target) {
+    if (isSVG(target)) {
+        var _a = target.getBBox(), width = _a.width, height = _a.height;
+        return !width && !height;
+    }
+    var _b = target, offsetWidth = _b.offsetWidth, offsetHeight = _b.offsetHeight;
+    return !(offsetWidth || offsetHeight || target.getClientRects().length);
+};
+var isElement = function (obj) {
+    var _a, _b;
+    if (obj instanceof Element) {
+        return true;
+    }
+    var scope = (_b = (_a = obj) === null || _a === void 0 ? void 0 : _a.ownerDocument) === null || _b === void 0 ? void 0 : _b.defaultView;
+    return !!(scope && obj instanceof scope.Element);
+};
+var isReplacedElement = function (target) {
+    switch (target.tagName) {
+        case 'INPUT':
+            if (target.type !== 'image') {
+                break;
+            }
+        case 'VIDEO':
+        case 'AUDIO':
+        case 'EMBED':
+        case 'OBJECT':
+        case 'CANVAS':
+        case 'IFRAME':
+        case 'IMG':
+            return true;
+    }
+    return false;
+};
+
+var global = typeof window !== 'undefined' ? window : {};
+
+var cache = new WeakMap();
+var scrollRegexp = /auto|scroll/;
+var verticalRegexp = /^tb|vertical/;
+var IE = (/msie|trident/i).test(global.navigator && global.navigator.userAgent);
+var parseDimension = function (pixel) { return parseFloat(pixel || '0'); };
+var size = function (inlineSize, blockSize, switchSizes) {
+    if (inlineSize === void 0) { inlineSize = 0; }
+    if (blockSize === void 0) { blockSize = 0; }
+    if (switchSizes === void 0) { switchSizes = false; }
+    return new ResizeObserverSize((switchSizes ? blockSize : inlineSize) || 0, (switchSizes ? inlineSize : blockSize) || 0);
+};
+var zeroBoxes = freeze({
+    devicePixelContentBoxSize: size(),
+    borderBoxSize: size(),
+    contentBoxSize: size(),
+    contentRect: new DOMRectReadOnly(0, 0, 0, 0)
+});
+var calculateBoxSizes = function (target, forceRecalculation) {
+    if (forceRecalculation === void 0) { forceRecalculation = false; }
+    if (cache.has(target) && !forceRecalculation) {
+        return cache.get(target);
+    }
+    if (isHidden(target)) {
+        cache.set(target, zeroBoxes);
+        return zeroBoxes;
+    }
+    var cs = getComputedStyle(target);
+    var svg = isSVG(target) && target.ownerSVGElement && target.getBBox();
+    var removePadding = !IE && cs.boxSizing === 'border-box';
+    var switchSizes = verticalRegexp.test(cs.writingMode || '');
+    var canScrollVertically = !svg && scrollRegexp.test(cs.overflowY || '');
+    var canScrollHorizontally = !svg && scrollRegexp.test(cs.overflowX || '');
+    var paddingTop = svg ? 0 : parseDimension(cs.paddingTop);
+    var paddingRight = svg ? 0 : parseDimension(cs.paddingRight);
+    var paddingBottom = svg ? 0 : parseDimension(cs.paddingBottom);
+    var paddingLeft = svg ? 0 : parseDimension(cs.paddingLeft);
+    var borderTop = svg ? 0 : parseDimension(cs.borderTopWidth);
+    var borderRight = svg ? 0 : parseDimension(cs.borderRightWidth);
+    var borderBottom = svg ? 0 : parseDimension(cs.borderBottomWidth);
+    var borderLeft = svg ? 0 : parseDimension(cs.borderLeftWidth);
+    var horizontalPadding = paddingLeft + paddingRight;
+    var verticalPadding = paddingTop + paddingBottom;
+    var horizontalBorderArea = borderLeft + borderRight;
+    var verticalBorderArea = borderTop + borderBottom;
+    var horizontalScrollbarThickness = !canScrollHorizontally ? 0 : target.offsetHeight - verticalBorderArea - target.clientHeight;
+    var verticalScrollbarThickness = !canScrollVertically ? 0 : target.offsetWidth - horizontalBorderArea - target.clientWidth;
+    var widthReduction = removePadding ? horizontalPadding + horizontalBorderArea : 0;
+    var heightReduction = removePadding ? verticalPadding + verticalBorderArea : 0;
+    var contentWidth = svg ? svg.width : parseDimension(cs.width) - widthReduction - verticalScrollbarThickness;
+    var contentHeight = svg ? svg.height : parseDimension(cs.height) - heightReduction - horizontalScrollbarThickness;
+    var borderBoxWidth = contentWidth + horizontalPadding + verticalScrollbarThickness + horizontalBorderArea;
+    var borderBoxHeight = contentHeight + verticalPadding + horizontalScrollbarThickness + verticalBorderArea;
+    var boxes = freeze({
+        devicePixelContentBoxSize: size(Math.round(contentWidth * devicePixelRatio), Math.round(contentHeight * devicePixelRatio), switchSizes),
+        borderBoxSize: size(borderBoxWidth, borderBoxHeight, switchSizes),
+        contentBoxSize: size(contentWidth, contentHeight, switchSizes),
+        contentRect: new DOMRectReadOnly(paddingLeft, paddingTop, contentWidth, contentHeight)
+    });
+    cache.set(target, boxes);
+    return boxes;
+};
+var calculateBoxSize = function (target, observedBox, forceRecalculation) {
+    var _a = calculateBoxSizes(target, forceRecalculation), borderBoxSize = _a.borderBoxSize, contentBoxSize = _a.contentBoxSize, devicePixelContentBoxSize = _a.devicePixelContentBoxSize;
+    switch (observedBox) {
+        case ResizeObserverBoxOptions.DEVICE_PIXEL_CONTENT_BOX:
+            return devicePixelContentBoxSize;
+        case ResizeObserverBoxOptions.BORDER_BOX:
+            return borderBoxSize;
+        default:
+            return contentBoxSize;
+    }
+};
+
+var ResizeObserverEntry = (function () {
+    function ResizeObserverEntry(target) {
+        var boxes = calculateBoxSizes(target);
+        this.target = target;
+        this.contentRect = boxes.contentRect;
+        this.borderBoxSize = freeze([boxes.borderBoxSize]);
+        this.contentBoxSize = freeze([boxes.contentBoxSize]);
+        this.devicePixelContentBoxSize = freeze([boxes.devicePixelContentBoxSize]);
+    }
+    return ResizeObserverEntry;
+}());
+
+var calculateDepthForNode = function (node) {
+    if (isHidden(node)) {
+        return Infinity;
+    }
+    var depth = 0;
+    var parent = node.parentNode;
+    while (parent) {
+        depth += 1;
+        parent = parent.parentNode;
+    }
+    return depth;
+};
+
+var broadcastActiveObservations = function () {
+    var shallowestDepth = Infinity;
+    var callbacks = [];
+    resizeObservers.forEach(function processObserver(ro) {
+        if (ro.activeTargets.length === 0) {
+            return;
+        }
+        var entries = [];
+        ro.activeTargets.forEach(function processTarget(ot) {
+            var entry = new ResizeObserverEntry(ot.target);
+            var targetDepth = calculateDepthForNode(ot.target);
+            entries.push(entry);
+            ot.lastReportedSize = calculateBoxSize(ot.target, ot.observedBox);
+            if (targetDepth < shallowestDepth) {
+                shallowestDepth = targetDepth;
+            }
+        });
+        callbacks.push(function resizeObserverCallback() {
+            ro.callback.call(ro.observer, entries, ro.observer);
+        });
+        ro.activeTargets.splice(0, ro.activeTargets.length);
+    });
+    for (var _i = 0, callbacks_1 = callbacks; _i < callbacks_1.length; _i++) {
+        var callback = callbacks_1[_i];
+        callback();
+    }
+    return shallowestDepth;
+};
+
+var gatherActiveObservationsAtDepth = function (depth) {
+    resizeObservers.forEach(function processObserver(ro) {
+        ro.activeTargets.splice(0, ro.activeTargets.length);
+        ro.skippedTargets.splice(0, ro.skippedTargets.length);
+        ro.observationTargets.forEach(function processTarget(ot) {
+            if (ot.isActive()) {
+                if (calculateDepthForNode(ot.target) > depth) {
+                    ro.activeTargets.push(ot);
+                }
+                else {
+                    ro.skippedTargets.push(ot);
+                }
+            }
+        });
+    });
+};
+
+var process = function () {
+    var depth = 0;
+    gatherActiveObservationsAtDepth(depth);
+    while (hasActiveObservations()) {
+        depth = broadcastActiveObservations();
+        gatherActiveObservationsAtDepth(depth);
+    }
+    if (hasSkippedObservations()) {
+        deliverResizeLoopError();
+    }
+    return depth > 0;
+};
+
+var trigger;
+var callbacks = [];
+var notify = function () { return callbacks.splice(0).forEach(function (cb) { return cb(); }); };
+var queueMicroTask = function (callback) {
+    if (!trigger) {
+        var toggle_1 = 0;
+        var el_1 = document.createTextNode('');
+        var config = { characterData: true };
+        new MutationObserver(function () { return notify(); }).observe(el_1, config);
+        trigger = function () { el_1.textContent = "" + (toggle_1 ? toggle_1-- : toggle_1++); };
+    }
+    callbacks.push(callback);
+    trigger();
+};
+
+var queueResizeObserver = function (cb) {
+    queueMicroTask(function ResizeObserver() {
+        requestAnimationFrame(cb);
+    });
+};
+
+var watching = 0;
+var isWatching = function () { return !!watching; };
+var CATCH_PERIOD = 250;
+var observerConfig = { attributes: true, characterData: true, childList: true, subtree: true };
+var events = [
+    'resize',
+    'load',
+    'transitionend',
+    'animationend',
+    'animationstart',
+    'animationiteration',
+    'keyup',
+    'keydown',
+    'mouseup',
+    'mousedown',
+    'mouseover',
+    'mouseout',
+    'blur',
+    'focus'
+];
+var time = function (timeout) {
+    if (timeout === void 0) { timeout = 0; }
+    return Date.now() + timeout;
+};
+var scheduled = false;
+var Scheduler = (function () {
+    function Scheduler() {
+        var _this = this;
+        this.stopped = true;
+        this.listener = function () { return _this.schedule(); };
+    }
+    Scheduler.prototype.run = function (timeout) {
+        var _this = this;
+        if (timeout === void 0) { timeout = CATCH_PERIOD; }
+        if (scheduled) {
+            return;
+        }
+        scheduled = true;
+        var until = time(timeout);
+        queueResizeObserver(function () {
+            var elementsHaveResized = false;
+            try {
+                elementsHaveResized = process();
+            }
+            finally {
+                scheduled = false;
+                timeout = until - time();
+                if (!isWatching()) {
+                    return;
+                }
+                if (elementsHaveResized) {
+                    _this.run(1000);
+                }
+                else if (timeout > 0) {
+                    _this.run(timeout);
+                }
+                else {
+                    _this.start();
+                }
+            }
+        });
+    };
+    Scheduler.prototype.schedule = function () {
+        this.stop();
+        this.run();
+    };
+    Scheduler.prototype.observe = function () {
+        var _this = this;
+        var cb = function () { return _this.observer && _this.observer.observe(document.body, observerConfig); };
+        document.body ? cb() : global.addEventListener('DOMContentLoaded', cb);
+    };
+    Scheduler.prototype.start = function () {
+        var _this = this;
+        if (this.stopped) {
+            this.stopped = false;
+            this.observer = new MutationObserver(this.listener);
+            this.observe();
+            events.forEach(function (name) { return global.addEventListener(name, _this.listener, true); });
+        }
+    };
+    Scheduler.prototype.stop = function () {
+        var _this = this;
+        if (!this.stopped) {
+            this.observer && this.observer.disconnect();
+            events.forEach(function (name) { return global.removeEventListener(name, _this.listener, true); });
+            this.stopped = true;
+        }
+    };
+    return Scheduler;
+}());
+var scheduler = new Scheduler();
+var updateCount = function (n) {
+    !watching && n > 0 && scheduler.start();
+    watching += n;
+    !watching && scheduler.stop();
+};
+
+var skipNotifyOnElement = function (target) {
+    return !isSVG(target)
+        && !isReplacedElement(target)
+        && getComputedStyle(target).display === 'inline';
+};
+var ResizeObservation = (function () {
+    function ResizeObservation(target, observedBox) {
+        this.target = target;
+        this.observedBox = observedBox || ResizeObserverBoxOptions.CONTENT_BOX;
+        this.lastReportedSize = {
+            inlineSize: 0,
+            blockSize: 0
+        };
+    }
+    ResizeObservation.prototype.isActive = function () {
+        var size = calculateBoxSize(this.target, this.observedBox, true);
+        if (skipNotifyOnElement(this.target)) {
+            this.lastReportedSize = size;
+        }
+        if (this.lastReportedSize.inlineSize !== size.inlineSize
+            || this.lastReportedSize.blockSize !== size.blockSize) {
+            return true;
+        }
+        return false;
+    };
+    return ResizeObservation;
+}());
+
+var ResizeObserverDetail = (function () {
+    function ResizeObserverDetail(resizeObserver, callback) {
+        this.activeTargets = [];
+        this.skippedTargets = [];
+        this.observationTargets = [];
+        this.observer = resizeObserver;
+        this.callback = callback;
+    }
+    return ResizeObserverDetail;
+}());
+
+var observerMap = new WeakMap();
+var getObservationIndex = function (observationTargets, target) {
+    for (var i = 0; i < observationTargets.length; i += 1) {
+        if (observationTargets[i].target === target) {
+            return i;
+        }
+    }
+    return -1;
+};
+var ResizeObserverController = (function () {
+    function ResizeObserverController() {
+    }
+    ResizeObserverController.connect = function (resizeObserver, callback) {
+        var detail = new ResizeObserverDetail(resizeObserver, callback);
+        observerMap.set(resizeObserver, detail);
+    };
+    ResizeObserverController.observe = function (resizeObserver, target, options) {
+        var detail = observerMap.get(resizeObserver);
+        var firstObservation = detail.observationTargets.length === 0;
+        if (getObservationIndex(detail.observationTargets, target) < 0) {
+            firstObservation && resizeObservers.push(detail);
+            detail.observationTargets.push(new ResizeObservation(target, options && options.box));
+            updateCount(1);
+            scheduler.schedule();
+        }
+    };
+    ResizeObserverController.unobserve = function (resizeObserver, target) {
+        var detail = observerMap.get(resizeObserver);
+        var index = getObservationIndex(detail.observationTargets, target);
+        var lastObservation = detail.observationTargets.length === 1;
+        if (index >= 0) {
+            lastObservation && resizeObservers.splice(resizeObservers.indexOf(detail), 1);
+            detail.observationTargets.splice(index, 1);
+            updateCount(-1);
+        }
+    };
+    ResizeObserverController.disconnect = function (resizeObserver) {
+        var _this = this;
+        var detail = observerMap.get(resizeObserver);
+        detail.observationTargets.slice().forEach(function (ot) { return _this.unobserve(resizeObserver, ot.target); });
+        detail.activeTargets.splice(0, detail.activeTargets.length);
+    };
+    return ResizeObserverController;
+}());
+
+var ResizeObserver$1 = (function () {
+    function ResizeObserver(callback) {
+        if (arguments.length === 0) {
+            throw new TypeError("Failed to construct 'ResizeObserver': 1 argument required, but only 0 present.");
+        }
+        if (typeof callback !== 'function') {
+            throw new TypeError("Failed to construct 'ResizeObserver': The callback provided as parameter 1 is not a function.");
+        }
+        ResizeObserverController.connect(this, callback);
+    }
+    ResizeObserver.prototype.observe = function (target, options) {
+        if (arguments.length === 0) {
+            throw new TypeError("Failed to execute 'observe' on 'ResizeObserver': 1 argument required, but only 0 present.");
+        }
+        if (!isElement(target)) {
+            throw new TypeError("Failed to execute 'observe' on 'ResizeObserver': parameter 1 is not of type 'Element");
+        }
+        ResizeObserverController.observe(this, target, options);
+    };
+    ResizeObserver.prototype.unobserve = function (target) {
+        if (arguments.length === 0) {
+            throw new TypeError("Failed to execute 'unobserve' on 'ResizeObserver': 1 argument required, but only 0 present.");
+        }
+        if (!isElement(target)) {
+            throw new TypeError("Failed to execute 'unobserve' on 'ResizeObserver': parameter 1 is not of type 'Element");
+        }
+        ResizeObserverController.unobserve(this, target);
+    };
+    ResizeObserver.prototype.disconnect = function () {
+        ResizeObserverController.disconnect(this);
+    };
+    ResizeObserver.toString = function () {
+        return 'function ResizeObserver () { [polyfill code] }';
+    };
+    return ResizeObserver;
+}());
+
+var ResizeObserver = window.ResizeObserver || ResizeObserver$1;
 
 var List = /*#__PURE__*/function (_EventEmitter) {
   _inherits(List, _EventEmitter);
@@ -2327,6 +2875,16 @@ var List = /*#__PURE__*/function (_EventEmitter) {
       radius: 30
     }, options);
     _this.draggables = draggables;
+    _this.changedDuringIteration = false;
+    _this.resizeObserver = new ResizeObserver(function () {
+      return _this.draggables.forEach(function (d) {
+        return d.startPositioning();
+      });
+    });
+
+    _this.draggables.forEach(function (d) {
+      return _this.resizeObserver.observe(d.element);
+    });
 
     _this.init();
 
@@ -2350,7 +2908,9 @@ var List = /*#__PURE__*/function (_EventEmitter) {
       });
 
       draggable.dragEndAction = function () {
-        return draggable.pinPosition(draggable.pinnedPosition, _this2.options.timeEnd);
+        draggable.pinPosition(draggable.pinnedPosition, _this2.options.timeEnd);
+
+        _this2.onEnd(draggable);
       };
     }
   }, {
@@ -2380,7 +2940,15 @@ var List = /*#__PURE__*/function (_EventEmitter) {
           draggable.pinnedPosition = pinnedPositions[targetIndex];
         }
 
+        this.changedDuringIteration = true;
+      }
+    }
+  }, {
+    key: "onEnd",
+    value: function onEnd(_draggable) {
+      if (this.changedDuringIteration) {
         this.emit('list:change');
+        this.changedDuringIteration = false;
       }
     }
   }, {
@@ -2586,13 +3154,13 @@ var BubblingList = /*#__PURE__*/function (_List) {
 
       if (targetIndex !== -1 && currentIndex !== targetIndex) {
         arrayMove(sortedDraggables, currentIndex, targetIndex);
-        this.bubling(sortedDraggables, draggable);
-        this.emit('list:change');
+        this.bubbling(sortedDraggables, draggable);
+        this.changedDuringIteration = true;
       }
     }
   }, {
-    key: "bubling",
-    value: function bubling(sortedDraggables, currentDraggable) {
+    key: "bubbling",
+    value: function bubbling(sortedDraggables, currentDraggable) {
       var _this2 = this;
 
       var currentPosition = this.startPosition.clone();
@@ -2622,11 +3190,28 @@ var BubblingList = /*#__PURE__*/function (_List) {
           container: containerElement
         }, options.draggable || {}));
       });
-      return new BubblingList(draggables, options.list || {});
+      var bubblingList = new BubblingList(draggables, options.list || {});
+
+      if (options.reorderOnChange) {
+        bubblingList.on('list:change', function () {
+          var orderedElements = bubblingList.getSortedDraggables().map(function (d) {
+            return d.element;
+          });
+          bubblingList.reset();
+          orderedElements.forEach(function (element) {
+            containerElement.appendChild(element);
+          });
+          draggables.forEach(function (d) {
+            return d.startPositioning();
+          });
+        });
+      }
+
+      return bubblingList;
     }
   }]);
 
   return BubblingList;
 }(List);
 
-export { Bound, BoundToArc, BoundToCircle, BoundToElement, BoundToLine, BoundToLineX, BoundToLineY, BoundToRectangle, BubblingList, Draggable, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Rectangle, Scope, Target, addClass, defaultScope, getDistance, getXDifference, getYDifference, indexOfNearestPoint, removeClass, scope, scopes, transformedSpaceDistanceFactory };
+export { Bound, BoundToArc, BoundToCircle, BoundToElement, BoundToLine, BoundToLineX, BoundToLineY, BoundToRectangle, BubblingList, Draggable, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Rectangle, Scope, Target, defaultScope, getDistance, getXDifference, getYDifference, indexOfNearestPoint, scope, scopes, transformedSpaceDistanceFactory };
