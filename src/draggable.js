@@ -68,13 +68,18 @@ export default class Draggable extends EventEmitter {
     preventDoubleInit(this)
     Draggable.emitter.emit('draggable:create', this)
     this._enable = true
+
     this.startBounding()
     this.startPositioning()
     this.startListening()
   }
 
   startBounding() {
-    this.bound = this.options.bound || BoundToElement.bounding(this.container, this.container)
+    if(this.options.bound) {
+      this.bounding = { bound: this.options.bound }
+    } else {
+      this.bounding = new BoundToElement(this.container, this.container)
+    }
   }
 
   startPositioning() {
@@ -86,8 +91,8 @@ export default class Draggable extends EventEmitter {
 
     this.pinPosition(this.initialPosition)
 
-    if (this.bound.refresh) {
-      this.bound.refresh()
+    if (this.bounding.refresh) {
+      this.bounding.refresh()
     }
   }
 
@@ -255,7 +260,6 @@ export default class Draggable extends EventEmitter {
 
     this.isDragging = true
     this.emit('drag:start')
-    addClass(this.element, 'dragee-active')
   }
 
   stopDragging() {
@@ -297,8 +301,9 @@ export default class Draggable extends EventEmitter {
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.scrollPoint.sub(this._startScrollPoint))
 
-    point = this.bound(point, this.getSize())
+    point = this.bounding.bound(point, this.getSize())
     this.move(point)
+    addClass(this.element, 'dragee-active')
   }
 
   dragEnd(event) {
@@ -323,14 +328,14 @@ export default class Draggable extends EventEmitter {
 
     this.isDragging = false
     this.element.removeAttribute('draggable')
-    removeClass(this.element, 'dragee-active')
+    setTimeout(() => removeClass(this.element, 'dragee-active'))
   }
 
   onScroll(_event) {
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.scrollPoint.sub(this._startScrollPoint))
 
-    point = this.bound(point, this.getSize())
+    point = this.bounding.bound(point, this.getSize())
     if (!this.nativeDragAndDrop) {
       this.move(point)
     }
@@ -356,7 +361,7 @@ export default class Draggable extends EventEmitter {
     this.touchPoint = new Point(event.clientX, event.clientY)
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.scrollPoint.sub(this._startScrollPoint))
-    point = this.bound(point, this.getSize())
+    point = this.bounding.bound(point, this.getSize())
     this.position = point
     this.emit('drag:move')
   }
@@ -429,8 +434,8 @@ export default class Draggable extends EventEmitter {
   }
 
   refresh() {
-    if (this.bound.refresh) {
-      this.bound.refresh()
+    if (this.bounding.refresh) {
+      this.bounding.refresh()
     }
   }
 

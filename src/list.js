@@ -17,6 +17,11 @@ export default class List extends EventEmitter {
     }, options)
 
     this.draggables = draggables
+    this.changedDuringIteration = false
+
+    this.resizeObserver = new ResizeObserver(() => this.draggables.forEach((d) => d.startPositioning()))
+    this.draggables.forEach((d) => this.resizeObserver.observe(d.element))
+
     this.init()
   }
 
@@ -28,7 +33,10 @@ export default class List extends EventEmitter {
   initDraggable(draggable) {
     draggable.enable = this._enable
     draggable.on('drag:move', () => this.onMove(draggable))
-    draggable.dragEndAction = () => draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
+    draggable.dragEndAction = () => {
+      draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
+      this.onEnd(draggable)
+    }
   }
 
   onMove(draggable) {
@@ -55,7 +63,14 @@ export default class List extends EventEmitter {
         draggable.pinnedPosition = pinnedPositions[targetIndex]
       }
 
+      this.changedDuringIteration = true
+    }
+  }
+
+  onEnd(draggable) {
+    if (this.changedDuringIteration) {
       this.emit('list:change')
+      this.changedDuringIteration = false
     }
   }
 

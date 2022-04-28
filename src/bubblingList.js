@@ -41,7 +41,7 @@ export default class BubblingList extends List {
     if (targetIndex !== -1 && currentIndex !== targetIndex) {
       arrayMove(sortedDraggables, currentIndex, targetIndex)
       this.bubbling(sortedDraggables, draggable)
-      this.emit('list:change')
+      this.changedDuringIteration = true
     }
   }
 
@@ -71,6 +71,20 @@ export default class BubblingList extends List {
         container: containerElement
       }, options.draggable || {}))
     })
-    return new BubblingList(draggables, options.list || {})
+    const bubblingList = new BubblingList(draggables, options.list || {})
+
+    if(options.reorderOnChange) {
+      bubblingList.on("list:change", () => {
+        const orderedElements = bubblingList.getSortedDraggables().map((d) => d.element)
+        bubblingList.reset()
+        orderedElements.forEach((element) => {
+          containerElement.appendChild(element)
+        })
+
+        draggables.forEach((d) => d.startPositioning())
+      })
+    }
+
+    return bubblingList
   }
 }

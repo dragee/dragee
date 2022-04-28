@@ -363,6 +363,32 @@
                         <li>⇔ 8</li>
                         <li>⇔ 9</li>
                       </ul>
+                      <ul class="list list-c">
+                        <li class="list-item">
+                          <div>
+                            <span>Expand</span> ⇔ 1
+                          </div>
+                          <div class="list-item-content" style="height: 30px;">
+                        </li>
+                        <li class="list-item">
+                          <div>
+                            <span>Expand</span> ⇔ 2
+                          </div>
+                          <div class="list-item-content" style="height: 70px;">
+                        </li>
+                        <li class="list-item">
+                          <div>
+                            <span>Expand</span> ⇔ 3
+                          </div>
+                          <div class="list-item-content" style="height: 50px;">
+                        </li>
+                        <li class="list-item">
+                          <div>
+                            <span>Expand</span> ⇔ 4
+                          </div>
+                          <div class="list-item-content" style="height: 100px;">
+                        </li>
+                      </ul>
                     </div>
                 </div>
                 <style>
@@ -375,6 +401,7 @@
                     }
 
                     #DemoList ul.list{
+                      width: 400px;
                       position: relative;
                       margin-bottom: 30px;
                       padding: 5%;
@@ -420,15 +447,26 @@
                     #DemoList ul.list.list-b li {
                       display: inline-block;
                     }
+
+                    .list-item .list-item-content {
+                      display: none;
+                      border:  1px solid grey;
+                    }
+
+                    .list-item.expanded .list-item-content {
+                      display: block;
+                    }
                 </style>
                 <script>
                     window.addEventListener("load", function(){
-                        var listA, listB,
+                        var listA, listB, listC,
                             root = document.getElementById("DemoList"),
                             listAParentElement = root.getElementsByClassName("list-a")[0],
                             listAElements = listAParentElement.getElementsByTagName("li"),
                             listBParentElement = root.getElementsByClassName("list-b")[0],
-                            listBElements = listBParentElement.getElementsByTagName("li");
+                            listBElements = listBParentElement.getElementsByTagName("li"),
+                            listCParentElement = root.getElementsByClassName("list-c")[0],
+                            listCElements = listCParentElement.getElementsByTagName("li");
 
                         listA = Dragee.BubblingList.factory(listAParentElement, listAElements, {
                           draggable: {
@@ -444,6 +482,23 @@
                             // nativeDragAndDrop: true
                           }
                         });
+
+                        [...listCElements].forEach((listItem) => {
+                          var expandButton = listItem.querySelector('span')
+
+                          expandButton.addEventListener('click', (event) => {
+                            if(!listItem.classList.contains('dragee-active')) {
+                              listItem.classList.toggle('expanded')
+                            }
+                          })
+                        })
+
+                        listC = Dragee.BubblingList.factory(listCParentElement, listCElements, {
+                          draggable: {
+                            // nativeDragAndDrop: true
+                          },
+                          reorderOnChange: true
+                        })
                     });
                 </script>
             </div>
