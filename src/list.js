@@ -1,3 +1,6 @@
+import { ResizeObserver as Polyfill } from '@juggle/resize-observer'
+const ResizeObserver = window.ResizeObserver || Polyfill
+
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
 import {
@@ -67,7 +70,7 @@ export default class List extends EventEmitter {
     }
   }
 
-  onEnd(draggable) {
+  onEnd(_draggable) {
     if (this.changedDuringIteration) {
       this.emit('list:change')
       this.changedDuringIteration = false

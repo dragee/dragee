@@ -1,6 +1,6 @@
 {
   "name": "dragee",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Dragee(drag&drop) library",
   "scripts": {
     "build": "rollup --config rollup.config.js",
@@ -27,6 +27,7 @@
   "author": "Vitaliy Yarovuy, Volodymyr Myskov",
   "license": "ISC",
   "dependencies": {
+    "@juggle/resize-observer": "^3.3.1",
     "desandro-get-style-property": "^1.0.4"
   },
   "module": "dist/index.esm.js",

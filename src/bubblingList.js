@@ -71,10 +71,10 @@ export default class BubblingList extends List {
         container: containerElement
       }, options.draggable || {}))
     })
-    const bubblingList = new BubblingList(draggables, options.list || {})
 
-    if(options.reorderOnChange) {
-      bubblingList.on("list:change", () => {
+    const bubblingList = new BubblingList(draggables, options.list || {})
+    if (options.reorderOnChange) {
+      bubblingList.on('list:change', () => {
         const orderedElements = bubblingList.getSortedDraggables().map((d) => d.element)
         bubblingList.reset()
         orderedElements.forEach((element) => {

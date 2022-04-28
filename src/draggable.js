@@ -74,7 +74,7 @@ export default class Draggable extends EventEmitter {
   }
 
   startBounding() {
-    if(this.options.bound) {
+    if (this.options.bound) {
       this.bounding = { bound: this.options.bound }
     } else {
       this.bounding = new BoundToElement(this.container, this.container)
