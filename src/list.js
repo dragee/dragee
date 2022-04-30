@@ -19,10 +19,14 @@ export default class List extends EventEmitter {
       radius: 30
     }, options)
 
+    this.container = options.container
     this.draggables = draggables
     this.changedDuringIteration = false
 
-    this.resizeObserver = new ResizeObserver(() => this.draggables.forEach((d) => d.startPositioning()))
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.options.reorderOnChange) this.reset()
+      this.draggables.forEach((d) => d.startPositioning())
+    })
     this.draggables.forEach((d) => this.resizeObserver.observe(d.element))
 
     this.init()
@@ -70,11 +74,27 @@ export default class List extends EventEmitter {
     }
   }
 
-  onEnd(_draggable) {
+  onEnd() {
     if (this.changedDuringIteration) {
       this.emit('list:change')
       this.changedDuringIteration = false
+
+      if (this.options.reorderOnChange && this.options.container) {
+        this.reorderElements()
+      }
     }
+  }
+
+  reorderElements() {
+    const orderedElements = this.getSortedDraggables().map((d) => d.element)
+    const fragment = document.createDocumentFragment()
+    orderedElements.forEach((element) => fragment.appendChild(element))
+
+    this.reset()
+    this.container.appendChild(fragment)
+    this.draggables.forEach((d) => d.startPositioning())
+
+    this.emit('list:reordered')
   }
 
   getCurrentPinnedPositions() {
@@ -186,6 +206,9 @@ export default class List extends EventEmitter {
         container: containerElement
       }, options.draggable || {}))
     })
-    return new List(draggables, options.list || {})
+
+    return new List(draggables, Object.assign({
+      container: containerElement
+    }, options.list || {}))
   }
 }

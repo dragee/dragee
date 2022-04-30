@@ -494,11 +494,14 @@
                         })
 
                         listC = Dragee.BubblingList.factory(listCParentElement, listCElements, {
-                          draggable: {
-                            // nativeDragAndDrop: true
-                          },
-                          reorderOnChange: true
-                        })
+                            draggable: {
+                              nativeDragAndDrop: true
+                            },
+                            list: {
+                              reorderOnChange: true
+                            }
+                          }
+                        )
                     });
                 </script>
             </div>

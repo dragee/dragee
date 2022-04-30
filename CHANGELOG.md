@@ -1,4 +1,5 @@
 ## [Unreleased]
+- Move `reorderOnChange` from `factory` to `List` class
 
 ## 1.0.7
 - Remove `addClass` and `removeClass` utils

@@ -72,19 +72,8 @@ export default class BubblingList extends List {
       }, options.draggable || {}))
     })
 
-    const bubblingList = new BubblingList(draggables, options.list || {})
-    if (options.reorderOnChange) {
-      bubblingList.on('list:change', () => {
-        const orderedElements = bubblingList.getSortedDraggables().map((d) => d.element)
-        bubblingList.reset()
-        orderedElements.forEach((element) => {
-          containerElement.appendChild(element)
-        })
-
-        draggables.forEach((d) => d.startPositioning())
-      })
-    }
-
-    return bubblingList
+    return new BubblingList(draggables, Object.assign({
+      container: containerElement
+    }, options.list || {}))
   }
 }
