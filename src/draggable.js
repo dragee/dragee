@@ -7,6 +7,8 @@ import Rectangle from './geometry/rectangle'
 import { defaultScope } from './scope'
 import isSupportPassiveEvents from './utils/is-support-passive-events'
 
+const passiveFalse = isSupportPassiveEvents ? { passive: false } : false
+
 const isTouch = 'ontouchstart' in window
 const mouseEvents = {
   start: 'mousedown',
@@ -105,8 +107,8 @@ export default class Draggable extends EventEmitter {
     this._nativeDrop = (event) => this.nativeDrop(event)
     this._scroll = (event) => this.onScroll(event)
 
-    this.handler.addEventListener(touchEvents.start, this._dragStart, isSupportPassiveEvents ? { passive: false } : false)
-    this.handler.addEventListener(mouseEvents.start, this._dragStart, isSupportPassiveEvents ? { passive: false } : false)
+    this.handler.addEventListener(touchEvents.start, this._dragStart, passiveFalse)
+    this.handler.addEventListener(mouseEvents.start, this._dragStart, passiveFalse)
     this.element.addEventListener('dragstart', this._nativeDragStart)
   }
 
@@ -248,18 +250,18 @@ export default class Draggable extends EventEmitter {
           document.removeEventListener(touchEvents.move, emulateOnFirstMove)
           document.removeEventListener(touchEvents.end, cancelEmulation)
         }
-        document.addEventListener(touchEvents.move, emulateOnFirstMove, isSupportPassiveEvents ? { passive: false } : false)
-        document.addEventListener(touchEvents.end, cancelEmulation, isSupportPassiveEvents ? { passive: false } : false)
+        document.addEventListener(touchEvents.move, emulateOnFirstMove, passiveFalse)
+        document.addEventListener(touchEvents.end, cancelEmulation, passiveFalse)
       } else {
         this.element.draggable = true
-        document.addEventListener(mouseEvents.end, this._nativeDragEnd, isSupportPassiveEvents ? { passive: false } : false)
+        document.addEventListener(mouseEvents.end, this._nativeDragEnd, passiveFalse)
       }
     } else {
-      document.addEventListener(touchEvents.move, this._dragMove, isSupportPassiveEvents ? { passive: false } : false)
-      document.addEventListener(mouseEvents.move, this._dragMove, isSupportPassiveEvents ? { passive: false } : false)
+      document.addEventListener(touchEvents.move, this._dragMove, passiveFalse)
+      document.addEventListener(mouseEvents.move, this._dragMove, passiveFalse)
 
-      document.addEventListener(touchEvents.end, this._dragEnd, isSupportPassiveEvents ? { passive: false } : false)
-      document.addEventListener(mouseEvents.end, this._dragEnd, isSupportPassiveEvents ? { passive: false } : false)
+      document.addEventListener(touchEvents.end, this._dragEnd, passiveFalse)
+      document.addEventListener(mouseEvents.end, this._dragEnd, passiveFalse)
     }
 
     window.addEventListener('scroll', this._scroll)
