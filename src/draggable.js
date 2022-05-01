@@ -238,11 +238,18 @@ export default class Draggable extends EventEmitter {
     }
 
     if (this.nativeDragAndDrop) {
-      const isSafari = /version\/(\d+).+?safari/i.test(window.navigator.userAgent)
       if ((isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
-             isSafari ||
-             this.emulateNativeDragAndDropForAll) {
-        this.emulateNativeDragAndDrop(event)
+             this.emulateNativeDragAndDropOnAllDevices) {
+        const emulateOnFirstMove = (event) => {
+          this.emulateNativeDragAndDrop(event)
+          cancelEmulation()
+        }
+        const cancelEmulation = () => {
+          document.removeEventListener(touchEvents.move, emulateOnFirstMove)
+          document.removeEventListener(touchEvents.end, cancelEmulation)
+        }
+        document.addEventListener(touchEvents.move, emulateOnFirstMove, isSupportPassiveEvents ? { passive: false } : false)
+        document.addEventListener(touchEvents.end, cancelEmulation, isSupportPassiveEvents ? { passive: false } : false)
       } else {
         this.element.draggable = true
         document.addEventListener(mouseEvents.end, this._nativeDragEnd, isSupportPassiveEvents ? { passive: false } : false)
@@ -466,8 +473,8 @@ export default class Draggable extends EventEmitter {
     return this.options.emulateNativeDragAndDropOnTouch || true
   }
 
-  get emulateNativeDragAndDropForAll() {
-    return this.options.emulateNativeDragAndDropForAll || false
+  get emulateNativeDragAndDropOnAllDevices() {
+    return this.options.emulateNativeDragAndDropOnAllDevices || false
   }
 
   get shouldRemoveZeroTranslate() {
