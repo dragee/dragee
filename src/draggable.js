@@ -261,22 +261,6 @@ export default class Draggable extends EventEmitter {
     this.emit('drag:start')
   }
 
-  stopDragging() {
-    document.removeEventListener(touchEvents.move, this._dragMove)
-    document.removeEventListener(mouseEvents.move, this._dragMove)
-    document.removeEventListener(touchEvents.end, this._dragEnd)
-    document.removeEventListener(mouseEvents.end, this._dragEnd)
-    document.removeEventListener('dragover', this._nativeDragOver)
-    document.removeEventListener('dragend', this._nativeDragEnd)
-    document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
-    document.removeEventListener('drop', this._nativeDrop)
-    document.removeEventListener('drop', this._nativeDrop)
-    window.removeEventListener('scroll', this._scroll)
-    this.element.draggable = false
-    this.isDragging = false
-    this.element.classList.remove('dragee-active')
-  }
-
   dragMove(event) {
     this.currentEvent = event
     let touch
