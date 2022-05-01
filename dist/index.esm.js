@@ -1757,6 +1757,9 @@ function checkSupportPassiveEvents() {
 var isSupportPassiveEvents = checkSupportPassiveEvents();
 var isSupportPassiveEvents$1 = isSupportPassiveEvents;
 
+var passiveFalse = isSupportPassiveEvents$1 ? {
+  passive: false
+} : false;
 var isTouch = ('ontouchstart' in window);
 var mouseEvents = {
   start: 'mousedown',
@@ -1906,12 +1909,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         return _this2.onScroll(event);
       };
 
-      this.handler.addEventListener(touchEvents.start, this._dragStart, isSupportPassiveEvents$1 ? {
-        passive: false
-      } : false);
-      this.handler.addEventListener(mouseEvents.start, this._dragStart, isSupportPassiveEvents$1 ? {
-        passive: false
-      } : false);
+      this.handler.addEventListener(touchEvents.start, this._dragStart, passiveFalse);
+      this.handler.addEventListener(mouseEvents.start, this._dragStart, passiveFalse);
       this.element.addEventListener('dragstart', this._nativeDragStart);
     }
   }, {
@@ -2030,6 +2029,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "dragStart",
     value: function dragStart(event) {
+      var _this3 = this;
+
       this.currentEvent = event;
 
       if (!this._enable) {
@@ -2056,51 +2057,34 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       }
 
       if (this.nativeDragAndDrop) {
-        var isSafari = /version\/(\d+).+?safari/i.test(window.navigator.userAgent);
+        if (isTouchEvent && this.emulateNativeDragAndDropOnTouch || this.emulateNativeDragAndDropOnAllDevices) {
+          var emulateOnFirstMove = function emulateOnFirstMove(event) {
+            _this3.emulateNativeDragAndDrop(event);
 
-        if (isTouchEvent && this.emulateNativeDragAndDropOnTouch || isSafari || this.emulateNativeDragAndDropForAll) {
-          this.emulateNativeDragAndDrop(event);
+            cancelEmulation();
+          };
+
+          var cancelEmulation = function cancelEmulation() {
+            document.removeEventListener(touchEvents.move, emulateOnFirstMove);
+            document.removeEventListener(touchEvents.end, cancelEmulation);
+          };
+
+          document.addEventListener(touchEvents.move, emulateOnFirstMove, passiveFalse);
+          document.addEventListener(touchEvents.end, cancelEmulation, passiveFalse);
         } else {
           this.element.draggable = true;
-          document.addEventListener(mouseEvents.end, this._nativeDragEnd, isSupportPassiveEvents$1 ? {
-            passive: false
-          } : false);
+          document.addEventListener(mouseEvents.end, this._nativeDragEnd, passiveFalse);
         }
       } else {
-        document.addEventListener(touchEvents.move, this._dragMove, isSupportPassiveEvents$1 ? {
-          passive: false
-        } : false);
-        document.addEventListener(mouseEvents.move, this._dragMove, isSupportPassiveEvents$1 ? {
-          passive: false
-        } : false);
-        document.addEventListener(touchEvents.end, this._dragEnd, isSupportPassiveEvents$1 ? {
-          passive: false
-        } : false);
-        document.addEventListener(mouseEvents.end, this._dragEnd, isSupportPassiveEvents$1 ? {
-          passive: false
-        } : false);
+        document.addEventListener(touchEvents.move, this._dragMove, passiveFalse);
+        document.addEventListener(mouseEvents.move, this._dragMove, passiveFalse);
+        document.addEventListener(touchEvents.end, this._dragEnd, passiveFalse);
+        document.addEventListener(mouseEvents.end, this._dragEnd, passiveFalse);
       }
 
       window.addEventListener('scroll', this._scroll);
       this.isDragging = true;
       this.emit('drag:start');
-    }
-  }, {
-    key: "stopDragging",
-    value: function stopDragging() {
-      document.removeEventListener(touchEvents.move, this._dragMove);
-      document.removeEventListener(mouseEvents.move, this._dragMove);
-      document.removeEventListener(touchEvents.end, this._dragEnd);
-      document.removeEventListener(mouseEvents.end, this._dragEnd);
-      document.removeEventListener('dragover', this._nativeDragOver);
-      document.removeEventListener('dragend', this._nativeDragEnd);
-      document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
-      document.removeEventListener('drop', this._nativeDrop);
-      document.removeEventListener('drop', this._nativeDrop);
-      window.removeEventListener('scroll', this._scroll);
-      this.element.draggable = false;
-      this.isDragging = false;
-      this.element.classList.remove('dragee-active');
     }
   }, {
     key: "dragMove",
@@ -2130,7 +2114,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "dragEnd",
     value: function dragEnd(event) {
-      var _this3 = this;
+      var _this4 = this;
 
       var isTouchEvent = isTouch && event instanceof window.TouchEvent;
 
@@ -2150,7 +2134,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       this.isDragging = false;
       this.element.removeAttribute('draggable');
       setTimeout(function () {
-        return _this3.element.classList.remove('dragee-active');
+        return _this4.element.classList.remove('dragee-active');
       });
     }
   }, {
@@ -2217,7 +2201,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "emulateNativeDragAndDrop",
     value: function emulateNativeDragAndDrop(event) {
-      var _this4 = this;
+      var _this5 = this;
 
       var containerRect = this.container.getBoundingClientRect();
       var clonedElement = this.element.cloneNode(true);
@@ -2234,17 +2218,17 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         on: {
           'drag:move': function dragMove() {
             var containerRectPoint = new Point(containerRect.left, containerRect.top);
-            _this4.position = emulationDraggable.position.sub(containerRectPoint).sub(_this4._startScrollPoint);
+            _this5.position = emulationDraggable.position.sub(containerRectPoint).sub(_this5._startScrollPoint);
 
-            _this4.emit('drag:move');
+            _this5.emit('drag:move');
           },
           'drag:end': function dragEnd() {
             emulationDraggable.destroy();
             document.body.removeChild(clonedElement);
 
-            _this4.element.classList.remove('dragee-placeholder');
+            _this5.element.classList.remove('dragee-placeholder');
 
-            _this4.element.classList.remove('dragee-active');
+            _this5.element.classList.remove('dragee-active');
           }
         }
       });
@@ -2320,9 +2304,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       return this.options.emulateNativeDragAndDropOnTouch || true;
     }
   }, {
-    key: "emulateNativeDragAndDropForAll",
+    key: "emulateNativeDragAndDropOnAllDevices",
     get: function get() {
-      return this.options.emulateNativeDragAndDropForAll || false;
+      return this.options.emulateNativeDragAndDropOnAllDevices || false;
     }
   }, {
     key: "shouldRemoveZeroTranslate",
@@ -2874,10 +2858,13 @@ var List = /*#__PURE__*/function (_EventEmitter) {
       timeExcange: 400,
       radius: 30
     }, options);
+    _this.container = options.container;
     _this.draggables = draggables;
     _this.changedDuringIteration = false;
     _this.resizeObserver = new ResizeObserver(function () {
-      return _this.draggables.forEach(function (d) {
+      if (_this.options.reorderOnChange) _this.reset();
+
+      _this.draggables.forEach(function (d) {
         return d.startPositioning();
       });
     });
@@ -2945,11 +2932,32 @@ var List = /*#__PURE__*/function (_EventEmitter) {
     }
   }, {
     key: "onEnd",
-    value: function onEnd(_draggable) {
+    value: function onEnd() {
       if (this.changedDuringIteration) {
         this.emit('list:change');
         this.changedDuringIteration = false;
+
+        if (this.options.reorderOnChange && this.options.container) {
+          this.reorderElements();
+        }
       }
+    }
+  }, {
+    key: "reorderElements",
+    value: function reorderElements() {
+      var orderedElements = this.getSortedDraggables().map(function (d) {
+        return d.element;
+      });
+      var fragment = document.createDocumentFragment();
+      orderedElements.forEach(function (element) {
+        return fragment.appendChild(element);
+      });
+      this.reset();
+      this.container.appendChild(fragment);
+      this.draggables.forEach(function (d) {
+        return d.startPositioning();
+      });
+      this.emit('list:reordered');
     }
   }, {
     key: "getCurrentPinnedPositions",
@@ -3093,7 +3101,9 @@ var List = /*#__PURE__*/function (_EventEmitter) {
           container: containerElement
         }, options.draggable || {}));
       });
-      return new List(draggables, options.list || {});
+      return new List(draggables, Object.assign({
+        container: containerElement
+      }, options.list || {}));
     }
   }]);
 
@@ -3190,24 +3200,9 @@ var BubblingList = /*#__PURE__*/function (_List) {
           container: containerElement
         }, options.draggable || {}));
       });
-      var bubblingList = new BubblingList(draggables, options.list || {});
-
-      if (options.reorderOnChange) {
-        bubblingList.on('list:change', function () {
-          var orderedElements = bubblingList.getSortedDraggables().map(function (d) {
-            return d.element;
-          });
-          bubblingList.reset();
-          orderedElements.forEach(function (element) {
-            containerElement.appendChild(element);
-          });
-          draggables.forEach(function (d) {
-            return d.startPositioning();
-          });
-        });
-      }
-
-      return bubblingList;
+      return new BubblingList(draggables, Object.assign({
+        container: containerElement
+      }, options.list || {}));
     }
   }]);
 
