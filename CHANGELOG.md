@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## 1.0.9
 - Improve(fix) adding and removing items of `bubblingList`
 
 ## 1.0.8

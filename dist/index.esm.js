@@ -2869,10 +2869,6 @@ var List = /*#__PURE__*/function (_EventEmitter) {
       });
     });
 
-    _this.draggables.forEach(function (d) {
-      return _this.resizeObserver.observe(d.element);
-    });
-
     _this.init();
 
     return _this;
@@ -2881,24 +2877,38 @@ var List = /*#__PURE__*/function (_EventEmitter) {
   _createClass(List, [{
     key: "init",
     value: function init() {
+      var _this2 = this;
+
       this._enable = true;
-      this.draggables.forEach(this.initDraggable, this);
+      this.draggables.forEach(function (draggable) {
+        return _this2.initDraggable(draggable);
+      });
     }
   }, {
     key: "initDraggable",
     value: function initDraggable(draggable) {
-      var _this2 = this;
+      var _this3 = this;
 
       draggable.enable = this._enable;
       draggable.on('drag:move', function () {
-        return _this2.onMove(draggable);
+        return _this3.onMove(draggable);
       });
 
       draggable.dragEndAction = function () {
-        draggable.pinPosition(draggable.pinnedPosition, _this2.options.timeEnd);
+        draggable.pinPosition(draggable.pinnedPosition, _this3.options.timeEnd);
 
-        _this2.onEnd(draggable);
+        _this3.onEnd(draggable);
       };
+
+      this.resizeObserver.observe(draggable.element);
+    }
+  }, {
+    key: "releaseDraggable",
+    value: function releaseDraggable(draggable) {
+      this.resizeObserver.unobserve(draggable.element);
+      draggable.resetOn('drag:end');
+      draggable.resetOn('drag:move');
+      removeItem(this.draggables, draggable);
     }
   }, {
     key: "onMove",
@@ -2988,21 +2998,21 @@ var List = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "add",
     value: function add(draggables) {
-      var _this3 = this;
+      var _this4 = this;
 
       if (!(draggables instanceof Array)) {
         draggables = [draggables];
       }
 
       draggables.forEach(function (draggable) {
-        return _this3.initDraggable(draggable);
+        return _this4.initDraggable(draggable);
       });
       this.draggables = this.draggables.concat(draggables);
     }
   }, {
     key: "remove",
     value: function remove(draggables) {
-      var _this4 = this;
+      var _this5 = this;
 
       var initialPositions = this.draggables.map(function (draggable) {
         return draggable.initialPosition;
@@ -3015,15 +3025,13 @@ var List = /*#__PURE__*/function (_EventEmitter) {
       }
 
       draggables.forEach(function (draggable) {
-        draggable.resetOn('drag:end');
-        draggable.resetOn('drag:move');
-        removeItem(_this4.draggables, draggable);
+        return _this5.releaseDraggable(draggable);
       });
       var j = 0;
       sortedDraggables.forEach(function (draggable) {
-        if (_this4.draggables.indexOf(draggable) !== -1) {
+        if (_this5.draggables.indexOf(draggable) !== -1) {
           if (draggable.pinnedPosition !== initialPositions[j]) {
-            draggable.pinPosition(initialPositions[j], _this4.options.timeExcange);
+            draggable.pinPosition(initialPositions[j], _this5.options.timeExcange);
           }
 
           draggable.initialPosition = initialPositions[j];
@@ -3069,13 +3077,13 @@ var List = /*#__PURE__*/function (_EventEmitter) {
       return this.getCurrentPinnedPositions();
     },
     set: function set(positions) {
-      var _this5 = this;
+      var _this6 = this;
 
       var message = 'wrong array length';
 
       if (positions.length === this.draggables.length) {
         positions.forEach(function (point, i) {
-          _this5.draggables[i].pinPosition(point);
+          _this6.draggables[i].pinPosition(point);
         });
       } else {
         throw message;
@@ -3174,6 +3182,7 @@ var BubblingList = /*#__PURE__*/function (_List) {
       var _this2 = this;
 
       var currentPosition = this.startPosition.clone();
+      sortedDraggables || (sortedDraggables = this.getSortedDraggables());
       sortedDraggables.forEach(function (draggable) {
         if (!draggable.pinnedPosition.compare(currentPosition)) {
           if (draggable === currentDraggable && !currentDraggable.nativeDragAndDrop) {
@@ -3185,6 +3194,23 @@ var BubblingList = /*#__PURE__*/function (_List) {
 
         currentPosition.y = currentPosition.y + draggable.getSize().y + _this2.verticalGap;
       });
+    }
+  }, {
+    key: "remove",
+    value: function remove(draggables) {
+      var _this3 = this;
+
+      if (!(draggables instanceof Array)) {
+        draggables = [draggables];
+      }
+
+      draggables.forEach(function (draggable) {
+        return _this3.releaseDraggable(draggable);
+      });
+      this.draggables.forEach(function (d) {
+        return d.startPositioning();
+      });
+      this.bubbling();
     }
   }, {
     key: "distanceFunc",
