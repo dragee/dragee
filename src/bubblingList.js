@@ -47,6 +47,7 @@ export default class BubblingList extends List {
 
   bubbling(sortedDraggables, currentDraggable) {
     const currentPosition = this.startPosition.clone()
+    sortedDraggables ||= this.getSortedDraggables()
 
     sortedDraggables.forEach((draggable) => {
       if (!draggable.pinnedPosition.compare(currentPosition)) {
@@ -59,6 +60,17 @@ export default class BubblingList extends List {
 
       currentPosition.y = currentPosition.y + draggable.getSize().y + this.verticalGap
     })
+  }
+
+  remove(draggables) {
+    if (!(draggables instanceof Array)) {
+      draggables = [draggables]
+    }
+
+    draggables.forEach((draggable) => this.releaseDraggable(draggable))
+
+    this.draggables.forEach((d) => d.startPositioning())
+    this.bubbling()
   }
 
   get distanceFunc() {

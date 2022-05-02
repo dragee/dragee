@@ -1,4 +1,5 @@
 ## [Unreleased]
+- Improve(fix) adding and removing items of `bubblingList`
 
 ## 1.0.8
 - Move `reorderOnChange` from `factory` to `List` class

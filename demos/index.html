@@ -366,29 +366,30 @@
                       <ul class="list list-c">
                         <li class="list-item">
                           <div>
-                            <span>Expand</span> ⇔ 1
+                            <span class="expand">Expand</span> ⇔ 1 <span class="remove">x</span>
                           </div>
                           <div class="list-item-content" style="height: 30px;">
                         </li>
                         <li class="list-item">
                           <div>
-                            <span>Expand</span> ⇔ 2
+                            <span class="expand">Expand</span> ⇔ 2 <span class="remove">x</span>
                           </div>
                           <div class="list-item-content" style="height: 70px;">
                         </li>
                         <li class="list-item">
                           <div>
-                            <span>Expand</span> ⇔ 3
+                            <span class="expand">Expand</span> ⇔ 3 <span class="remove">x</span>
                           </div>
                           <div class="list-item-content" style="height: 50px;">
                         </li>
                         <li class="list-item">
                           <div>
-                            <span>Expand</span> ⇔ 4
+                            <span class="expand">Expand</span> ⇔ 4 <span class="remove">x</span>
                           </div>
                           <div class="list-item-content" style="height: 100px;">
                         </li>
                       </ul>
+                      <button type="button" class="btn btn-primary list-c-add-tem">Add item</button>
                     </div>
                 </div>
                 <style>
@@ -450,11 +451,21 @@
 
                     .list-item .list-item-content {
                       display: none;
-                      border:  1px solid grey;
+                      margin: 5px 0;
+                      border:  1px dotted grey;
                     }
 
                     .list-item.expanded .list-item-content {
                       display: block;
+                    }
+
+                    #DemoList ul.list button {
+                      margin-top:  30px;
+                    }
+
+                    #DemoList ul.list li span.remove {
+                      float: right;
+                      cursor: pointer;
                     }
                 </style>
                 <script>
@@ -481,15 +492,25 @@
                           }
                         });
 
-                        [...listCElements].forEach((listItem) => {
-                          var expandButton = listItem.querySelector('span')
+                        // List C Example
 
-                          expandButton.addEventListener('click', (event) => {
+                        const initListItem = (listItem) => {
+                          const removeButton = listItem.querySelector('.remove')
+
+                          listItem.addEventListener('click', (event) => {
                             if(!listItem.classList.contains('dragee-active')) {
                               listItem.classList.toggle('expanded')
                             }
                           })
-                        })
+
+                          removeButton.addEventListener('click', (event) => {
+                            draggable = listC.draggables.find((d) => d.element == listItem)
+                            listCParentElement.removeChild(listItem)
+                            listC.remove(draggable)
+                          })
+                        }
+
+                        [...listCElements].forEach((listItem) => initListItem(listItem))
 
                         listC = Dragee.BubblingList.factory(listCParentElement, listCElements, {
                             draggable: {
@@ -500,6 +521,25 @@
                             }
                           }
                         )
+
+                        const addButton = document.querySelector(".list-c-add-tem")
+                        let itemCount = 5
+
+                        addButton.addEventListener('click', (event) => {
+                          listItem = document.createElement('li')
+                          listItem.classList.add('list-item')
+                          listItem.innerHTML = `<div>
+                            <span class="expand">Expand</span> ⇔ ${itemCount++} <span class="remove">x</span>
+                          </div>
+                          <div class="list-item-content" style="height: ${itemCount * 10}px;">`
+                          listCParentElement.appendChild(listItem)
+                          initListItem(listItem)
+
+                          listC.add(new Dragee.Draggable(listItem, {
+                            nativeDragAndDrop: true,
+                            container: listCParentElement
+                          }))
+                        })
                     });
                 </script>
             </div>

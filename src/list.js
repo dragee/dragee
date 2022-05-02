@@ -27,14 +27,13 @@ export default class List extends EventEmitter {
       if (this.options.reorderOnChange) this.reset()
       this.draggables.forEach((d) => d.startPositioning())
     })
-    this.draggables.forEach((d) => this.resizeObserver.observe(d.element))
 
     this.init()
   }
 
   init() {
     this._enable = true
-    this.draggables.forEach(this.initDraggable, this)
+    this.draggables.forEach((draggable) => this.initDraggable(draggable))
   }
 
   initDraggable(draggable) {
@@ -44,6 +43,14 @@ export default class List extends EventEmitter {
       draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
       this.onEnd(draggable)
     }
+    this.resizeObserver.observe(draggable.element)
+  }
+
+  releaseDraggable(draggable) {
+    this.resizeObserver.unobserve(draggable.element)
+    draggable.resetOn('drag:end')
+    draggable.resetOn('drag:move')
+    removeItem(this.draggables, draggable)
   }
 
   onMove(draggable) {
@@ -130,11 +137,7 @@ export default class List extends EventEmitter {
       draggables = [draggables]
     }
 
-    draggables.forEach((draggable) => {
-      draggable.resetOn('drag:end')
-      draggable.resetOn('drag:move')
-      removeItem(this.draggables, draggable)
-    })
+    draggables.forEach((draggable) => this.releaseDraggable(draggable))
 
     let j = 0
     sortedDraggables.forEach((draggable) => {
