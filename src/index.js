@@ -1,3 +1,7 @@
+import 'core-js/actual/array/from'
+import 'core-js/actual/object/assign'
+import 'core-js/actual/object/entries'
+
 import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 import Draggable from './draggable'

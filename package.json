@@ -28,6 +28,7 @@
   "license": "ISC",
   "dependencies": {
     "@juggle/resize-observer": "^3.3.1",
+    "core-js": "3.22.4",
     "desandro-get-style-property": "^1.0.4"
   },
   "module": "dist/index.esm.js",
