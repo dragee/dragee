@@ -2031,8 +2031,6 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     value: function dragStart(event) {
       var _this3 = this;
 
-      this.currentEvent = event;
-
       if (!this._enable) {
         return;
       }
@@ -2078,14 +2076,13 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       }
 
       window.addEventListener('scroll', this._scroll);
-      this.isDragging = true;
       this.emit('drag:start');
     }
   }, {
     key: "dragMove",
     value: function dragMove(event) {
-      this.currentEvent = event;
       var touch;
+      this.isDragging = true;
       var isTouchEvent = isTouch && event instanceof window.TouchEvent;
 
       if (isTouchEvent) {
@@ -2117,8 +2114,11 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         return;
       }
 
-      event.stopPropagation();
-      event.preventDefault();
+      if (this.isDragging) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+
       this.dragEndAction();
       this.emit('drag:end');
       document.removeEventListener(touchEvents.move, this._dragMove);
@@ -2158,7 +2158,6 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
       this.element.classList.add('dragee-placeholder');
-      this.currentEvent = event;
 
       if (event.clientX === 0 && event.clientY === 0) {
         return;

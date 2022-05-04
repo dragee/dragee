@@ -1,5 +1,7 @@
 ## [Unreleased]
-- Remove `event.prevetDefault` and `event.stopPropagation` from dragend if element was not moved
+
+## 1.0.12
+- Remove `event.preventDefault` and `event.stopPropagation` from dragend if element was not moved
 
 ## 1.0.11
 - Remove `event.preventDefault` from drag start
