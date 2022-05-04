@@ -2936,28 +2936,30 @@ var List = /*#__PURE__*/function (_EventEmitter) {
     }
   }, {
     key: "onEnd",
-    value: function onEnd() {
+    value: function onEnd(draggable) {
       if (this.changedDuringIteration) {
         this.emit('list:change');
         this.changedDuringIteration = false;
 
         if (this.options.reorderOnChange && this.options.container) {
-          this.reorderElements();
+          this.reorderElements(draggable);
         }
       }
     }
   }, {
     key: "reorderElements",
-    value: function reorderElements() {
-      var orderedElements = this.getSortedDraggables().map(function (d) {
-        return d.element;
-      });
-      var fragment = document.createDocumentFragment();
-      orderedElements.forEach(function (element) {
-        return fragment.appendChild(element);
-      });
+    value: function reorderElements(movedDraggable) {
+      var sortedDraggables = this.getSortedDraggables();
+      var index = sortedDraggables.indexOf(movedDraggable);
+      var next = sortedDraggables[index + 1];
       this.reset();
-      this.container.appendChild(fragment);
+
+      if (next) {
+        this.container.insertBefore(movedDraggable.element, next.element);
+      } else {
+        this.container.appendChild(movedDraggable.element);
+      }
+
       this.draggables.forEach(function (d) {
         return d.startPositioning();
       });

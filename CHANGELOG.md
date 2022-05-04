@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## 1.0.13
 - Improve `reorderElements` performance
 
 ## 1.0.12
