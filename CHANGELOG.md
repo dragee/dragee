@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.11
+- Remove `event.preventDefault` from drag start
+
 ## 1.0.10
 - Remove `event.stopPropagation` from drag start
 

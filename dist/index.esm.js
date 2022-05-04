@@ -2051,10 +2051,6 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         event.target.focus();
       }
 
-      if (!(this.nativeDragAndDrop || event.target instanceof window.HTMLInputElement || event.target instanceof window.HTMLInputElement)) {
-        event.preventDefault();
-      }
-
       if (this.nativeDragAndDrop) {
         if (isTouchEvent && this.emulateNativeDragAndDropOnTouch || this.emulateNativeDragAndDropOnAllDevices) {
           var emulateOnFirstMove = function emulateOnFirstMove(event) {

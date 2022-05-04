@@ -232,12 +232,6 @@ export default class Draggable extends EventEmitter {
       event.target.focus()
     }
 
-    if (!(this.nativeDragAndDrop ||
-            event.target instanceof window.HTMLInputElement ||
-            event.target instanceof window.HTMLInputElement)) {
-      event.preventDefault()
-    }
-
     if (this.nativeDragAndDrop) {
       if ((isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
              this.emulateNativeDragAndDropOnAllDevices) {
