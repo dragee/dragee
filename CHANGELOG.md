@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.14
+- Fix `bubblingList` remove function
+
 ## 1.0.13
 - Improve `reorderElements` performance
 

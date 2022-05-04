@@ -3203,6 +3203,9 @@ var BubblingList = /*#__PURE__*/function (_List) {
       draggables.forEach(function (draggable) {
         return _this3.releaseDraggable(draggable);
       });
+      this.draggables = this.draggables.filter(function (d) {
+        return !draggables.includes(d);
+      });
       this.draggables.forEach(function (d) {
         return d.startPositioning();
       });
