@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.10
+- Remove `event.stopPropagation` from drag start
+
 ## 1.0.9
 - Improve(fix) adding and removing items of `bubblingList`
 

@@ -227,7 +227,6 @@ export default class Draggable extends EventEmitter {
 
     this._startScrollPoint = new Point(window.scrollX, window.scrollY)
 
-    event.stopPropagation()
     if (event.target instanceof window.HTMLInputElement ||
           event.target instanceof window.HTMLInputElement) {
       event.target.focus()
