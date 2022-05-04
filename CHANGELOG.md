@@ -1,4 +1,5 @@
 ## [Unreleased]
+- Improve `reorderElements` performance
 
 ## 1.0.12
 - Remove `event.preventDefault` and `event.stopPropagation` from dragend if element was not moved

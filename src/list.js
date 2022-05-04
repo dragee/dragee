@@ -81,26 +81,31 @@ export default class List extends EventEmitter {
     }
   }
 
-  onEnd() {
+  onEnd(draggable) {
     if (this.changedDuringIteration) {
       this.emit('list:change')
       this.changedDuringIteration = false
 
       if (this.options.reorderOnChange && this.options.container) {
-        this.reorderElements()
+        this.reorderElements(draggable)
       }
     }
   }
 
-  reorderElements() {
-    const orderedElements = this.getSortedDraggables().map((d) => d.element)
-    const fragment = document.createDocumentFragment()
-    orderedElements.forEach((element) => fragment.appendChild(element))
+  reorderElements(movedDraggable) {
+    const sortedDraggables = this.getSortedDraggables()
+    const index = sortedDraggables.indexOf(movedDraggable)
+    const next = sortedDraggables[index + 1]
 
     this.reset()
-    this.container.appendChild(fragment)
-    this.draggables.forEach((d) => d.startPositioning())
 
+    if(next) {
+      this.container.insertBefore(movedDraggable.element, next.element)
+    } else {
+      this.container.appendChild(movedDraggable.element)
+    }
+
+    this.draggables.forEach((d) => d.startPositioning())
     this.emit('list:reordered')
   }
 
