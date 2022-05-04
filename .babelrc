@@ -7,15 +7,7 @@
       "presets": [
         [
           "@babel/env", {
-            targets: { browsers: "> 0.25%, not dead, ie >= 11" },
-            modules: false,
-            spec: true,
-            useBuiltIns: "entry",
-            forceAllTransforms: true,
-            corejs: {
-              version: 3,
-              proposals: false
-            }
+            targets: { browsers: "> 0.25%, not dead" }
           }
         ]
       ]
