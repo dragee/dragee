@@ -208,7 +208,6 @@ export default class Draggable extends EventEmitter {
   }
 
   dragStart(event) {
-    this.currentEvent = event
     if (!this._enable) {
       return
     }
@@ -259,13 +258,13 @@ export default class Draggable extends EventEmitter {
 
     window.addEventListener('scroll', this._scroll)
 
-    this.isDragging = true
     this.emit('drag:start')
   }
 
   dragMove(event) {
-    this.currentEvent = event
     let touch
+
+    this.isDragging = true
 
     const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
     if (isTouchEvent) {
@@ -298,8 +297,11 @@ export default class Draggable extends EventEmitter {
       return
     }
 
-    event.stopPropagation()
-    event.preventDefault()
+    if(this.isDragging) {
+      event.stopPropagation()
+      event.preventDefault()
+    }
+
     this.dragEndAction()
     this.emit('drag:end')
 
@@ -338,7 +340,6 @@ export default class Draggable extends EventEmitter {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'move'
     this.element.classList.add('dragee-placeholder')
-    this.currentEvent = event
     if (event.clientX === 0 && event.clientY === 0) {
       return
     }
