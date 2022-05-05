@@ -380,7 +380,7 @@
                           <div>
                             <span class="expand">Expand</span> ⇔ 3 <span class="remove">x</span>
                           </div>
-                          <div class="list-item-content" style="height: 50px;">
+                          <div class="list-item-content" style="height: 500px;">
                         </li>
                         <li class="list-item">
                           <div>
@@ -450,13 +450,14 @@
                     }
 
                     .list-item .list-item-content {
-                      display: none;
+                      max-height: 0;
                       margin: 5px 0;
                       border:  1px dotted grey;
+                      transition: 200ms;
                     }
 
                     .list-item.expanded .list-item-content {
-                      display: block;
+                      max-height: 300px;
                     }
 
                     #DemoList ul.list button {

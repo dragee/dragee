@@ -1,5 +1,6 @@
 import { ResizeObserver as Polyfill } from '@juggle/resize-observer'
 const ResizeObserver = window.ResizeObserver || Polyfill
+import debounce from './utils/debounce'
 
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
@@ -23,10 +24,11 @@ export default class List extends EventEmitter {
     this.draggables = draggables
     this.changedDuringIteration = false
 
-    this.resizeObserver = new ResizeObserver(() => {
+    this.resizeObserver = new ResizeObserver(debounce(() => {
+      console.log("Resized")
       if (this.options.reorderOnChange) this.reset()
       this.draggables.forEach((d) => d.startPositioning())
-    })
+    }, 100))
 
     this.init()
   }
