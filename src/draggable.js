@@ -143,7 +143,9 @@ export default class Draggable extends EventEmitter {
       transition = transition.replace(/transform \d*m?s/, transitionCss)
     }
 
-    this.element.style[transitionProperty] = transition
+    if(this.element.style[transitionProperty] != transition) {
+      this.element.style[transitionProperty] = transition
+    }
   }
 
   _setTranslate(point) {
@@ -163,7 +165,9 @@ export default class Draggable extends EventEmitter {
       transform = transform.replace(/translate3d\([^)]+\)/, translateCss)
     }
 
-    this.element.style[transformProperty] = transform
+    if(this.element.style[transformProperty] != transform) {
+      this.element.style[transformProperty] = transform
+    }
   }
 
   move(point, time=0, isSilent=false) {
