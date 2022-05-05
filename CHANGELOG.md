@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.15
+- Performence improvements
+
 ## 1.0.14
 - Fix `bubblingList` remove function
 

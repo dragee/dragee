@@ -1950,7 +1950,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         transition = transition.replace(/transform \d*m?s/, transitionCss);
       }
 
-      this.element.style[transitionProperty] = transition;
+      if (this.element.style[transitionProperty] != transition) {
+        this.element.style[transitionProperty] = transition;
+      }
     }
   }, {
     key: "_setTranslate",
@@ -1971,7 +1973,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         transform = transform.replace(/translate3d\([^)]+\)/, translateCss);
       }
 
-      this.element.style[transformProperty] = transform;
+      if (this.element.style[transformProperty] != transform) {
+        this.element.style[transformProperty] = transform;
+      }
     }
   }, {
     key: "move",
@@ -2832,6 +2836,24 @@ var ResizeObserver$1 = (function () {
     return ResizeObserver;
 }());
 
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function executedFunction() {
+    var context = this;
+    var args = arguments;
+
+    var later = function later() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+}
+
 var ResizeObserver = window.ResizeObserver || ResizeObserver$1;
 
 var List = /*#__PURE__*/function (_EventEmitter) {
@@ -2855,13 +2877,13 @@ var List = /*#__PURE__*/function (_EventEmitter) {
     _this.container = options.container;
     _this.draggables = draggables;
     _this.changedDuringIteration = false;
-    _this.resizeObserver = new ResizeObserver(function () {
+    _this.resizeObserver = new ResizeObserver(debounce(function () {
       if (_this.options.reorderOnChange) _this.reset();
 
       _this.draggables.forEach(function (d) {
         return d.startPositioning();
       });
-    });
+    }, 100));
 
     _this.init();
 

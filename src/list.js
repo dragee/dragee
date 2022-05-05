@@ -25,7 +25,6 @@ export default class List extends EventEmitter {
     this.changedDuringIteration = false
 
     this.resizeObserver = new ResizeObserver(debounce(() => {
-      console.log("Resized")
       if (this.options.reorderOnChange) this.reset()
       this.draggables.forEach((d) => d.startPositioning())
     }, 100))
