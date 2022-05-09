@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## 1.0.16
 - Add the `touchDraggingThreshold` option that defines threshold between scrolling and dragging
 
 ## 1.0.15

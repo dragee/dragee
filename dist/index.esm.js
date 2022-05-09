@@ -1836,6 +1836,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     preventDoubleInit(_assertThisInitialized(_this));
     Draggable.emitter.emit('draggable:create', _assertThisInitialized(_this));
     _this._enable = true;
+    _this.touchDraggingThreshold = 'touchDraggingThreshold' in _this.options ? _this.options.touchDraggingThreshold : 100;
 
     _this.startBounding();
 
@@ -2031,6 +2032,11 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       this.downDirection = this.position.y < point.y;
     }
   }, {
+    key: "seemsScrolling",
+    value: function seemsScrolling() {
+      return +new Date() - this._startTouchTimestamp < this.touchDraggingThreshold;
+    }
+  }, {
     key: "dragStart",
     value: function dragStart(event) {
       var _this3 = this;
@@ -2045,6 +2051,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
       if (isTouchEvent) {
         this._touchId = event.changedTouches[0].identifier;
+        this._startTouchTimestamp = +new Date();
       }
 
       this._startScrollPoint = new Point(window.scrollX, window.scrollY);
@@ -2056,7 +2063,11 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       if (this.nativeDragAndDrop) {
         if (isTouchEvent && this.emulateNativeDragAndDropOnTouch || this.emulateNativeDragAndDropOnAllDevices) {
           var emulateOnFirstMove = function emulateOnFirstMove(event) {
-            _this3.emulateNativeDragAndDrop(event);
+            if (_this3.seemsScrolling()) {
+              _this3.cancelDragging();
+            } else {
+              _this3.emulateNativeDragAndDrop(event);
+            }
 
             cancelEmulation();
           };
@@ -2095,6 +2106,11 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         if (!touch) {
           return;
         }
+
+        if (this.seemsScrolling()) {
+          this.cancelDragging();
+          return;
+        }
       }
 
       event.stopPropagation();
@@ -2125,13 +2141,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
       this.dragEndAction();
       this.emit('drag:end');
-      document.removeEventListener(touchEvents.move, this._dragMove);
-      document.removeEventListener(mouseEvents.move, this._dragMove);
-      document.removeEventListener(touchEvents.end, this._dragEnd);
-      document.removeEventListener(mouseEvents.end, this._dragEnd);
-      window.removeEventListener('scroll', this._scroll);
-      this.isDragging = false;
-      this.element.removeAttribute('draggable');
+      this.cancelDragging();
       setTimeout(function () {
         return _this4.element.classList.remove('dragee-active');
       });
@@ -2197,6 +2207,18 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       event.preventDefault();
     }
   }, {
+    key: "cancelDragging",
+    value: function cancelDragging() {
+      document.removeEventListener(touchEvents.move, this._dragMove);
+      document.removeEventListener(mouseEvents.move, this._dragMove);
+      document.removeEventListener(touchEvents.end, this._dragEnd);
+      document.removeEventListener(mouseEvents.end, this._dragEnd);
+      document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
+      window.removeEventListener('scroll', this._scroll);
+      this.isDragging = false;
+      this.element.removeAttribute('draggable');
+    }
+  }, {
     key: "emulateNativeDragAndDrop",
     value: function emulateNativeDragAndDrop(event) {
       var _this5 = this;
@@ -2210,6 +2232,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       this.element.classList.add('dragee-placeholder');
       var emulationDraggable = new Draggable(clonedElement, {
         container: document.body,
+        touchDraggingThreshold: 0,
         bound: function bound(point) {
           return point;
         },
@@ -2234,6 +2257,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       emulationDraggable._startScrollPoint = this._startScrollPoint;
       emulationDraggable.move(this.pinnedPosition.add(containerRectPoint).add(new Point(window.scrollX, window.scrollY)));
       emulationDraggable.dragStart(event);
+      event.preventDefault();
     }
   }, {
     key: "dragEndAction",
