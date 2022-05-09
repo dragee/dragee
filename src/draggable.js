@@ -69,6 +69,7 @@ export default class Draggable extends EventEmitter {
     preventDoubleInit(this)
     Draggable.emitter.emit('draggable:create', this)
     this._enable = true
+    this.touchDraggingThreshold = ('touchDraggingThreshold' in this.options) ? this.options.touchDraggingThreshold : 100
 
     this.startBounding()
     this.startPositioning()
@@ -211,6 +212,10 @@ export default class Draggable extends EventEmitter {
     this.downDirection = (this.position.y < point.y)
   }
 
+  seemsScrolling() {
+    return (+new Date() - this._startTouchTimestamp) < this.touchDraggingThreshold
+  }
+
   dragStart(event) {
     if (!this._enable) {
       return
@@ -226,6 +231,7 @@ export default class Draggable extends EventEmitter {
     this._startPosition = this.getPosition()
     if (isTouchEvent) {
       this._touchId = event.changedTouches[0].identifier
+      this._startTouchTimestamp = +new Date()
     }
 
     this._startScrollPoint = new Point(window.scrollX, window.scrollY)
@@ -239,13 +245,18 @@ export default class Draggable extends EventEmitter {
       if ((isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
              this.emulateNativeDragAndDropOnAllDevices) {
         const emulateOnFirstMove = (event) => {
-          this.emulateNativeDragAndDrop(event)
+          if(this.seemsScrolling()) {
+            this.cancelDragging()
+          } else {
+            this.emulateNativeDragAndDrop(event)
+          }
           cancelEmulation()
         }
         const cancelEmulation = () => {
           document.removeEventListener(touchEvents.move, emulateOnFirstMove)
           document.removeEventListener(touchEvents.end, cancelEmulation)
         }
+
         document.addEventListener(touchEvents.move, emulateOnFirstMove, passiveFalse)
         document.addEventListener(touchEvents.end, cancelEmulation, passiveFalse)
       } else {
@@ -275,6 +286,11 @@ export default class Draggable extends EventEmitter {
       touch = getTouchByID(event, this._touchId)
 
       if (!touch) {
+        return
+      }
+
+      if(this.seemsScrolling()){
+        this.cancelDragging()
         return
       }
     }
@@ -308,17 +324,8 @@ export default class Draggable extends EventEmitter {
 
     this.dragEndAction()
     this.emit('drag:end')
+    this.cancelDragging()
 
-    document.removeEventListener(touchEvents.move, this._dragMove)
-    document.removeEventListener(mouseEvents.move, this._dragMove)
-
-    document.removeEventListener(touchEvents.end, this._dragEnd)
-    document.removeEventListener(mouseEvents.end, this._dragEnd)
-
-    window.removeEventListener('scroll', this._scroll)
-
-    this.isDragging = false
-    this.element.removeAttribute('draggable')
     setTimeout(() => this.element.classList.remove('dragee-active'))
   }
 
@@ -375,6 +382,21 @@ export default class Draggable extends EventEmitter {
     event.preventDefault()
   }
 
+  cancelDragging() {
+    document.removeEventListener(touchEvents.move, this._dragMove)
+    document.removeEventListener(mouseEvents.move, this._dragMove)
+
+    document.removeEventListener(touchEvents.end, this._dragEnd)
+    document.removeEventListener(mouseEvents.end, this._dragEnd)
+
+    document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
+
+    window.removeEventListener('scroll', this._scroll)
+
+    this.isDragging = false
+    this.element.removeAttribute('draggable')
+  }
+
   emulateNativeDragAndDrop(event) {
     const containerRect = this.container.getBoundingClientRect()
     const clonedElement = this.element.cloneNode(true)
@@ -386,6 +408,7 @@ export default class Draggable extends EventEmitter {
 
     const emulationDraggable = new Draggable(clonedElement, {
       container: document.body,
+      touchDraggingThreshold: 0,
       bound(point) {
         return point
       },
@@ -413,6 +436,7 @@ export default class Draggable extends EventEmitter {
     )
 
     emulationDraggable.dragStart(event)
+    event.preventDefault()
   }
 
   dragEndAction() {

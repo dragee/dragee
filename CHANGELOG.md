@@ -1,7 +1,8 @@
 ## [Unreleased]
+- Add the `touchDraggingThreshold` option that defines threshold between scrolling and dragging
 
 ## 1.0.15
-- Performence improvements
+- Performance improvements
 
 ## 1.0.14
 - Fix `bubblingList` remove function
@@ -34,7 +35,6 @@
 - 'Draggable' should not fire `drag:move` event on dragStart
 
 ## 1.0.5
-
 - Improved EventEmiter. Remove `context` property. From now we should use arrow functions instead of `context`
 
 ## 1.0.4
