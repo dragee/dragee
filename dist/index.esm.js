@@ -1836,7 +1836,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     preventDoubleInit(_assertThisInitialized(_this));
     Draggable.emitter.emit('draggable:create', _assertThisInitialized(_this));
     _this._enable = true;
-    _this.touchDraggingThreshold = 'touchDraggingThreshold' in _this.options ? _this.options.touchDraggingThreshold : 100;
+    _this.touchDraggingThreshold = 'touchDraggingThreshold' in _this.options ? _this.options.touchDraggingThreshold : 0;
 
     _this.startBounding();
 
@@ -2037,6 +2037,17 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       return +new Date() - this._startTouchTimestamp < this.touchDraggingThreshold;
     }
   }, {
+    key: "shouldUseNativeDragAndDrop",
+    value: function shouldUseNativeDragAndDrop(event) {
+      var isTouchEvent = isTouch && event instanceof window.TouchEvent;
+
+      if (isTouchEvent) {
+        return this.nativeDragAndDrop && this.emulateNativeDragAndDropOnTouch;
+      } else {
+        return this.nativeDragAndDrop;
+      }
+    }
+  }, {
     key: "dragStart",
     value: function dragStart(event) {
       var _this3 = this;
@@ -2060,11 +2071,11 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         event.target.focus();
       }
 
-      if (this.nativeDragAndDrop) {
+      if (this.shouldUseNativeDragAndDrop(event)) {
         if (isTouchEvent && this.emulateNativeDragAndDropOnTouch || this.emulateNativeDragAndDropOnAllDevices) {
           var emulateOnFirstMove = function emulateOnFirstMove(event) {
             if (_this3.seemsScrolling()) {
-              _this3.cancelDragging();
+              _this3.cancelDraggin();
             } else {
               _this3.emulateNativeDragAndDrop(event);
             }
@@ -2108,7 +2119,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         }
 
         if (this.seemsScrolling()) {
-          this.cancelDragging();
+          this.cancelDraggin();
           return;
         }
       }
@@ -2141,7 +2152,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
       this.dragEndAction();
       this.emit('drag:end');
-      this.cancelDragging();
+      this.cancelDraggin();
       setTimeout(function () {
         return _this4.element.classList.remove('dragee-active');
       });
@@ -2207,8 +2218,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       event.preventDefault();
     }
   }, {
-    key: "cancelDragging",
-    value: function cancelDragging() {
+    key: "cancelDraggin",
+    value: function cancelDraggin() {
       document.removeEventListener(touchEvents.move, this._dragMove);
       document.removeEventListener(mouseEvents.move, this._dragMove);
       document.removeEventListener(touchEvents.end, this._dragEnd);
@@ -2323,7 +2334,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "emulateNativeDragAndDropOnTouch",
     get: function get() {
-      return this.options.emulateNativeDragAndDropOnTouch || true;
+      return this.options.emulateNativeDragAndDropOnTouch || false;
     }
   }, {
     key: "emulateNativeDragAndDropOnAllDevices",
