@@ -2038,10 +2038,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     }
   }, {
     key: "shouldUseNativeDragAndDrop",
-    value: function shouldUseNativeDragAndDrop(event) {
-      var isTouchEvent = isTouch && event instanceof window.TouchEvent;
-
-      if (isTouchEvent) {
+    value: function shouldUseNativeDragAndDrop() {
+      if (this.isTouchEvent) {
         return this.nativeDragAndDrop && this.emulateNativeDragAndDropOnTouch;
       } else {
         return this.nativeDragAndDrop;
@@ -2056,11 +2054,11 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         return;
       }
 
-      var isTouchEvent = isTouch && event instanceof window.TouchEvent;
-      this.touchPoint = this._startTouchPoint = new Point(isTouchEvent ? event.changedTouches[0].pageX : event.clientX, isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
+      this.isTouchEvent = isTouch && event instanceof window.TouchEvent;
+      this.touchPoint = this._startTouchPoint = new Point(this.isTouchEvent ? event.changedTouches[0].pageX : event.clientX, this.isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
       this._startPosition = this.getPosition();
 
-      if (isTouchEvent) {
+      if (this.isTouchEvent) {
         this._touchId = event.changedTouches[0].identifier;
         this._startTouchTimestamp = +new Date();
       }
@@ -2071,8 +2069,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         event.target.focus();
       }
 
-      if (this.shouldUseNativeDragAndDrop(event)) {
-        if (isTouchEvent && this.emulateNativeDragAndDropOnTouch || this.emulateNativeDragAndDropOnAllDevices) {
+      if (this.shouldUseNativeDragAndDrop()) {
+        if (this.isTouchEvent && this.emulateNativeDragAndDropOnTouch || this.emulateNativeDragAndDropOnAllDevices) {
           var emulateOnFirstMove = function emulateOnFirstMove(event) {
             if (_this3.seemsScrolling()) {
               _this3.cancelDraggin();
@@ -2109,9 +2107,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     value: function dragMove(event) {
       var touch;
       this.isDragging = true;
-      var isTouchEvent = isTouch && event instanceof window.TouchEvent;
+      this.isTouchEvent = isTouch && event instanceof window.TouchEvent;
 
-      if (isTouchEvent) {
+      if (this.isTouchEvent) {
         touch = getTouchByID(event, this._touchId);
 
         if (!touch) {
@@ -2126,7 +2124,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
       event.stopPropagation();
       event.preventDefault();
-      this.touchPoint = new Point(isTouchEvent ? touch.pageX : event.clientX, isTouchEvent ? touch.pageY : event.clientY);
+      this.touchPoint = new Point(this.isTouchEvent ? touch.pageX : event.clientX, this.isTouchEvent ? touch.pageY : event.clientY);
 
       var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
@@ -2139,9 +2137,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     value: function dragEnd(event) {
       var _this4 = this;
 
-      var isTouchEvent = isTouch && event instanceof window.TouchEvent;
+      this.isTouchEvent = isTouch && event instanceof window.TouchEvent;
 
-      if (isTouchEvent && !getTouchByID(event, this._touchId)) {
+      if (this.isTouchEvent && !getTouchByID(event, this._touchId)) {
         return;
       }
 
@@ -3238,7 +3236,7 @@ var BubblingList = /*#__PURE__*/function (_List) {
       sortedDraggables || (sortedDraggables = this.getSortedDraggables());
       sortedDraggables.forEach(function (draggable) {
         if (!draggable.pinnedPosition.compare(currentPosition)) {
-          if (draggable === currentDraggable && !currentDraggable.nativeDragAndDrop) {
+          if (draggable === currentDraggable && !currentDraggable.shouldUseNativeDragAndDrop()) {
             draggable.pinnedPosition = currentPosition.clone();
           } else {
             draggable.pinPosition(currentPosition, draggable === currentDraggable ? 0 : _this2.options.timeExcange);
