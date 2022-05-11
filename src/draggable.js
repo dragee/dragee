@@ -216,10 +216,8 @@ export default class Draggable extends EventEmitter {
     return (+new Date() - this._startTouchTimestamp) < this.touchDraggingThreshold
   }
 
-  shouldUseNativeDragAndDrop(event) {
-    const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
-
-    if (isTouchEvent) {
+  shouldUseNativeDragAndDrop() {
+    if (this.isTouchEvent) {
       return this.nativeDragAndDrop && this.emulateNativeDragAndDropOnTouch
     } else {
       return this.nativeDragAndDrop
@@ -231,15 +229,15 @@ export default class Draggable extends EventEmitter {
       return
     }
 
-    const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
+    this.isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
 
     this.touchPoint = this._startTouchPoint = new Point(
-      isTouchEvent ? event.changedTouches[0].pageX : event.clientX,
-      isTouchEvent ? event.changedTouches[0].pageY : event.clientY
+      this.isTouchEvent ? event.changedTouches[0].pageX : event.clientX,
+      this.isTouchEvent ? event.changedTouches[0].pageY : event.clientY
     )
 
     this._startPosition = this.getPosition()
-    if (isTouchEvent) {
+    if (this.isTouchEvent) {
       this._touchId = event.changedTouches[0].identifier
       this._startTouchTimestamp = +new Date()
     }
@@ -251,8 +249,8 @@ export default class Draggable extends EventEmitter {
       event.target.focus()
     }
 
-    if (this.shouldUseNativeDragAndDrop(event)) {
-      if ((isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
+    if (this.shouldUseNativeDragAndDrop()) {
+      if ((this.isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
              this.emulateNativeDragAndDropOnAllDevices) {
         const emulateOnFirstMove = (event) => {
           if(this.seemsScrolling()) {
@@ -291,8 +289,8 @@ export default class Draggable extends EventEmitter {
 
     this.isDragging = true
 
-    const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
-    if (isTouchEvent) {
+    this.isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
+    if (this.isTouchEvent) {
       touch = getTouchByID(event, this._touchId)
 
       if (!touch) {
@@ -308,8 +306,8 @@ export default class Draggable extends EventEmitter {
     event.stopPropagation()
     event.preventDefault()
     this.touchPoint = new Point(
-      isTouchEvent ? touch.pageX : event.clientX,
-      isTouchEvent ? touch.pageY : event.clientY
+      this.isTouchEvent ? touch.pageX : event.clientX,
+      this.isTouchEvent ? touch.pageY : event.clientY
     )
 
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
@@ -321,9 +319,9 @@ export default class Draggable extends EventEmitter {
   }
 
   dragEnd(event) {
-    const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
+    this.isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
 
-    if (isTouchEvent && !getTouchByID(event, this._touchId)) {
+    if (this.isTouchEvent && !getTouchByID(event, this._touchId)) {
       return
     }
 

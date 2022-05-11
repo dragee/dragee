@@ -51,7 +51,7 @@ export default class BubblingList extends List {
 
     sortedDraggables.forEach((draggable) => {
       if (!draggable.pinnedPosition.compare(currentPosition)) {
-        if (draggable === currentDraggable && !currentDraggable.nativeDragAndDrop) {
+        if (draggable === currentDraggable && !currentDraggable.shouldUseNativeDragAndDrop()) {
           draggable.pinnedPosition = currentPosition.clone()
         } else {
           draggable.pinPosition(currentPosition, (draggable === currentDraggable) ? 0 : this.options.timeExcange)

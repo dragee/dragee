@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.18
+- Fix bug: `BubblingList` dragging when `nativeDragAndDrop` on mobile devices
+
 ## 1.0.17
 - By default on touch devices we should not emulate native drag&drop
 - `touchDraggingThreshold` from now equal to zero
