@@ -216,6 +216,16 @@ export default class Draggable extends EventEmitter {
     return (+new Date() - this._startTouchTimestamp) < this.touchDraggingThreshold
   }
 
+  shouldUseNativeDragAndDrop(event) {
+    const isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
+
+    if (isTouchEvent) {
+      return this.nativeDragAndDrop && this.emulateNativeDragAndDropOnTouch
+    } else {
+      return this.nativeDragAndDrop
+    }
+  }
+
   dragStart(event) {
     if (!this._enable) {
       return
@@ -241,7 +251,7 @@ export default class Draggable extends EventEmitter {
       event.target.focus()
     }
 
-    if (this.nativeDragAndDrop) {
+    if (this.shouldUseNativeDragAndDrop(event)) {
       if ((isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
              this.emulateNativeDragAndDropOnAllDevices) {
         const emulateOnFirstMove = (event) => {
@@ -494,7 +504,7 @@ export default class Draggable extends EventEmitter {
   }
 
   get emulateNativeDragAndDropOnTouch() {
-    return this.options.emulateNativeDragAndDropOnTouch || true
+    return this.options.emulateNativeDragAndDropOnTouch || false
   }
 
   get emulateNativeDragAndDropOnAllDevices() {

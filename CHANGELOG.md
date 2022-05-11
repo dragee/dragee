@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## 1.0.17
+- By default on touch devices we should not emulate native drag&drop
+- `touchDraggingThreshold` from now equal to zero
+
 ## 1.0.16
 - Add the `touchDraggingThreshold` option that defines threshold between scrolling and dragging
 
