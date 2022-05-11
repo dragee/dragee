@@ -69,7 +69,7 @@ export default class Draggable extends EventEmitter {
     preventDoubleInit(this)
     Draggable.emitter.emit('draggable:create', this)
     this._enable = true
-    this.touchDraggingThreshold = ('touchDraggingThreshold' in this.options) ? this.options.touchDraggingThreshold : 100
+    this.touchDraggingThreshold = ('touchDraggingThreshold' in this.options) ? this.options.touchDraggingThreshold : 0
 
     this.startBounding()
     this.startPositioning()
@@ -246,7 +246,7 @@ export default class Draggable extends EventEmitter {
              this.emulateNativeDragAndDropOnAllDevices) {
         const emulateOnFirstMove = (event) => {
           if(this.seemsScrolling()) {
-            this.cancelDragging()
+            this.cancelDraggin ()
           } else {
             this.emulateNativeDragAndDrop(event)
           }
@@ -290,7 +290,7 @@ export default class Draggable extends EventEmitter {
       }
 
       if(this.seemsScrolling()){
-        this.cancelDragging()
+        this.cancelDraggin ()
         return
       }
     }
@@ -324,7 +324,7 @@ export default class Draggable extends EventEmitter {
 
     this.dragEndAction()
     this.emit('drag:end')
-    this.cancelDragging()
+    this.cancelDraggin ()
 
     setTimeout(() => this.element.classList.remove('dragee-active'))
   }
@@ -382,7 +382,7 @@ export default class Draggable extends EventEmitter {
     event.preventDefault()
   }
 
-  cancelDragging() {
+  cancelDraggin () {
     document.removeEventListener(touchEvents.move, this._dragMove)
     document.removeEventListener(mouseEvents.move, this._dragMove)
 
