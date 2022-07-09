@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.20
+- Add possibility to customize `copyStyles` whe we use `emulateNativeDragAndDrop`
+
 ## 1.0.19
 - Fix bug: `BubblingList` should auto detect `startPosition` before bubbling on remove `draggable`
 

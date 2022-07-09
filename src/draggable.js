@@ -405,11 +405,19 @@ export default class Draggable extends EventEmitter {
     this.element.removeAttribute('draggable')
   }
 
+  copyStyles(source, destination) {
+    if (this.options.copyStyles) {
+      this.options.copyStyles(source, destination)
+    } else {
+      copyStyles(source, destination)
+    }
+  }
+
   emulateNativeDragAndDrop(event) {
     const containerRect = this.container.getBoundingClientRect()
     const clonedElement = this.element.cloneNode(true)
     clonedElement.style[transformProperty] = ''
-    copyStyles(this.element, clonedElement)
+    this.copyStyles(this.element, clonedElement)
     clonedElement.style.position = 'absolute'
     document.body.appendChild(clonedElement)
     this.element.classList.add('dragee-placeholder')

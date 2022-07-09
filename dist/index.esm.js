@@ -1801,7 +1801,7 @@ function addToDefaultScope(draggable) {
   defaultScope.addDraggable(draggable);
 }
 
-function copyStyles(source, destination) {
+function _copyStyles(source, destination) {
   var cs = window.getComputedStyle(source);
 
   for (var i = 0; i < cs.length; i++) {
@@ -1813,7 +1813,7 @@ function copyStyles(source, destination) {
   }
 
   for (var _i = 0; _i < source.children.length; _i++) {
-    copyStyles(source.children[_i], destination.children[_i]);
+    _copyStyles(source.children[_i], destination.children[_i]);
   }
 }
 
@@ -2073,7 +2073,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         if (this.isTouchEvent && this.emulateNativeDragAndDropOnTouch || this.emulateNativeDragAndDropOnAllDevices) {
           var emulateOnFirstMove = function emulateOnFirstMove(event) {
             if (_this3.seemsScrolling()) {
-              _this3.cancelDraggin();
+              _this3.cancelDragging();
             } else {
               _this3.emulateNativeDragAndDrop(event);
             }
@@ -2117,7 +2117,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         }
 
         if (this.seemsScrolling()) {
-          this.cancelDraggin();
+          this.cancelDragging();
           return;
         }
       }
@@ -2150,7 +2150,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
       this.dragEndAction();
       this.emit('drag:end');
-      this.cancelDraggin();
+      this.cancelDragging();
       setTimeout(function () {
         return _this4.element.classList.remove('dragee-active');
       });
@@ -2216,8 +2216,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       event.preventDefault();
     }
   }, {
-    key: "cancelDraggin",
-    value: function cancelDraggin() {
+    key: "cancelDragging",
+    value: function cancelDragging() {
       document.removeEventListener(touchEvents.move, this._dragMove);
       document.removeEventListener(mouseEvents.move, this._dragMove);
       document.removeEventListener(touchEvents.end, this._dragEnd);
@@ -2228,6 +2228,15 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       this.element.removeAttribute('draggable');
     }
   }, {
+    key: "copyStyles",
+    value: function copyStyles(source, destination) {
+      if (this.options.copyStyles) {
+        this.options.copyStyles(source, destination);
+      } else {
+        _copyStyles(source, destination);
+      }
+    }
+  }, {
     key: "emulateNativeDragAndDrop",
     value: function emulateNativeDragAndDrop(event) {
       var _this5 = this;
@@ -2235,7 +2244,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       var containerRect = this.container.getBoundingClientRect();
       var clonedElement = this.element.cloneNode(true);
       clonedElement.style[transformProperty] = '';
-      copyStyles(this.element, clonedElement);
+      this.copyStyles(this.element, clonedElement);
       clonedElement.style.position = 'absolute';
       document.body.appendChild(clonedElement);
       this.element.classList.add('dragee-placeholder');
