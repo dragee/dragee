@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.21
+- Fix bug: `BubblingList` should emit `list:change` event when we use `emulateNativeDragAndDrop` on mobiles
+
 ## 1.0.20
 - Add possibility to customize `copyStyles` whe we use `emulateNativeDragAndDrop`
 

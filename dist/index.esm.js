@@ -2268,6 +2268,10 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
             _this5.element.classList.remove('dragee-placeholder');
 
             _this5.element.classList.remove('dragee-active');
+
+            _this5.emit('drag:end');
+
+            _this5.dragEndAction();
           }
         }
       });

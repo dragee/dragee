@@ -483,6 +483,7 @@
                         listA = Dragee.BubblingList.factory(listAParentElement, listAElements, {
                           draggable: {
                             nativeDragAndDrop: true,
+                            emulateNativeDragAndDropOnTouch: true,
                             radius: 10,
                             container: document.body
                           }
@@ -492,6 +493,8 @@
                             // nativeDragAndDrop: true
                           }
                         });
+
+                        listA.on('list:change', () => console.log("List changed"))
 
                         // List C Example
 

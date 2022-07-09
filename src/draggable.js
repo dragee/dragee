@@ -440,6 +440,9 @@ export default class Draggable extends EventEmitter {
           document.body.removeChild(clonedElement)
           this.element.classList.remove('dragee-placeholder')
           this.element.classList.remove('dragee-active')
+
+          this.emit('drag:end')
+          this.dragEndAction()
         }
       }
     })
