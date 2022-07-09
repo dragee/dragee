@@ -254,7 +254,7 @@ export default class Draggable extends EventEmitter {
              this.emulateNativeDragAndDropOnAllDevices) {
         const emulateOnFirstMove = (event) => {
           if (this.seemsScrolling()) {
-            this.cancelDraggin()
+            this.cancelDragging()
           } else {
             this.emulateNativeDragAndDrop(event)
           }
@@ -298,7 +298,7 @@ export default class Draggable extends EventEmitter {
       }
 
       if (this.seemsScrolling()) {
-        this.cancelDraggin()
+        this.cancelDragging()
         return
       }
     }
@@ -332,7 +332,7 @@ export default class Draggable extends EventEmitter {
 
     this.dragEndAction()
     this.emit('drag:end')
-    this.cancelDraggin()
+    this.cancelDragging()
 
     setTimeout(() => this.element.classList.remove('dragee-active'))
   }
@@ -390,7 +390,7 @@ export default class Draggable extends EventEmitter {
     event.preventDefault()
   }
 
-  cancelDraggin () {
+  cancelDragging () {
     document.removeEventListener(touchEvents.move, this._dragMove)
     document.removeEventListener(mouseEvents.move, this._dragMove)
 
