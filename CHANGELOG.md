@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.19
+- Fix bug: `BubblingList` should auto detect `startPosition` before bubbling on remove `draggable`
+
 ## 1.0.18
 - Fix bug: `BubblingList` dragging when `nativeDragAndDrop` on mobile devices
 

@@ -144,7 +144,7 @@ export default class Draggable extends EventEmitter {
       transition = transition.replace(/transform \d*m?s/, transitionCss)
     }
 
-    if(this.element.style[transitionProperty] != transition) {
+    if (this.element.style[transitionProperty] !== transition) {
       this.element.style[transitionProperty] = transition
     }
   }
@@ -166,7 +166,7 @@ export default class Draggable extends EventEmitter {
       transform = transform.replace(/translate3d\([^)]+\)/, translateCss)
     }
 
-    if(this.element.style[transformProperty] != transform) {
+    if (this.element.style[transformProperty] !== transform) {
       this.element.style[transformProperty] = transform
     }
   }
@@ -253,8 +253,8 @@ export default class Draggable extends EventEmitter {
       if ((this.isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
              this.emulateNativeDragAndDropOnAllDevices) {
         const emulateOnFirstMove = (event) => {
-          if(this.seemsScrolling()) {
-            this.cancelDraggin ()
+          if (this.seemsScrolling()) {
+            this.cancelDraggin()
           } else {
             this.emulateNativeDragAndDrop(event)
           }
@@ -297,8 +297,8 @@ export default class Draggable extends EventEmitter {
         return
       }
 
-      if(this.seemsScrolling()){
-        this.cancelDraggin ()
+      if (this.seemsScrolling()) {
+        this.cancelDraggin()
         return
       }
     }
@@ -325,14 +325,14 @@ export default class Draggable extends EventEmitter {
       return
     }
 
-    if(this.isDragging) {
+    if (this.isDragging) {
       event.stopPropagation()
       event.preventDefault()
     }
 
     this.dragEndAction()
     this.emit('drag:end')
-    this.cancelDraggin ()
+    this.cancelDraggin()
 
     setTimeout(() => this.element.classList.remove('dragee-active'))
   }

@@ -1951,7 +1951,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         transition = transition.replace(/transform \d*m?s/, transitionCss);
       }
 
-      if (this.element.style[transitionProperty] != transition) {
+      if (this.element.style[transitionProperty] !== transition) {
         this.element.style[transitionProperty] = transition;
       }
     }
@@ -1974,7 +1974,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         transform = transform.replace(/translate3d\([^)]+\)/, translateCss);
       }
 
-      if (this.element.style[transformProperty] != transform) {
+      if (this.element.style[transformProperty] !== transform) {
         this.element.style[transformProperty] = transform;
       }
     }
@@ -3207,6 +3207,11 @@ var BubblingList = /*#__PURE__*/function (_List) {
         this.verticalGap = 0;
       }
 
+      this.autoDetectStartPosition();
+    }
+  }, {
+    key: "autoDetectStartPosition",
+    value: function autoDetectStartPosition() {
       if (this.draggables.length >= 1) {
         this.startPosition = this.draggables[0].pinnedPosition;
       }
@@ -3264,6 +3269,7 @@ var BubblingList = /*#__PURE__*/function (_List) {
       this.draggables.forEach(function (d) {
         return d.startPositioning();
       });
+      this.autoDetectStartPosition();
       this.bubbling();
     }
   }, {

@@ -100,7 +100,7 @@ export default class List extends EventEmitter {
 
     this.reset()
 
-    if(next) {
+    if (next) {
       this.container.insertBefore(movedDraggable.element, next.element)
     } else {
       this.container.appendChild(movedDraggable.element)

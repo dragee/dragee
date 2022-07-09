@@ -26,6 +26,10 @@ export default class BubblingList extends List {
       this.verticalGap = 0
     }
 
+    this.autoDetectStartPosition()
+  }
+
+  autoDetectStartPosition() {
     if (this.draggables.length >= 1) {
       this.startPosition = this.draggables[0].pinnedPosition
     }
@@ -71,6 +75,8 @@ export default class BubblingList extends List {
     this.draggables = this.draggables.filter((d) => !draggables.includes(d))
 
     this.draggables.forEach((d) => d.startPositioning())
+
+    this.autoDetectStartPosition()
     this.bubbling()
   }
 
