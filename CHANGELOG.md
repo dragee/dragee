@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+## 1.0.24
 - Improve how draggable works with transition property
 
 ## 1.0.23

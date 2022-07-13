@@ -1933,7 +1933,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "_setDefaultTransition",
     value: function _setDefaultTransition() {
-      this.element.style[transitionProperty] = window.getComputedStyle(this.element)[transitionProperty];
+      if (!this.element.style[transitionProperty]) {
+        this.element.style[transitionProperty] = window.getComputedStyle(this.element)[transitionProperty];
+      }
     }
   }, {
     key: "_setTransition",
@@ -1948,7 +1950,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
           transition = transitionCss;
         }
       } else {
-        transition = transition.replace(/transform \d*m?s/, transitionCss);
+        transition = transition.replace(/transform \d*m?s/g, transitionCss);
       }
 
       if (this.element.style[transitionProperty] !== transition) {
