@@ -2923,13 +2923,7 @@ var List = /*#__PURE__*/function (_EventEmitter) {
     _this.container = options.container;
     _this.draggables = draggables;
     _this.changedDuringIteration = false;
-    _this.resizeObserver = new ResizeObserver(debounce(function () {
-      if (_this.options.reorderOnChange) _this.reset();
-
-      _this.draggables.forEach(function (d) {
-        return d.startPositioning();
-      });
-    }, 100));
+    _this.resizeObserver = new ResizeObserver(debounce(_this.onResize.bind(_assertThisInitialized(_this)), 100));
 
     if (_this.container) {
       _this.resizeObserver.observe(_this.container);
@@ -2941,6 +2935,14 @@ var List = /*#__PURE__*/function (_EventEmitter) {
   }
 
   _createClass(List, [{
+    key: "onResize",
+    value: function onResize() {
+      if (this.options.reorderOnChange) this.reset();
+      this.draggables.forEach(function (d) {
+        return d.startPositioning();
+      });
+    }
+  }, {
     key: "init",
     value: function init() {
       var _this2 = this;
@@ -3208,6 +3210,15 @@ var BubblingList = /*#__PURE__*/function (_List) {
   }
 
   _createClass(BubblingList, [{
+    key: "onResize",
+    value: function onResize() {
+      if (this.options.reorderOnChange) this.reset();
+      this.draggables.forEach(function (d) {
+        return d.startPositioning();
+      });
+      this.autoDetectVerticalGap();
+    }
+  }, {
     key: "initDraggable",
     value: function initDraggable(draggable) {
       var _this = this;

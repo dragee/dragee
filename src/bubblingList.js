@@ -12,6 +12,12 @@ export default class BubblingList extends List {
     super(draggables, options)
   }
 
+  onResize() {
+    if (this.options.reorderOnChange) this.reset()
+    this.draggables.forEach((d) => d.startPositioning())
+    this.autoDetectVerticalGap()
+  }
+
   initDraggable(draggable) {
     draggable.on('drag:start', () => this.autoDetectVerticalGap(draggable))
     super.initDraggable(draggable)

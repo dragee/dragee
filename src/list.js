@@ -24,16 +24,18 @@ export default class List extends EventEmitter {
     this.draggables = draggables
     this.changedDuringIteration = false
 
-    this.resizeObserver = new ResizeObserver(debounce(() => {
-      if (this.options.reorderOnChange) this.reset()
-      this.draggables.forEach((d) => d.startPositioning())
-    }, 100))
+    this.resizeObserver = new ResizeObserver(debounce(this.onResize.bind(this), 100))
 
     if (this.container) {
       this.resizeObserver.observe(this.container)
     }
 
     this.init()
+  }
+
+  onResize() {
+    if (this.options.reorderOnChange) this.reset()
+    this.draggables.forEach((d) => d.startPositioning())
   }
 
   init() {
