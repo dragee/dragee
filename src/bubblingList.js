@@ -10,34 +10,30 @@ const arrayMove = (array, from, to) => {
 export default class BubblingList extends List {
   constructor(draggables, options={}) {
     super(draggables, options)
-  }
-
-  onResize() {
-    super.onResize()
     this.autoDetectVerticalGap()
-  }
-
-  initDraggable(draggable) {
-    draggable.on('drag:start', () => this.autoDetectVerticalGap(draggable))
-    super.initDraggable(draggable)
+    this.autoDetectStartPosition()
   }
 
   autoDetectVerticalGap() {
-    if (this.draggables.length >= 2) {
+    if (this.draggables.length >= 2 && !this.verticalGap) {
       const sorted = this.getSortedDraggables()
 
       this.verticalGap = sorted[1].pinnedPosition.y - sorted[0].pinnedPosition.y - sorted[0].getSize().y
     } else {
       this.verticalGap = 0
     }
-
-    this.autoDetectStartPosition()
   }
 
   autoDetectStartPosition() {
-    if (this.draggables.length >= 1) {
+    if (this.draggables.length >= 1 && !this.startPosition) {
       this.startPosition = this.draggables[0].pinnedPosition
     }
+  }
+
+  add(draggables) {
+    super.add(draggables)
+    this.autoDetectStartPosition()
+    this.autoDetectVerticalGap()
   }
 
   onMove(draggable) {

@@ -3204,51 +3204,45 @@ var BubblingList = /*#__PURE__*/function (_List) {
   var _super = _createSuper(BubblingList);
 
   function BubblingList(draggables) {
+    var _this;
+
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     _classCallCheck(this, BubblingList);
 
-    return _super.call(this, draggables, options);
+    _this = _super.call(this, draggables, options);
+
+    _this.autoDetectVerticalGap();
+
+    _this.autoDetectStartPosition();
+
+    return _this;
   }
 
   _createClass(BubblingList, [{
-    key: "onResize",
-    value: function onResize() {
-      if (this.options.reorderOnChange) this.reset();
-      this.draggables.forEach(function (d) {
-        return d.startPositioning();
-      });
-      this.autoDetectVerticalGap();
-    }
-  }, {
-    key: "initDraggable",
-    value: function initDraggable(draggable) {
-      var _this = this;
-
-      draggable.on('drag:start', function () {
-        return _this.autoDetectVerticalGap(draggable);
-      });
-
-      _get(_getPrototypeOf(BubblingList.prototype), "initDraggable", this).call(this, draggable);
-    }
-  }, {
     key: "autoDetectVerticalGap",
     value: function autoDetectVerticalGap() {
-      if (this.draggables.length >= 2) {
+      if (this.draggables.length >= 2 && !this.verticalGap) {
         var sorted = this.getSortedDraggables();
         this.verticalGap = sorted[1].pinnedPosition.y - sorted[0].pinnedPosition.y - sorted[0].getSize().y;
       } else {
         this.verticalGap = 0;
       }
-
-      this.autoDetectStartPosition();
     }
   }, {
     key: "autoDetectStartPosition",
     value: function autoDetectStartPosition() {
-      if (this.draggables.length >= 1) {
+      if (this.draggables.length >= 1 && !this.startPosition) {
         this.startPosition = this.draggables[0].pinnedPosition;
       }
+    }
+  }, {
+    key: "add",
+    value: function add(draggables) {
+      _get(_getPrototypeOf(BubblingList.prototype), "add", this).call(this, draggables);
+
+      this.autoDetectStartPosition();
+      this.autoDetectVerticalGap();
     }
   }, {
     key: "onMove",
