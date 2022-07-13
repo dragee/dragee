@@ -3225,8 +3225,6 @@ var BubblingList = /*#__PURE__*/function (_List) {
       if (this.draggables.length >= 2 && !this.verticalGap) {
         var sorted = this.getSortedDraggables();
         this.verticalGap = sorted[1].pinnedPosition.y - sorted[0].pinnedPosition.y - sorted[0].getSize().y;
-      } else {
-        this.verticalGap = 0;
       }
     }
   }, {
@@ -3235,6 +3233,13 @@ var BubblingList = /*#__PURE__*/function (_List) {
       if (this.draggables.length >= 1 && !this.startPosition) {
         this.startPosition = this.draggables[0].pinnedPosition;
       }
+    }
+  }, {
+    key: "onResize",
+    value: function onResize() {
+      _get(_getPrototypeOf(BubblingList.prototype), "onResize", this).call(this);
+
+      this.autoDetectVerticalGap();
     }
   }, {
     key: "add",
@@ -3276,7 +3281,7 @@ var BubblingList = /*#__PURE__*/function (_List) {
           }
         }
 
-        currentPosition.y = currentPosition.y + draggable.getSize().y + _this2.verticalGap;
+        currentPosition.y = currentPosition.y + draggable.getSize().y + (_this2.verticalGap || 0);
       });
     }
   }, {

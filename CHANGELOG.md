@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.26
+- Fix `verticalGap` detection
+
 ## 1.0.25
 - Improve `BubblingList` detection of `startPosition` and `verticalGap`. Do it only once.
 

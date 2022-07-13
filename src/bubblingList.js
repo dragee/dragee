@@ -19,8 +19,6 @@ export default class BubblingList extends List {
       const sorted = this.getSortedDraggables()
 
       this.verticalGap = sorted[1].pinnedPosition.y - sorted[0].pinnedPosition.y - sorted[0].getSize().y
-    } else {
-      this.verticalGap = 0
     }
   }
 
@@ -28,6 +26,11 @@ export default class BubblingList extends List {
     if (this.draggables.length >= 1 && !this.startPosition) {
       this.startPosition = this.draggables[0].pinnedPosition
     }
+  }
+
+  onResize() {
+    super.onResize()
+    this.autoDetectVerticalGap()
   }
 
   add(draggables) {
@@ -63,7 +66,7 @@ export default class BubblingList extends List {
         }
       }
 
-      currentPosition.y = currentPosition.y + draggable.getSize().y + this.verticalGap
+      currentPosition.y = currentPosition.y + draggable.getSize().y + (this.verticalGap || 0)
     })
   }
 
