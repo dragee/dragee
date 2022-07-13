@@ -127,7 +127,9 @@ export default class Draggable extends EventEmitter {
   }
 
   _setDefaultTransition () {
-    this.element.style[transitionProperty] = window.getComputedStyle(this.element)[transitionProperty]
+    if (!this.element.style[transitionProperty]) {
+      this.element.style[transitionProperty] = window.getComputedStyle(this.element)[transitionProperty]
+    }
   }
 
   _setTransition(time) {
@@ -141,7 +143,7 @@ export default class Draggable extends EventEmitter {
         transition = transitionCss
       }
     } else {
-      transition = transition.replace(/transform \d*m?s/, transitionCss)
+      transition = transition.replace(/transform \d*m?s/g, transitionCss)
     }
 
     if (this.element.style[transitionProperty] !== transition) {

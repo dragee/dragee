@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Improve how draggable works with transition property
+
 ## 1.0.23
 - Improve list autorefresh draggable positioning when the container changes its size for `bubblingList`. We should call `autoDetectVerticalGap` too, as resize can be called during dragging.
 
