@@ -13,8 +13,7 @@ export default class BubblingList extends List {
   }
 
   onResize() {
-    if (this.options.reorderOnChange) this.reset()
-    this.draggables.forEach((d) => d.startPositioning())
+    super.onResize()
     this.autoDetectVerticalGap()
   }
 
