@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.0.22
+- Improve list autorefresh draggable positioning when the container changes its size. It can be useful when some block inside(not draggable) was removed.
+
 ## 1.0.21
 - Fix bug: `BubblingList` should emit `list:change` event when we use `emulateNativeDragAndDrop` on mobiles
 

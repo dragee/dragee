@@ -2931,6 +2931,10 @@ var List = /*#__PURE__*/function (_EventEmitter) {
       });
     }, 100));
 
+    if (_this.container) {
+      _this.resizeObserver.observe(_this.container);
+    }
+
     _this.init();
 
     return _this;
@@ -3116,6 +3120,10 @@ var List = /*#__PURE__*/function (_EventEmitter) {
       this.draggables.forEach(function (draggable) {
         return draggable.destroy();
       });
+
+      if (this.container) {
+        this.resizeObserver.unobserve(this.container);
+      }
     }
   }, {
     key: "sorting",

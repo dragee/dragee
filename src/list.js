@@ -29,6 +29,10 @@ export default class List extends EventEmitter {
       this.draggables.forEach((d) => d.startPositioning())
     }, 100))
 
+    if (this.container) {
+      this.resizeObserver.observe(this.container)
+    }
+
     this.init()
   }
 
@@ -165,6 +169,9 @@ export default class List extends EventEmitter {
 
   destroy() {
     this.draggables.forEach((draggable) => draggable.destroy())
+    if (this.container) {
+      this.resizeObserver.unobserve(this.container)
+    }
   }
 
   sorting(draggableA, draggableB) {
