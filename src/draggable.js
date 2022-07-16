@@ -252,8 +252,7 @@ export default class Draggable extends EventEmitter {
     }
 
     if (this.shouldUseNativeDragAndDrop()) {
-      if ((this.isTouchEvent && this.emulateNativeDragAndDropOnTouch) ||
-             this.emulateNativeDragAndDropOnAllDevices) {
+      if (this.isTouchEvent && this.emulateNativeDragAndDropOnTouch) {
         const emulateOnFirstMove = (event) => {
           if (this.seemsScrolling()) {
             this.cancelDragging()
@@ -516,10 +515,6 @@ export default class Draggable extends EventEmitter {
 
   get emulateNativeDragAndDropOnTouch() {
     return this.options.emulateNativeDragAndDropOnTouch || false
-  }
-
-  get emulateNativeDragAndDropOnAllDevices() {
-    return this.options.emulateNativeDragAndDropOnAllDevices || false
   }
 
   get shouldRemoveZeroTranslate() {

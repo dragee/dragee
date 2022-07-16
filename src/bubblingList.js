@@ -1,5 +1,6 @@
 import List from './list'
 import { indexOfNearestPoint, getYDifference } from './geometry/distances'
+import Point from './geometry/point'
 
 import Draggable from './draggable'
 
@@ -28,6 +29,11 @@ export default class BubblingList extends List {
     }
   }
 
+  initDraggable(draggable) {
+    super.initDraggable(draggable)
+    draggable.on('drag:start', () => this.onDragStart(draggable))
+  }
+
   onResize() {
     super.onResize()
     this.autoDetectVerticalGap()
@@ -39,16 +45,45 @@ export default class BubblingList extends List {
     this.autoDetectVerticalGap()
   }
 
+  onDragStart(draggable) {
+    this.cachedSortedDraggables = this.getSortedDraggables()
+    this.indexOfActiveDraggable = this.cachedSortedDraggables.indexOf(draggable)
+  }
+
   onMove(draggable) {
-    const sortedDraggables = this.getSortedDraggables()
-    const pinnedPositions = sortedDraggables.map((draggable) => draggable.pinnedPosition)
+    const prevDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable - 1]
+    const nextDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable + 1]
+    const currentOrder = [prevDraggable, draggable, nextDraggable].filter(Boolean).map((d) => d.pinnedPosition)
+    const currentPosition = draggable.pinnedPosition
 
-    const currentIndex = sortedDraggables.indexOf(draggable)
-    const targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.distanceFunc)
+    const targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc)
 
-    if (targetIndex !== -1 && currentIndex !== targetIndex) {
-      arrayMove(sortedDraggables, currentIndex, targetIndex)
-      this.bubbling(sortedDraggables, draggable)
+    if(prevDraggable && targetIndex === 0) {
+      if(draggable.shouldUseNativeDragAndDrop()) {
+        draggable.pinPosition(prevDraggable.pinnedPosition)
+      } else {
+        draggable.pinnedPosition = prevDraggable.pinnedPosition.clone()
+      }
+      prevDraggable.pinPosition(new Point(
+        currentPosition.x,
+        draggable.pinnedPosition.y + draggable.getSize().y + (this.verticalGap || 0)
+      ), this.options.timeExcange)
+      arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable--, this.indexOfActiveDraggable)
+      this.onMove(draggable)
+      this.changedDuringIteration = true
+    } else if(nextDraggable && (targetIndex === 2 || (targetIndex === 1 && !prevDraggable))) {
+      nextDraggable.pinPosition(draggable.pinnedPosition, this.options.timeExcange)
+      const draggableNewPosition = new Point(
+        nextDraggable.pinnedPosition.x,
+        nextDraggable.pinnedPosition.y + nextDraggable.getSize().y + (this.verticalGap || 0)
+      )
+      if(draggable.shouldUseNativeDragAndDrop()) {
+        draggable.pinPosition(draggableNewPosition)
+      } else {
+        draggable.pinnedPosition = draggableNewPosition
+      }
+      arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable++, this.indexOfActiveDraggable)
+      this.onMove(draggable)
       this.changedDuringIteration = true
     }
   }

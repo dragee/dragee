@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## 1.1.0
+- Improve `BubblingList` performance by using smarter bubbling algorithm. We now sort only dragging draggable and its siblings with recursion.
+- Removed `emulateNativeDragAndDropOnAllDevices` option
+
 ## 1.0.26
 - Fix `verticalGap` detection
 

@@ -2072,7 +2072,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       }
 
       if (this.shouldUseNativeDragAndDrop()) {
-        if (this.isTouchEvent && this.emulateNativeDragAndDropOnTouch || this.emulateNativeDragAndDropOnAllDevices) {
+        if (this.isTouchEvent && this.emulateNativeDragAndDropOnTouch) {
           var emulateOnFirstMove = function emulateOnFirstMove(event) {
             if (_this3.seemsScrolling()) {
               _this3.cancelDragging();
@@ -2348,11 +2348,6 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     key: "emulateNativeDragAndDropOnTouch",
     get: function get() {
       return this.options.emulateNativeDragAndDropOnTouch || false;
-    }
-  }, {
-    key: "emulateNativeDragAndDropOnAllDevices",
-    get: function get() {
-      return this.options.emulateNativeDragAndDropOnAllDevices || false;
     }
   }, {
     key: "shouldRemoveZeroTranslate",
@@ -3235,6 +3230,17 @@ var BubblingList = /*#__PURE__*/function (_List) {
       }
     }
   }, {
+    key: "initDraggable",
+    value: function initDraggable(draggable) {
+      var _this2 = this;
+
+      _get(_getPrototypeOf(BubblingList.prototype), "initDraggable", this).call(this, draggable);
+
+      draggable.on('drag:start', function () {
+        return _this2.onDragStart(draggable);
+      });
+    }
+  }, {
     key: "onResize",
     value: function onResize() {
       _get(_getPrototypeOf(BubblingList.prototype), "onResize", this).call(this);
@@ -3250,25 +3256,52 @@ var BubblingList = /*#__PURE__*/function (_List) {
       this.autoDetectVerticalGap();
     }
   }, {
+    key: "onDragStart",
+    value: function onDragStart(draggable) {
+      this.cachedSortedDraggables = this.getSortedDraggables();
+      this.indexOfActiveDraggable = this.cachedSortedDraggables.indexOf(draggable);
+    }
+  }, {
     key: "onMove",
     value: function onMove(draggable) {
-      var sortedDraggables = this.getSortedDraggables();
-      var pinnedPositions = sortedDraggables.map(function (draggable) {
-        return draggable.pinnedPosition;
+      var prevDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable - 1];
+      var nextDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable + 1];
+      var currentOrder = [prevDraggable, draggable, nextDraggable].filter(Boolean).map(function (d) {
+        return d.pinnedPosition;
       });
-      var currentIndex = sortedDraggables.indexOf(draggable);
-      var targetIndex = indexOfNearestPoint(pinnedPositions, draggable.position, this.options.radius, this.distanceFunc);
+      var currentPosition = draggable.pinnedPosition;
+      var targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc);
 
-      if (targetIndex !== -1 && currentIndex !== targetIndex) {
-        arrayMove(sortedDraggables, currentIndex, targetIndex);
-        this.bubbling(sortedDraggables, draggable);
+      if (prevDraggable && targetIndex === 0) {
+        if (draggable.shouldUseNativeDragAndDrop()) {
+          draggable.pinPosition(prevDraggable.pinnedPosition);
+        } else {
+          draggable.pinnedPosition = prevDraggable.pinnedPosition.clone();
+        }
+
+        prevDraggable.pinPosition(new Point(currentPosition.x, draggable.pinnedPosition.y + draggable.getSize().y + (this.verticalGap || 0)), this.options.timeExcange);
+        arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable--, this.indexOfActiveDraggable);
+        this.onMove(draggable);
+        this.changedDuringIteration = true;
+      } else if (nextDraggable && (targetIndex === 2 || targetIndex === 1 && !prevDraggable)) {
+        nextDraggable.pinPosition(draggable.pinnedPosition, this.options.timeExcange);
+        var draggableNewPosition = new Point(nextDraggable.pinnedPosition.x, nextDraggable.pinnedPosition.y + nextDraggable.getSize().y + (this.verticalGap || 0));
+
+        if (draggable.shouldUseNativeDragAndDrop()) {
+          draggable.pinPosition(draggableNewPosition);
+        } else {
+          draggable.pinnedPosition = draggableNewPosition;
+        }
+
+        arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable++, this.indexOfActiveDraggable);
+        this.onMove(draggable);
         this.changedDuringIteration = true;
       }
     }
   }, {
     key: "bubbling",
     value: function bubbling(sortedDraggables, currentDraggable) {
-      var _this2 = this;
+      var _this3 = this;
 
       var currentPosition = this.startPosition.clone();
       sortedDraggables || (sortedDraggables = this.getSortedDraggables());
@@ -3277,24 +3310,24 @@ var BubblingList = /*#__PURE__*/function (_List) {
           if (draggable === currentDraggable && !currentDraggable.shouldUseNativeDragAndDrop()) {
             draggable.pinnedPosition = currentPosition.clone();
           } else {
-            draggable.pinPosition(currentPosition, draggable === currentDraggable ? 0 : _this2.options.timeExcange);
+            draggable.pinPosition(currentPosition, draggable === currentDraggable ? 0 : _this3.options.timeExcange);
           }
         }
 
-        currentPosition.y = currentPosition.y + draggable.getSize().y + (_this2.verticalGap || 0);
+        currentPosition.y = currentPosition.y + draggable.getSize().y + (_this3.verticalGap || 0);
       });
     }
   }, {
     key: "remove",
     value: function remove(draggables) {
-      var _this3 = this;
+      var _this4 = this;
 
       if (!(draggables instanceof Array)) {
         draggables = [draggables];
       }
 
       draggables.forEach(function (draggable) {
-        return _this3.releaseDraggable(draggable);
+        return _this4.releaseDraggable(draggable);
       });
       this.draggables = this.draggables.filter(function (d) {
         return !draggables.includes(d);
@@ -3302,7 +3335,6 @@ var BubblingList = /*#__PURE__*/function (_List) {
       this.draggables.forEach(function (d) {
         return d.startPositioning();
       });
-      this.autoDetectStartPosition();
       this.bubbling();
     }
   }, {
