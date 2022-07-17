@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.1.1
+- Throttle `dragover` handler. Make duration configurable with `dragOverThrottleDuration` option.
+
 ## 1.1.0
 - Improve `BubblingList` performance by using smarter bubbling algorithm. We now sort only dragging draggable and its siblings with recursion.
 - Removed `emulateNativeDragAndDropOnAllDevices` option

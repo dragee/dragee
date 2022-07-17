@@ -6,6 +6,15 @@ import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 import { defaultScope } from './scope'
 import isSupportPassiveEvents from './utils/is-support-passive-events'
+import throttle from './utils/throttle'
+
+const throttledDragOver = (callback, duration) => {
+  const throttledCallback = throttle((event) => callback(event), duration)
+  return event => {
+    event.preventDefault()
+    throttledCallback(event)
+  }
+}
 
 const passiveFalse = isSupportPassiveEvents ? { passive: false } : false
 
@@ -69,8 +78,6 @@ export default class Draggable extends EventEmitter {
     preventDoubleInit(this)
     Draggable.emitter.emit('draggable:create', this)
     this._enable = true
-    this.touchDraggingThreshold = ('touchDraggingThreshold' in this.options) ? this.options.touchDraggingThreshold : 0
-
     this.startBounding()
     this.startPositioning()
     this.startListening()
@@ -103,7 +110,7 @@ export default class Draggable extends EventEmitter {
     this._dragMove = (event) => this.dragMove(event)
     this._dragEnd = (event) => this.dragEnd(event)
     this._nativeDragStart = (event) => this.nativeDragStart(event)
-    this._nativeDragOver = (event) => this.nativeDragOver(event)
+    this._nativeDragOver = throttledDragOver((event) => this.nativeDragOver(event), this.dragOverThrottleDuration)
     this._nativeDragEnd = (event) => this.nativeDragEnd(event)
     this._nativeDrop = (event) => this.nativeDrop(event)
     this._scroll = (event) => this.onScroll(event)
@@ -519,6 +526,14 @@ export default class Draggable extends EventEmitter {
 
   get shouldRemoveZeroTranslate() {
     return this.options.shouldRemoveZeroTranslate || false
+  }
+
+  get touchDraggingThreshold() {
+    return this.options.touchDraggingThreshold || 0
+  }
+
+  get dragOverThrottleDuration() {
+    return this.options.dragOverThrottleDuration || 50
   }
 
   get scrollPoint() {

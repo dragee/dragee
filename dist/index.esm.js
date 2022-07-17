@@ -1757,6 +1757,30 @@ function checkSupportPassiveEvents() {
 var isSupportPassiveEvents = checkSupportPassiveEvents();
 var isSupportPassiveEvents$1 = isSupportPassiveEvents;
 
+function throttle(func, wait) {
+  var lastTime = 0;
+  return function executedFunction() {
+    var context = this;
+    var args = arguments;
+    var now = Date.now();
+
+    if (now - lastTime >= wait) {
+      func.apply(context, args);
+      lastTime = now;
+    }
+  };
+}
+
+var throttledDragOver = function throttledDragOver(callback, duration) {
+  var throttledCallback = throttle(function (event) {
+    return callback(event);
+  }, duration);
+  return function (event) {
+    event.preventDefault();
+    throttledCallback(event);
+  };
+};
+
 var passiveFalse = isSupportPassiveEvents$1 ? {
   passive: false
 } : false;
@@ -1836,7 +1860,6 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     preventDoubleInit(_assertThisInitialized(_this));
     Draggable.emitter.emit('draggable:create', _assertThisInitialized(_this));
     _this._enable = true;
-    _this.touchDraggingThreshold = 'touchDraggingThreshold' in _this.options ? _this.options.touchDraggingThreshold : 0;
 
     _this.startBounding();
 
@@ -1894,9 +1917,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         return _this2.nativeDragStart(event);
       };
 
-      this._nativeDragOver = function (event) {
+      this._nativeDragOver = throttledDragOver(function (event) {
         return _this2.nativeDragOver(event);
-      };
+      }, this.dragOverThrottleDuration);
 
       this._nativeDragEnd = function (event) {
         return _this2.nativeDragEnd(event);
@@ -2353,6 +2376,16 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     key: "shouldRemoveZeroTranslate",
     get: function get() {
       return this.options.shouldRemoveZeroTranslate || false;
+    }
+  }, {
+    key: "touchDraggingThreshold",
+    get: function get() {
+      return this.options.touchDraggingThreshold || 0;
+    }
+  }, {
+    key: "dragOverThrottleDuration",
+    get: function get() {
+      return this.options.dragOverThrottleDuration || 50;
     }
   }, {
     key: "scrollPoint",
