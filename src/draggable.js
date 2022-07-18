@@ -533,7 +533,7 @@ export default class Draggable extends EventEmitter {
   }
 
   get dragOverThrottleDuration() {
-    return this.options.dragOverThrottleDuration || 50
+    return this.options.dragOverThrottleDuration || 10
   }
 
   get scrollPoint() {

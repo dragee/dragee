@@ -2385,7 +2385,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "dragOverThrottleDuration",
     get: function get() {
-      return this.options.dragOverThrottleDuration || 50;
+      return this.options.dragOverThrottleDuration || 10;
     }
   }, {
     key: "scrollPoint",

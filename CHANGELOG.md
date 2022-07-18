@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.1.2
+- Decrease default `dragOverThrottleDuration` to 10ms
+
 ## 1.1.1
 - Throttle `dragover` handler. Make duration configurable with `dragOverThrottleDuration` option.
 
