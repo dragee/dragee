@@ -108,6 +108,9 @@ export default class BubblingList extends List {
     this.draggables = this.draggables.filter((d) => !draggables.includes(d))
 
     this.draggables.forEach((d) => d.startPositioning())
+
+    this.autoDetectVerticalGap()
+    this.autoDetectStartPosition()
     this.bubbling()
   }
 

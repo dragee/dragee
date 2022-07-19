@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.1.5
+- Auto detect `verticalGap` and `startposition` on remove draggables, as it can be called before first dragstart.
+
 ## 1.1.4
 - Improve `verticalGap` option definition
 
