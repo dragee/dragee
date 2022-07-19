@@ -3374,7 +3374,7 @@ var BubblingList = /*#__PURE__*/function (_List) {
   }, {
     key: "verticalGap",
     get: function get() {
-      if (this.options.hasOwnProperty('verticalGap')) {
+      if (this.options.verticalGap) {
         return this.options.verticalGap;
       } else {
         this.autoDetectVerticalGap();

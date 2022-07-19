@@ -116,7 +116,7 @@ export default class BubblingList extends List {
   }
 
   get verticalGap() {
-    if(this.options.hasOwnProperty('verticalGap')) {
+    if(this.options.verticalGap) {
       return this.options.verticalGap
     } else {
       this.autoDetectVerticalGap()

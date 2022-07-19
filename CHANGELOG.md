@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.1.4
+- Improve `verticalGap` option definition
+
 ## 1.1.3
 - Made `verticalGap` configurable. Automatically we try to autodetect it on the first `dragstart`
 - Fix infinite loop while dragging by bubbling only in the dragging direction
