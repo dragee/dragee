@@ -76,7 +76,6 @@ BoundToArc.bounding(center, radius, startAgle, endAngle)
 | `isContentBoxSize` | `Boolean` | `true` | You can identify  that we should take into account element borders and paddings when we calculate draggable size. |
 | `nativeDragAndDrop` | `Boolean` | `false` | There can be situations where we need to use html5 drag&drop instead of `dragee` realization. Example: `table>tr` have a lot of issues, so it's easier to fix them using html5 drag&drop realization or emulation. |
 | `emulateNativeDragAndDropOnTouch` | `Boolean` | `true` | Emulate native drag&drop on touch devices. |
-| `emulateNativeDragAndDropForAll` | `Boolean` | `false` | Emulate native drag&drop on all browsers. |
 
 ## List
 

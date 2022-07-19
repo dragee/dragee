@@ -2009,7 +2009,6 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       var time = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
       var isSilent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       point = point.clone();
-      this.determineDirection(point);
       this.position = point;
 
       this._setTransition(time);
@@ -2051,10 +2050,12 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "determineDirection",
     value: function determineDirection(point) {
-      this.leftDirection = this.position.x < point.x;
-      this.rightDirection = this.position.x > point.x;
-      this.upDirection = this.position.y > point.y;
-      this.downDirection = this.position.y < point.y;
+      this._previousDirectionPosition || (this._previousDirectionPosition = this._startPosition);
+      this.leftDirection = this._previousDirectionPosition.x < point.x;
+      this.rightDirection = this._previousDirectionPosition.x > point.x;
+      this.upDirection = this._previousDirectionPosition.y > point.y;
+      this.downDirection = this._previousDirectionPosition.y < point.y;
+      this._previousDirectionPosition = point;
     }
   }, {
     key: "seemsScrolling",
@@ -2154,6 +2155,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
       point = this.bounding.bound(point, this.getSize());
+      this.determineDirection(point);
       this.move(point);
       this.element.classList.add('dragee-active');
     }
@@ -2188,6 +2190,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       point = this.bounding.bound(point, this.getSize());
 
       if (!this.nativeDragAndDrop) {
+        this.determineDirection(point);
         this.move(point);
       }
     }
@@ -2216,6 +2219,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
 
       point = this.bounding.bound(point, this.getSize());
+      this.determineDirection(point);
       this.position = point;
       this.emit('drag:move');
     }
@@ -2250,6 +2254,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
       window.removeEventListener('scroll', this._scroll);
       this.isDragging = false;
+      this._previousDirectionPosition = null;
       this.element.removeAttribute('draggable');
     }
   }, {
@@ -2283,6 +2288,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
           'drag:move': function dragMove() {
             var containerRectPoint = new Point(containerRect.left, containerRect.top);
             _this5.position = emulationDraggable.position.sub(containerRectPoint).sub(_this5._startScrollPoint);
+
+            _this5.determineDirection(_this5.position);
 
             _this5.emit('drag:move');
           },
@@ -2385,7 +2392,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "dragOverThrottleDuration",
     get: function get() {
-      return this.options.dragOverThrottleDuration || 10;
+      return this.options.dragOverThrottleDuration || 16;
     }
   }, {
     key: "scrollPoint",
@@ -3231,28 +3238,18 @@ var BubblingList = /*#__PURE__*/function (_List) {
 
   var _super = _createSuper(BubblingList);
 
-  function BubblingList(draggables) {
-    var _this;
-
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
+  function BubblingList() {
     _classCallCheck(this, BubblingList);
 
-    _this = _super.call(this, draggables, options);
-
-    _this.autoDetectVerticalGap();
-
-    _this.autoDetectStartPosition();
-
-    return _this;
+    return _super.apply(this, arguments);
   }
 
   _createClass(BubblingList, [{
     key: "autoDetectVerticalGap",
     value: function autoDetectVerticalGap() {
-      if (this.draggables.length >= 2 && !this.verticalGap) {
+      if (!this._verticalGap && !this.options.verticalGap && this.draggables.length >= 2) {
         var sorted = this.getSortedDraggables();
-        this.verticalGap = sorted[1].pinnedPosition.y - sorted[0].pinnedPosition.y - sorted[0].getSize().y;
+        this._verticalGap = sorted[1].pinnedPosition.y - sorted[0].pinnedPosition.y - sorted[0].getSize().y;
       }
     }
   }, {
@@ -3265,32 +3262,19 @@ var BubblingList = /*#__PURE__*/function (_List) {
   }, {
     key: "initDraggable",
     value: function initDraggable(draggable) {
-      var _this2 = this;
+      var _this = this;
 
       _get(_getPrototypeOf(BubblingList.prototype), "initDraggable", this).call(this, draggable);
 
       draggable.on('drag:start', function () {
-        return _this2.onDragStart(draggable);
+        return _this.onDragStart(draggable);
       });
-    }
-  }, {
-    key: "onResize",
-    value: function onResize() {
-      _get(_getPrototypeOf(BubblingList.prototype), "onResize", this).call(this);
-
-      this.autoDetectVerticalGap();
-    }
-  }, {
-    key: "add",
-    value: function add(draggables) {
-      _get(_getPrototypeOf(BubblingList.prototype), "add", this).call(this, draggables);
-
-      this.autoDetectStartPosition();
-      this.autoDetectVerticalGap();
     }
   }, {
     key: "onDragStart",
     value: function onDragStart(draggable) {
+      this.autoDetectVerticalGap();
+      this.autoDetectStartPosition();
       this.cachedSortedDraggables = this.getSortedDraggables();
       this.indexOfActiveDraggable = this.cachedSortedDraggables.indexOf(draggable);
     }
@@ -3299,42 +3283,54 @@ var BubblingList = /*#__PURE__*/function (_List) {
     value: function onMove(draggable) {
       var prevDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable - 1];
       var nextDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable + 1];
-      var currentOrder = [prevDraggable, draggable, nextDraggable].filter(Boolean).map(function (d) {
-        return d.pinnedPosition;
-      });
       var currentPosition = draggable.pinnedPosition;
-      var targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc);
+      var currentOrder;
+      var targetIndex;
 
-      if (prevDraggable && targetIndex === 0) {
-        if (draggable.shouldUseNativeDragAndDrop()) {
-          draggable.pinPosition(prevDraggable.pinnedPosition);
-        } else {
-          draggable.pinnedPosition = prevDraggable.pinnedPosition.clone();
+      if (draggable.upDirection && prevDraggable) {
+        currentOrder = [prevDraggable, draggable].map(function (d) {
+          return d.pinnedPosition;
+        });
+        targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc);
+
+        if (targetIndex === 0) {
+          if (draggable.shouldUseNativeDragAndDrop()) {
+            draggable.pinPosition(prevDraggable.pinnedPosition);
+          } else {
+            draggable.pinnedPosition = prevDraggable.pinnedPosition.clone();
+          }
+
+          prevDraggable.pinPosition(new Point(currentPosition.x, draggable.pinnedPosition.y + draggable.getSize().y + this.verticalGap), this.options.timeExcange);
+          arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable--, this.indexOfActiveDraggable);
+          this.onMove(draggable);
+          this.changedDuringIteration = true;
         }
+      } else if (draggable.downDirection && nextDraggable) {
+        currentOrder = [draggable, nextDraggable].map(function (d) {
+          return d.pinnedPosition;
+        });
+        targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc);
 
-        prevDraggable.pinPosition(new Point(currentPosition.x, draggable.pinnedPosition.y + draggable.getSize().y + (this.verticalGap || 0)), this.options.timeExcange);
-        arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable--, this.indexOfActiveDraggable);
-        this.onMove(draggable);
-        this.changedDuringIteration = true;
-      } else if (nextDraggable && (targetIndex === 2 || targetIndex === 1 && !prevDraggable)) {
-        nextDraggable.pinPosition(draggable.pinnedPosition, this.options.timeExcange);
-        var draggableNewPosition = new Point(nextDraggable.pinnedPosition.x, nextDraggable.pinnedPosition.y + nextDraggable.getSize().y + (this.verticalGap || 0));
+        if (targetIndex === 1) {
+          nextDraggable.pinPosition(draggable.pinnedPosition, this.options.timeExcange);
+          var draggableNewPosition = new Point(nextDraggable.pinnedPosition.x, nextDraggable.pinnedPosition.y + nextDraggable.getSize().y + this.verticalGap);
 
-        if (draggable.shouldUseNativeDragAndDrop()) {
-          draggable.pinPosition(draggableNewPosition);
-        } else {
-          draggable.pinnedPosition = draggableNewPosition;
+          if (draggable.shouldUseNativeDragAndDrop()) {
+            draggable.pinPosition(draggableNewPosition);
+          } else {
+            draggable.pinnedPosition = draggableNewPosition;
+          }
+
+          arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable++, this.indexOfActiveDraggable);
+          this.onMove(draggable);
+          this.changedDuringIteration = true;
         }
-
-        arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable++, this.indexOfActiveDraggable);
-        this.onMove(draggable);
-        this.changedDuringIteration = true;
       }
     }
   }, {
     key: "bubbling",
     value: function bubbling(sortedDraggables, currentDraggable) {
-      var _this3 = this;
+      var _this2 = this;
 
       var currentPosition = this.startPosition.clone();
       sortedDraggables || (sortedDraggables = this.getSortedDraggables());
@@ -3343,24 +3339,24 @@ var BubblingList = /*#__PURE__*/function (_List) {
           if (draggable === currentDraggable && !currentDraggable.shouldUseNativeDragAndDrop()) {
             draggable.pinnedPosition = currentPosition.clone();
           } else {
-            draggable.pinPosition(currentPosition, draggable === currentDraggable ? 0 : _this3.options.timeExcange);
+            draggable.pinPosition(currentPosition, draggable === currentDraggable ? 0 : _this2.options.timeExcange);
           }
         }
 
-        currentPosition.y = currentPosition.y + draggable.getSize().y + (_this3.verticalGap || 0);
+        currentPosition.y = currentPosition.y + draggable.getSize().y + _this2.verticalGap;
       });
     }
   }, {
     key: "remove",
     value: function remove(draggables) {
-      var _this4 = this;
+      var _this3 = this;
 
       if (!(draggables instanceof Array)) {
         draggables = [draggables];
       }
 
       draggables.forEach(function (draggable) {
-        return _this4.releaseDraggable(draggable);
+        return _this3.releaseDraggable(draggable);
       });
       this.draggables = this.draggables.filter(function (d) {
         return !draggables.includes(d);
@@ -3374,6 +3370,19 @@ var BubblingList = /*#__PURE__*/function (_List) {
     key: "distanceFunc",
     get: function get() {
       return this.options.getDistance || getYDifference;
+    }
+  }, {
+    key: "verticalGap",
+    get: function get() {
+      if (this.options.hasOwnProperty('verticalGap')) {
+        return this.options.verticalGap;
+      } else {
+        this.autoDetectVerticalGap();
+        return this._verticalGap || 0;
+      }
+    },
+    set: function set(gapValue) {
+      this.options.verticalGap = gapValue;
     }
   }], [{
     key: "factory",
