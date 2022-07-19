@@ -182,8 +182,6 @@ export default class Draggable extends EventEmitter {
 
   move(point, time=0, isSilent=false) {
     point = point.clone()
-
-    this.determineDirection(point)
     this.position = point
 
     this._setTransition(time)
@@ -215,10 +213,14 @@ export default class Draggable extends EventEmitter {
   }
 
   determineDirection(point) {
-    this.leftDirection = (this.position.x < point.x)
-    this.rightDirection = (this.position.x > point.x)
-    this.upDirection = (this.position.y > point.y)
-    this.downDirection = (this.position.y < point.y)
+    this._previousDirectionPosition ||= this._startPosition
+
+    this.leftDirection = (this._previousDirectionPosition.x < point.x)
+    this.rightDirection = (this._previousDirectionPosition.x > point.x)
+    this.upDirection = (this._previousDirectionPosition.y > point.y)
+    this.downDirection = (this._previousDirectionPosition.y < point.y)
+
+    this._previousDirectionPosition = point
   }
 
   seemsScrolling() {
@@ -322,6 +324,7 @@ export default class Draggable extends EventEmitter {
                                    .add(this.scrollPoint.sub(this._startScrollPoint))
 
     point = this.bounding.bound(point, this.getSize())
+    this.determineDirection(point)
     this.move(point)
     this.element.classList.add('dragee-active')
   }
@@ -351,6 +354,7 @@ export default class Draggable extends EventEmitter {
 
     point = this.bounding.bound(point, this.getSize())
     if (!this.nativeDragAndDrop) {
+      this.determineDirection(point)
       this.move(point)
     }
   }
@@ -375,6 +379,7 @@ export default class Draggable extends EventEmitter {
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.scrollPoint.sub(this._startScrollPoint))
     point = this.bounding.bound(point, this.getSize())
+    this.determineDirection(point)
     this.position = point
     this.emit('drag:move')
   }
@@ -410,6 +415,7 @@ export default class Draggable extends EventEmitter {
     window.removeEventListener('scroll', this._scroll)
 
     this.isDragging = false
+    this._previousDirectionPosition = null
     this.element.removeAttribute('draggable')
   }
 
@@ -441,6 +447,8 @@ export default class Draggable extends EventEmitter {
           const containerRectPoint = new Point(containerRect.left, containerRect.top)
           this.position = emulationDraggable.position.sub(containerRectPoint)
                                                      .sub(this._startScrollPoint)
+
+          this.determineDirection(this.position)
           this.emit('drag:move')
         },
         'drag:end': () => {
@@ -533,7 +541,7 @@ export default class Draggable extends EventEmitter {
   }
 
   get dragOverThrottleDuration() {
-    return this.options.dragOverThrottleDuration || 10
+    return this.options.dragOverThrottleDuration || 16
   }
 
   get scrollPoint() {

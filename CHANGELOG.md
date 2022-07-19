@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## 1.1.3
+- Made `verticalGap` configurable. Automatically we try to autodetect it on the first `dragstart`
+- Fix infinite loop while dragging by bubbling only in the dragging direction
+- Fix determining direction when the `nativeDragAndDrop` option is turned on, and while emulating it on mobiles, and while scrolling.
+
 ## 1.1.2
 - Decrease default `dragOverThrottleDuration` to 10ms
 
