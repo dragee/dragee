@@ -3364,9 +3364,12 @@ var BubblingList = /*#__PURE__*/function (_List) {
       this.draggables.forEach(function (d) {
         return d.startPositioning();
       });
-      this.autoDetectVerticalGap();
-      this.autoDetectStartPosition();
-      this.bubbling();
+
+      if (this.draggables.length > 0) {
+        this.autoDetectVerticalGap();
+        this.autoDetectStartPosition();
+        this.bubbling();
+      }
     }
   }, {
     key: "distanceFunc",

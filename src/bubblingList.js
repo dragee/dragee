@@ -109,9 +109,11 @@ export default class BubblingList extends List {
 
     this.draggables.forEach((d) => d.startPositioning())
 
-    this.autoDetectVerticalGap()
-    this.autoDetectStartPosition()
-    this.bubbling()
+    if(this.draggables.length > 0) {
+      this.autoDetectVerticalGap()
+      this.autoDetectStartPosition()
+      this.bubbling()
+    }
   }
 
   get distanceFunc() {

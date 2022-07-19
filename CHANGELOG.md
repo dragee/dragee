@@ -1,7 +1,10 @@
 ## [Unreleased]
 
+## 1.1.6
+- We do not need to call `bubbling` after removing all `draggables`
+
 ## 1.1.5
-- Auto detect `verticalGap` and `startposition` on remove draggables, as it can be called before first dragstart.
+- Auto detect `verticalGap` and `startPosition` on remove draggable, as it can be called before the first `dragstart`
 
 ## 1.1.4
 - Improve `verticalGap` option definition
