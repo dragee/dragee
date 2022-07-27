@@ -121,7 +121,7 @@ export default class Draggable extends EventEmitter {
   }
 
   getSize() {
-    return Point.elementSize(this.element, this.options.isContentBoxSize)
+    return Point.elementSize(this.element)
   }
 
   getPosition() {

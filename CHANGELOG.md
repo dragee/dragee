@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.1.7
+- Improve `elementSize` calculation, remove `isContentBoxSize` option
+
 ## 1.1.6
 - We do not need to call `bubbling` after removing all `draggables`
 

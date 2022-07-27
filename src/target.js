@@ -79,12 +79,7 @@ export default class Target extends EventEmitter {
   }
 
   getRectangle() {
-    return Rectangle.fromElement(
-      this.element,
-      this.container,
-      this.options.isContentBoxSize,
-      true
-    )
+    return Rectangle.fromElement(this.element, this.container, true)
   }
 
   catchDraggable(draggable) {

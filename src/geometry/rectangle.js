@@ -89,9 +89,9 @@ export default class Rectangle {
     return Math.min(this.size.x, this.size.y)
   }
 
-  static fromElement(element, parent=element.parentNode, isContentBoxSize=false, isConsiderTranslate=false) {
+  static fromElement(element, parent=element.parentNode, isConsiderTranslate=false) {
     const position = Point.elementOffset(element, parent, isConsiderTranslate)
-    const size = Point.elementSize(element, isContentBoxSize)
+    const size = Point.elementSize(element)
     return new Rectangle(position, size)
   }
 }

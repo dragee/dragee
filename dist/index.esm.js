@@ -286,14 +286,7 @@ function _createForOfIteratorHelper(o, allowArrayLike) {
   };
 }
 
-function getSumValueOfStyleRules(element, rules) {
-  return rules.reduce(function (sum, rule) {
-    return sum + parseInt(window.getComputedStyle(element)[rule] || 0);
-  }, 0);
-}
 /** Class representing a point. */
-
-
 var Point = /*#__PURE__*/function () {
   /**
   * Create a point.
@@ -353,16 +346,8 @@ var Point = /*#__PURE__*/function () {
   }, {
     key: "elementSize",
     value: function elementSize(element) {
-      var isContentBoxSize = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      var width = parseInt(window.getComputedStyle(element)['width']);
-      var height = parseInt(window.getComputedStyle(element)['height']);
-
-      if (!isContentBoxSize) {
-        width += getSumValueOfStyleRules(element, ['padding-left', 'padding-right', 'border-left-width', 'border-right-width']);
-        height += getSumValueOfStyleRules(element, ['padding-top', 'padding-bottom', 'border-top-width', 'border-bottom-width']);
-      }
-
-      return new Point(width, height);
+      var elementRect = element.getBoundingClientRect();
+      return new Point(elementRect.width, elementRect.height);
     }
   }]);
 
@@ -484,10 +469,9 @@ var Rectangle = /*#__PURE__*/function () {
     key: "fromElement",
     value: function fromElement(element) {
       var parent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : element.parentNode;
-      var isContentBoxSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      var isConsiderTranslate = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var isConsiderTranslate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var position = Point.elementOffset(element, parent, isConsiderTranslate);
-      var size = Point.elementSize(element, isContentBoxSize);
+      var size = Point.elementSize(element);
       return new Rectangle(position, size);
     }
   }]);
@@ -1415,7 +1399,7 @@ var Target = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "getRectangle",
     value: function getRectangle() {
-      return Rectangle.fromElement(this.element, this.container, this.options.isContentBoxSize, true);
+      return Rectangle.fromElement(this.element, this.container, true);
     }
   }, {
     key: "catchDraggable",
@@ -1940,7 +1924,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "getSize",
     value: function getSize() {
-      return Point.elementSize(this.element, this.options.isContentBoxSize);
+      return Point.elementSize(this.element);
     }
   }, {
     key: "getPosition",

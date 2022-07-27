@@ -45,9 +45,6 @@ new Draggable(element, {
 ### position
 Start positioning. By default we automatically calculate position inside `container`
 
-### isContentBoxSize
-You can identify  that we should take into account element borders and paddings when we calculate draggable size
-
 ## List options:
 ### nativeDragAndDrop
 There can be situations where we need to use html5 drag&drop instead of `dragee` realization.

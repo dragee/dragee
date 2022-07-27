@@ -73,7 +73,6 @@ BoundToArc.bounding(center, radius, startAgle, endAngle)
 | `handler` | `string/element` | null | specifies on what element the drag interaction starts. |
 | `container` | `element` | auto | HTMLElement that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate `container` automatically by finding first `parentNode` that have non `static` positioning. |
 | `position` | `Point` | auto | Start positioning. By default we automatically calculate position inside `container` element. |
-| `isContentBoxSize` | `Boolean` | `true` | You can identify  that we should take into account element borders and paddings when we calculate draggable size. |
 | `nativeDragAndDrop` | `Boolean` | `false` | There can be situations where we need to use html5 drag&drop instead of `dragee` realization. Example: `table>tr` have a lot of issues, so it's easier to fix them using html5 drag&drop realization or emulation. |
 | `emulateNativeDragAndDropOnTouch` | `Boolean` | `true` | Emulate native drag&drop on touch devices. |
 
