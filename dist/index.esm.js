@@ -2073,7 +2073,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         this._startTouchTimestamp = +new Date();
       }
 
-      this._startScrollPoint = new Point(window.scrollX, window.scrollY);
+      this._startWindowScrollPoint = this.windowScrollPoint;
+      this._startParentsScrollPoint = this.parentsScrollPoint;
 
       if (event.target instanceof window.HTMLInputElement || event.target instanceof window.HTMLInputElement) {
         event.target.focus();
@@ -2110,6 +2111,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       }
 
       window.addEventListener('scroll', this._scroll);
+      this.parents.forEach(function (p) {
+        return p.addEventListener('scroll', _this3._scroll);
+      });
       this.emit('drag:start');
     }
   }, {
@@ -2136,7 +2140,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       event.preventDefault();
       this.touchPoint = new Point(this.isTouchEvent ? touch.pageX : event.clientX, this.isTouchEvent ? touch.pageY : event.clientY);
 
-      var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
+      var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.parentsScrollPoint.sub(this._startParentsScrollPoint));
 
       point = this.bounding.bound(point, this.getSize());
       this.determineDirection(point);
@@ -2169,7 +2173,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "onScroll",
     value: function onScroll(_event) {
-      var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
+      var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.parentsScrollPoint.sub(this._startParentsScrollPoint));
 
       point = this.bounding.bound(point, this.getSize());
 
@@ -2200,7 +2204,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
 
       this.touchPoint = new Point(event.clientX, event.clientY);
 
-      var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.scrollPoint.sub(this._startScrollPoint));
+      var point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.parentsScrollPoint.sub(this._startParentsScrollPoint));
 
       point = this.bounding.bound(point, this.getSize());
       this.determineDirection(point);
@@ -2210,6 +2214,8 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "nativeDragEnd",
     value: function nativeDragEnd(_event) {
+      var _this5 = this;
+
       this.element.classList.remove('dragee-placeholder');
       this.dragEndAction();
       this.emit('drag:end');
@@ -2218,6 +2224,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
       document.removeEventListener('drop', this._nativeDrop);
       window.removeEventListener('scroll', this._scroll);
+      this.parents.forEach(function (p) {
+        return p.removeEventListener('scroll', _this5._scroll);
+      });
       this.isDragging = false;
       this.element.removeAttribute('draggable');
       this.element.classList.remove('dragee-active');
@@ -2231,12 +2240,17 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "cancelDragging",
     value: function cancelDragging() {
+      var _this6 = this;
+
       document.removeEventListener(touchEvents.move, this._dragMove);
       document.removeEventListener(mouseEvents.move, this._dragMove);
       document.removeEventListener(touchEvents.end, this._dragEnd);
       document.removeEventListener(mouseEvents.end, this._dragEnd);
       document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
       window.removeEventListener('scroll', this._scroll);
+      this.parents.forEach(function (p) {
+        return p.removeEventListener('scroll', _this6._scroll);
+      });
       this.isDragging = false;
       this._previousDirectionPosition = null;
       this.element.removeAttribute('draggable');
@@ -2253,7 +2267,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "emulateNativeDragAndDrop",
     value: function emulateNativeDragAndDrop(event) {
-      var _this5 = this;
+      var _this7 = this;
 
       var containerRect = this.container.getBoundingClientRect();
       var clonedElement = this.element.cloneNode(true);
@@ -2271,29 +2285,31 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         on: {
           'drag:move': function dragMove() {
             var containerRectPoint = new Point(containerRect.left, containerRect.top);
-            _this5.position = emulationDraggable.position.sub(containerRectPoint).sub(_this5._startScrollPoint);
+            _this7.position = emulationDraggable.position.sub(containerRectPoint).sub(_this7._startWindowScrollPoint).add(_this7._startParentsScrollPoint);
 
-            _this5.determineDirection(_this5.position);
+            _this7.determineDirection(_this7.position);
 
-            _this5.emit('drag:move');
+            _this7.emit('drag:move');
           },
           'drag:end': function dragEnd() {
             emulationDraggable.destroy();
             document.body.removeChild(clonedElement);
 
-            _this5.element.classList.remove('dragee-placeholder');
+            _this7.element.classList.remove('dragee-placeholder');
 
-            _this5.element.classList.remove('dragee-active');
+            _this7.element.classList.remove('dragee-active');
 
-            _this5.emit('drag:end');
+            _this7.emit('drag:end');
 
-            _this5.dragEndAction();
+            _this7.dragEndAction();
+
+            _this7.cancelDragging();
           }
         }
       });
       var containerRectPoint = new Point(containerRect.left, containerRect.top);
-      emulationDraggable._startScrollPoint = this._startScrollPoint;
-      emulationDraggable.move(this.pinnedPosition.add(containerRectPoint).add(new Point(window.scrollX, window.scrollY)));
+      emulationDraggable._startWindowScrollPoint = this._startWindowScrollPoint;
+      emulationDraggable.move(this.pinnedPosition.add(containerRectPoint).add(this.windowScrollPoint).sub(this.parentsScrollPoint));
       emulationDraggable.dragStart(event);
       event.preventDefault();
     }
@@ -2379,9 +2395,33 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       return this.options.dragOverThrottleDuration || 16;
     }
   }, {
-    key: "scrollPoint",
+    key: "windowScrollPoint",
     get: function get() {
       return new Point(window.scrollX, window.scrollY);
+    }
+  }, {
+    key: "parents",
+    get: function get() {
+      if (this._cachedParents) return this._cachedParents;
+      this._cachedParents = [];
+      var element = this.element;
+
+      while (element.parentNode && element != this.container) {
+        this._cachedParents.unshift(element.parentNode);
+
+        element = element.parentNode;
+      }
+
+      return this._cachedParents;
+    }
+  }, {
+    key: "parentsScrollPoint",
+    get: function get() {
+      return new Point(this.parents.reduce(function (sum, p) {
+        return sum + p.scrollLeft;
+      }, 0), this.parents.reduce(function (sum, p) {
+        return sum + p.scrollTop;
+      }, 0));
     }
   }, {
     key: "enable",

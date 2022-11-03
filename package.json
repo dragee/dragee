@@ -1,6 +1,6 @@
 {
   "name": "dragee",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Dragee(drag&drop) library",
   "scripts": {
     "build": "rollup --config rollup.config.js",

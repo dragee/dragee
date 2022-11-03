@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.1.8
+- Improve draggable positioning while scrolling all parents
+
 ## 1.1.7
 - Improve `elementSize` calculation, remove `isContentBoxSize` option
 

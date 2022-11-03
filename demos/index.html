@@ -432,6 +432,9 @@
                     }
 
                     #DemoList ul.list.list-a {
+                      height: 400px;
+                      overflow: auto;
+                      overflow-x: hidden;
                       width: 26%;
                     }
                     #DemoList ul.list li.dragee-placeholder {
@@ -485,7 +488,8 @@
                             nativeDragAndDrop: true,
                             emulateNativeDragAndDropOnTouch: true,
                             radius: 10,
-                            container: document.body
+                            container: document.body,
+                            bound(p) { return p }
                           }
                         });
                         listB = Dragee.List.factory(listBParentElement, listBElements, {
