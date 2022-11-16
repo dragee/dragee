@@ -21,7 +21,6 @@
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-uglify": "^6.0.3",
     "rollup-plugin-visualizer": "^5.8.3"
   },
   "repository": "github:dragee/dragee",
@@ -29,7 +28,8 @@
   "license": "ISC",
   "dependencies": {
     "@juggle/resize-observer": "^3.4.0",
-    "desandro-get-style-property": "^1.0.4"
+    "desandro-get-style-property": "^1.0.4",
+    "rollup-plugin-terser": "^7.0.2"
   },
   "module": "dist/index.esm.js",
   "main": "dist/index.umd.js",
