@@ -554,6 +554,103 @@
         </div>
     </section>
 
+    <section id="NestingList" >
+        <div class="row demo-row">
+            <div class="span12 demo-span">
+                <div id="DemoNestingList" class="demo-html">
+                    <div id="DemoNestingList" class="demo-html">
+                      <ul class="list list-a">
+                        <li class="list-a-items"><span class='handler'>↔</span> A
+                          <ul class="list list-b">
+                            <li><span class='handler'>↔</span> AA</li>
+                            <li><span class='handler'>↔</span> AB</li>
+                            <li><span class='handler'>↔</span> AC</li>
+                          </ul>
+                        </li>
+                        <li class="list-a-items"><span class='handler'>↔</span> B</li>
+                        <li class="list-a-items"><span class='handler'>↔</span> C</li>
+                      </ul>
+                    </div>
+                </div>
+                <style>
+                    #DemoNestingList{
+                      padding: 2%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: hidden;
+                    }
+
+                    #DemoNestingList ul.list{
+                      width: 600px;
+                      position: relative;
+                      margin-bottom: 30px;
+                      padding: 5%;
+                      margin: 2%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                    }
+
+                    #DemoNestingList ul.list li{
+                      list-style: none;
+                      margin: 4px;
+                      padding: 9px 14px;
+                      font-size: 15px;
+                      color: #333;
+                      cursor: move;
+                      border: 1px solid #333;
+                      border-radius: 5px;
+                      background: #f5f5f5;
+                      position: relative;
+                      transition: opacity 0ms;
+                    }
+                    #DemoNestingList ul.list li.dragee-active{
+                      z-index: 2;
+                      background: yellow;
+                    }
+
+                    #DemoNestingList ul.list li.dragee-placeholder {
+                      z-index: 0;
+                      opacity: 0.2;
+                      background: yellow;
+                      transition: opacity 0ms;
+                    }
+
+                    #DemoNestingList ul.list.list-b {
+                      width: 200px;
+                      margin: 0 auto;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        var listA, listB,
+                            root = document.getElementById("DemoNestingList"),
+                            listAParentElement = root.getElementsByClassName("list-a")[0],
+                            listAElements = listAParentElement.querySelectorAll(".list-a-items"),
+                            listBParentElement = root.getElementsByClassName("list-b")[0],
+                            listBElements = listBParentElement.getElementsByTagName("li");
+
+                        listA = Dragee.BubblingList.factory(listAParentElement, listAElements, {
+                          draggable: {
+                            nativeDragAndDrop: true,
+                            radius: 10,
+                            bound(p) { return p }
+                          }
+                        });
+                        listB = Dragee.List.factory(listBParentElement, listBElements, {
+                          draggable: {
+                            nativeDragAndDrop: true,
+                            radius: 10,
+                            bound(p) { return p }
+                          }
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </section>
+
     <section id="TargetBasic" >
         <div class="row demo-row">
             <div class="span6 demo-span">
