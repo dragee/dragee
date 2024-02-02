@@ -1761,6 +1761,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       if (!this._enable) {
         return;
       }
+      if (this.stopPropagationOnStart) {
+        event.stopPropagation();
+      }
       this.isTouchEvent = isTouch && event instanceof window.TouchEvent;
       this.touchPoint = this._startTouchPoint = new Point(this.isTouchEvent ? event.changedTouches[0].pageX : event.clientX, this.isTouchEvent ? event.changedTouches[0].pageY : event.clientY);
       this._startPosition = this.getPosition();
@@ -1862,6 +1865,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "nativeDragStart",
     value: function nativeDragStart(event) {
+      if (this.stopPropagationOnStart) {
+        event.stopPropagation();
+      }
       event.dataTransfer.setData('text', 'FireFox fix');
       event.dataTransfer.effectAllowed = 'move';
       document.addEventListener('dragover', this._nativeDragOver);
@@ -2029,6 +2035,13 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
         }
       }
       return this._handler;
+    }
+
+    // It can be usefull for nested draggables
+  }, {
+    key: "stopPropagationOnStart",
+    get: function get() {
+      return this.options.stopPropagationOnStart || false;
     }
   }, {
     key: "nativeDragAndDrop",

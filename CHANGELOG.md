@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.1.9
+- Add `stopPropagationOnStart` option for `draggable`. It can be useful when we have nested draggables
+
 ## 1.1.8
 - Improve draggable positioning while scrolling all parents
 
@@ -113,8 +116,8 @@
 - Rename parent to container
 
 ## 1.0.0
-### Remove
-- Remove IE9 support
+### Removed
+- Removed IE9 support
 
 ### Added
 - shouldRemoveZeroTranslate option for draggable

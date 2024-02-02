@@ -642,7 +642,8 @@
                           draggable: {
                             nativeDragAndDrop: true,
                             radius: 10,
-                            bound(p) { return p }
+                            bound(p) { return p },
+                            stopPropagationOnStart: true
                           }
                         });
                     });
