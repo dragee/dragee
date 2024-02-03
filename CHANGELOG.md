@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## 1.1.10
+- rename `stopPropagationOnStart` option to `stopPropagationOnStartDrag`
+- always stop propagation on native drag start event to prevent parent sortable from receiving it
+
 ## 1.1.9
 - Add `stopPropagationOnStart` option for `draggable`. It can be useful when we have nested draggables
 

@@ -240,7 +240,7 @@ export default class Draggable extends EventEmitter {
       return
     }
 
-    if (this.stopPropagationOnStart) {
+    if (this.stopPropagationOnDragStart) {
       event.stopPropagation()
     }
 
@@ -368,9 +368,7 @@ export default class Draggable extends EventEmitter {
   }
 
   nativeDragStart(event) {
-    if (this.stopPropagationOnStart) {
-      event.stopPropagation()
-    }
+    event.stopPropagation()
     event.dataTransfer.setData('text', 'FireFox fix')
     event.dataTransfer.effectAllowed = 'move'
     document.addEventListener('dragover', this._nativeDragOver)
@@ -542,9 +540,8 @@ export default class Draggable extends EventEmitter {
     return this._handler
   }
 
-  // It can be usefull for nested draggables
-  get stopPropagationOnStart() {
-    return this.options.stopPropagationOnStart || false
+  get stopPropagationOnDragStart() {
+    return this.options.stopPropagationOnDragStart || false
   }
 
   get nativeDragAndDrop() {
