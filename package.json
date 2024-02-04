@@ -1,6 +1,6 @@
 {
   "name": "dragee",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Dragee(drag&drop) library",
   "scripts": {
     "build": "rollup --config rollup.config.mjs",
@@ -21,6 +21,7 @@
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-visualizer": "^5.8.3"
   },
   "repository": "github:dragee/dragee",
@@ -28,8 +29,7 @@
   "license": "ISC",
   "dependencies": {
     "@juggle/resize-observer": "^3.4.0",
-    "desandro-get-style-property": "^1.0.4",
-    "rollup-plugin-terser": "^7.0.2"
+    "desandro-get-style-property": "^1.0.4"
   },
   "module": "dist/index.esm.js",
   "main": "dist/index.umd.js",

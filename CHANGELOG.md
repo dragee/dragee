@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.1.11
+- remove `rollup-plugin-terser` from dependencies
+
 ## 1.1.10
 - rename `stopPropagationOnStart` option to `stopPropagationOnStartDrag`
 - always stop propagation on native drag start event to prevent parent sortable from receiving it
