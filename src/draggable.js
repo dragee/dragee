@@ -117,7 +117,6 @@ export default class Draggable extends EventEmitter {
 
     this.handler.addEventListener(touchEvents.start, this._dragStart, passiveFalse)
     this.handler.addEventListener(mouseEvents.start, this._dragStart, passiveFalse)
-    this.element.addEventListener('dragstart', this._nativeDragStart)
   }
 
   getSize() {
@@ -283,6 +282,7 @@ export default class Draggable extends EventEmitter {
         document.addEventListener(touchEvents.move, emulateOnFirstMove, passiveFalse)
         document.addEventListener(touchEvents.end, cancelEmulation, passiveFalse)
       } else {
+        this.element.addEventListener('dragstart', this._nativeDragStart)
         this.element.draggable = true
         document.addEventListener(mouseEvents.end, this._nativeDragEnd, passiveFalse)
       }
@@ -406,6 +406,7 @@ export default class Draggable extends EventEmitter {
     this.parents.forEach((p) => p.removeEventListener('scroll', this._scroll))
     this.isDragging = false
     this.element.removeAttribute('draggable')
+    this.element.removeEventListener('dragstart', this._nativeDragStart)
     this.element.classList.remove('dragee-active')
   }
 
@@ -429,6 +430,7 @@ export default class Draggable extends EventEmitter {
     this.isDragging = false
     this._previousDirectionPosition = null
     this.element.removeAttribute('draggable')
+    this.element.removeEventListener('dragstart', this._nativeDragStart)
   }
 
   copyStyles(source, destination) {

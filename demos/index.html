@@ -345,7 +345,13 @@
                 <div id="DemoList" class="demo-html">
                     <div id="DemoList" class="demo-html">
                       <ul class="list list-a">
-                        <li style="height: 188px"><span class='handler'>↔</span> A</li>
+                        <li style="height: 188px">
+                          <span class='handler'>↔</span> A
+                          <br />
+                          <input />
+                          <br />
+                          Ola-la
+                        </li>
                         <li style="height: 38px"><span class='handler'>↔</span> B</li>
                         <li style="height: 48px"><span class='handler'>↔</span> C</li>
                         <li style="height: 58px"><span class='handler'>↔</span> D</li>
@@ -426,6 +432,12 @@
                       position: relative;
                       transition: opacity 0ms;
                     }
+                    #DemoList ul.list-a li {
+                      cursor: auto;
+                    }
+                    #DemoList ul.list-a li .handler {
+                      cursor: move;
+                    }
                     #DemoList ul.list li.dragee-active{
                       z-index: 2;
                       background: yellow;
@@ -485,6 +497,7 @@
 
                         listA = Dragee.BubblingList.factory(listAParentElement, listAElements, {
                           draggable: {
+                            handler: '.handler',
                             nativeDragAndDrop: true,
                             emulateNativeDragAndDropOnTouch: true,
                             radius: 10,

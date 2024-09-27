@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 1.1.12
+- improve `nativeDragAndDrop` mode, prevents from dragging when nested elements start dragging
+
 ## 1.1.11
 - remove `rollup-plugin-terser` from dependencies
 

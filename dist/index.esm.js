@@ -1628,7 +1628,6 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       };
       this.handler.addEventListener(touchEvents.start, this._dragStart, passiveFalse);
       this.handler.addEventListener(mouseEvents.start, this._dragStart, passiveFalse);
-      this.element.addEventListener('dragstart', this._nativeDragStart);
     }
   }, {
     key: "getSize",
@@ -1793,6 +1792,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
           document.addEventListener(touchEvents.move, emulateOnFirstMove, passiveFalse);
           document.addEventListener(touchEvents.end, cancelEmulation, passiveFalse);
         } else {
+          this.element.addEventListener('dragstart', this._nativeDragStart);
           this.element.draggable = true;
           document.addEventListener(mouseEvents.end, this._nativeDragEnd, passiveFalse);
         }
@@ -1905,6 +1905,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       });
       this.isDragging = false;
       this.element.removeAttribute('draggable');
+      this.element.removeEventListener('dragstart', this._nativeDragStart);
       this.element.classList.remove('dragee-active');
     }
   }, {
@@ -1929,6 +1930,7 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       this.isDragging = false;
       this._previousDirectionPosition = null;
       this.element.removeAttribute('draggable');
+      this.element.removeEventListener('dragstart', this._nativeDragStart);
     }
   }, {
     key: "copyStyles",
