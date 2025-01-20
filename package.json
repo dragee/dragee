@@ -27,10 +27,6 @@
   "repository": "github:dragee/dragee",
   "author": "Vitaliy Yarovuy, Volodymyr Myskov",
   "license": "ISC",
-  "dependencies": {
-    "@juggle/resize-observer": "^3.4.0",
-    "desandro-get-style-property": "^1.0.4"
-  },
   "module": "dist/index.esm.js",
   "main": "dist/index.umd.js",
   "homepage": "https://dragee.github.io/",

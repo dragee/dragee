@@ -2,7 +2,21 @@ import Draggable from '../src/draggable'
 import List from '../src/List'
 import Point from '../src/geometry/point'
 
+class ResizeObserver {
+  observe() {
+    // do nothing
+  }
+  unobserve() {
+    // do nothing
+  }
+  disconnect() {
+    // do nothing
+  }
+}
+
 describe('list/getSortedDraggables', () => {
+  window.ResizeObserver = ResizeObserver
+
   it('should return order based on y position', () => {
     document.body.innerHTML = `<div style="position: relative;">
       <div class='draggable-a'>A</div>

@@ -1,7 +1,4 @@
-import { ResizeObserver as Polyfill } from '@juggle/resize-observer'
-const ResizeObserver = window.ResizeObserver || Polyfill
 import debounce from './utils/debounce'
-
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
 import {

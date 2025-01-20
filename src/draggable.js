@@ -1,6 +1,5 @@
 import getDefaultContainer from './utils/get-default-container'
 import EventEmitter from './eventEmitter'
-import getStyleProperty from 'desandro-get-style-property'
 import { BoundToElement } from './bounding'
 import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
@@ -30,8 +29,8 @@ const touchEvents = {
   end: 'touchend'
 }
 const draggables = []
-const transformProperty = getStyleProperty('transform')
-const transitionProperty = getStyleProperty('transition')
+const transformProperty = 'transform'
+const transitionProperty = 'transition'
 
 function getTouchByID(element, touchId) {
   for (let i = 0; i < element.changedTouches.length; i++) {
