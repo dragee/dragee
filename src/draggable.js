@@ -141,14 +141,14 @@ export default class Draggable extends EventEmitter {
     let transition = this.element.style[transitionProperty]
     const transitionCss = `transform ${time}ms`
 
-    if (!/transform \d*m?s/.test(transition)) {
+    if (!/transform\s?\d*m?s?/.test(transition)) {
       if (transition) {
         transition += `, ${transitionCss}`
       } else {
         transition = transitionCss
       }
     } else {
-      transition = transition.replace(/transform \d*m?s/g, transitionCss)
+      transition = transition.replace(/transform\s?\d*m?s?/g, transitionCss)
     }
 
     if (this.element.style[transitionProperty] !== transition) {

@@ -1,4 +1,5 @@
 ## [Unreleased]
+- minor transition property fix
 - get rid of dependencies as we not longer need them due to the fact of better browser compatibility
 
 ## 1.1.12
