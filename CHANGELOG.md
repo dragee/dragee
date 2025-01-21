@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## 1.2.0
 - add `nativeDragStartDelay` option. It can be helpful when draggable elements change their sizes or position when we start dragging
 - minor transition property fix
 - get rid of dependencies as we no longer need them due to the fact of better browser compatibility
