@@ -1454,6 +1454,14 @@ var throttledDragOver = function throttledDragOver(callback, duration) {
     throttledCallback(event);
   };
 };
+var delayedNativeDragStart = function delayedNativeDragStart(callback, delay) {
+  return function (event) {
+    event.stopPropagation();
+    setTimeout(function () {
+      return callback(event);
+    }, delay);
+  };
+};
 var passiveFalse = isSupportPassiveEvents$1 ? {
   passive: false
 } : false;
@@ -1559,9 +1567,9 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
       this._dragEnd = function (event) {
         return _this2.dragEnd(event);
       };
-      this._nativeDragStart = function (event) {
+      this._nativeDragStart = delayedNativeDragStart(function (event) {
         return _this2.nativeDragStart(event);
-      };
+      }, this.nativeDragStartDelay);
       this._nativeDragOver = throttledDragOver(function (event) {
         return _this2.nativeDragOver(event);
       }, this.dragOverThrottleDuration);
@@ -1605,14 +1613,14 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     value: function _setTransition(time) {
       var transition = this.element.style[transitionProperty];
       var transitionCss = "transform ".concat(time, "ms");
-      if (!/transform \d*m?s/.test(transition)) {
+      if (!/transform\s?\d*m?s?/.test(transition)) {
         if (transition) {
           transition += ", ".concat(transitionCss);
         } else {
           transition = transitionCss;
         }
       } else {
-        transition = transition.replace(/transform \d*m?s/g, transitionCss);
+        transition = transition.replace(/transform\s?\d*m?s?/g, transitionCss);
       }
       if (this.element.style[transitionProperty] !== transition) {
         this.element.style[transitionProperty] = transition;
@@ -2003,6 +2011,11 @@ var Draggable = /*#__PURE__*/function (_EventEmitter) {
     key: "shouldRemoveZeroTranslate",
     get: function get() {
       return this.options.shouldRemoveZeroTranslate || false;
+    }
+  }, {
+    key: "nativeDragStartDelay",
+    get: function get() {
+      return this.options.nativeDragStartDelay || 0;
     }
   }, {
     key: "touchDraggingThreshold",

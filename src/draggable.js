@@ -9,9 +9,16 @@ import throttle from './utils/throttle'
 
 const throttledDragOver = (callback, duration) => {
   const throttledCallback = throttle((event) => callback(event), duration)
-  return event => {
+  return (event) => {
     event.preventDefault()
     throttledCallback(event)
+  }
+}
+
+const delayedNativeDragStart = (callback, delay) => {
+  return (event) => {
+    event.stopPropagation()
+    setTimeout(() => callback(event), delay)
   }
 }
 
@@ -108,7 +115,7 @@ export default class Draggable extends EventEmitter {
     this._dragStart = (event) => this.dragStart(event)
     this._dragMove = (event) => this.dragMove(event)
     this._dragEnd = (event) => this.dragEnd(event)
-    this._nativeDragStart = (event) => this.nativeDragStart(event)
+    this._nativeDragStart = delayedNativeDragStart((event) => this.nativeDragStart(event), this.nativeDragStartDelay)
     this._nativeDragOver = throttledDragOver((event) => this.nativeDragOver(event), this.dragOverThrottleDuration)
     this._nativeDragEnd = (event) => this.nativeDragEnd(event)
     this._nativeDrop = (event) => this.nativeDrop(event)
@@ -555,6 +562,10 @@ export default class Draggable extends EventEmitter {
 
   get shouldRemoveZeroTranslate() {
     return this.options.shouldRemoveZeroTranslate || false
+  }
+
+  get nativeDragStartDelay() {
+    return this.options.nativeDragStartDelay || 0
   }
 
   get touchDraggingThreshold() {
