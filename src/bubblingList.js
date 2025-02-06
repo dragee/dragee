@@ -35,6 +35,8 @@ export default class BubblingList extends List {
   }
 
   onMove(draggable) {
+    if (this.swappingDisabled) return
+
     const prevDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable - 1]
     const nextDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable + 1]
     const currentPosition = draggable.pinnedPosition

@@ -58,6 +58,8 @@ export default class List extends EventEmitter {
   }
 
   onMove(draggable) {
+    if (this.swappingDisabled) return
+
     const sortedDraggables = this.getSortedDraggables()
     const pinnedPositions = sortedDraggables.map((draggable) => draggable.pinnedPosition)
 
@@ -213,6 +215,14 @@ export default class List extends EventEmitter {
     this.draggables.forEach((draggable) => {
       draggable.enable = enable
     })
+  }
+
+  get swappingDisabled() {
+    return this._swappingDisabled
+  }
+
+  set swappingDisabled(disabled) {
+    this._swappingDisabled = disabled
   }
 
   static factory(containerElement, elements, options={}) {
