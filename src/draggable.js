@@ -4,7 +4,6 @@ import { BoundToElement } from './bounding'
 import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 import { defaultScope } from './scope'
-import isSupportPassiveEvents from './utils/is-support-passive-events'
 import throttle from './utils/throttle'
 
 const throttledDragOver = (callback, duration) => {
@@ -22,7 +21,7 @@ const delayedNativeDragStart = (callback, delay) => {
   }
 }
 
-const passiveFalse = isSupportPassiveEvents ? { passive: false } : false
+const passiveFalse = { passive: false }
 
 const isTouch = 'ontouchstart' in window
 const mouseEvents = {
