@@ -444,6 +444,7 @@ export default class Draggable extends EventEmitter {
     const clonedElement = this.element.cloneNode(true)
     clonedElement.style[transformProperty] = ''
     this.copyStyles(this.element, clonedElement)
+    clonedElement.classList.add('dragee-native-emulation')
     clonedElement.style.position = 'absolute'
     document.body.appendChild(clonedElement)
     this.element.classList.add('dragee-placeholder')
