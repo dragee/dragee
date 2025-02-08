@@ -32,7 +32,11 @@ export default class List extends EventEmitter {
 
   onResize() {
     if (this.options.reorderOnChange) this.reset()
-    this.draggables.forEach((d) => d.startPositioning())
+    this.draggables.forEach((draggable) => {
+      if(!draggable.isDragging) {
+        draggable.startPositioning()
+      }
+    })
   }
 
   init() {
