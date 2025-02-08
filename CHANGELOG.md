@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## 1.2.1
 - remove `nativeDragStartDelay` option and add `swappingDisabled` instead
 - add the `dragee-native-emulation` class to the element that emulates native drag&drop behaviour on mobile devices
 

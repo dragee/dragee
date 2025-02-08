@@ -876,23 +876,6 @@ function scope(fn) {
   return currentScope;
 }
 
-function checkSupportPassiveEvents() {
-  let passiveSupported = false;
-  try {
-    const options = Object.defineProperty({}, 'passive', {
-      get() {
-        return passiveSupported = true;
-      }
-    });
-    window.addEventListener('test', options, options);
-    window.removeEventListener('test', options, options);
-  } catch (_err) {
-    passiveSupported = false;
-  }
-  return passiveSupported;
-}
-const isSupportPassiveEvents = checkSupportPassiveEvents();
-
 function throttle(func, wait) {
   let lastTime = 0;
   return function executedFunction() {
@@ -913,15 +896,9 @@ const throttledDragOver = (callback, duration) => {
     throttledCallback(event);
   };
 };
-const delayedNativeDragStart = (callback, delay) => {
-  return event => {
-    event.stopPropagation();
-    setTimeout(() => callback(event), delay);
-  };
-};
-const passiveFalse = isSupportPassiveEvents ? {
+const passiveFalse = {
   passive: false
-} : false;
+};
 const isTouch = ('ontouchstart' in window);
 const mouseEvents = {
   start: 'mousedown',
@@ -1004,7 +981,7 @@ class Draggable extends EventEmitter {
     this._dragStart = event => this.dragStart(event);
     this._dragMove = event => this.dragMove(event);
     this._dragEnd = event => this.dragEnd(event);
-    this._nativeDragStart = delayedNativeDragStart(event => this.nativeDragStart(event), this.nativeDragStartDelay);
+    this._nativeDragStart = event => this.nativeDragStart(event);
     this._nativeDragOver = throttledDragOver(event => this.nativeDragOver(event), this.dragOverThrottleDuration);
     this._nativeDragEnd = event => this.nativeDragEnd(event);
     this._nativeDrop = event => this.nativeDrop(event);
@@ -1269,6 +1246,7 @@ class Draggable extends EventEmitter {
     const clonedElement = this.element.cloneNode(true);
     clonedElement.style[transformProperty] = '';
     this.copyStyles(this.element, clonedElement);
+    clonedElement.classList.add('dragee-native-emulation');
     clonedElement.style.position = 'absolute';
     document.body.appendChild(clonedElement);
     this.element.classList.add('dragee-placeholder');
@@ -1356,9 +1334,6 @@ class Draggable extends EventEmitter {
   get shouldRemoveZeroTranslate() {
     return this.options.shouldRemoveZeroTranslate || false;
   }
-  get nativeDragStartDelay() {
-    return this.options.nativeDragStartDelay || 0;
-  }
   get touchDraggingThreshold() {
     return this.options.touchDraggingThreshold || 0;
   }
@@ -1430,7 +1405,11 @@ class List extends EventEmitter {
   }
   onResize() {
     if (this.options.reorderOnChange) this.reset();
-    this.draggables.forEach(d => d.startPositioning());
+    this.draggables.forEach(draggable => {
+      if (!draggable.isDragging) {
+        draggable.startPositioning();
+      }
+    });
   }
   init() {
     this._enable = true;
@@ -1452,6 +1431,7 @@ class List extends EventEmitter {
     removeItem(this.draggables, draggable);
   }
   onMove(draggable) {
+    if (this.swappingDisabled) return;
     const sortedDraggables = this.getSortedDraggables();
     const pinnedPositions = sortedDraggables.map(draggable => draggable.pinnedPosition);
     const currentIndex = sortedDraggables.indexOf(draggable);
@@ -1581,6 +1561,12 @@ class List extends EventEmitter {
       draggable.enable = enable;
     });
   }
+  get swappingDisabled() {
+    return this._swappingDisabled;
+  }
+  set swappingDisabled(disabled) {
+    this._swappingDisabled = disabled;
+  }
   static factory(containerElement, elements) {
     let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     const draggables = Array.from(elements).map(element => {
@@ -1620,6 +1606,7 @@ class BubblingList extends List {
     this.indexOfActiveDraggable = this.cachedSortedDraggables.indexOf(draggable);
   }
   onMove(draggable) {
+    if (this.swappingDisabled) return;
     const prevDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable - 1];
     const nextDraggable = this.cachedSortedDraggables[this.indexOfActiveDraggable + 1];
     const currentPosition = draggable.pinnedPosition;
