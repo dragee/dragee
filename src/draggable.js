@@ -16,7 +16,7 @@ const throttledDragOver = (callback, duration) => {
 
 const passiveFalse = { passive: false }
 
-const isTouch = 'ontouchstart' in window
+const isTouch = navigator.maxTouchPoints > 0
 const mouseEvents = {
   start: 'mousedown',
   move: 'mousemove',
