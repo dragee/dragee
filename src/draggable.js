@@ -91,7 +91,7 @@ export default class Draggable extends EventEmitter {
 
   startPositioning() {
     this._setDefaultTransition()
-    this.offset = Point.elementOffset(this.element, this.container, true)
+    this.offset = Point.elementOffset(this.element, this.container)
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
