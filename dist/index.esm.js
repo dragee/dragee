@@ -889,6 +889,16 @@ function throttle(func, wait) {
   };
 }
 
+function getParentsChain(childElement, rootElement) {
+  const chain = [];
+  let element = childElement;
+  while (element.parentNode && element !== rootElement) {
+    chain.unshift(element.parentNode);
+    element = element.parentNode;
+  }
+  return chain;
+}
+
 const throttledDragOver = (callback, duration) => {
   const throttledCallback = throttle(event => callback(event), duration);
   return event => {
@@ -899,7 +909,7 @@ const throttledDragOver = (callback, duration) => {
 const passiveFalse = {
   passive: false
 };
-const isTouch = ('ontouchstart' in window);
+const isTouch = navigator.maxTouchPoints > 0;
 const mouseEvents = {
   start: 'mousedown',
   move: 'mousemove',
@@ -968,7 +978,7 @@ class Draggable extends EventEmitter {
   }
   startPositioning() {
     this._setDefaultTransition();
-    this.offset = Point.elementOffset(this.element, this.container, true);
+    this.offset = Point.elementOffset(this.element, this.container);
     this.pinnedPosition = this.offset;
     this.position = this.offset;
     this.initialPosition = this.options.position || this.offset;
@@ -1100,12 +1110,13 @@ class Draggable extends EventEmitter {
       this._startTouchTimestamp = +new Date();
     }
     this._startWindowScrollPoint = this.windowScrollPoint;
-    this._startParentsScrollPoint = this.parentsScrollPoint;
+    this._startScrollElementsOffset = this.scrollElementsOffset;
     if (event.target instanceof window.HTMLInputElement || event.target instanceof window.HTMLInputElement) {
       event.target.focus();
     }
     if (this.shouldUseNativeDragAndDrop()) {
       if (this.isTouchEvent && this.emulateNativeDragAndDropOnTouch) {
+        this._startParentsScrollOffset = this.parentsScrollOffset;
         const emulateOnFirstMove = event => {
           if (this.seemsScrolling()) {
             this.cancelDragging();
@@ -1132,7 +1143,7 @@ class Draggable extends EventEmitter {
       document.addEventListener(mouseEvents.end, this._dragEnd, passiveFalse);
     }
     window.addEventListener('scroll', this._scroll);
-    this.parents.forEach(p => p.addEventListener('scroll', this._scroll));
+    this.scrollElements.forEach(p => p.addEventListener('scroll', this._scroll));
     this.emit('drag:start');
   }
   dragMove(event) {
@@ -1152,7 +1163,7 @@ class Draggable extends EventEmitter {
     event.stopPropagation();
     event.preventDefault();
     this.touchPoint = new Point(this.isTouchEvent ? touch.pageX : event.clientX, this.isTouchEvent ? touch.pageY : event.clientY);
-    let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.parentsScrollPoint.sub(this._startParentsScrollPoint));
+    let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.scrollElementsOffset.sub(this._startScrollElementsOffset));
     point = this.bounding.bound(point, this.getSize());
     this.determineDirection(point);
     this.move(point);
@@ -1173,7 +1184,7 @@ class Draggable extends EventEmitter {
     setTimeout(() => this.element.classList.remove('dragee-active'));
   }
   onScroll(_event) {
-    let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.parentsScrollPoint.sub(this._startParentsScrollPoint));
+    let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.scrollElementsOffset.sub(this._startScrollElementsOffset));
     point = this.bounding.bound(point, this.getSize());
     if (!this.nativeDragAndDrop) {
       this.determineDirection(point);
@@ -1196,7 +1207,7 @@ class Draggable extends EventEmitter {
       return;
     }
     this.touchPoint = new Point(event.clientX, event.clientY);
-    let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.parentsScrollPoint.sub(this._startParentsScrollPoint));
+    let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.scrollElementsOffset.sub(this._startScrollElementsOffset));
     point = this.bounding.bound(point, this.getSize());
     this.determineDirection(point);
     this.position = point;
@@ -1211,7 +1222,7 @@ class Draggable extends EventEmitter {
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
     document.removeEventListener('drop', this._nativeDrop);
     window.removeEventListener('scroll', this._scroll);
-    this.parents.forEach(p => p.removeEventListener('scroll', this._scroll));
+    this.scrollElements.forEach(p => p.removeEventListener('scroll', this._scroll));
     this.isDragging = false;
     this.element.removeAttribute('draggable');
     this.element.removeEventListener('dragstart', this._nativeDragStart);
@@ -1228,7 +1239,7 @@ class Draggable extends EventEmitter {
     document.removeEventListener(mouseEvents.end, this._dragEnd);
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd);
     window.removeEventListener('scroll', this._scroll);
-    this.parents.forEach(p => p.removeEventListener('scroll', this._scroll));
+    this.scrollElements.forEach(p => p.removeEventListener('scroll', this._scroll));
     this.isDragging = false;
     this._previousDirectionPosition = null;
     this.element.removeAttribute('draggable');
@@ -1259,7 +1270,7 @@ class Draggable extends EventEmitter {
       on: {
         'drag:move': () => {
           const containerRectPoint = new Point(containerRect.left, containerRect.top);
-          this.position = emulationDraggable.position.sub(containerRectPoint).sub(this._startWindowScrollPoint).add(this._startParentsScrollPoint);
+          this.position = emulationDraggable.position.sub(containerRectPoint).sub(this._startWindowScrollPoint).add(this._startParentsScrollOffset);
           this.determineDirection(this.position);
           this.emit('drag:move');
         },
@@ -1276,7 +1287,7 @@ class Draggable extends EventEmitter {
     });
     const containerRectPoint = new Point(containerRect.left, containerRect.top);
     emulationDraggable._startWindowScrollPoint = this._startWindowScrollPoint;
-    emulationDraggable.move(this.pinnedPosition.add(containerRectPoint).add(this.windowScrollPoint).sub(this.parentsScrollPoint));
+    emulationDraggable.move(this.pinnedPosition.add(containerRectPoint).add(this.windowScrollPoint).sub(this.parentsScrollOffset));
     emulationDraggable.dragStart(event);
     event.preventDefault();
   }
@@ -1343,17 +1354,19 @@ class Draggable extends EventEmitter {
   get windowScrollPoint() {
     return new Point(window.scrollX, window.scrollY);
   }
-  get parents() {
-    if (this._cachedParents) return this._cachedParents;
-    this._cachedParents = [];
-    let element = this.element;
-    while (element.parentNode && element != this.container) {
-      this._cachedParents.unshift(element.parentNode);
-      element = element.parentNode;
-    }
-    return this._cachedParents;
+  get scrollRootContainer() {
+    return this.options.scrollRootContainer || this.container;
   }
-  get parentsScrollPoint() {
+  get scrollElements() {
+    return this._cachedScrollElements ? this._cachedScrollElements : this._cachedScrollElements = getParentsChain(this.element, this.scrollRootContainer);
+  }
+  get scrollElementsOffset() {
+    return new Point(this.scrollElements.reduce((sum, p) => sum + p.scrollLeft, 0), this.scrollElements.reduce((sum, p) => sum + p.scrollTop, 0));
+  }
+  get parents() {
+    return this._cachedParents ? this._cachedParents : this._cachedParents = getParentsChain(this.element, this.container);
+  }
+  get parentsScrollOffset() {
     return new Point(this.parents.reduce((sum, p) => sum + p.scrollLeft, 0), this.parents.reduce((sum, p) => sum + p.scrollTop, 0));
   }
   get enable() {

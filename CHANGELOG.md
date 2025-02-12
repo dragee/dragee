@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## 1.2.2
 - add the `scrollRootContainer` option to define which parents we should listen for scrolling
 
 ## 1.2.1
