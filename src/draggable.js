@@ -5,6 +5,7 @@ import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 import { defaultScope } from './scope'
 import throttle from './utils/throttle'
+import getParentsChain from './utils/get-parents-chain'
 
 const throttledDragOver = (callback, duration) => {
   const throttledCallback = throttle((event) => callback(event), duration)
@@ -255,7 +256,7 @@ export default class Draggable extends EventEmitter {
     }
 
     this._startWindowScrollPoint = this.windowScrollPoint
-    this._startParentsScrollPoint = this.parentsScrollPoint
+    this._startScrollElementsOffset = this.scrollElementsOffset
 
     if (event.target instanceof window.HTMLInputElement ||
           event.target instanceof window.HTMLInputElement) {
@@ -264,6 +265,8 @@ export default class Draggable extends EventEmitter {
 
     if (this.shouldUseNativeDragAndDrop()) {
       if (this.isTouchEvent && this.emulateNativeDragAndDropOnTouch) {
+        this._startParentsScrollOffset = this.parentsScrollOffset
+
         const emulateOnFirstMove = (event) => {
           if (this.seemsScrolling()) {
             this.cancelDragging()
@@ -293,7 +296,7 @@ export default class Draggable extends EventEmitter {
     }
 
     window.addEventListener('scroll', this._scroll)
-    this.parents.forEach((p) => p.addEventListener('scroll', this._scroll))
+    this.scrollElements.forEach((p) => p.addEventListener('scroll', this._scroll))
 
     this.emit('drag:start')
   }
@@ -326,7 +329,7 @@ export default class Draggable extends EventEmitter {
 
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.windowScrollPoint.sub(this._startWindowScrollPoint))
-                                   .add(this.parentsScrollPoint.sub(this._startParentsScrollPoint))
+                                   .add(this.scrollElementsOffset.sub(this._startScrollElementsOffset))
 
     point = this.bounding.bound(point, this.getSize())
     this.determineDirection(point)
@@ -356,7 +359,7 @@ export default class Draggable extends EventEmitter {
   onScroll(_event) {
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.windowScrollPoint.sub(this._startWindowScrollPoint))
-                                   .add(this.parentsScrollPoint.sub(this._startParentsScrollPoint))
+                                   .add(this.scrollElementsOffset.sub(this._startScrollElementsOffset))
 
     point = this.bounding.bound(point, this.getSize())
     if (!this.nativeDragAndDrop) {
@@ -385,7 +388,7 @@ export default class Draggable extends EventEmitter {
     this.touchPoint = new Point(event.clientX, event.clientY)
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.windowScrollPoint.sub(this._startWindowScrollPoint))
-                                   .add(this.parentsScrollPoint.sub(this._startParentsScrollPoint))
+                                   .add(this.scrollElementsOffset.sub(this._startScrollElementsOffset))
     point = this.bounding.bound(point, this.getSize())
     this.determineDirection(point)
     this.position = point
@@ -401,7 +404,7 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
     document.removeEventListener('drop', this._nativeDrop)
     window.removeEventListener('scroll', this._scroll)
-    this.parents.forEach((p) => p.removeEventListener('scroll', this._scroll))
+    this.scrollElements.forEach((p) => p.removeEventListener('scroll', this._scroll))
     this.isDragging = false
     this.element.removeAttribute('draggable')
     this.element.removeEventListener('dragstart', this._nativeDragStart)
@@ -423,7 +426,7 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
 
     window.removeEventListener('scroll', this._scroll)
-    this.parents.forEach((p) => p.removeEventListener('scroll', this._scroll))
+    this.scrollElements.forEach((p) => p.removeEventListener('scroll', this._scroll))
 
     this.isDragging = false
     this._previousDirectionPosition = null
@@ -460,7 +463,7 @@ export default class Draggable extends EventEmitter {
           const containerRectPoint = new Point(containerRect.left, containerRect.top)
           this.position = emulationDraggable.position.sub(containerRectPoint)
                                                      .sub(this._startWindowScrollPoint)
-                                                     .add(this._startParentsScrollPoint)
+                                                     .add(this._startParentsScrollOffset)
 
           this.determineDirection(this.position)
           this.emit('drag:move')
@@ -484,7 +487,7 @@ export default class Draggable extends EventEmitter {
     emulationDraggable.move(
       this.pinnedPosition.add(containerRectPoint)
                          .add(this.windowScrollPoint)
-                         .sub(this.parentsScrollPoint)
+                         .sub(this.parentsScrollOffset)
     )
 
     emulationDraggable.dragStart(event)
@@ -569,21 +572,30 @@ export default class Draggable extends EventEmitter {
     return new Point(window.scrollX, window.scrollY)
   }
 
-  get parents() {
-    if (this._cachedParents) return this._cachedParents
-
-    this._cachedParents = []
-    let element = this.element
-
-    while(element.parentNode && element != this.container) {
-      this._cachedParents.unshift(element.parentNode);
-      element = element.parentNode;
-    }
-
-    return this._cachedParents
+  get scrollRootContainer() {
+    return this.options.scrollRootContainer || this.container
   }
 
-  get parentsScrollPoint() {
+  get scrollElements() {
+    return this._cachedScrollElements
+      ? this._cachedScrollElements
+      : (this._cachedScrollElements = getParentsChain(this.element, this.scrollRootContainer))
+  }
+
+  get scrollElementsOffset() {
+    return new Point(
+      this.scrollElements.reduce((sum, p) => sum + p.scrollLeft, 0),
+      this.scrollElements.reduce((sum, p) => sum + p.scrollTop, 0)
+    )
+  }
+
+  get parents() {
+    return this._cachedParents
+      ? this._cachedParents
+      : (this._cachedParents = getParentsChain(this.element, this.container))
+  }
+
+  get parentsScrollOffset() {
     return new Point(
       this.parents.reduce((sum, p) => sum + p.scrollLeft, 0),
       this.parents.reduce((sum, p) => sum + p.scrollTop, 0)
