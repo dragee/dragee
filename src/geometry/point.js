@@ -40,6 +40,14 @@ export default class Point {
 
   static elementOffset(element, parent) {
     parent = parent || element.parentNode
+    return new Point(
+      element.offsetLeft - parent.offsetLeft,
+      element.offsetTop - parent.offsetTop
+    )
+  }
+
+  static elementBoundingOffset(element, parent) {
+    parent = parent || element.parentNode
     const elementRect = element.getBoundingClientRect()
     const parentRect = parent.getBoundingClientRect()
     return new Point(

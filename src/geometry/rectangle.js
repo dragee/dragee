@@ -90,7 +90,9 @@ export default class Rectangle {
   }
 
   static fromElement(element, parent=element.parentNode, isConsiderTranslate=false) {
-    const position = Point.elementOffset(element, parent, isConsiderTranslate)
+    const position = isConsiderTranslate
+      ? Point.elementBoundingOffset(element, parent)
+      : Point.elementOffset(element, parent)
     const size = Point.elementSize(element)
     return new Rectangle(position, size)
   }

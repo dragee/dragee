@@ -92,7 +92,9 @@ export default class Draggable extends EventEmitter {
 
   startPositioning() {
     this._setDefaultTransition()
-    this.offset = Point.elementOffset(this.element, this.container)
+    this.offset = this.isConsiderTransformOffset
+      ? Point.elementBoundingOffset(this.element, this.container)
+      : Point.elementOffset(this.element, this.container)
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
@@ -566,6 +568,10 @@ export default class Draggable extends EventEmitter {
 
   get dragOverThrottleDuration() {
     return this.options.dragOverThrottleDuration || 16
+  }
+
+  get isConsiderTransformOffset () {
+    this.options.considerTransformOffset || false
   }
 
   get windowScrollPoint() {

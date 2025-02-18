@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- add the `considerTransformOffset` option to define that when we compute `offset` whether we should take into account transform offset or not, it is a breaking change, as previously we take it into account, but now `considerTransformOffset` is false by default.
+
 ## 1.2.2
 - add the `scrollRootContainer` option to define which parents we should listen for scrolling
 
