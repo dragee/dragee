@@ -1,141 +1,183 @@
-# Getting Started
 
-Install with npm
+# Dragee
 
-```
+[![npm version](https://badge.fury.io/js/dragee.svg)](https://badge.fury.io/js/dragee)
+
+A lightweight, dependency-free JavaScript library for drag and drop, sortable lists, and target-based interactions.
+
+[Full Documentation](https://dragee.github.io/)
+
+## Installation
+
+```bash
 npm install dragee
 ```
 
-Install with yarn
-```
-yarn add dragee
-```
+## Core Components
 
-# Usage
+### Draggable
 
-## Draggable
+The base class for making elements draggable.
 
 ```javascript
-import { Draggable } from 'dragee'
-new Draggable(element[, options])
-```
+import { Draggable } from 'dragee';
 
-
-### Listeners
-```javascript
-new Draggable(element, {
-    on: {
-        'drag:start': () => addClass(element, 'is-dragging')
-        'drag:move': () => console.log('drag:move')
-        'drag:end': () => removeClass(element, 'is-dragging')
-    }
-})
-```
-
-### bound
-`bound` is function that restrict movements of `Draggable`.
-Bounding conception can help us to restrict `draggable` movements. We can set to move it insite rectangle, by circle, by line, etc.
-By default we will resctrict movements inside `container` rectangle
-
-
-![Скриншот 2019-11-04 20 10 03](https://user-images.githubusercontent.com/244409/68145781-36dd3500-ff3f-11e9-8ab2-5f0d22b1d448.png)
-
-```javascript
-import { BoundToCircle } from 'dragee'
+const element = document.getElementById('draggable');
+const calculusFx = (x) => {
+  x = x / 100;
+  return (x * Math.sin(x * x) + 1) * 10 + 80;
+};
 
 new Draggable(element, {
-    bound(point, size) {
-        const retPoint = point.clone()
-        retPoint.y = calculusFx(point.x)
-        return retPoint
-    }
-})
+  bound: (point, size) => {
+    const retPoint = point.clone();
+    retPoint.y = calculusFx(point.x);
+    return retPoint;
+  },
+  position: new Point(210, calculusFx(210))
+});
 
-new Draggable(element, {
-    bound: BoundToCircle.bounding(new Dragee.Point(100, 90), 80)
-})
+// Events
+draggable.on('drag:start', (event) => console.log('Started dragging'));
+draggable.on('drag:move', (event) => console.log('Dragging'));
+draggable.on('drag:end', (event) => console.log('Finished dragging'));
 ```
 
-Predefined boundings:
+![Draggable Bounding Demo](https://user-images.githubusercontent.com/244409/68145781-36dd3500-ff3f-11e9-8ab2-5f0d22b1d448.png)
+
+### Predefined Bounding Functions
+
+Dragee provides several predefined bounding functions to constrain draggable movement:
+
 ```javascript
-BoundToElemen.bounding(element, container)
+// Bound to element's boundaries
+BoundToElement.bounding(element, container)
+
+// Bound to specific rectangle
 BoundToRectangle.bounding(rectangle)
-BoundTolineX.bounding(x, startY, endY)
-BoundTolineY.bounding(y, startX, endX)
+
+// Bound to vertical line with Y-axis constraints
+BoundToLineX.bounding(x, startY, endY)
+
+// Bound to horizontal line with X-axis constraints
+BoundToLineY.bounding(y, startX, endX)
+
+// Bound to line between two points
 BoundToLine.bounding(startPoint, endPoint)
+
+// Bound to circle
 BoundToCircle.bounding(center, radius)
-BoundToArc.bounding(center, radius, startAgle, endAngle)
+
+// Bound to arc
+BoundToArc.bounding(center, radius, startAngle, endAngle)
 ```
 
-### Other Options
-| **Option** | **Type** | **Default** | **Description** |
-| --- | :---: | :---: | --- |
-| `handler` | `string/element` | null | specifies on what element the drag interaction starts. |
-| `container` | `element` | auto | HTMLElement that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate `container` automatically by finding first `parentNode` that have non `static` positioning. |
-| `position` | `Point` | auto | Start positioning. By default we automatically calculate position inside `container` element. |
-| `nativeDragAndDrop` | `Boolean` | `false` | There can be situations where we need to use html5 drag&drop instead of `dragee` realization. Example: `table>tr` have a lot of issues, so it's easier to fix them using html5 drag&drop realization or emulation. |
-| `emulateNativeDragAndDropOnTouch` | `Boolean` | `true` | Emulate native drag&drop on touch devices. |
+### Sortable
 
-## List
+Two types of sortable lists are available:
 
-During dragging we search nearest `Draggable` from list and if distance between them is less than radius, we excange their positions
+#### List
+Basic sortable list implementation.
 
 ```javascript
-Dragee.List(draggables[, options])
+import { Draggable, List } from 'dragee';
+
+const gridContainer = document.querySelector('.grid-container');
+const gridItems = gridContainer.querySelectorAll('.grid-item');
+
+const gridDraggables = Array.from(gridItems).map(item =>
+  new Draggable(item, {
+    container: gridContainer,
+    nativeDragAndDrop: true
+  })
+);
+
+new List(gridDraggables)
 ```
 
-## Example:
-
-```html
-<ul id="listA" class="list">
-    <li>↔ A</li>
-    <li>↔ B</li>
-    ...
-    <li>↔ Z</li>
-</ul>
-```
+#### BubblingList
+Vertical sortable list that uses bubbling algorithm for smooth and natural sorting behavior.
 
 ```javascript
-const container = document.getElementById("listA")
-const elements = [...container.querySelectorAll("li")]
-const draggables = elements.map((element) => new Draggable(element, { container })
+import { Draggable, BubblingList } from 'dragee';
 
-new List(draggables)
-````
+const listContainer = document.querySelector('.sortable-demo-list');
+const listItems = listContainer.querySelectorAll('.items')
 
-## Options:
+const draggableItems = Array.from(listItems).map(item => {
+  new Draggable(item, {
+    container: listContainer,
+    nativeDragAndDrop: true,
+    emulateNativeDragAndDropOnTouch: true
+  })
+});
 
-### getDistance
-
-Function that calculate distance from one draggable to other.
-We already implemented `getDistance`, `getXDifference` and `getYDifference` functions.
-By default we use `getDistance` function.
-
-```javascript
-import { getYDifference, List } from 'dragee'
-
-new List(draggables, {
-    getDistance: getYDifference
-})
-
-new List(draggables, {
-    getDistance: (p1, p2) => Math.abs(p1.x - p2.x)
-})
+new BubblingList(draggableItems);
 ```
 
-### sorting
+![Sotrable BubblingList Demo](https://github.com/user-attachments/assets/29d6eb14-485e-44e4-bf04-9f6f3ffe2609)
 
-By default we sort by `y` value. If it's equal, then by `x`. But it's possible to customize this behaviour
+### Targets
 
-### radius
-radius that determine if we can excange two `Draggable`.
-Default: 30px
+Target areas for draggable elements.
 
-### timeEnd
-time to move `draggable` to endpoint
-Default: 200ms
+```javascript
+import { Target, FloatLeftStrategy, transformedSpaceDistanceFactory } from 'dragee'
 
-### timeExcange
-time to exchange two `draggables`
-Default: 400ms
+const target = new Target(element, draggables, {
+  timeEnd: 200,
+  timeExcange: 400,
+  parent: parentElement,
+  strategy: new FloatLeftStrategy(
+    () => target.getRectangle()
+    {
+      radius: 80,
+      getDistance: transformedSpaceDistanceFactory({ x: 1, y: 4 }),
+      removable: true
+    }
+  )
+});
+```
 
+### Target Strategies
+
+#### FloatLeftStrategy
+Orders draggables from top to bottom, positioning them on the left side of the target area.
+
+```javascript
+new Target(element, draggables, {
+  strategy: new FloatLeftStrategy(
+    () => target.getRectangle(),
+    {
+      radius: 80,
+      getDistance: transformedSpaceDistanceFactory({ x: 1, y: 4 })
+    }
+  )
+});
+```
+
+#### FloatRightStrategy
+Orders draggables from top to bottom, positioning them on the right side of the target area.
+
+```javascript
+new Target(element, draggables, {
+  strategy: new FloatRightStrategy(
+    () => target.getRectangle(),
+    {
+      radius: 80,
+      getDistance: transformedSpaceDistanceFactory({ x: 1, y: 4 })
+    }
+  )
+});
+```
+
+#### NotCrossingStrategy
+A free-form positioning strategy that prevents draggables from overlapping. Items can be placed anywhere within the target area but will maintain their own space without intersecting with other items.
+
+```javascript
+new Target(element, draggables, {
+  strategy: new NotCrossingStrategy(
+    () => target.getRectangle()
+  )
+});
+```
