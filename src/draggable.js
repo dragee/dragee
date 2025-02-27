@@ -1,5 +1,4 @@
 import EventEmitter from './eventEmitter'
-import { BoundToElement } from './bounding'
 import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
 import { defaultScope } from './scope'
@@ -82,10 +81,8 @@ export default class Draggable extends EventEmitter {
   }
 
   startBounding() {
-    if (this.options.bound) {
-      this.bounding = { bound: this.options.bound }
-    } else {
-      this.bounding = new BoundToElement(this.container, this.container)
+    this.bounding = this.options.bounding || {
+      bound: this.options.bound || ((point) => point)
     }
   }
 

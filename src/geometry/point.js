@@ -45,13 +45,15 @@ export default class Point {
     if (parent === element) {
       return new Point(0, 0);
     } else if (parent === element.offsetParent) {
-      return new Point(element.offsetLeft, element.offsetTop)
+      return new Point(
+        element.offsetLeft + parent.clientLeft,
+        element.offsetTop + parent.clientTop
+      )
     } else {
       const considerOffsetElements = [element, getParentsChain(element, parent).pop()]
-
       return new Point(
-        considerOffsetElements.reduce((sum, p) => sum + p.offsetLeft, 0),
-        considerOffsetElements.reduce((sum, p) => sum + p.offsetTop, 0)
+        considerOffsetElements.reduce((sum, p) => sum + p.offsetLeft, 0) + parent.clientLeft,
+        considerOffsetElements.reduce((sum, p) => sum + p.offsetTop, 0) + parent.clientTop
       )
     }
   }

@@ -134,16 +134,4 @@ export default class BubblingList extends List {
   set verticalGap(gapValue) {
     this.options.verticalGap = gapValue
   }
-
-  static factory(containerElement, elements, options={}) {
-    const draggables = Array.from(elements).map((element) => {
-      return new Draggable(element, Object.assign({
-        container: containerElement
-      }, options.draggable || {}))
-    })
-
-    return new BubblingList(draggables, Object.assign({
-      container: containerElement
-    }, options.list || {}))
-  }
 }

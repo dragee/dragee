@@ -13,6 +13,11 @@
     <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+    <style>
+      .draggable {
+        user-select: none;
+      }
+    </style>
 </head>
 
 <body data-spy="scroll" data-target=".subnav" data-offset="0">
@@ -30,7 +35,7 @@
                     <li class="active"><a href="index.html">Home</a></li>
                     <li><a href="contacts.html">Contacts</a></li>
                 </ul>
-                <a href="https://github.com/dragee/dragee" class="btn btn-primary" >View project on GitHub</a>
+                <a href="https://github.com/dragee/dragee" class="btn btn-primary">View project on GitHub</a>
             </div>
         </div>
     </div>
@@ -106,7 +111,8 @@
                         const root = document.getElementById("DemoDraggable");
                         root.querySelectorAll(".draggable").forEach((draggableElement) => {
                             new Dragee.Draggable(draggableElement, {
-                              shouldRemoveZeroTranslate: true
+                              shouldRemoveZeroTranslate: true,
+                              bounding: new Dragee.BoundToElement(draggableElement.offsetParent, draggableElement.offsetParent)
                             })
                         })
                     })
@@ -486,8 +492,7 @@
                 </style>
                 <script>
                     window.addEventListener("load", function(){
-                        var listA, listB, listC,
-                            root = document.getElementById("DemoList"),
+                        var root = document.getElementById("DemoList"),
                             listAParentElement = root.getElementsByClassName("list-a")[0],
                             listAElements = listAParentElement.getElementsByTagName("li"),
                             listBParentElement = root.getElementsByClassName("list-b")[0],
@@ -495,21 +500,18 @@
                             listCParentElement = root.getElementsByClassName("list-c")[0],
                             listCElements = listCParentElement.getElementsByTagName("li");
 
-                        listA = Dragee.BubblingList.factory(listAParentElement, listAElements, {
-                          draggable: {
+                        const listA = new Dragee.BubblingList(Array.from(listAElements).map((element) => {
+                          return new Dragee.Draggable(element, {
                             handler: '.handler',
                             nativeDragAndDrop: true,
                             emulateNativeDragAndDropOnTouch: true,
-                            radius: 10,
-                            container: document.body,
-                            bound(p) { return p }
-                          }
-                        });
-                        listB = Dragee.List.factory(listBParentElement, listBElements, {
-                          draggable: {
-                            // nativeDragAndDrop: true
-                          },
-                        });
+                            container: document.body
+                          })
+                        }), { radius: 10 })
+
+                        const listB = new Dragee.List(Array.from(listBElements).map((element) => {
+                          return new Dragee.Draggable(element)
+                        }))
 
                         listA.on('list:change', () => console.log("List changed"))
 
@@ -533,15 +535,12 @@
 
                         [...listCElements].forEach((listItem) => initListItem(listItem))
 
-                        listC = Dragee.BubblingList.factory(listCParentElement, listCElements, {
-                            draggable: {
-                              nativeDragAndDrop: true
-                            },
-                            list: {
-                              reorderOnChange: true
-                            }
-                          }
-                        )
+                        const listC = new Dragee.BubblingList(Array.from(listCElements).map((element) => {
+                          return new Dragee.Draggable(element, {
+                            container: listCParentElement,
+                            nativeDragAndDrop: true
+                          })
+                        }), { reorderOnChange: true })
 
                         const addButton = document.querySelector(".list-c-add-tem")
                         let itemCount = 5
@@ -644,20 +643,19 @@
                             listBParentElement = root.getElementsByClassName("list-b")[0],
                             listBElements = listBParentElement.getElementsByTagName("li");
 
-                        listA = Dragee.BubblingList.factory(listAParentElement, listAElements, {
-                          draggable: {
-                            nativeDragAndDrop: true,
-                            radius: 10,
-                            bound(p) { return p }
-                          }
-                        });
-                        listB = Dragee.List.factory(listBParentElement, listBElements, {
-                          draggable: {
-                            nativeDragAndDrop: true,
-                            radius: 10,
-                            bound(p) { return p }
-                          }
-                        });
+                        listA = new Dragee.BubblingList(Array.from(listAElements).map((element) => {
+                          return new Dragee.Draggable(element, {
+                            container: listAParentElement,
+                            nativeDragAndDrop: true
+                          })
+                        }), { radius: 10 });
+
+                        listB = new Dragee.List(Array.from(listBElements).map((element) => {
+                          return new Dragee.Draggable(element, {
+                            container: listBParentElement,
+                            nativeDragAndDrop: true
+                          })
+                        }, { radius: 10 }))
                     });
                 </script>
             </div>

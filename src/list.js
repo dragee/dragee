@@ -228,16 +228,4 @@ export default class List extends EventEmitter {
   set swappingDisabled(disabled) {
     this._swappingDisabled = disabled
   }
-
-  static factory(containerElement, elements, options={}) {
-    const draggables = Array.from(elements).map((element) => {
-      return new Draggable(element, Object.assign({
-        container: containerElement
-      }, options.draggable || {}))
-    })
-
-    return new List(draggables, Object.assign({
-      container: containerElement
-    }, options.list || {}))
-  }
 }
