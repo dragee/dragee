@@ -1,4 +1,3 @@
-import getDefaultContainer from './utils/get-default-container'
 import EventEmitter from './eventEmitter'
 import { BoundToElement } from './bounding'
 import Point from './geometry/point'
@@ -531,7 +530,7 @@ export default class Draggable extends EventEmitter {
   }
 
   get container() {
-    return (this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element))
+    return (this._container = this._container || this.options.container || this.options.parent || this.element.offsetParent)
   }
 
   get handler() {

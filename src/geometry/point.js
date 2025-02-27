@@ -1,3 +1,5 @@
+import getParentsChain from '../utils/get-parents-chain'
+
 /** Class representing a point. */
 export default class Point {
   /**
@@ -40,10 +42,18 @@ export default class Point {
 
   static elementOffset(element, parent) {
     parent = parent || element.parentNode
-    return new Point(
-      element.offsetLeft - parent.offsetLeft,
-      element.offsetTop - parent.offsetTop
-    )
+    if (parent === element) {
+      return new Point(0, 0);
+    } else if (parent === element.offsetParent) {
+      return new Point(element.offsetLeft, element.offsetTop)
+    } else {
+      const considerOffsetElements = [element, getParentsChain(element, parent).pop()]
+
+      return new Point(
+        considerOffsetElements.reduce((sum, p) => sum + p.offsetLeft, 0),
+        considerOffsetElements.reduce((sum, p) => sum + p.offsetTop, 0)
+      )
+    }
   }
 
   static elementBoundingOffset(element, parent) {

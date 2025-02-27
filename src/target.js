@@ -1,6 +1,5 @@
 import range from './utils/range.js'
 import removeItem from './utils/remove-array-item'
-import getDefaultContainer from './utils/get-default-container'
 import EventEmitter from './eventEmitter'
 import Rectangle from './geometry/rectangle'
 import { transformedSpaceDistanceFactory } from './geometry/distances'
@@ -212,7 +211,7 @@ export default class Target extends EventEmitter {
   }
 
   get container() {
-    return (this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element))
+    return (this._container = this._container || this.options.container || this.options.parent || this.element.offsetParent)
   }
 }
 
