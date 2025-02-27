@@ -1,7 +1,8 @@
 ## [Unreleased]
 
-- add the `considerTransformOffset` option to define that when we compute `offset` whether we should take into account transform offset or not, it is a breaking change, as previously we take it into account, but now `considerTransformOffset` is false by default.
-- remove List and BubblingList factories
+- we have added the `considerTransformOffset` option to define whether we should consider `transform: translate` offset when computing `offset`. This is a breaking change; previously, we took it into account, but now `considerTransformOffset` is false by default.
+- removed List and BubblingList factories
+- changed the default bounding for Draggable. From now on, it should not restrict movements inside the parent container by default. If you want to implement this, please use the `BoundToElement` helper.
 
 ## 1.2.2
 - add the `scrollRootContainer` option to define which parents we should listen for scrolling
