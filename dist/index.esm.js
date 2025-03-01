@@ -1,3 +1,13 @@
+function getParentsChain(childElement, rootElement) {
+  const chain = [];
+  let element = childElement;
+  while (element.parentNode && element !== rootElement) {
+    chain.unshift(element.parentNode);
+    element = element.parentNode;
+  }
+  return chain;
+}
+
 /** Class representing a point. */
 class Point {
   /**
@@ -31,6 +41,17 @@ class Point {
     return `{x=${this.x},y=${this.y}`;
   }
   static elementOffset(element, parent) {
+    parent = parent || element.parentNode;
+    if (parent === element) {
+      return new Point(0, 0);
+    } else if (parent === element.offsetParent) {
+      return new Point(element.offsetLeft + parent.clientLeft, element.offsetTop + parent.clientTop);
+    } else {
+      const considerOffsetElements = [element, getParentsChain(element, parent).pop()];
+      return new Point(considerOffsetElements.reduce((sum, p) => sum + p.offsetLeft, 0) + parent.clientLeft, considerOffsetElements.reduce((sum, p) => sum + p.offsetTop, 0) + parent.clientTop);
+    }
+  }
+  static elementBoundingOffset(element, parent) {
     parent = parent || element.parentNode;
     const elementRect = element.getBoundingClientRect();
     const parentRect = parent.getBoundingClientRect();
@@ -119,18 +140,10 @@ class Rectangle {
   static fromElement(element) {
     let parent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : element.parentNode;
     let isConsiderTranslate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    const position = Point.elementOffset(element, parent, isConsiderTranslate);
+    const position = isConsiderTranslate ? Point.elementBoundingOffset(element, parent) : Point.elementOffset(element, parent);
     const size = Point.elementSize(element);
     return new Rectangle(position, size);
   }
-}
-
-function getDefaultContainer(element) {
-  let container = element.parentNode;
-  while (container.parentNode && window.getComputedStyle(container)['position'] === 'static' && container.tagName !== 'BODY') {
-    container = container.parentNode;
-  }
-  return container;
 }
 
 class EventEmitter {
@@ -181,6 +194,34 @@ class EventEmitter {
   resetOn(eventName) {
     this.events[eventName] = [];
   }
+}
+
+function removeItem (array, val) {
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === val) {
+      array.splice(i, 1);
+      i--;
+    }
+  }
+  return array;
+}
+
+function range(start, stop, step) {
+  const result = [];
+  if (typeof stop === 'undefined') {
+    stop = start;
+    start = 0;
+  }
+  if (typeof step === 'undefined') {
+    step = 1;
+  }
+  if (step > 0 && start >= stop || step < 0 && start <= stop) {
+    return [];
+  }
+  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
+    result.push(i);
+  }
+  return result;
 }
 
 function getDistance(p1, p2) {
@@ -275,6 +316,143 @@ function addPointToBoundPoints(boundpoints, point, isRight) {
   }
   result.push(point);
   return result;
+}
+
+class BasicStrategy {
+  constructor(rectangle) {
+    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    this.rectangle = rectangle;
+    this.options = options;
+  }
+  get boundRect() {
+    return typeof this.rectangle === 'function' ? this.rectangle() : this.rectangle;
+  }
+}
+class NotCrossingStrategy extends BasicStrategy {
+  positioning(rectangleList, indexesOfNews) {
+    const staticRectangleIndexes = rectangleList.reduce((indexes, _rect, index) => {
+      if (indexesOfNews.indexOf(index) === -1) {
+        indexes.push(index);
+      }
+      return indexes;
+    }, []);
+    indexesOfNews.forEach(index => {
+      let rect = rectangleList[index];
+      let removable = false;
+      staticRectangleIndexes.forEach(indexOfStatic => {
+        const staticRect = rectangleList[indexOfStatic];
+        rect = staticRect.moveToBound(rect);
+      });
+      removable = staticRectangleIndexes.some(indexOfStatic => {
+        const staticRect = rectangleList[indexOfStatic];
+        return !!staticRect.and(rect);
+      }) || rect.and(this.boundRect).getSquare() !== rect.getSquare();
+      if (removable) {
+        rect.removable = true;
+      } else {
+        staticRectangleIndexes.push(index);
+      }
+    });
+    return rectangleList;
+  }
+  sorting(odlDraggablesList, newDraggables, indexOfNews) {
+    const draggables = odlDraggablesList.concat(newDraggables);
+    newDraggables.forEach(draggable => {
+      indexOfNews.push(draggables.indexOf(draggable));
+    });
+    return draggables;
+  }
+}
+class FloatLeftStrategy extends BasicStrategy {
+  constructor(rectangle) {
+    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    super(rectangle, options);
+    this.options = Object.assign({
+      removable: true
+    }, options);
+    this.radius = options.radius || 80;
+    this.paddingTopLeft = options.paddingTopLeft || new Point(0, 0);
+    this.paddingBottomRight = options.paddingBottomRight || new Point(0, 0);
+    this.yGapBetweenDraggables = options.yGapBetweenDraggables || 0;
+    this.getDistance = options.getDistance || getDistance;
+    this.getPosition = options.getPosition || (draggable => draggable.position);
+  }
+  positioning(rectangleList, _indexesOfNews) {
+    const boundRect = this.boundRect;
+    const rectP2 = boundRect.getP2();
+    let boundaryPoints = [boundRect.position];
+    rectangleList.forEach((rect, rectIndex) => {
+      let position,
+        isValid = false;
+      for (let i = 0; i < boundaryPoints.length; i++) {
+        position = new Point(boundaryPoints[i].x + this.paddingTopLeft.x, i > 0 ? boundaryPoints[i - 1].y + this.yGapBetweenDraggables : boundRect.position.y + this.paddingTopLeft.y);
+        isValid = position.x + rect.size.x < rectP2.x;
+        if (isValid) {
+          break;
+        }
+      }
+      if (!isValid) {
+        position = new Point(boundRect.position.x + this.paddingTopLeft.x, boundaryPoints[boundaryPoints.length - 1].y + (rectIndex > 0 ? this.yGapBetweenDraggables : this.paddingTopLeft.y));
+      }
+      rect.position = position;
+      if (this.options.removable && rect.getP3().y > boundRect.getP3().y) {
+        rect.removable = true;
+      }
+      boundaryPoints = addPointToBoundPoints(boundaryPoints, rect.getP3().add(this.paddingBottomRight));
+    });
+    return rectangleList;
+  }
+  sorting(odlDraggablesList, newDraggables, indexOfNews) {
+    const newList = odlDraggablesList.concat();
+    const listOldPosition = odlDraggablesList.map(draggable => draggable.getPosition());
+    newDraggables.forEach(newDraggable => {
+      let index = indexOfNearestPoint(listOldPosition, this.getPosition(newDraggable), this.radius, this.getDistance);
+      if (index === -1) {
+        index = newList.length;
+      } else {
+        index = newList.indexOf(odlDraggablesList[index]);
+      }
+      newList.splice(index, 0, newDraggable);
+    });
+    newDraggables.forEach(newDraggable => {
+      indexOfNews.push(newList.indexOf(newDraggable));
+    });
+    return newList;
+  }
+}
+class FloatRightStrategy extends FloatLeftStrategy {
+  constructor(rectangle) {
+    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    super(rectangle, options);
+    this.paddingTopRight = options.paddingTopRight || new Point(5, 5);
+    this.paddingBottomLeft = options.paddingBottomLeft || new Point(0, 0);
+    this.yGapBetweenDraggables = options.yGapBetweenDraggables || 0;
+    this.paddingBottomNegLeft = new Point(-this.paddingBottomLeft.x, this.paddingBottomLeft.y);
+  }
+  positioning(rectangleList, _indexesOfNews) {
+    const boundRect = this.boundRect;
+    let boundaryPoints = [boundRect.getP2()];
+    rectangleList.forEach((rect, rectIndex) => {
+      let position,
+        isValid = false;
+      for (let i = 0; i < boundaryPoints.length; i++) {
+        position = new Point(boundaryPoints[i].x - rect.size.x - this.paddingTopRight.x, i > 0 ? boundaryPoints[i - 1].y + this.yGapBetweenDraggables : boundRect.position.y + this.paddingTopRight.y);
+        isValid = position.x > rect.position.x;
+        if (isValid) {
+          break;
+        }
+      }
+      if (!isValid) {
+        position = new Point(boundRect.getP2().x - rect.size.x - this.paddingTopRight.x, boundaryPoints[boundaryPoints.length - 1].y + (rectIndex > 0 ? this.yGapBetweenDraggables : this.paddingTopRight.y));
+      }
+      rect.position = position;
+      if (this.options.removable && rect.getP4().y > boundRect.getP4().y) {
+        rect.removable = true;
+      }
+      boundaryPoints = addPointToBoundPoints(boundaryPoints, rect.getP4().add(this.paddingBottomNegLeft), true);
+    });
+    return rectangleList;
+  }
 }
 
 function getAngleDiff(alpha, beta) {
@@ -446,171 +624,6 @@ class BoundToArc extends BoundToCircle {
   }
 }
 
-function removeItem (array, val) {
-  for (let i = 0; i < array.length; i++) {
-    if (array[i] === val) {
-      array.splice(i, 1);
-      i--;
-    }
-  }
-  return array;
-}
-
-function range(start, stop, step) {
-  const result = [];
-  if (typeof stop === 'undefined') {
-    stop = start;
-    start = 0;
-  }
-  if (typeof step === 'undefined') {
-    step = 1;
-  }
-  if (step > 0 && start >= stop || step < 0 && start <= stop) {
-    return [];
-  }
-  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
-    result.push(i);
-  }
-  return result;
-}
-
-class BasicStrategy {
-  constructor(rectangle) {
-    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    this.rectangle = rectangle;
-    this.options = options;
-  }
-  get boundRect() {
-    return typeof this.rectangle === 'function' ? this.rectangle() : this.rectangle;
-  }
-}
-class NotCrossingStrategy extends BasicStrategy {
-  positioning(rectangleList, indexesOfNews) {
-    const staticRectangleIndexes = rectangleList.reduce((indexes, _rect, index) => {
-      if (indexesOfNews.indexOf(index) === -1) {
-        indexes.push(index);
-      }
-      return indexes;
-    }, []);
-    indexesOfNews.forEach(index => {
-      let rect = rectangleList[index];
-      let removable = false;
-      staticRectangleIndexes.forEach(indexOfStatic => {
-        const staticRect = rectangleList[indexOfStatic];
-        rect = staticRect.moveToBound(rect);
-      });
-      removable = staticRectangleIndexes.some(indexOfStatic => {
-        const staticRect = rectangleList[indexOfStatic];
-        return !!staticRect.and(rect);
-      }) || rect.and(this.boundRect).getSquare() !== rect.getSquare();
-      if (removable) {
-        rect.removable = true;
-      } else {
-        staticRectangleIndexes.push(index);
-      }
-    });
-    return rectangleList;
-  }
-  sorting(odlDraggablesList, newDraggables, indexOfNews) {
-    const draggables = odlDraggablesList.concat(newDraggables);
-    newDraggables.forEach(draggable => {
-      indexOfNews.push(draggables.indexOf(draggable));
-    });
-    return draggables;
-  }
-}
-class FloatLeftStrategy extends BasicStrategy {
-  constructor(rectangle) {
-    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    super(rectangle, options);
-    this.options = Object.assign({
-      removable: true
-    }, options);
-    this.radius = options.radius || 80;
-    this.paddingTopLeft = options.paddingTopLeft || new Point(0, 0);
-    this.paddingBottomRight = options.paddingBottomRight || new Point(0, 0);
-    this.yGapBetweenDraggables = options.yGapBetweenDraggables || 0;
-    this.getDistance = options.getDistance || getDistance;
-    this.getPosition = options.getPosition || (draggable => draggable.position);
-  }
-  positioning(rectangleList, _indexesOfNews) {
-    const boundRect = this.boundRect;
-    const rectP2 = boundRect.getP2();
-    let boundaryPoints = [boundRect.position];
-    rectangleList.forEach((rect, rectIndex) => {
-      let position,
-        isValid = false;
-      for (let i = 0; i < boundaryPoints.length; i++) {
-        position = new Point(boundaryPoints[i].x + this.paddingTopLeft.x, i > 0 ? boundaryPoints[i - 1].y + this.yGapBetweenDraggables : boundRect.position.y + this.paddingTopLeft.y);
-        isValid = position.x + rect.size.x < rectP2.x;
-        if (isValid) {
-          break;
-        }
-      }
-      if (!isValid) {
-        position = new Point(boundRect.position.x + this.paddingTopLeft.x, boundaryPoints[boundaryPoints.length - 1].y + (rectIndex > 0 ? this.yGapBetweenDraggables : this.paddingTopLeft.y));
-      }
-      rect.position = position;
-      if (this.options.removable && rect.getP3().y > boundRect.getP3().y) {
-        rect.removable = true;
-      }
-      boundaryPoints = addPointToBoundPoints(boundaryPoints, rect.getP3().add(this.paddingBottomRight));
-    });
-    return rectangleList;
-  }
-  sorting(odlDraggablesList, newDraggables, indexOfNews) {
-    const newList = odlDraggablesList.concat();
-    const listOldPosition = odlDraggablesList.map(draggable => draggable.getPosition());
-    newDraggables.forEach(newDraggable => {
-      let index = indexOfNearestPoint(listOldPosition, this.getPosition(newDraggable), this.radius, this.getDistance);
-      if (index === -1) {
-        index = newList.length;
-      } else {
-        index = newList.indexOf(odlDraggablesList[index]);
-      }
-      newList.splice(index, 0, newDraggable);
-    });
-    newDraggables.forEach(newDraggable => {
-      indexOfNews.push(newList.indexOf(newDraggable));
-    });
-    return newList;
-  }
-}
-class FloatRightStrategy extends FloatLeftStrategy {
-  constructor(rectangle) {
-    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    super(rectangle, options);
-    this.paddingTopRight = options.paddingTopRight || new Point(5, 5);
-    this.paddingBottomLeft = options.paddingBottomLeft || new Point(0, 0);
-    this.yGapBetweenDraggables = options.yGapBetweenDraggables || 0;
-    this.paddingBottomNegLeft = new Point(-this.paddingBottomLeft.x, this.paddingBottomLeft.y);
-  }
-  positioning(rectangleList, _indexesOfNews) {
-    const boundRect = this.boundRect;
-    let boundaryPoints = [boundRect.getP2()];
-    rectangleList.forEach((rect, rectIndex) => {
-      let position,
-        isValid = false;
-      for (let i = 0; i < boundaryPoints.length; i++) {
-        position = new Point(boundaryPoints[i].x - rect.size.x - this.paddingTopRight.x, i > 0 ? boundaryPoints[i - 1].y + this.yGapBetweenDraggables : boundRect.position.y + this.paddingTopRight.y);
-        isValid = position.x > rect.position.x;
-        if (isValid) {
-          break;
-        }
-      }
-      if (!isValid) {
-        position = new Point(boundRect.getP2().x - rect.size.x - this.paddingTopRight.x, boundaryPoints[boundaryPoints.length - 1].y + (rectIndex > 0 ? this.yGapBetweenDraggables : this.paddingTopRight.y));
-      }
-      rect.position = position;
-      if (this.options.removable && rect.getP4().y > boundRect.getP4().y) {
-        rect.removable = true;
-      }
-      boundaryPoints = addPointToBoundPoints(boundaryPoints, rect.getP4().add(this.paddingBottomNegLeft), true);
-    });
-    return rectangleList;
-  }
-}
-
 const addToDefaultScope$1 = function (target) {
   defaultScope.addTarget(target);
 };
@@ -773,7 +786,7 @@ class Target extends EventEmitter {
     this.innerDraggables.slice();
   }
   get container() {
-    return this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element);
+    return this._container = this._container || this.options.container || this.options.parent || this.element.offsetParent;
   }
 }
 Target.emitter = new EventEmitter();
@@ -889,16 +902,6 @@ function throttle(func, wait) {
   };
 }
 
-function getParentsChain(childElement, rootElement) {
-  const chain = [];
-  let element = childElement;
-  while (element.parentNode && element !== rootElement) {
-    chain.unshift(element.parentNode);
-    element = element.parentNode;
-  }
-  return chain;
-}
-
 const throttledDragOver = (callback, duration) => {
   const throttledCallback = throttle(event => callback(event), duration);
   return event => {
@@ -968,17 +971,13 @@ class Draggable extends EventEmitter {
     this.startListening();
   }
   startBounding() {
-    if (this.options.bound) {
-      this.bounding = {
-        bound: this.options.bound
-      };
-    } else {
-      this.bounding = new BoundToElement(this.container, this.container);
-    }
+    this.bounding = this.options.bounding || {
+      bound: this.options.bound || (point => point)
+    };
   }
   startPositioning() {
     this._setDefaultTransition();
-    this.offset = Point.elementOffset(this.element, this.container);
+    this.offset = this.isConsiderTransformOffset ? Point.elementBoundingOffset(this.element, this.container) : Point.elementOffset(this.element, this.container);
     this.pinnedPosition = this.offset;
     this.position = this.offset;
     this.initialPosition = this.options.position || this.offset;
@@ -1321,7 +1320,7 @@ class Draggable extends EventEmitter {
     }
   }
   get container() {
-    return this._container = this._container || this.options.container || this.options.parent || getDefaultContainer(this.element);
+    return this._container = this._container || this.options.container || this.options.parent || this.element.offsetParent;
   }
   get handler() {
     if (!this._handler) {
@@ -1350,6 +1349,9 @@ class Draggable extends EventEmitter {
   }
   get dragOverThrottleDuration() {
     return this.options.dragOverThrottleDuration || 16;
+  }
+  get isConsiderTransformOffset() {
+    this.options.considerTransformOffset || false;
   }
   get windowScrollPoint() {
     return new Point(window.scrollX, window.scrollY);
@@ -1580,17 +1582,6 @@ class List extends EventEmitter {
   set swappingDisabled(disabled) {
     this._swappingDisabled = disabled;
   }
-  static factory(containerElement, elements) {
-    let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    const draggables = Array.from(elements).map(element => {
-      return new Draggable(element, Object.assign({
-        container: containerElement
-      }, options.draggable || {}));
-    });
-    return new List(draggables, Object.assign({
-      container: containerElement
-    }, options.list || {}));
-  }
 }
 
 const arrayMove = (array, from, to) => {
@@ -1696,17 +1687,6 @@ class BubblingList extends List {
   }
   set verticalGap(gapValue) {
     this.options.verticalGap = gapValue;
-  }
-  static factory(containerElement, elements) {
-    let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    const draggables = Array.from(elements).map(element => {
-      return new Draggable(element, Object.assign({
-        container: containerElement
-      }, options.draggable || {}));
-    });
-    return new BubblingList(draggables, Object.assign({
-      container: containerElement
-    }, options.list || {}));
   }
 }
 
