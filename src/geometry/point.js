@@ -37,7 +37,7 @@ export default class Point {
   }
 
   toString() {
-    return `{x=${this.x},y=${this.y}`
+    return `{x=${this.x},y=${this.y}}`
   }
 
   static elementOffset(element, parent) {
