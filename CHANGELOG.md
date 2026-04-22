@@ -1,4 +1,7 @@
 ## [Unreleased]
+- Fix `Point.toString()` — add missing closing brace so the output is `{x=N,y=N}` instead of `{x=N,y=N`
+- Fix `Target.getSortedDraggables()` — add missing `return` so the method returns the sorted copy instead of `undefined`
+- Fix `Draggable` `isConsiderTransformOffset` getter — add missing `return` so the `considerTransformOffset` option actually takes effect
 
 ## 1.3.0
 - we have added the `considerTransformOffset` option to define whether we should consider `transform: translate` offset when computing `offset`. This is a breaking change; previously, we took it into account, but now `considerTransformOffset` is false by default.

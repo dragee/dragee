@@ -207,7 +207,7 @@ export default class Target extends EventEmitter {
   }
 
   getSortedDraggables() {
-    this.innerDraggables.slice()
+    return this.innerDraggables.slice()
   }
 
   get container() {

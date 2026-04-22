@@ -567,7 +567,7 @@ export default class Draggable extends EventEmitter {
   }
 
   get isConsiderTransformOffset () {
-    this.options.considerTransformOffset || false
+    return this.options.considerTransformOffset || false
   }
 
   get windowScrollPoint() {
