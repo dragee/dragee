@@ -38,7 +38,7 @@ class Point {
     return new Point(this.x, this.y);
   }
   toString() {
-    return `{x=${this.x},y=${this.y}`;
+    return `{x=${this.x},y=${this.y}}`;
   }
   static elementOffset(element, parent) {
     parent = parent || element.parentNode;
@@ -783,7 +783,7 @@ class Target extends EventEmitter {
     this.innerDraggables = [];
   }
   getSortedDraggables() {
-    this.innerDraggables.slice();
+    return this.innerDraggables.slice();
   }
   get container() {
     return this._container = this._container || this.options.container || this.options.parent || this.element.offsetParent;
@@ -1143,11 +1143,14 @@ class Draggable extends EventEmitter {
     }
     window.addEventListener('scroll', this._scroll);
     this.scrollElements.forEach(p => p.addEventListener('scroll', this._scroll));
-    this.emit('drag:start');
+    if (!this.shouldUseNativeDragAndDrop() && this.dragStartThreshold > 0) {
+      this._dragStartPending = true;
+    } else {
+      this.emit('drag:start');
+    }
   }
   dragMove(event) {
     let touch;
-    this.isDragging = true;
     this.isTouchEvent = isTouch && event instanceof window.TouchEvent;
     if (this.isTouchEvent) {
       touch = getTouchByID(event, this._touchId);
@@ -1159,9 +1162,19 @@ class Draggable extends EventEmitter {
         return;
       }
     }
+    this.touchPoint = new Point(this.isTouchEvent ? touch.pageX : event.clientX, this.isTouchEvent ? touch.pageY : event.clientY);
+    if (this._dragStartPending) {
+      const dx = this.touchPoint.x - this._startTouchPoint.x;
+      const dy = this.touchPoint.y - this._startTouchPoint.y;
+      if (Math.sqrt(dx * dx + dy * dy) < this.dragStartThreshold) {
+        return;
+      }
+      this._dragStartPending = false;
+      this.emit('drag:start');
+    }
+    this.isDragging = true;
     event.stopPropagation();
     event.preventDefault();
-    this.touchPoint = new Point(this.isTouchEvent ? touch.pageX : event.clientX, this.isTouchEvent ? touch.pageY : event.clientY);
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint)).add(this.windowScrollPoint.sub(this._startWindowScrollPoint)).add(this.scrollElementsOffset.sub(this._startScrollElementsOffset));
     point = this.bounding.bound(point, this.getSize());
     this.determineDirection(point);
@@ -1171,6 +1184,12 @@ class Draggable extends EventEmitter {
   dragEnd(event) {
     this.isTouchEvent = isTouch && event instanceof window.TouchEvent;
     if (this.isTouchEvent && !getTouchByID(event, this._touchId)) {
+      return;
+    }
+    if (this._dragStartPending) {
+      // threshold never crossed — treat as click, clean up silently
+      this._dragStartPending = false;
+      this.cancelDragging();
       return;
     }
     if (this.isDragging) {
@@ -1347,11 +1366,14 @@ class Draggable extends EventEmitter {
   get touchDraggingThreshold() {
     return this.options.touchDraggingThreshold || 0;
   }
+  get dragStartThreshold() {
+    return this.options.dragStartThreshold || 0;
+  }
   get dragOverThrottleDuration() {
     return this.options.dragOverThrottleDuration || 16;
   }
   get isConsiderTransformOffset() {
-    this.options.considerTransformOffset || false;
+    return this.options.considerTransformOffset || false;
   }
   get windowScrollPoint() {
     return new Point(window.scrollX, window.scrollY);

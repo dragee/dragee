@@ -120,6 +120,77 @@
             </div>
         </div>
     </section>
+    <section id="DraggableThreshold" >
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoDraggableThreshold" class="demo-html">
+                    <div class="area">
+                        <div class="draggable">
+                            <i class="icon-move"></i> Drag me (threshold 10px)
+                        </div>
+                    </div>
+                    <p class="threshold-status">Status: <span>idle</span></p>
+                </div>
+                <style>
+                    #DemoDraggableThreshold .area{
+                        position: relative;
+                        overflow: hidden;
+                        padding: 10%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225, 0.4);
+                    }
+                    #DemoDraggableThreshold .area .draggable{
+                        display: inline-block;
+                        padding: 9px 14px;
+                        font-size: 15px;
+                        color: #333;
+                        cursor: move;
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        background: #f5f5f5;
+                        user-select: none;
+                    }
+                    #DemoDraggableThreshold .area .draggable.dragee-active{
+                        background-color: #ffc40d;
+                    }
+                    #DemoDraggableThreshold .threshold-status{
+                        margin-top: 10px;
+                        color: #555;
+                    }
+                    #DemoDraggableThreshold .threshold-status span{
+                        font-weight: bold;
+                        color: #222;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        const root = document.getElementById("DemoDraggableThreshold")
+                        const el = root.querySelector(".draggable")
+                        const status = root.querySelector(".threshold-status span")
+
+                        const draggable = new Dragee.Draggable(el, {
+                            dragStartThreshold: 10,
+                            shouldRemoveZeroTranslate: true,
+                            bounding: new Dragee.BoundToElement(el.offsetParent, el.offsetParent)
+                        })
+
+                        draggable.on('drag:start', function(){ status.textContent = 'drag started' })
+                        draggable.on('drag:end',   function(){ status.textContent = 'drag ended' })
+                        el.addEventListener('click', function(){ status.textContent = 'click (below threshold)' })
+                    })
+                </script>
+            </div>
+            <div class="span6 demo-span">
+                <pre class="prettyprint lang-js">const draggable = new Dragee.Draggable(element, {
+    // drag only activates after the pointer
+    // travels this many pixels — a small jiggle
+    // is treated as a click, not a drag
+    dragStartThreshold: 10
+})</pre>
+            </div>
+        </div>
+    </section>
     <section id="Bounding" >
       <div class="row demo-row">
           <div class="span5 demo-span">

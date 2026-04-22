@@ -296,13 +296,15 @@ export default class Draggable extends EventEmitter {
     window.addEventListener('scroll', this._scroll)
     this.scrollElements.forEach((p) => p.addEventListener('scroll', this._scroll))
 
-    this.emit('drag:start')
+    if (!this.shouldUseNativeDragAndDrop() && this.dragStartThreshold > 0) {
+      this._dragStartPending = true
+    } else {
+      this.emit('drag:start')
+    }
   }
 
   dragMove(event) {
     let touch
-
-    this.isDragging = true
 
     this.isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
     if (this.isTouchEvent) {
@@ -318,12 +320,24 @@ export default class Draggable extends EventEmitter {
       }
     }
 
-    event.stopPropagation()
-    event.preventDefault()
     this.touchPoint = new Point(
       this.isTouchEvent ? touch.pageX : event.clientX,
       this.isTouchEvent ? touch.pageY : event.clientY
     )
+
+    if (this._dragStartPending) {
+      const dx = this.touchPoint.x - this._startTouchPoint.x
+      const dy = this.touchPoint.y - this._startTouchPoint.y
+      if (Math.sqrt(dx * dx + dy * dy) < this.dragStartThreshold) {
+        return
+      }
+      this._dragStartPending = false
+      this.emit('drag:start')
+    }
+
+    this.isDragging = true
+    event.stopPropagation()
+    event.preventDefault()
 
     let point = this._startPosition.add(this.touchPoint.sub(this._startTouchPoint))
                                    .add(this.windowScrollPoint.sub(this._startWindowScrollPoint))
@@ -339,6 +353,13 @@ export default class Draggable extends EventEmitter {
     this.isTouchEvent = (isTouch && (event instanceof window.TouchEvent))
 
     if (this.isTouchEvent && !getTouchByID(event, this._touchId)) {
+      return
+    }
+
+    if (this._dragStartPending) {
+      // threshold never crossed — treat as click, clean up silently
+      this._dragStartPending = false
+      this.cancelDragging()
       return
     }
 
@@ -560,6 +581,10 @@ export default class Draggable extends EventEmitter {
 
   get touchDraggingThreshold() {
     return this.options.touchDraggingThreshold || 0
+  }
+
+  get dragStartThreshold() {
+    return this.options.dragStartThreshold || 0
   }
 
   get dragOverThrottleDuration() {

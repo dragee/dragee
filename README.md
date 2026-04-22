@@ -20,7 +20,7 @@ npm install dragee
 The base class for making elements draggable.
 
 ```javascript
-import { Draggable } from 'dragee';
+import { Draggable, Point } from 'dragee';
 
 const element = document.getElementById('draggable');
 const calculusFx = (x) => {
@@ -28,7 +28,7 @@ const calculusFx = (x) => {
   return (x * Math.sin(x * x) + 1) * 10 + 80;
 };
 
-new Draggable(element, {
+const draggable = new Draggable(element, {
   bound: (point, size) => {
     const retPoint = point.clone();
     retPoint.y = calculusFx(point.x);
@@ -38,12 +38,26 @@ new Draggable(element, {
 });
 
 // Events
-draggable.on('drag:start', (event) => console.log('Started dragging'));
-draggable.on('drag:move', (event) => console.log('Dragging'));
-draggable.on('drag:end', (event) => console.log('Finished dragging'));
+draggable.on('drag:start', () => console.log('Started dragging'));
+draggable.on('drag:move', () => console.log('Dragging'));
+draggable.on('drag:end', () => console.log('Finished dragging'));
 ```
 
 ![Draggable Bounding Demo](https://user-images.githubusercontent.com/244409/68145781-36dd3500-ff3f-11e9-8ab2-5f0d22b1d448.png)
+
+#### Common options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `container` | `Element` | `element.offsetParent` | Coordinate space for position calculations |
+| `position` | `Point` | current `offset` | Initial position |
+| `bound` / `bounding` | `(point, size) => Point` \| `Bound` | identity | Movement constraint |
+| `handler` | `Element` \| `string` | `element` | Sub-element (or selector) that starts the drag |
+| `dragStartThreshold` | `number` | `0` | Pixels the pointer must travel before drag activates. Prevents accidental drags when the user just wants to click |
+| `shouldRemoveZeroTranslate` | `boolean` | `false` | Remove `translate3d(0,0,0)` from the inline `transform` when resting |
+| `nativeDragAndDrop` | `boolean` | `false` | Use HTML5 drag-and-drop events instead of mouse/touch |
+| `emulateNativeDragAndDropOnTouch` | `boolean` | `false` | On touch devices, emulate native drag-and-drop |
+| `stopPropagationOnDragStart` | `boolean` | `false` | Stop event propagation on drag start |
 
 ### Predefined Bounding Functions
 
@@ -102,15 +116,15 @@ Vertical sortable list that uses bubbling algorithm for smooth and natural sorti
 import { Draggable, BubblingList } from 'dragee';
 
 const listContainer = document.querySelector('.sortable-demo-list');
-const listItems = listContainer.querySelectorAll('.items')
+const listItems = listContainer.querySelectorAll('.items');
 
-const draggableItems = Array.from(listItems).map(item => {
+const draggableItems = Array.from(listItems).map((item) =>
   new Draggable(item, {
     container: listContainer,
     nativeDragAndDrop: true,
     emulateNativeDragAndDropOnTouch: true
   })
-});
+);
 
 new BubblingList(draggableItems);
 ```
@@ -122,14 +136,14 @@ new BubblingList(draggableItems);
 Target areas for draggable elements.
 
 ```javascript
-import { Target, FloatLeftStrategy, transformedSpaceDistanceFactory } from 'dragee'
+import { Target, FloatLeftStrategy, transformedSpaceDistanceFactory } from 'dragee';
 
 const target = new Target(element, draggables, {
   timeEnd: 200,
   timeExcange: 400,
-  parent: parentElement,
+  container: parentElement,
   strategy: new FloatLeftStrategy(
-    () => target.getRectangle()
+    () => target.getRectangle(),
     {
       radius: 80,
       getDistance: transformedSpaceDistanceFactory({ x: 1, y: 4 }),

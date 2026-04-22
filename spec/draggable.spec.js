@@ -5,6 +5,8 @@ import {
   createContainer,
   createDraggable,
   track,
+  mouseDown,
+  mouseMove,
   simulateDrag,
   endDrag,
   cleanup
@@ -200,6 +202,62 @@ describe('draggable/bounding', () => {
     const bounded = draggable.bounding.bound(new Point(100, 200))
     expect(bounded.x).toBe(50)
     expect(bounded.y).toBe(50)
+  })
+})
+
+describe('draggable/dragStartThreshold', () => {
+  it('should not fire drag:start below the threshold', () => {
+    const d = createDraggable({ dragStartThreshold: 5 })
+    const startFn = jest.fn()
+    d.on('drag:start', startFn)
+
+    simulateDrag(d, new Point(0, 0), new Point(2, 2))
+    expect(startFn).not.toHaveBeenCalled()
+    endDrag(new Point(2, 2))
+  })
+
+  it('should fire drag:start once after crossing the threshold', () => {
+    const d = createDraggable({ dragStartThreshold: 5 })
+    const startFn = jest.fn()
+    d.on('drag:start', startFn)
+
+    mouseDown(d.element, new Point(0, 0))
+    mouseMove(new Point(2, 2))          // below threshold — silent
+    expect(startFn).not.toHaveBeenCalled()
+    mouseMove(new Point(10, 10))        // crosses threshold
+    expect(startFn).toHaveBeenCalledTimes(1)
+    mouseMove(new Point(20, 20))        // already started — no extra fire
+    expect(startFn).toHaveBeenCalledTimes(1)
+    endDrag(new Point(20, 20))
+  })
+
+  it('should not fire drag:end when threshold was never crossed', () => {
+    const d = createDraggable({ dragStartThreshold: 5 })
+    const endFn = jest.fn()
+    d.on('drag:end', endFn)
+
+    simulateDrag(d, new Point(0, 0), new Point(2, 2))
+    endDrag(new Point(2, 2))
+    expect(endFn).not.toHaveBeenCalled()
+  })
+
+  it('should not move element below the threshold', () => {
+    const d = createDraggable({ dragStartThreshold: 5 })
+
+    simulateDrag(d, new Point(0, 0), new Point(2, 2))
+    expect(d.element.classList.contains('dragee-active')).toBe(false)
+    expect(d.isDragging).toBeFalsy()
+    endDrag(new Point(2, 2))
+  })
+
+  it('defaults to 0 — immediate drag:start like before', () => {
+    const d = createDraggable()
+    const startFn = jest.fn()
+    d.on('drag:start', startFn)
+
+    mouseDown(d.element, new Point(0, 0))
+    expect(startFn).toHaveBeenCalledTimes(1)
+    endDrag(new Point(0, 0))
   })
 })
 
