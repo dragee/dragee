@@ -83,7 +83,7 @@ const draggable = new Draggable(element, {
 
 | Event | `event.detail` | DOM event | Description |
 | --- | --- | --- | --- |
-| `drag:start` | `{ draggable }` | `dragee:start` | Drag begins (after threshold is met) |
+| `drag:start` | `{ draggable }` | `dragee:start` | Drag begins (after threshold is met). **Cancelable** |
 | `drag:move` | `{ draggable }` | `dragee:move` | Position updates during dragging |
 | `drag:end` | `{ draggable }` | `dragee:end` | Drag finishes |
 
@@ -92,6 +92,14 @@ Each event is also dispatched as a bubbling DOM `CustomEvent` on the element. Th
 ```javascript
 container.addEventListener('dragee:end', (event) => {
   console.log('dropped', event.detail.draggable.element)
+})
+```
+
+Calling `event.preventDefault()` on `drag:start` (or on `dragee:start`) cancels the drag:
+
+```javascript
+draggable.on('drag:start', (event) => {
+  if (isLocked) event.preventDefault()
 })
 ```
 
@@ -333,9 +341,17 @@ target.on('target:remove', (event) => console.log('removed', event.detail.dragga
 
 | Event | `event.detail` | DOM event | Description |
 | --- | --- | --- | --- |
-| `target:beforeAdd` | `{ target, draggable }` | `dragee:target-before-add` | Before a draggable is added |
+| `target:beforeAdd` | `{ target, draggable }` | `dragee:target-before-add` | Before a draggable is added. **Cancelable** |
 | `target:add` | `{ target, draggable }` | `dragee:target-add` | After a draggable is added |
 | `target:remove` | `{ target, draggable }` | `dragee:target-remove` | After a draggable is removed |
+
+Calling `event.preventDefault()` on `target:beforeAdd` refuses the draggable: a dropped one returns to its initial position, and `add()` does nothing. For example, to limit a column to 5 cards:
+
+```javascript
+target.on('target:beforeAdd', (event) => {
+  if (target.innerDraggables.length >= 5) event.preventDefault()
+})
+```
 
 DOM events are dispatched from the target element and bubble. For example, one listener on a kanban board can track all its columns:
 
@@ -616,6 +632,7 @@ new Draggable(el, {
   ```
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.
+- **A drop refused by a target** (`target:beforeAdd` prevented, or a custom `catchDraggable` accepting a draggable whose center is outside) returns the draggable to its initial position.
 
 ---
 

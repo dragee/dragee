@@ -260,6 +260,11 @@ export default class Draggable extends EventEmitter {
       event.target.focus()
     }
 
+    const isStartPending = !this.shouldUseNativeDragAndDrop() && this.dragStartThreshold > 0
+    if (!isStartPending && !this.emitDragEvent('start', { cancelable: true })) {
+      return
+    }
+
     if (this.shouldUseNativeDragAndDrop()) {
       if (this.isTouchEvent && this.emulateNativeDragAndDropOnTouch) {
         this._startParentsScrollOffset = this.parentsScrollOffset
@@ -295,11 +300,7 @@ export default class Draggable extends EventEmitter {
     window.addEventListener('scroll', this._scroll)
     this.scrollElements.forEach((p) => p.addEventListener('scroll', this._scroll))
 
-    if (!this.shouldUseNativeDragAndDrop() && this.dragStartThreshold > 0) {
-      this._dragStartPending = true
-    } else {
-      this.emitDragEvent('start')
-    }
+    this._dragStartPending = isStartPending
   }
 
   dragMove(event) {
@@ -331,7 +332,10 @@ export default class Draggable extends EventEmitter {
         return
       }
       this._dragStartPending = false
-      this.emitDragEvent('start')
+      if (!this.emitDragEvent('start', { cancelable: true })) {
+        this.cancelDragging()
+        return
+      }
     }
 
     this.isDragging = true
@@ -513,13 +517,13 @@ export default class Draggable extends EventEmitter {
     event.preventDefault()
   }
 
-  emitDragEvent(type) {
+  emitDragEvent(type, { cancelable = false } = {}) {
     const detail = { draggable: this }
-    this.emit(`drag:${type}`, detail)
+    const isNotPrevented = this.emit(`drag:${type}`, detail, { cancelable })
 
-    if (this.domEvents) {
-      dispatchDomEvent(this.element, `dragee:${type}`, detail)
-    }
+    if (!this.domEvents) return isNotPrevented
+
+    return dispatchDomEvent(this.element, `dragee:${type}`, detail, { cancelable }) && isNotPrevented
   }
 
   overrideDragEndAction(action) {

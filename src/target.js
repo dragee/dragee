@@ -113,13 +113,15 @@ export default class Target extends EventEmitter {
   onEnd(draggable) {
     const newDraggablesIndex = []
 
-    if (this.getRectangle().includePoint(draggable.getCenter())) {
-      draggable.position = this.bound(draggable.position, draggable.getSize())
-    } else {
+    if (!this.getRectangle().includePoint(draggable.getCenter())) {
       return false
     }
 
-    this.emitTargetEvent('beforeAdd', draggable)
+    if (!this.emitTargetEvent('beforeAdd', draggable, { cancelable: true })) {
+      return false
+    }
+
+    draggable.position = this.bound(draggable.position, draggable.getSize())
 
     this.innerDraggables = this.sorting(this.innerDraggables, [draggable], newDraggablesIndex)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
@@ -152,7 +154,9 @@ export default class Target extends EventEmitter {
   add(draggable, time) {
     const newDraggablesIndex = this.innerDraggables.length
 
-    this.emitTargetEvent('beforeAdd', draggable)
+    if (!this.emitTargetEvent('beforeAdd', draggable, { cancelable: true })) {
+      return
+    }
 
     this.pushInnerDraggable(draggable)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
@@ -216,14 +220,14 @@ export default class Target extends EventEmitter {
     return this.innerDraggables.slice()
   }
 
-  emitTargetEvent(type, draggable) {
+  emitTargetEvent(type, draggable, { cancelable = false } = {}) {
     const detail = { target: this, draggable }
-    this.emit(`target:${type}`, detail)
+    const isNotPrevented = this.emit(`target:${type}`, detail, { cancelable })
 
-    if (this.domEvents) {
-      const domType = type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
-      dispatchDomEvent(this.element, `dragee:target-${domType}`, detail)
-    }
+    if (!this.domEvents) return isNotPrevented
+
+    const domType = type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
+    return dispatchDomEvent(this.element, `dragee:target-${domType}`, detail, { cancelable }) && isNotPrevented
   }
 
   get container() {

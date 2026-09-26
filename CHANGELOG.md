@@ -9,9 +9,11 @@
 - listener semantics follow `EventTarget`: the same function added twice is registered once, and an exception in one listener no longer stops the others
 - requires Chrome / Edge 90+, Firefox 86+, Safari 15+ (`EventTarget` subclassing and the `signal` listener option)
 - remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
+- a drop refused by a target returns the draggable to its initial position (previously it stayed where it was dropped)
 
 ### Added
 - `on()` returns a function that removes the listener; add `off()` and `once()`. Standard listener options such as `{ signal }` are supported. `unsubscribe()` is kept as a deprecated alias for `off()`
+- cancelable events: `event.preventDefault()` on `drag:start` cancels the drag; on `target:beforeAdd` it refuses the draggable
 - bubbling DOM events (disable with the `domEvents: false` option), with the same `event.detail` as the instance events:
   - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element
   - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element

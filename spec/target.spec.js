@@ -1,6 +1,6 @@
 import Target from '../src/target'
 import Point from '../src/geometry/point'
-import { createContainer, createDraggables, cleanup } from './testing-sdk'
+import { createContainer, createDraggable, createDraggables, simulateDrag, endDrag, cleanup } from './testing-sdk'
 
 afterEach(cleanup)
 
@@ -32,4 +32,29 @@ describe('Target', () => {
     ])
   })
 
+  describe('refusing a draggable in target:beforeAdd', () => {
+    it('should not add it programmatically', () => {
+      const { target, draggables: [draggable] } = createTargetSetup()
+      target.on('target:beforeAdd', (e) => e.preventDefault())
+
+      target.add(draggable)
+
+      expect(target.getSortedDraggables()).not.toContain(draggable)
+    })
+
+    it('should send a dropped draggable back to its initial position', () => {
+      const draggable = createDraggable({ position: new Point(100, 100) })
+      const targetElement = document.createElement('div')
+      createContainer().appendChild(targetElement)
+      const target = new Target(targetElement, [draggable], { catchDraggable: () => true })
+      targetElement.addEventListener('dragee:target-before-add', (e) => e.preventDefault())
+
+      simulateDrag(draggable, new Point(100, 100), new Point(0, 0))
+      endDrag(new Point(0, 0))
+
+      expect(target.getSortedDraggables()).not.toContain(draggable)
+      expect(draggable.position).toEqual(new Point(100, 100))
+      target.destroy()
+    })
+  })
 })

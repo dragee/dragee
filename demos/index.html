@@ -191,6 +191,116 @@
             </div>
         </div>
     </section>
+    <section id="CancelDragStart" >
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoCancelDragStart" class="demo-html">
+                    <p class="hint">While <b>Read-only</b> is on, no card can be dragged, including cards added later: one <code>dragee:start</code> listener on the board cancels every drag.</p>
+                    <div class="controls">
+                        <label><input type="checkbox" class="read-only"> Read-only</label>
+                        <button type="button" class="btn btn-small add-card">Add card</button>
+                    </div>
+                    <div class="board">
+                        <div class="draggable">Card 1</div>
+                        <div class="draggable">Card 2</div>
+                        <div class="draggable">Card 3</div>
+                    </div>
+                    <p class="status">Status: <span>idle</span></p>
+                </div>
+                <style>
+                    #DemoCancelDragStart .controls{
+                        margin-bottom: 10px;
+                    }
+                    #DemoCancelDragStart .controls label{
+                        display: inline-block;
+                        margin-right: 15px;
+                    }
+                    #DemoCancelDragStart .board{
+                        position: relative;
+                        overflow: hidden;
+                        padding: 5%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225, 0.4);
+                    }
+                    #DemoCancelDragStart .board .draggable{
+                        display: inline-block;
+                        margin: 4px;
+                        padding: 9px 14px;
+                        font-size: 15px;
+                        color: #333;
+                        cursor: move;
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        background: #f5f5f5;
+                        user-select: none;
+                    }
+                    #DemoCancelDragStart .board.read-only .draggable{
+                        cursor: not-allowed;
+                        color: #888;
+                        border-style: dashed;
+                    }
+                    #DemoCancelDragStart .board .draggable.dragee-active{
+                        background-color: #ffc40d;
+                    }
+                    #DemoCancelDragStart .hint,
+                    #DemoCancelDragStart .status{
+                        color: #555;
+                    }
+                    #DemoCancelDragStart .status{
+                        margin-top: 10px;
+                    }
+                    #DemoCancelDragStart .status span{
+                        font-weight: bold;
+                        color: #222;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        const root = document.getElementById("DemoCancelDragStart")
+                        const board = root.querySelector(".board")
+                        const readOnly = root.querySelector(".read-only")
+                        const status = root.querySelector(".status span")
+                        let cardCount = board.children.length
+
+                        const makeDraggable = (element) => new Dragee.Draggable(element, {
+                          container: board,
+                          bounding: new Dragee.BoundToElement(board, board)
+                        })
+
+                        board.querySelectorAll(".draggable").forEach(makeDraggable)
+
+                        board.addEventListener('dragee:start', (event) => {
+                          const cardName = event.detail.draggable.element.textContent
+                          if (readOnly.checked) {
+                            event.preventDefault()
+                            status.textContent = 'read-only, dragging ' + cardName + ' was canceled'
+                          } else {
+                            status.textContent = 'dragging ' + cardName
+                          }
+                        })
+
+                        readOnly.addEventListener('change', () => {
+                          board.classList.toggle('read-only', readOnly.checked)
+                        })
+
+                        root.querySelector(".add-card").addEventListener('click', () => {
+                          const card = document.createElement('div')
+                          card.className = 'draggable'
+                          card.textContent = 'Card ' + (++cardCount)
+                          board.appendChild(card)
+                          makeDraggable(card)
+                        })
+                    })
+                </script>
+            </div>
+            <div class="span6 demo-span">
+                <pre class="prettyprint lang-js">board.addEventListener('dragee:start', (event) => {
+    if (readOnly.checked) event.preventDefault()
+})</pre>
+            </div>
+        </div>
+    </section>
     <section id="Bounding" >
       <div class="row demo-row">
           <div class="span5 demo-span">
@@ -1224,6 +1334,136 @@
                         });
                     });
                 </script>
+            </div>
+        </div>
+    </section>
+
+    <section id="TargetLimit" >
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoTargetLimit" class="demo-html">
+                    <div class="area">
+                        <div class="target">Max 2 cards</div>
+                        <ul class="draggable-holder">
+                            <li class="draggable">✈ A</li>
+                            <li class="draggable">✈ B</li>
+                            <li class="draggable">✈ C</li>
+                            <li class="draggable">✈ D</li>
+                        </ul>
+                    </div>
+                    <p class="status">Status: <span>drop cards into the column</span></p>
+                </div>
+                <style>
+                    #DemoTargetLimit .area{
+                        position: relative;
+                        overflow: hidden;
+                        padding: 3%;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225, 0.4);
+                    }
+                    #DemoTargetLimit .area .target{
+                        width: 40%;
+                        min-height: 110px;
+                        padding: 2%;
+                        float: left;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225, 0.4);
+                    }
+                    #DemoTargetLimit .area .target.full{
+                        border-color: #ee5f5b;
+                    }
+                    #DemoTargetLimit ul.draggable-holder{
+                        width: 45%;
+                        margin: 0 0 0 5%;
+                        float: left;
+                        list-style: none;
+                    }
+                    #DemoTargetLimit ul.draggable-holder .draggable{
+                        width: 80px;
+                        margin: 4px 0;
+                        padding: 9px 0;
+                        font-size: 15px;
+                        color: #333;
+                        cursor: move;
+                        text-align: center;
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        background: #f5f5f5;
+                        position: relative;
+                    }
+                    #DemoTargetLimit ul.draggable-holder .draggable.dragee-active{
+                        z-index: 2;
+                        background: #ffc40d;
+                    }
+                    #DemoTargetLimit ul.draggable-holder .draggable.in-target{
+                        background: #62c462;
+                    }
+                    #DemoTargetLimit .status{
+                        clear: both;
+                        margin-top: 10px;
+                        color: #555;
+                    }
+                    #DemoTargetLimit .status span{
+                        font-weight: bold;
+                        color: #222;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        const root = document.getElementById("DemoTargetLimit")
+                        const area = root.querySelector(".area")
+                        const targetElement = root.querySelector(".target")
+                        const status = root.querySelector(".status span")
+                        const maxCards = 2
+                        let target
+
+                        Dragee.scope(() => {
+                          const draggables = [...area.querySelectorAll(".draggable")].map((element) => {
+                            return new Dragee.Draggable(element, { container: area })
+                          })
+
+                          target = new Dragee.Target(targetElement, draggables, {
+                            container: area,
+                            strategy: new Dragee.FloatLeftStrategy(() => target.getRectangle(), {
+                              radius: 80,
+                              removable: true,
+                              paddingTopLeft: new Dragee.Point(5, 5),
+                              yGapBetweenDraggables: 5
+                            })
+                          })
+                        })
+
+                        const renderStatus = () => {
+                          const count = target.innerDraggables.length
+                          targetElement.classList.toggle('full', count >= maxCards)
+                          status.textContent = count + ' of ' + maxCards + ' cards in the column'
+                        }
+
+                        target.on('target:beforeAdd', (event) => {
+                          if (target.innerDraggables.length >= maxCards) {
+                            event.preventDefault()
+                            status.textContent = 'the column is full, the card went back'
+                          }
+                        })
+                        target.on('target:add', (event) => {
+                          event.detail.draggable.element.classList.add('in-target')
+                          renderStatus()
+                        })
+                        target.on('target:remove', (event) => {
+                          event.detail.draggable.element.classList.remove('in-target')
+                          renderStatus()
+                        })
+                    })
+                </script>
+            </div>
+            <div class="span6 demo-span">
+                <pre class="prettyprint lang-js">target.on('target:beforeAdd', (event) => {
+    if (target.innerDraggables.length >= 2) {
+        event.preventDefault()
+    }
+})</pre>
             </div>
         </div>
     </section>
