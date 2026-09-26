@@ -1,6 +1,7 @@
 import range from './utils/range.js'
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
+import dispatchDomEvent from './utils/dispatch-dom-event'
 import Rectangle from './geometry/rectangle'
 import { transformedSpaceDistanceFactory } from './geometry/distances'
 import { scopes, defaultScope } from './scope'
@@ -32,6 +33,7 @@ export default class Target extends EventEmitter {
     )
 
     this.element = element
+    this.removeOnMoveSubscriptions = new Map()
     draggables.forEach((draggable) => draggable.targets.push(target))
     this.draggables = draggables
 
@@ -73,7 +75,7 @@ export default class Target extends EventEmitter {
         return draggable.getRectangle()
       }), indexesOfNew)
       this.setPosition(rectangles, indexesOfNew)
-      this.innerDraggables.forEach((draggable) => this.emit('target:add', draggable))
+      this.innerDraggables.forEach((draggable) => this.emitTargetEvent('add', draggable))
     }
   }
 
@@ -121,7 +123,7 @@ export default class Target extends EventEmitter {
       return false
     }
 
-    this.emit('target:beforeAdd', draggable)
+    this.emitTargetEvent('beforeAdd', draggable)
 
     this.innerDraggables = this.sorting(this.innerDraggables, [draggable], newDraggablesIndex)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
@@ -142,8 +144,9 @@ export default class Target extends EventEmitter {
 
       if (rect.removable) {
         draggable.move(draggable.initialPosition, timeEnd, true, true)
+        this.stopRemoveOnMove(draggable)
         removeItem(this.innerDraggables, draggable)
-        this.emit('target:remove', draggable)
+        this.emitTargetEvent('remove', draggable)
       } else {
         draggable.move(rect.position, timeEnd, true, true)
       }
@@ -153,7 +156,7 @@ export default class Target extends EventEmitter {
   add(draggable, time) {
     const newDraggablesIndex = this.innerDraggables.length
 
-    this.emit('target:beforeAdd', draggable)
+    this.emitTargetEvent('beforeAdd', draggable)
 
     this.pushInnerDraggable(draggable)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
@@ -173,15 +176,22 @@ export default class Target extends EventEmitter {
   }
 
   addRemoveOnMove(draggable) {
-    draggable.on('drag:move', this.removeHandler = () => {
-      this.remove(draggable)
-    })
+    this.stopRemoveOnMove(draggable)
+    this.removeOnMoveSubscriptions.set(draggable, draggable.on('drag:move', () => this.remove(draggable)))
 
-    this.emit('target:add', draggable)
+    this.emitTargetEvent('add', draggable)
+  }
+
+  stopRemoveOnMove(draggable) {
+    const unsubscribe = this.removeOnMoveSubscriptions.get(draggable)
+    if (unsubscribe) {
+      unsubscribe()
+      this.removeOnMoveSubscriptions.delete(draggable)
+    }
   }
 
   remove(draggable) {
-    draggable.unsubscribe('drag:move', this.removeHandler)
+    this.stopRemoveOnMove(draggable)
 
     const index = this.innerDraggables.indexOf(draggable)
     if (index === -1) {
@@ -195,13 +205,14 @@ export default class Target extends EventEmitter {
     }), [])
 
     this.setPosition(rectangles, [])
-    this.emit('target:remove', draggable)
+    this.emitTargetEvent('remove', draggable)
   }
 
   reset() {
     this.innerDraggables.forEach((draggable) => {
       draggable.move(draggable.initialPosition, 0, true, true)
-      this.emit('target:remove', draggable)
+      this.stopRemoveOnMove(draggable)
+      this.emitTargetEvent('remove', draggable)
     })
     this.innerDraggables = []
   }
@@ -210,8 +221,21 @@ export default class Target extends EventEmitter {
     return this.innerDraggables.slice()
   }
 
+  emitTargetEvent(type, draggable) {
+    this.emit(`target:${type}`, draggable)
+
+    if (this.domEvents) {
+      const domType = type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
+      dispatchDomEvent(this.element, `dragee:target-${domType}`, { target: this, draggable })
+    }
+  }
+
   get container() {
     return (this._container = this._container || this.options.container || this.options.parent || this.element.offsetParent)
+  }
+
+  get domEvents() {
+    return this.options.domEvents !== false
   }
 }
 

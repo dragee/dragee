@@ -13,7 +13,7 @@ export default class BubblingList extends List {
 
     const axis = this.axis
     const sorted = this.getSortedDraggables()
-    // Skip items already detached from the DOM (e.g. removed before `remove()`): their size is 0
+    // Detached elements report size 0
     const index = sorted.findIndex((d, i) => i < sorted.length - 1 && d.element.isConnected)
     if (index === -1) return
 
@@ -29,7 +29,7 @@ export default class BubblingList extends List {
 
   initDraggable(draggable) {
     super.initDraggable(draggable)
-    draggable.on('drag:start', () => this.onDragStart(draggable))
+    this.listenTo(draggable, 'drag:start', () => this.onDragStart(draggable))
   }
 
   onDragStart(draggable) {
@@ -121,7 +121,6 @@ export default class BubblingList extends List {
     }
   }
 
-  // Position right after `draggable` placed at `position`, along the list axis
   nextPosition(position, draggable) {
     const next = position.clone()
     next[this.axis] = position[this.axis] + draggable.getSize()[this.axis] + this.gap

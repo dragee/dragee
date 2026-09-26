@@ -9,13 +9,13 @@ export default class EventEmitter {
     }
   }
 
-  emit(eventName) {
+  emit(eventName, ...args) {
     this.interrupted = false
-    const args = [].slice.call(arguments, 1)
 
     if (!this.events[eventName]) return
 
-    for (const func of this.events[eventName]) {
+    // Iterate over a copy so listeners can unsubscribe while the event is being emitted
+    for (const func of this.events[eventName].slice()) {
       func(...args)
       if (this.interrupted) {
         return
@@ -28,26 +28,40 @@ export default class EventEmitter {
   }
 
   on(eventName, fn) {
-    if (!this.events[eventName]) {
-      this.events[eventName] = []
-    }
-
-    this.events[eventName].push(fn)
+    this.listeners(eventName).push(fn)
+    return () => this.off(eventName, fn)
   }
 
   prependOn(eventName, fn) {
-    if (!this.events[eventName]) {
-      this.events[eventName] = []
-    }
-
-    this.events[eventName].unshift(fn)
+    this.listeners(eventName).unshift(fn)
+    return () => this.off(eventName, fn)
   }
 
-  unsubscribe(eventName, fn) {
-    if (this.events[eventName]) {
-      const index = this.events[eventName].indexOf(fn)
+  once(eventName, fn) {
+    const wrapper = (...args) => {
+      this.off(eventName, wrapper)
+      fn(...args)
+    }
+    wrapper.listener = fn
+    return this.on(eventName, wrapper)
+  }
+
+  off(eventName, fn) {
+    if (!this.events[eventName]) return
+
+    const index = this.events[eventName].findIndex((listener) => listener === fn || listener.listener === fn)
+    if (index !== -1) {
       this.events[eventName].splice(index, 1)
     }
+  }
+
+  // Deprecated alias for `off`
+  unsubscribe(eventName, fn) {
+    this.off(eventName, fn)
+  }
+
+  listeners(eventName) {
+    return (this.events[eventName] ||= [])
   }
 
   resetEmitter () {

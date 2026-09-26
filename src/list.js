@@ -1,6 +1,7 @@
 import debounce from './utils/debounce'
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
+import dispatchDomEvent from './utils/dispatch-dom-event'
 import {
   getDistance,
   indexOfNearestPoint
@@ -20,6 +21,7 @@ export default class List extends EventEmitter {
     this.container = options.container
     this.draggables = draggables
     this.changedDuringIteration = false
+    this.subscriptions = new Map()
 
     this.resizeObserver = new ResizeObserver(debounce(this.onResize.bind(this), 100))
 
@@ -46,18 +48,30 @@ export default class List extends EventEmitter {
 
   initDraggable(draggable) {
     draggable.enable = this._enable
-    draggable.on('drag:move', () => this.onMove(draggable))
-    draggable.dragEndAction = () => {
+    this.listenTo(draggable, 'drag:move', () => this.onMove(draggable))
+    this.trackRelease(draggable, draggable.overrideDragEndAction(() => {
       draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
       this.onEnd(draggable)
-    }
+    }))
     this.resizeObserver.observe(draggable.element)
+  }
+
+  listenTo(draggable, eventName, handler) {
+    this.trackRelease(draggable, draggable.on(eventName, handler))
+  }
+
+  trackRelease(draggable, release) {
+    if (!this.subscriptions.has(draggable)) {
+      this.subscriptions.set(draggable, [])
+    }
+    this.subscriptions.get(draggable).push(release)
   }
 
   releaseDraggable(draggable) {
     this.resizeObserver.unobserve(draggable.element)
-    draggable.resetOn('drag:end')
-    draggable.resetOn('drag:move')
+    const releases = this.subscriptions.get(draggable) || []
+    releases.forEach((release) => release())
+    this.subscriptions.delete(draggable)
     removeItem(this.draggables, draggable)
   }
 
@@ -93,7 +107,7 @@ export default class List extends EventEmitter {
 
   onEnd(draggable) {
     if (this.changedDuringIteration) {
-      this.emit('list:change')
+      this.emitListEvent('change', draggable)
       this.changedDuringIteration = false
 
       if (this.options.reorderOnChange && this.options.container) {
@@ -116,7 +130,15 @@ export default class List extends EventEmitter {
     }
 
     this.draggables.forEach((d) => d.startPositioning())
-    this.emit('list:reordered')
+    this.emitListEvent('reordered', movedDraggable)
+  }
+
+  emitListEvent(type, draggable) {
+    this.emit(`list:${type}`, draggable)
+
+    if (this.domEvents) {
+      dispatchDomEvent(draggable.element, `dragee:list-${type}`, { list: this, draggable })
+    }
   }
 
   getCurrentPinnedPositions() {
@@ -193,6 +215,10 @@ export default class List extends EventEmitter {
 
   get distanceFunc() {
     return this.options.getDistance || getDistance
+  }
+
+  get domEvents() {
+    return this.options.domEvents !== false
   }
 
   get positions() {

@@ -4,7 +4,6 @@ import { createDraggables, simulateDrag, endDrag, cleanup } from './testing-sdk'
 
 afterEach(cleanup)
 
-// Items are laid out along `axis` every 50px; in jsdom their size is 0
 function createBubblingSetup(options = {}, { count = 3, crossPosition = 0 } = {}) {
   const { container, draggables } = createDraggables(count, (i) => ({
     position: options.axis === 'x' ? new Point(i * 50, crossPosition) : new Point(crossPosition, i * 50)
@@ -28,6 +27,19 @@ describe('BubblingList', () => {
 
       expect(first.pinnedPosition.y).toBe(50)
       expect(second.pinnedPosition.y).toBe(0)
+    })
+
+    it('should report the change with the dragged item, also as a bubbling DOM event', () => {
+      const { list, draggables: [first] } = createBubblingSetup()
+      const onChange = jest.fn()
+      const domEvents = []
+      list.on('list:change', onChange)
+      document.body.addEventListener('dragee:list-change', (e) => domEvents.push(e.detail))
+
+      dragBy(first, new Point(0, 45))
+
+      expect(onChange).toHaveBeenCalledWith(first)
+      expect(domEvents).toEqual([{ list, draggable: first }])
     })
 
     it('should not swap items when swappingDisabled is true', () => {

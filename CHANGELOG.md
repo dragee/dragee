@@ -1,4 +1,16 @@
 ## [Unreleased]
+- `on()` and `prependOn()` return a function that removes the listener; add `off()` and `once()`. `unsubscribe()` is kept as a deprecated alias for `off()`
+- events carry a payload: `drag:start` / `drag:move` / `drag:end`, `list:change`, `list:reordered` and `scope:change` receive the related draggable
+- bubbling DOM events (disable with the `domEvents: false` option):
+  - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element, `event.detail` = `{ draggable }`
+  - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element, `event.detail` = `{ list, draggable }`
+  - `Target`: `dragee:target-before-add` / `dragee:target-add` / `dragee:target-remove` from the target element, `event.detail` = `{ target, draggable }`
+- fix `unsubscribe()` removing the last listener when the given one was not subscribed
+- fix listeners being skipped when a listener unsubscribes while an event is being emitted
+- fix `List.remove()` wiping user `drag:move` / `drag:end` listeners, leaving the `BubblingList` `drag:start` listener and still controlling the drop of the removed draggable
+- fix `Target` keeping a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener
+- fix a draggable released from a `List` or `Scope` still being handled by it on drag end; the previous drag end handling is restored
+- fix targets created inside `scope()` being added to the default scope too
 - fix `BubblingList.remove()` detecting the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
 - add horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
 - add the `gap` option for `BubblingList`; `verticalGap` is kept as a deprecated alias. An explicit `0` gap is now respected instead of triggering auto-detection

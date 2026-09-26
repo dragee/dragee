@@ -10,9 +10,7 @@ class Scope extends EventEmitter {
     super(options)
     scopes.forEach((scope) => {
       if (draggables) {
-        draggables.forEach((draggable) => {
-          removeItem(scope.draggables, draggable)
-        })
+        draggables.forEach((draggable) => scope.releaseDraggable(draggable))
       }
 
       if (targets) {
@@ -24,6 +22,7 @@ class Scope extends EventEmitter {
 
     this.draggables = draggables || []
     this.targets = targets || []
+    this.dragEndActionReleases = new Map()
     scopes.push(this)
     this.options = {
       timeEnd: (options.timeEnd) || 400
@@ -33,14 +32,25 @@ class Scope extends EventEmitter {
   }
 
   init() {
-    this.draggables.forEach((draggable) => {
-      draggable.dragEndAction = () => this.onEnd(draggable)
-    })
+    this.draggables.forEach((draggable) => this.initDraggable(draggable))
   }
 
   addDraggable(draggable) {
     this.draggables.push(draggable)
-    draggable.dragEndAction = () => this.onEnd(draggable)
+    this.initDraggable(draggable)
+  }
+
+  initDraggable(draggable) {
+    this.dragEndActionReleases.set(draggable, draggable.overrideDragEndAction(() => this.onEnd(draggable)))
+  }
+
+  releaseDraggable(draggable) {
+    const release = this.dragEndActionReleases.get(draggable)
+    if (release) {
+      release()
+      this.dragEndActionReleases.delete(draggable)
+    }
+    removeItem(this.draggables, draggable)
   }
 
   addTarget(target) {
@@ -62,7 +72,7 @@ class Scope extends EventEmitter {
       draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
     }
 
-    this.emit('scope:change')
+    this.emit('scope:change', draggable)
   }
 
   reset() {
@@ -108,14 +118,17 @@ function scope(fn) {
 
   const addTargetToScope = function(target) {
     currentScope.addTarget(target)
-    Draggable.emitter.interrupt()
+    Target.emitter.interrupt()
   }
 
-  Draggable.emitter.prependOn('draggable:create', addDraggableToScope)
-  Target.emitter.prependOn('target:create', addTargetToScope)
-  fn.call()
-  Draggable.emitter.unsubscribe('draggable:create', addDraggableToScope)
-  Target.emitter.unsubscribe('target:create', addTargetToScope)
+  const offDraggable = Draggable.emitter.prependOn('draggable:create', addDraggableToScope)
+  const offTarget = Target.emitter.prependOn('target:create', addTargetToScope)
+  try {
+    fn.call()
+  } finally {
+    offDraggable()
+    offTarget()
+  }
   return currentScope
 }
 

@@ -54,8 +54,28 @@ describe('EventEmitter', () => {
     })
   })
 
-  describe('unsubscribe', () => {
-    it('should remove a specific listener', () => {
+  describe('off', () => {
+    it('should remove only the specified listener', () => {
+      const fn1 = jest.fn()
+      const fn2 = jest.fn()
+      emitter.on('test', fn1)
+      emitter.on('test', fn2)
+      emitter.off('test', fn1)
+      emitter.emit('test')
+      expect(fn1).not.toHaveBeenCalled()
+      expect(fn2).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not remove anything when the listener was never added', () => {
+      const fn = jest.fn()
+      emitter.on('test', fn)
+      emitter.off('test', () => {})
+      emitter.off('nope', () => {})
+      emitter.emit('test')
+      expect(fn).toHaveBeenCalledTimes(1)
+    })
+
+    it('should be available as the deprecated unsubscribe', () => {
       const fn = jest.fn()
       emitter.on('test', fn)
       emitter.unsubscribe('test', fn)
@@ -63,19 +83,42 @@ describe('EventEmitter', () => {
       expect(fn).not.toHaveBeenCalled()
     })
 
-    it('should not throw when unsubscribing from nonexistent event', () => {
-      expect(() => emitter.unsubscribe('nope', () => {})).not.toThrow()
+    it('should not skip the next listener when a listener removes itself during emit', () => {
+      const second = jest.fn()
+      const first = () => emitter.off('test', first)
+      emitter.on('test', first)
+      emitter.on('test', second)
+      emitter.emit('test')
+      expect(second).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('on', () => {
+    it('should return a function that removes the listener', () => {
+      const fn = jest.fn()
+      const off = emitter.on('test', fn)
+      off()
+      emitter.emit('test')
+      expect(fn).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('once', () => {
+    it('should call the listener only for the first emit', () => {
+      const fn = jest.fn()
+      emitter.once('test', fn)
+      emitter.emit('test', 1)
+      emitter.emit('test', 2)
+      expect(fn).toHaveBeenCalledTimes(1)
+      expect(fn).toHaveBeenCalledWith(1)
     })
 
-    it('should remove only the specified listener', () => {
-      const fn1 = jest.fn()
-      const fn2 = jest.fn()
-      emitter.on('test', fn1)
-      emitter.on('test', fn2)
-      emitter.unsubscribe('test', fn1)
+    it('should be removable with off using the original listener', () => {
+      const fn = jest.fn()
+      emitter.once('test', fn)
+      emitter.off('test', fn)
       emitter.emit('test')
-      expect(fn1).not.toHaveBeenCalled()
-      expect(fn2).toHaveBeenCalledTimes(1)
+      expect(fn).not.toHaveBeenCalled()
     })
   })
 

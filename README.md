@@ -5,7 +5,7 @@
 [![bundle size](https://img.shields.io/bundlephobia/minzip/dragee)](https://bundlephobia.com/package/dragee)
 [![license](https://img.shields.io/npm/l/dragee)](https://github.com/dragee/dragee/blob/master/LICENSE)
 
-Precise, constraint-based drag-and-drop for JavaScript. Zero dependencies. 7 geometric bounds. Sortable lists. Multi-target scoping.
+Precise, constraint-based drag-and-drop for JavaScript. Zero dependencies. 7 geometric bounds. Sortable lists (vertical and horizontal). Multi-target scoping. Bubbling DOM events for easy framework integration.
 
 [Documentation & Demos](https://dragee.github.io/) | [GitHub](https://github.com/dragee/dragee)
 
@@ -72,15 +72,24 @@ const draggable = new Draggable(element, {
 | `emulateNativeDragAndDropOnTouch` | `boolean` | `false` | Emulate native DnD on touch devices |
 | `stopPropagationOnDragStart` | `boolean` | `false` | Stop event propagation on drag start |
 | `copyStyles` | `function` | — | Custom function to copy styles during touch DnD emulation |
+| `domEvents` | `boolean` | `true` | Dispatch `dragee:*` DOM events on the element |
 | `on` | `object` | — | Event listeners: `{ 'drag:start': fn, ... }` |
 
 ### Events
 
-| Event | Description |
-| --- | --- |
-| `drag:start` | Drag begins (after threshold is met) |
-| `drag:move` | Position updates during dragging |
-| `drag:end` | Drag finishes |
+| Event | Arguments | DOM event | Description |
+| --- | --- | --- | --- |
+| `drag:start` | `draggable` | `dragee:start` | Drag begins (after threshold is met) |
+| `drag:move` | `draggable` | `dragee:move` | Position updates during dragging |
+| `drag:end` | `draggable` | `dragee:end` | Drag finishes |
+
+Each event is also dispatched as a bubbling DOM `CustomEvent` on the element, with `event.detail.draggable`. That makes it possible to listen on a common ancestor instead of every draggable:
+
+```javascript
+container.addEventListener('dragee:end', (event) => {
+  console.log('dropped', event.detail.draggable.element)
+})
+```
 
 ### Methods
 
@@ -186,7 +195,7 @@ const list = new List(draggables, {
   container
 })
 
-list.on('list:change', () => console.log('order changed'))
+list.on('list:change', (draggable) => console.log('order changed by', draggable.element))
 ```
 
 #### Options
@@ -200,14 +209,17 @@ list.on('list:change', () => console.log('order changed'))
 | `reorderOnChange` | `boolean` | `false` | Reorder DOM elements on swap |
 | `sorting` | `(a, b) => number` | by y, then x | Custom sort comparator |
 | `getDistance` | `(p1, p2) => number` | Euclidean | Custom distance function |
+| `domEvents` | `boolean` | `true` | Dispatch `dragee:*` DOM events (see Events) |
 | `on` | `object` | — | Event listeners |
 
 #### Events
 
-| Event | Description |
-| --- | --- |
-| `list:change` | List order changed (items swapped) |
-| `list:reordered` | DOM elements reordered (when `reorderOnChange: true`) |
+| Event | Arguments | DOM event | Description |
+| --- | --- | --- | --- |
+| `list:change` | `draggable` | `dragee:list-change` | List order changed (items swapped); receives the dragged item |
+| `list:reordered` | `draggable` | `dragee:list-reordered` | DOM elements reordered (when `reorderOnChange: true`); receives the moved item |
+
+DOM events are dispatched from the dragged item's element and bubble, so they reach the list container and any ancestor even without the `container` option. `event.detail` is `{ list, draggable }`; with nested lists use `event.detail.list` to tell them apart.
 
 #### Methods
 
@@ -314,15 +326,25 @@ target.on('target:remove', (draggable) => console.log('removed', draggable.eleme
 | `bound` | `(point, size) => Point` | `BoundToElement` | Post-drop constraint |
 | `catchDraggable` | `(target, draggable) => boolean` | center inclusion | Custom hit-test for accepting drops |
 | `container` / `parent` | `Element` | `element.offsetParent` | Coordinate space |
+| `domEvents` | `boolean` | `true` | Dispatch `dragee:*` DOM events (see Events) |
 | `on` | `object` | — | Event listeners |
 
 ### Events
 
-| Event | Arguments | Description |
-| --- | --- | --- |
-| `target:beforeAdd` | `draggable` | Before a draggable is added |
-| `target:add` | `draggable` | After a draggable is added |
-| `target:remove` | `draggable` | After a draggable is removed |
+| Event | Arguments | DOM event | Description |
+| --- | --- | --- | --- |
+| `target:beforeAdd` | `draggable` | `dragee:target-before-add` | Before a draggable is added |
+| `target:add` | `draggable` | `dragee:target-add` | After a draggable is added |
+| `target:remove` | `draggable` | `dragee:target-remove` | After a draggable is removed |
+
+DOM events are dispatched from the target element and bubble, with `event.detail` = `{ target, draggable }`. For example, one listener on a kanban board can track all its columns:
+
+```javascript
+board.addEventListener('dragee:target-add', (event) => {
+  const { target, draggable } = event.detail
+  console.log(draggable.element, 'moved to', target.element)
+})
+```
 
 ### Methods
 
@@ -432,8 +454,8 @@ const kanbanScope = scope(() => {
   const columns = columnEls.map(el => new Target(el, cards))
 })
 
-kanbanScope.on('scope:change', () => {
-  console.log('positions:', kanbanScope.positions)
+kanbanScope.on('scope:change', (draggable) => {
+  console.log('dropped', draggable.element, 'positions:', kanbanScope.positions)
 })
 ```
 
@@ -470,9 +492,9 @@ const myScope = new Scope(draggables, targets, { timeEnd: 400 })
 
 #### Events
 
-| Event | Description |
-| --- | --- |
-| `scope:change` | A draggable was dropped into a target |
+| Event | Arguments | Description |
+| --- | --- | --- |
+| `scope:change` | `draggable` | A draggable was dropped into a target |
 
 ### Exported Utilities
 
@@ -555,12 +577,17 @@ indexOfNearestPoint(pointArray, target, radius, distanceFn?)
 All dragee classes extend EventEmitter. Available on any instance:
 
 ```javascript
-draggable.on('drag:start', handler)
-draggable.unsubscribe('drag:start', handler)
-draggable.prependOn('drag:start', firstHandler)
-draggable.resetOn('drag:start')
-draggable.resetEmitter()
+const off = draggable.on('drag:start', handler)  // returns a function that removes the listener
+off()
+
+draggable.off('drag:start', handler)
+draggable.once('drag:start', handler)           // called only for the next event
+draggable.prependOn('drag:start', firstHandler) // also returns a remover
+draggable.resetOn('drag:start')                 // removes all listeners of the event
+draggable.resetEmitter()                        // removes all listeners
 ```
+
+`unsubscribe(eventName, fn)` is a deprecated alias for `off`.
 
 Constructor shorthand with the `on` option:
 

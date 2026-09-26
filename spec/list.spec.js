@@ -1,7 +1,7 @@
 import Draggable from '../src/draggable'
 import List from '../src/list'
 import Point from '../src/geometry/point'
-import { createContainer, createDraggables, track, cleanup } from './testing-sdk'
+import { createContainer, createDraggables, track, simulateDrag, endDrag, cleanup } from './testing-sdk'
 
 afterEach(cleanup)
 
@@ -194,3 +194,25 @@ describe('list/reset', () => {
   })
 })
 
+describe('list/remove listeners', () => {
+  it('should keep listeners added by the user on a removed draggable', () => {
+    const { list, draggables: [draggable] } = createListSetup(3)
+    const onMove = jest.fn()
+    draggable.on('drag:move', onMove)
+
+    list.remove(draggable)
+    draggable.move(new Point(5, 5))
+
+    expect(onMove).toHaveBeenCalledWith(draggable)
+  })
+
+  it('should stop controlling where a removed draggable is dropped', () => {
+    const { list, draggables: [draggable] } = createListSetup(3)
+
+    list.remove(draggable)
+    simulateDrag(draggable, new Point(0, 0), new Point(0, 45))
+    endDrag(new Point(0, 45))
+
+    expect(draggable.position.y).toBe(45)
+  })
+})
