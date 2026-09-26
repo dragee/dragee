@@ -38,7 +38,7 @@ describe('BubblingList', () => {
 
       dragBy(first, new Point(0, 45))
 
-      expect(onChange).toHaveBeenCalledWith(first)
+      expect(onChange.mock.calls.map(([event]) => event.detail)).toEqual([{ list, draggable: first }])
       expect(domEvents).toEqual([{ list, draggable: first }])
     })
 

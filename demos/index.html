@@ -1030,11 +1030,11 @@
                                 }
                               ),
                               on: {
-                                'target:add': (draggable) => {
-                                  draggable.element.classList.add(classForTargets[i]);
+                                'target:add': (event) => {
+                                  event.detail.draggable.element.classList.add(classForTargets[i]);
                                 },
-                                'target:remove': (draggable) => {
-                                  draggable.element.classList.remove(classForTargets[i]);
+                                'target:remove': (event) => {
+                                  event.detail.draggable.element.classList.remove(classForTargets[i]);
                                 }
                               }
                             })
@@ -1212,11 +1212,11 @@
                                   return target.getRectangle();
                                 }),
                                 on: {
-                                  'target:add': function(draggable) {
-                                    draggable.element.classList.add("ontarget")
+                                  'target:add': function(event) {
+                                    event.detail.draggable.element.classList.add("ontarget")
                                   },
-                                  'target:remove': function(draggable) {
-                                    draggable.element.classList.remove("ontarget")
+                                  'target:remove': function(event) {
+                                    event.detail.draggable.element.classList.remove("ontarget")
                                   }
                                 }
                             });

@@ -29,7 +29,7 @@ export default class Target extends EventEmitter {
     )
 
     this.element = element
-    this.removeOnMoveSubscriptions = new Map()
+    this.removeOnMoveControllers = new Map()
     draggables.forEach((draggable) => draggable.targets.push(target))
     this.draggables = draggables
 
@@ -173,17 +173,16 @@ export default class Target extends EventEmitter {
 
   addRemoveOnMove(draggable) {
     this.stopRemoveOnMove(draggable)
-    this.removeOnMoveSubscriptions.set(draggable, draggable.on('drag:move', () => this.remove(draggable)))
+    const controller = new AbortController()
+    draggable.addEventListener('drag:move', () => this.remove(draggable), { signal: controller.signal })
+    this.removeOnMoveControllers.set(draggable, controller)
 
     this.emitTargetEvent('add', draggable)
   }
 
   stopRemoveOnMove(draggable) {
-    const unsubscribe = this.removeOnMoveSubscriptions.get(draggable)
-    if (unsubscribe) {
-      unsubscribe()
-      this.removeOnMoveSubscriptions.delete(draggable)
-    }
+    this.removeOnMoveControllers.get(draggable)?.abort()
+    this.removeOnMoveControllers.delete(draggable)
   }
 
   remove(draggable) {
@@ -218,11 +217,12 @@ export default class Target extends EventEmitter {
   }
 
   emitTargetEvent(type, draggable) {
-    this.emit(`target:${type}`, draggable)
+    const detail = { target: this, draggable }
+    this.emit(`target:${type}`, detail)
 
     if (this.domEvents) {
       const domType = type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
-      dispatchDomEvent(this.element, `dragee:target-${domType}`, { target: this, draggable })
+      dispatchDomEvent(this.element, `dragee:target-${domType}`, detail)
     }
   }
 

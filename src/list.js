@@ -21,7 +21,7 @@ export default class List extends EventEmitter {
     this.container = options.container
     this.draggables = draggables
     this.changedDuringIteration = false
-    this.subscriptions = new Map()
+    this.draggableControllers = new Map()
 
     this.resizeObserver = new ResizeObserver(debounce(this.onResize.bind(this), 100))
 
@@ -49,29 +49,29 @@ export default class List extends EventEmitter {
   initDraggable(draggable) {
     draggable.enable = this._enable
     this.listenTo(draggable, 'drag:move', () => this.onMove(draggable))
-    this.trackRelease(draggable, draggable.overrideDragEndAction(() => {
+    const restoreDragEndAction = draggable.overrideDragEndAction(() => {
       draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
       this.onEnd(draggable)
-    }))
+    })
+    this.signalFor(draggable).addEventListener('abort', restoreDragEndAction)
     this.resizeObserver.observe(draggable.element)
   }
 
   listenTo(draggable, eventName, handler) {
-    this.trackRelease(draggable, draggable.on(eventName, handler))
+    draggable.addEventListener(eventName, handler, { signal: this.signalFor(draggable) })
   }
 
-  trackRelease(draggable, release) {
-    if (!this.subscriptions.has(draggable)) {
-      this.subscriptions.set(draggable, [])
+  signalFor(draggable) {
+    if (!this.draggableControllers.has(draggable)) {
+      this.draggableControllers.set(draggable, new AbortController())
     }
-    this.subscriptions.get(draggable).push(release)
+    return this.draggableControllers.get(draggable).signal
   }
 
   releaseDraggable(draggable) {
     this.resizeObserver.unobserve(draggable.element)
-    const releases = this.subscriptions.get(draggable) || []
-    releases.forEach((release) => release())
-    this.subscriptions.delete(draggable)
+    this.draggableControllers.get(draggable)?.abort()
+    this.draggableControllers.delete(draggable)
     removeItem(this.draggables, draggable)
   }
 
@@ -134,10 +134,11 @@ export default class List extends EventEmitter {
   }
 
   emitListEvent(type, draggable) {
-    this.emit(`list:${type}`, draggable)
+    const detail = { list: this, draggable }
+    this.emit(`list:${type}`, detail)
 
     if (this.domEvents) {
-      dispatchDomEvent(draggable.element, `dragee:list-${type}`, { list: this, draggable })
+      dispatchDomEvent(draggable.element, `dragee:list-${type}`, detail)
     }
   }
 

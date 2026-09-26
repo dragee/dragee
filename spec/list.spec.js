@@ -203,7 +203,7 @@ describe('list/remove listeners', () => {
     list.remove(draggable)
     draggable.move(new Point(5, 5))
 
-    expect(onMove).toHaveBeenCalledWith(draggable)
+    expect(onMove).toHaveBeenCalledTimes(1)
   })
 
   it('should stop controlling where a removed draggable is dropped', () => {
