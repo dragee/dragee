@@ -120,10 +120,6 @@ container.addEventListener('dragee:end', (event) => {
 | `targets` | `Target[]` | Targets this draggable belongs to |
 | `enable` | `boolean` | Get/set to enable or disable dragging |
 
-### Static
-
-`Draggable.emitter` — global EventEmitter that fires `draggable:create` for every new Draggable instance.
-
 ---
 
 ## Bounding
@@ -369,10 +365,6 @@ board.addEventListener('dragee:target-add', (event) => {
 | `draggables` | `Draggable[]` | All draggables associated with this target |
 | `container` | `Element` | Coordinate space element |
 
-### Static
-
-`Target.emitter` — global EventEmitter that fires `target:create` for every new Target instance.
-
 ---
 
 ## Positioning Strategies
@@ -444,7 +436,7 @@ Scope groups draggables and targets together, managing which draggables can inte
 
 ### scope() Helper
 
-The simplest way to create an isolated scope. Everything created inside the callback automatically belongs to the same scope.
+The simplest way to create an isolated scope. Everything created inside the callback automatically belongs to the same scope. `scope()` calls can be nested: instances join the innermost one.
 
 ```javascript
 import { scope, Draggable, Target } from 'dragee'

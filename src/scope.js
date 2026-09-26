@@ -1,9 +1,8 @@
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
-import Draggable from './draggable'
-import Target from './target'
 
 const scopes = []
+const scopeStack = []
 
 class Scope extends EventEmitter {
   constructor(draggables, targets, options={}) {
@@ -108,28 +107,20 @@ class Scope extends EventEmitter {
 
 const defaultScope = new Scope()
 
+function currentScope() {
+  return scopeStack[scopeStack.length - 1] || defaultScope
+}
+
 function scope(fn) {
   const currentScope = new Scope()
 
-  const addDraggableToScope = function(draggable) {
-    currentScope.addDraggable(draggable)
-    Draggable.emitter.interrupt()
-  }
-
-  const addTargetToScope = function(target) {
-    currentScope.addTarget(target)
-    Target.emitter.interrupt()
-  }
-
-  const offDraggable = Draggable.emitter.prependOn('draggable:create', addDraggableToScope)
-  const offTarget = Target.emitter.prependOn('target:create', addTargetToScope)
+  scopeStack.push(currentScope)
   try {
     fn.call()
   } finally {
-    offDraggable()
-    offTarget()
+    scopeStack.pop()
   }
   return currentScope
 }
 
-export { scopes, defaultScope, Scope, scope }
+export { scopes, defaultScope, currentScope, Scope, scope }
