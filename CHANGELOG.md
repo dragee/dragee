@@ -1,4 +1,8 @@
 ## [Unreleased]
+- fix `BubblingList.remove()` detecting the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
+- add horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
+- add the `gap` option for `BubblingList`; `verticalGap` is kept as a deprecated alias. An explicit `0` gap is now respected instead of triggering auto-detection
+- fix swapped `leftDirection` / `rightDirection` flags in `Draggable` (moving right used to set `leftDirection`)
 
 ## 1.3.1
 - add `dragStartThreshold` option for `Draggable`. It can be helpful to prevent accidental drags when the user just wants to click — drag activates only after the pointer travels this distance

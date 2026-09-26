@@ -142,7 +142,7 @@ describe('draggable/drag lifecycle', () => {
     const draggable = createDraggable()
 
     simulateDrag(draggable, new Point(0, 0), new Point(50, 50))
-    expect(draggable.leftDirection).toBe(true)
+    expect(draggable.rightDirection).toBe(true)
     expect(draggable.downDirection).toBe(true)
     endDrag(new Point(50, 50))
   })

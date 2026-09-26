@@ -1,6 +1,5 @@
 import List from './list'
-import { indexOfNearestPoint, getYDifference } from './geometry/distances'
-import Point from './geometry/point'
+import { indexOfNearestPoint, getXDifference, getYDifference } from './geometry/distances'
 
 import Draggable from './draggable'
 
@@ -9,11 +8,17 @@ const arrayMove = (array, from, to) => {
 }
 
 export default class BubblingList extends List {
-  autoDetectVerticalGap() {
-    if (!this._verticalGap && !this.options.verticalGap && this.draggables.length >= 2) {
-      const sorted = this.getSortedDraggables()
-      this._verticalGap = sorted[1].pinnedPosition.y - sorted[0].pinnedPosition.y - sorted[0].getSize().y
-    }
+  autoDetectGap() {
+    if (this._gap !== undefined || this.explicitGap !== undefined || this.draggables.length < 2) return
+
+    const axis = this.axis
+    const sorted = this.getSortedDraggables()
+    // Skip items already detached from the DOM (e.g. removed before `remove()`): their size is 0
+    const index = sorted.findIndex((d, i) => i < sorted.length - 1 && d.element.isConnected)
+    if (index === -1) return
+
+    const [current, next] = [sorted[index], sorted[index + 1]]
+    this._gap = next.pinnedPosition[axis] - current.pinnedPosition[axis] - current.getSize()[axis]
   }
 
   autoDetectStartPosition() {
@@ -28,7 +33,7 @@ export default class BubblingList extends List {
   }
 
   onDragStart(draggable) {
-    this.autoDetectVerticalGap()
+    this.autoDetectGap()
     this.autoDetectStartPosition()
     this.cachedSortedDraggables = this.getSortedDraggables()
     this.indexOfActiveDraggable = this.cachedSortedDraggables.indexOf(draggable)
@@ -44,7 +49,7 @@ export default class BubblingList extends List {
     let currentOrder
     let targetIndex
 
-    if(draggable.upDirection && prevDraggable) {
+    if(this.isMovingBackward(draggable) && prevDraggable) {
       currentOrder = [prevDraggable, draggable].map((d) => d.pinnedPosition)
       targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc)
 
@@ -54,24 +59,20 @@ export default class BubblingList extends List {
         } else {
           draggable.pinnedPosition = prevDraggable.pinnedPosition.clone()
         }
-        prevDraggable.pinPosition(new Point(
-          currentPosition.x,
-          draggable.pinnedPosition.y + draggable.getSize().y + this.verticalGap
-        ), this.options.timeExcange)
+        const prevNewPosition = this.nextPosition(draggable.pinnedPosition, draggable)
+        prevNewPosition[this.crossAxis] = currentPosition[this.crossAxis]
+        prevDraggable.pinPosition(prevNewPosition, this.options.timeExcange)
         arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable--, this.indexOfActiveDraggable)
         this.onMove(draggable)
         this.changedDuringIteration = true
       }
-    } else if(draggable.downDirection && nextDraggable) {
+    } else if(this.isMovingForward(draggable) && nextDraggable) {
       currentOrder = [draggable, nextDraggable].map((d) => d.pinnedPosition)
       targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc)
 
       if(targetIndex === 1) {
         nextDraggable.pinPosition(draggable.pinnedPosition, this.options.timeExcange)
-        const draggableNewPosition = new Point(
-          nextDraggable.pinnedPosition.x,
-          nextDraggable.pinnedPosition.y + nextDraggable.getSize().y + this.verticalGap
-        )
+        const draggableNewPosition = this.nextPosition(nextDraggable.pinnedPosition, nextDraggable)
         if(draggable.shouldUseNativeDragAndDrop()) {
           draggable.pinPosition(draggableNewPosition)
         } else {
@@ -85,7 +86,7 @@ export default class BubblingList extends List {
   }
 
   bubbling(sortedDraggables, currentDraggable) {
-    const currentPosition = this.startPosition.clone()
+    let currentPosition = this.startPosition.clone()
     sortedDraggables ||= this.getSortedDraggables()
 
     sortedDraggables.forEach((draggable) => {
@@ -97,7 +98,7 @@ export default class BubblingList extends List {
         }
       }
 
-      currentPosition.y = currentPosition.y + draggable.getSize().y + this.verticalGap
+      currentPosition = this.nextPosition(currentPosition, draggable)
     })
   }
 
@@ -106,32 +107,68 @@ export default class BubblingList extends List {
       draggables = [draggables]
     }
 
+    // Detect layout before removal, otherwise the gap is measured across the hole
+    this.autoDetectGap()
+    this.autoDetectStartPosition()
+
     draggables.forEach((draggable) => this.releaseDraggable(draggable))
     this.draggables = this.draggables.filter((d) => !draggables.includes(d))
 
     this.draggables.forEach((d) => d.startPositioning())
 
     if(this.draggables.length > 0) {
-      this.autoDetectVerticalGap()
-      this.autoDetectStartPosition()
       this.bubbling()
     }
   }
 
-  get distanceFunc() {
-    return this.options.getDistance || getYDifference
+  // Position right after `draggable` placed at `position`, along the list axis
+  nextPosition(position, draggable) {
+    const next = position.clone()
+    next[this.axis] = position[this.axis] + draggable.getSize()[this.axis] + this.gap
+    return next
   }
 
+  isMovingBackward(draggable) {
+    return this.axis === 'x' ? draggable.leftDirection : draggable.upDirection
+  }
+
+  isMovingForward(draggable) {
+    return this.axis === 'x' ? draggable.rightDirection : draggable.downDirection
+  }
+
+  get axis() {
+    return this.options.axis === 'x' ? 'x' : 'y'
+  }
+
+  get crossAxis() {
+    return this.axis === 'x' ? 'y' : 'x'
+  }
+
+  get distanceFunc() {
+    return this.options.getDistance || (this.axis === 'x' ? getXDifference : getYDifference)
+  }
+
+  get explicitGap() {
+    return this.options.gap ?? this.options.verticalGap
+  }
+
+  get gap() {
+    if (this.explicitGap !== undefined) return this.explicitGap
+
+    this.autoDetectGap()
+    return this._gap || 0
+  }
+
+  set gap(gapValue) {
+    this.options.gap = gapValue
+  }
+
+  // Deprecated alias for `gap`
   get verticalGap() {
-    if(this.options.verticalGap) {
-      return this.options.verticalGap
-    } else {
-      this.autoDetectVerticalGap()
-      return this._verticalGap || 0
-    }
+    return this.gap
   }
 
   set verticalGap(gapValue) {
-    this.options.verticalGap = gapValue
+    this.gap = gapValue
   }
 }

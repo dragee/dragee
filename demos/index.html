@@ -733,6 +733,128 @@
         </div>
     </section>
 
+    <section id="HorizontalList" >
+        <div class="row demo-row">
+            <div class="span12 demo-span">
+                <div id="DemoHorizontalList" class="demo-html">
+                    <div class="horizontal-demo horizontal-demo-plain">
+                      <h4>Horizontal BubblingList</h4>
+                      <ul class="list">
+                        <li>Alpha <span class="remove">x</span></li>
+                        <li>B <span class="remove">x</span></li>
+                        <li>Longer item <span class="remove">x</span></li>
+                        <li>Delta <span class="remove">x</span></li>
+                        <li>E <span class="remove">x</span></li>
+                        <li>The widest item here <span class="remove">x</span></li>
+                      </ul>
+                      <p class="order"></p>
+                    </div>
+                    <div class="horizontal-demo horizontal-demo-native">
+                      <h4>Horizontal BubblingList with native drag&amp;drop</h4>
+                      <ul class="list">
+                        <li>Alpha <span class="remove">x</span></li>
+                        <li>B <span class="remove">x</span></li>
+                        <li>Longer item <span class="remove">x</span></li>
+                        <li>Delta <span class="remove">x</span></li>
+                        <li>E <span class="remove">x</span></li>
+                        <li>The widest item here <span class="remove">x</span></li>
+                      </ul>
+                      <p class="order"></p>
+                    </div>
+                </div>
+                <style>
+                    #DemoHorizontalList{
+                      padding: 2%;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                      overflow: hidden;
+                    }
+
+                    #DemoHorizontalList ul.list{
+                      display: flex;
+                      align-items: flex-start;
+                      gap: 8px;
+                      position: relative;
+                      margin: 0 0 10px;
+                      padding: 20px;
+                      border: 1px dashed #333;
+                      border-radius: 6px;
+                      background-color: rgba(225, 225, 225,0.4);
+                    }
+
+                    #DemoHorizontalList ul.list li{
+                      list-style: none;
+                      padding: 9px 14px;
+                      font-size: 15px;
+                      color: #333;
+                      cursor: move;
+                      white-space: nowrap;
+                      border: 1px solid #333;
+                      border-radius: 5px;
+                      background: #f5f5f5;
+                      position: relative;
+                      transition: opacity 0ms;
+                    }
+
+                    #DemoHorizontalList ul.list li.dragee-active{
+                      z-index: 2;
+                      background: yellow;
+                    }
+
+                    #DemoHorizontalList ul.list li.dragee-placeholder {
+                      z-index: 0;
+                      opacity: 0.2;
+                      background: yellow;
+                      transition: opacity 0ms;
+                    }
+
+                    #DemoHorizontalList ul.list li span.remove {
+                      margin-left: 6px;
+                      cursor: pointer;
+                    }
+                </style>
+                <script>
+                    window.addEventListener("load", function(){
+                        const root = document.getElementById("DemoHorizontalList")
+
+                        const initHorizontalList = (demoElement, draggableOptions) => {
+                          const listElement = demoElement.querySelector("ul.list"),
+                                orderElement = demoElement.querySelector(".order")
+
+                          const list = new Dragee.BubblingList(Array.from(listElement.children).map((element) => {
+                            return new Dragee.Draggable(element, { container: listElement, ...draggableOptions })
+                          }), { axis: 'x', container: listElement, reorderOnChange: true })
+
+                          const renderOrder = () => {
+                            orderElement.textContent = 'Order: ' + list.getSortedDraggables()
+                              .map((d) => d.element.firstChild.textContent.trim())
+                              .join(', ')
+                          }
+
+                          list.draggables.forEach((draggable) => {
+                            draggable.element.querySelector('.remove').addEventListener('click', () => {
+                              listElement.removeChild(draggable.element)
+                              list.remove(draggable)
+                              renderOrder()
+                            })
+                          })
+
+                          list.on('list:reordered', renderOrder)
+                          renderOrder()
+                        }
+
+                        initHorizontalList(root.querySelector(".horizontal-demo-plain"))
+                        initHorizontalList(root.querySelector(".horizontal-demo-native"), {
+                          nativeDragAndDrop: true,
+                          emulateNativeDragAndDropOnTouch: true
+                        })
+                    });
+                </script>
+            </div>
+        </div>
+    </section>
+
     <section id="TargetBasic" >
         <div class="row demo-row">
             <div class="span6 demo-span">

@@ -211,8 +211,8 @@ export default class Draggable extends EventEmitter {
   determineDirection(point) {
     this._previousDirectionPosition ||= this._startPosition
 
-    this.leftDirection = (this._previousDirectionPosition.x < point.x)
-    this.rightDirection = (this._previousDirectionPosition.x > point.x)
+    this.leftDirection = (this._previousDirectionPosition.x > point.x)
+    this.rightDirection = (this._previousDirectionPosition.x < point.x)
     this.upDirection = (this._previousDirectionPosition.y > point.y)
     this.downDirection = (this._previousDirectionPosition.y < point.y)
 
