@@ -10,12 +10,13 @@
 - requires Chrome / Edge 90+, Firefox 86+, Safari 15+ (`EventTarget` subclassing and the `signal` listener option)
 - remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
 - a drop refused by a target returns the draggable to its initial position (previously it stayed where it was dropped)
+- replace the overridable `dragEndAction()` with the cancelable `drag:drop` event; `List` and `Scope` place their draggables through it. `scope:change` is emitted only for draggables that belong to targets
 
 ### Added
 - `on()` returns a function that removes the listener; add `off()` and `once()`. Standard listener options such as `{ signal }` are supported. `unsubscribe()` is kept as a deprecated alias for `off()`
-- cancelable events: `event.preventDefault()` on `drag:start` cancels the drag; on `target:beforeAdd` it refuses the draggable
+- cancelable events: `event.preventDefault()` on `drag:start` cancels the drag; on `drag:drop` it skips the default placement; on `target:beforeAdd` it refuses the draggable
 - bubbling DOM events (disable with the `domEvents: false` option), with the same `event.detail` as the instance events:
-  - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element
+  - `Draggable`: `dragee:start` / `dragee:move` / `dragee:drop` / `dragee:end` from its element
   - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element
   - `Target`: `dragee:target-before-add` / `dragee:target-add` / `dragee:target-remove` from the target element
 - horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
@@ -24,7 +25,8 @@
 ### Fixed
 - `List.remove()` wiped user `drag:move` / `drag:end` listeners, left the `BubblingList` `drag:start` listener attached and still controlled the drop of the removed draggable
 - `Target` kept a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener
-- a draggable released from a `List` or `Scope` was still handled by it on drag end; the previous drag end handling is now restored
+- a draggable released from a `List` or `Scope` was still handled by it on drop
+- a draggable outside lists and targets did not update its `pinnedPosition` on drop
 - targets created inside `scope()` were added to the default scope too
 - `Draggable.destroy()` did not remove the draggable from its scope (this also leaked the clone used for touch drag emulation)
 - `BubblingList.remove()` detected the gap and start position after removal (measured across the hole, so remaining items were not reflowed)

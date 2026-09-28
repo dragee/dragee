@@ -216,3 +216,27 @@ describe('list/remove listeners', () => {
     expect(draggable.position.y).toBe(45)
   })
 })
+
+describe('list/drop', () => {
+  it('should animate a dropped item back to its slot', () => {
+    const { draggables: [draggable] } = createListSetup(3, { timeEnd: 200 })
+
+    simulateDrag(draggable, new Point(0, 0), new Point(0, 45))
+    endDrag(new Point(0, 45))
+
+    expect(draggable.position).toEqual(new Point(0, 0))
+    expect(draggable.element.style.transition).toContain('transform 200ms')
+  })
+
+  it('should leave the drop to a drag:drop listener registered before the list', () => {
+    const { container, draggables } = createDraggables(3, (i) => ({ position: new Point(i * 10, 0) }))
+    const [draggable] = draggables
+    draggable.on('drag:drop', (event) => event.preventDefault())
+    new List(draggables, { container })
+
+    simulateDrag(draggable, new Point(0, 0), new Point(0, 45))
+    endDrag(new Point(0, 45))
+
+    expect(draggable.position).toEqual(new Point(0, 45))
+  })
+})

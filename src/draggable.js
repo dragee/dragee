@@ -4,7 +4,6 @@ import Rectangle from './geometry/rectangle'
 import { scopes, currentScope } from './scope'
 import throttle from './utils/throttle'
 import getParentsChain from './utils/get-parents-chain'
-import removeItem from './utils/remove-array-item'
 import dispatchDomEvent from './utils/dispatch-dom-event'
 
 const throttledDragOver = (callback, duration) => {
@@ -68,7 +67,6 @@ export default class Draggable extends EventEmitter {
   constructor(element, options={}) {
     super(options)
     this.targets = []
-    this._dragEndActions = []
     this.options = options
     this.element = element
     preventDoubleInit(this)
@@ -371,7 +369,7 @@ export default class Draggable extends EventEmitter {
       event.preventDefault()
     }
 
-    this.dragEndAction()
+    this.drop()
     this.emitDragEvent('end')
     this.cancelDragging()
 
@@ -419,7 +417,7 @@ export default class Draggable extends EventEmitter {
 
   nativeDragEnd(_event) {
     this.element.classList.remove('dragee-placeholder')
-    this.dragEndAction()
+    this.drop()
     this.emitDragEvent('end')
     document.removeEventListener('dragover', this._nativeDragOver)
     document.removeEventListener('dragend', this._nativeDragEnd)
@@ -497,7 +495,7 @@ export default class Draggable extends EventEmitter {
           this.element.classList.remove('dragee-placeholder')
           this.element.classList.remove('dragee-active')
 
-          this.dragEndAction()
+          this.drop()
           this.emitDragEvent('end')
           this.cancelDragging()
         }
@@ -526,17 +524,8 @@ export default class Draggable extends EventEmitter {
     return dispatchDomEvent(this.element, `dragee:${type}`, detail, { cancelable }) && isNotPrevented
   }
 
-  overrideDragEndAction(action) {
-    this._dragEndActions.push(action)
-    return () => removeItem(this._dragEndActions, action)
-  }
-
-  dragEndAction() {
-    const action = this._dragEndActions[this._dragEndActions.length - 1]
-
-    if (action) {
-      action()
-    } else {
+  drop() {
+    if (this.emitDragEvent('drop', { cancelable: true })) {
       this.pinPosition(this.position)
     }
   }

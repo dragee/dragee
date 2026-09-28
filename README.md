@@ -85,6 +85,7 @@ const draggable = new Draggable(element, {
 | --- | --- | --- | --- |
 | `drag:start` | `{ draggable }` | `dragee:start` | Drag begins (after threshold is met). **Cancelable** |
 | `drag:move` | `{ draggable }` | `dragee:move` | Position updates during dragging |
+| `drag:drop` | `{ draggable }` | `dragee:drop` | Draggable is released, before it is placed. **Cancelable** |
 | `drag:end` | `{ draggable }` | `dragee:end` | Drag finishes |
 
 Each event is also dispatched as a bubbling DOM `CustomEvent` on the element. That makes it possible to listen on a common ancestor instead of every draggable:
@@ -102,6 +103,17 @@ draggable.on('drag:start', (event) => {
   if (isLocked) event.preventDefault()
 })
 ```
+
+By default a released draggable is pinned where it was dropped. Calling `event.preventDefault()` on `drag:drop` skips that, so the draggable can be placed differently:
+
+```javascript
+draggable.on('drag:drop', (event) => {
+  event.preventDefault()
+  draggable.pinPosition(snapToGrid(draggable.position), 200)
+})
+```
+
+Lists and scopes place their draggables through the same event and leave the drop alone when an earlier listener has already called `preventDefault()`.
 
 ### Methods
 
@@ -506,7 +518,7 @@ const myScope = new Scope(draggables, targets, { timeEnd: 400 })
 
 | Event | `event.detail` | Description |
 | --- | --- | --- |
-| `scope:change` | `{ scope, draggable }` | A draggable was dropped |
+| `scope:change` | `{ scope, draggable }` | A draggable that belongs to targets was dropped |
 
 ### Exported Utilities
 
@@ -632,6 +644,7 @@ new Draggable(el, {
   ```
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.
+- **`dragEndAction` can no longer be overridden.** Listen to `drag:drop` and call `event.preventDefault()` to place a dropped draggable yourself.
 - **A drop refused by a target** (`target:beforeAdd` prevented, or a custom `catchDraggable` accepting a draggable whose center is outside) returns the draggable to its initial position.
 
 ---

@@ -21,7 +21,7 @@ class Scope extends EventEmitter {
 
     this.draggables = draggables || []
     this.targets = targets || []
-    this.dragEndActionReleases = new Map()
+    this.dropSubscriptions = new Map()
     scopes.push(this)
     this.options = {
       timeEnd: (options.timeEnd) || 400
@@ -40,15 +40,17 @@ class Scope extends EventEmitter {
   }
 
   initDraggable(draggable) {
-    this.dragEndActionReleases.set(draggable, draggable.overrideDragEndAction(() => this.onEnd(draggable)))
+    this.dropSubscriptions.set(draggable, draggable.on('drag:drop', (event) => {
+      if (event.defaultPrevented || !draggable.targets.length) return
+
+      event.preventDefault()
+      this.onEnd(draggable)
+    }))
   }
 
   releaseDraggable(draggable) {
-    const release = this.dragEndActionReleases.get(draggable)
-    if (release) {
-      release()
-      this.dragEndActionReleases.delete(draggable)
-    }
+    this.dropSubscriptions.get(draggable)?.()
+    this.dropSubscriptions.delete(draggable)
     removeItem(this.draggables, draggable)
   }
 
@@ -67,7 +69,7 @@ class Scope extends EventEmitter {
 
     const isAccepted = shotTargets.length > 0 && shotTargets[0].onEnd(draggable)
 
-    if (!isAccepted && draggable.targets.length) {
+    if (!isAccepted) {
       draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
     }
 

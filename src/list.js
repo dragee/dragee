@@ -49,11 +49,13 @@ export default class List extends EventEmitter {
   initDraggable(draggable) {
     draggable.enable = this._enable
     this.listenTo(draggable, 'drag:move', () => this.onMove(draggable))
-    const restoreDragEndAction = draggable.overrideDragEndAction(() => {
+    this.listenTo(draggable, 'drag:drop', (event) => {
+      if (event.defaultPrevented) return
+
+      event.preventDefault()
       draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
       this.onEnd(draggable)
     })
-    this.signalFor(draggable).addEventListener('abort', restoreDragEndAction)
     this.resizeObserver.observe(draggable.element)
   }
 

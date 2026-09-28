@@ -54,7 +54,25 @@ describe('Target', () => {
 
       expect(target.getSortedDraggables()).not.toContain(draggable)
       expect(draggable.position).toEqual(new Point(100, 100))
+      expect(draggable.element.style.transition).toContain('transform 400ms')
       target.destroy()
     })
+  })
+
+  it('should leave a drop prevented by a drag:drop listener of the draggable to that listener', () => {
+    const draggable = createDraggable({
+      position: new Point(100, 100),
+      on: { 'drag:drop': (event) => event.preventDefault() }
+    })
+    const targetElement = document.createElement('div')
+    createContainer().appendChild(targetElement)
+    const target = new Target(targetElement, [draggable], { catchDraggable: () => true })
+
+    simulateDrag(draggable, new Point(100, 100), new Point(0, 0))
+    endDrag(new Point(0, 0))
+
+    expect(target.getSortedDraggables()).not.toContain(draggable)
+    expect(draggable.position).toEqual(new Point(0, 0))
+    target.destroy()
   })
 })

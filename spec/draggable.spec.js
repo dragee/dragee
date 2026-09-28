@@ -170,6 +170,27 @@ describe('draggable/drag lifecycle', () => {
   })
 })
 
+describe('draggable/drop', () => {
+  it('should pin the draggable where it was released', () => {
+    const draggable = createDraggable()
+
+    simulateDrag(draggable, new Point(0, 0), new Point(30, 40))
+    endDrag(new Point(30, 40))
+
+    expect(draggable.pinnedPosition).toEqual(new Point(30, 40))
+  })
+
+  it('should keep the previous pinned position when drag:drop is prevented', () => {
+    const draggable = createDraggable()
+    draggable.on('drag:drop', (event) => event.preventDefault())
+
+    simulateDrag(draggable, new Point(0, 0), new Point(30, 40))
+    endDrag(new Point(30, 40))
+
+    expect(draggable.pinnedPosition).toEqual(new Point(0, 0))
+  })
+})
+
 describe('draggable/canceling drag start', () => {
   it.each([
     ['a drag:start listener', {}, (draggable) => draggable.on('drag:start', (e) => e.preventDefault())],
