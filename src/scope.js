@@ -1,18 +1,15 @@
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
-import Draggable from './draggable'
-import Target from './target'
 
 const scopes = []
+const scopeStack = []
 
 class Scope extends EventEmitter {
   constructor(draggables, targets, options={}) {
     super(options)
     scopes.forEach((scope) => {
       if (draggables) {
-        draggables.forEach((draggable) => {
-          removeItem(scope.draggables, draggable)
-        })
+        draggables.forEach((draggable) => scope.releaseDraggable(draggable))
       }
 
       if (targets) {
@@ -33,14 +30,20 @@ class Scope extends EventEmitter {
   }
 
   init() {
-    this.draggables.forEach((draggable) => {
-      draggable.dragEndAction = () => this.onEnd(draggable)
-    })
+    this.draggables.forEach((draggable) => this.initDraggable(draggable))
   }
 
   addDraggable(draggable) {
     this.draggables.push(draggable)
+    this.initDraggable(draggable)
+  }
+
+  initDraggable(draggable) {
     draggable.dragEndAction = () => this.onEnd(draggable)
+  }
+
+  releaseDraggable(draggable) {
+    removeItem(this.draggables, draggable)
   }
 
   addTarget(target) {
@@ -98,25 +101,20 @@ class Scope extends EventEmitter {
 
 const defaultScope = new Scope()
 
+function currentScope() {
+  return scopeStack[scopeStack.length - 1] || defaultScope
+}
+
 function scope(fn) {
   const currentScope = new Scope()
 
-  const addDraggableToScope = function(draggable) {
-    currentScope.addDraggable(draggable)
-    Draggable.emitter.interrupt()
+  scopeStack.push(currentScope)
+  try {
+    fn.call()
+  } finally {
+    scopeStack.pop()
   }
-
-  const addTargetToScope = function(target) {
-    currentScope.addTarget(target)
-    Draggable.emitter.interrupt()
-  }
-
-  Draggable.emitter.prependOn('draggable:create', addDraggableToScope)
-  Target.emitter.prependOn('target:create', addTargetToScope)
-  fn.call()
-  Draggable.emitter.unsubscribe('draggable:create', addDraggableToScope)
-  Target.emitter.unsubscribe('target:create', addTargetToScope)
   return currentScope
 }
 
-export { scopes, defaultScope, Scope, scope }
+export { scopes, defaultScope, currentScope, Scope, scope }

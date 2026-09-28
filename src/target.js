@@ -4,14 +4,10 @@ import EventEmitter from './eventEmitter'
 import dispatchDomEvent from './utils/dispatch-dom-event'
 import Rectangle from './geometry/rectangle'
 import { transformedSpaceDistanceFactory } from './geometry/distances'
-import { scopes, defaultScope } from './scope'
+import { scopes, currentScope } from './scope'
 
 import { FloatLeftStrategy } from './positioning'
 import { BoundToElement } from './bounding'
-
-const addToDefaultScope = function(target) {
-  defaultScope.addTarget(target)
-}
 
 export default class Target extends EventEmitter {
   constructor(element, draggables, options = {}) {
@@ -36,7 +32,7 @@ export default class Target extends EventEmitter {
     this.unsubscribes = []
     draggables.forEach((draggable) => this.watchDraggable(draggable))
 
-    Target.emitter.emit('target:create', this)
+    currentScope().addTarget(this)
 
     this.startBounding()
     this.init()
@@ -229,5 +225,3 @@ export default class Target extends EventEmitter {
   }
 }
 
-Target.emitter = new EventEmitter()
-Target.emitter.on('target:create', addToDefaultScope)

@@ -1,17 +1,26 @@
 ## [Unreleased]
+
+### Breaking
+- remove `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
+
+### Added
 - `on()` and `prependOn()` return a function that removes the listener; add `off()` and `once()`. `unsubscribe()` is an alias for `off()`
 - bubbling DOM events (disable with the `domEvents: false` option):
   - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element, `event.detail` = `{ draggable }`
   - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element, `event.detail` = `{ list, draggable }`
   - `Target`: `dragee:target-before-add` / `dragee:target-add` / `dragee:target-remove` from the target element, `event.detail` = `{ target, draggable }`
-- fix `unsubscribe()` removing the last listener when the given one was not subscribed
-- fix listeners being skipped when a listener unsubscribes while an event is being emitted
-- fix `List.remove()` wiping user `drag:move` / `drag:end` listeners and leaving the `BubblingList` `drag:start` listener attached
-- fix `Target` keeping a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener. A target now watches each of its draggables, including ones added with `add()`, until `destroy()`, and keeps its own copy of the `draggables` array, so `add()` doesn't leak a draggable into other targets sharing that array
-- fix `BubblingList.remove()` detecting the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
-- add horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
-- add the `gap` option for `BubblingList`; `verticalGap` is an alias for it. An explicit `0` gap is now respected instead of triggering auto-detection
-- fix swapped `leftDirection` / `rightDirection` flags in `Draggable` (moving right used to set `leftDirection`)
+- horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
+- the `gap` option for `BubblingList`; `verticalGap` is an alias for it. An explicit `0` gap is now respected instead of triggering auto-detection
+
+### Fixed
+- `unsubscribe()` removed the last listener when the given one was not subscribed
+- listeners were skipped when a listener unsubscribed while an event was being emitted
+- `List.remove()` wiped user `drag:move` / `drag:end` listeners and left the `BubblingList` `drag:start` listener attached
+- `Target` kept a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener. A target now watches each of its draggables, including ones added with `add()`, until `destroy()`, and keeps its own copy of the `draggables` array, so `add()` doesn't leak a draggable into other targets sharing that array
+- targets created inside `scope()` were added to the default scope too
+- `Draggable.destroy()` did not remove the draggable from its scope (this also leaked the clone used for touch drag emulation)
+- `BubblingList.remove()` detected the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
+- swapped `leftDirection` / `rightDirection` flags in `Draggable` (moving right used to set `leftDirection`)
 
 ## 1.3.1
 - add `dragStartThreshold` option for `Draggable`. It can be helpful to prevent accidental drags when the user just wants to click — drag activates only after the pointer travels this distance

@@ -1,7 +1,7 @@
 import EventEmitter from './eventEmitter'
 import Point from './geometry/point'
 import Rectangle from './geometry/rectangle'
-import { defaultScope } from './scope'
+import { scopes, currentScope } from './scope'
 import throttle from './utils/throttle'
 import getParentsChain from './utils/get-parents-chain'
 import dispatchDomEvent from './utils/dispatch-dom-event'
@@ -48,10 +48,6 @@ function preventDoubleInit(draggable) {
   draggables.push(draggable)
 }
 
-function addToDefaultScope(draggable) {
-  defaultScope.addDraggable(draggable)
-}
-
 function copyStyles(source, destination) {
   const cs = window.getComputedStyle(source)
 
@@ -74,7 +70,7 @@ export default class Draggable extends EventEmitter {
     this.options = options
     this.element = element
     preventDoubleInit(this)
-    Draggable.emitter.emit('draggable:create', this)
+    currentScope().addDraggable(this)
     this._enable = true
     this.startBounding()
     this.startPositioning()
@@ -549,6 +545,7 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener('dragend', this._nativeDragEnd)
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
     document.removeEventListener('drop', this._nativeDrop)
+    scopes.forEach((scope) => scope.releaseDraggable(this))
     this.resetEmitter()
 
     const index = draggables.indexOf(this)
@@ -658,5 +655,3 @@ export default class Draggable extends EventEmitter {
   }
 }
 
-Draggable.emitter = new EventEmitter()
-Draggable.emitter.on('draggable:create', addToDefaultScope)
