@@ -106,6 +106,23 @@ describe('draggable/drag lifecycle', () => {
     expect(draggable.isDragging).toBe(false)
   })
 
+  it('should dispatch bubbling dragee:* DOM events that can be delegated to an ancestor', () => {
+    const draggable = createDraggable()
+    const received = []
+    document.body.addEventListener('dragee:start', (e) => received.push([e.type, e.detail.draggable]))
+    document.body.addEventListener('dragee:move', (e) => received.push([e.type, e.detail.draggable]))
+    document.body.addEventListener('dragee:end', (e) => received.push([e.type, e.detail.draggable]))
+
+    simulateDrag(draggable, new Point(10, 10), new Point(50, 50))
+    endDrag(new Point(50, 50))
+
+    expect(received).toEqual([
+      ['dragee:start', draggable],
+      ['dragee:move', draggable],
+      ['dragee:end', draggable]
+    ])
+  })
+
   it('should not start drag when disabled', () => {
     const draggable = createDraggable()
     draggable.enable = false

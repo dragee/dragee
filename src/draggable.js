@@ -4,6 +4,7 @@ import Rectangle from './geometry/rectangle'
 import { defaultScope } from './scope'
 import throttle from './utils/throttle'
 import getParentsChain from './utils/get-parents-chain'
+import dispatchDomEvent from './utils/dispatch-dom-event'
 
 const throttledDragOver = (callback, duration) => {
   const throttledCallback = throttle((event) => callback(event), duration)
@@ -184,7 +185,7 @@ export default class Draggable extends EventEmitter {
     this._setTranslate(point.sub(this.offset))
 
     if (!isSilent) {
-      this.emit('drag:move')
+      this.emitDragEvent('move')
     }
   }
 
@@ -299,7 +300,7 @@ export default class Draggable extends EventEmitter {
     if (!this.shouldUseNativeDragAndDrop() && this.dragStartThreshold > 0) {
       this._dragStartPending = true
     } else {
-      this.emit('drag:start')
+      this.emitDragEvent('start')
     }
   }
 
@@ -332,7 +333,7 @@ export default class Draggable extends EventEmitter {
         return
       }
       this._dragStartPending = false
-      this.emit('drag:start')
+      this.emitDragEvent('start')
     }
 
     this.isDragging = true
@@ -369,7 +370,7 @@ export default class Draggable extends EventEmitter {
     }
 
     this.dragEndAction()
-    this.emit('drag:end')
+    this.emitDragEvent('end')
     this.cancelDragging()
 
     setTimeout(() => this.element.classList.remove('dragee-active'))
@@ -411,13 +412,13 @@ export default class Draggable extends EventEmitter {
     point = this.bounding.bound(point, this.getSize())
     this.determineDirection(point)
     this.position = point
-    this.emit('drag:move')
+    this.emitDragEvent('move')
   }
 
   nativeDragEnd(_event) {
     this.element.classList.remove('dragee-placeholder')
     this.dragEndAction()
-    this.emit('drag:end')
+    this.emitDragEvent('end')
     document.removeEventListener('dragover', this._nativeDragOver)
     document.removeEventListener('dragend', this._nativeDragEnd)
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
@@ -474,6 +475,7 @@ export default class Draggable extends EventEmitter {
     const emulationDraggable = new Draggable(clonedElement, {
       container: document.body,
       touchDraggingThreshold: 0,
+      domEvents: false,
       bound(point) {
         return point
       },
@@ -485,7 +487,7 @@ export default class Draggable extends EventEmitter {
                                                      .add(this._startParentsScrollOffset)
 
           this.determineDirection(this.position)
-          this.emit('drag:move')
+          this.emitDragEvent('move')
         },
         'drag:end': () => {
           emulationDraggable.destroy()
@@ -493,8 +495,8 @@ export default class Draggable extends EventEmitter {
           this.element.classList.remove('dragee-placeholder')
           this.element.classList.remove('dragee-active')
 
-          this.emit('drag:end')
           this.dragEndAction()
+          this.emitDragEvent('end')
           this.cancelDragging()
         }
       }
@@ -511,6 +513,14 @@ export default class Draggable extends EventEmitter {
 
     emulationDraggable.dragStart(event)
     event.preventDefault()
+  }
+
+  emitDragEvent(type) {
+    this.emit(`drag:${type}`)
+
+    if (this.domEvents) {
+      dispatchDomEvent(this.element, `dragee:${type}`, { draggable: this })
+    }
   }
 
   dragEndAction() {
@@ -569,6 +579,10 @@ export default class Draggable extends EventEmitter {
 
   get nativeDragAndDrop() {
     return this.options.nativeDragAndDrop || false
+  }
+
+  get domEvents() {
+    return this.options.domEvents !== false
   }
 
   get emulateNativeDragAndDropOnTouch() {

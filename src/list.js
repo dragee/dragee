@@ -1,6 +1,7 @@
 import debounce from './utils/debounce'
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
+import dispatchDomEvent from './utils/dispatch-dom-event'
 import {
   getDistance,
   indexOfNearestPoint
@@ -101,7 +102,7 @@ export default class List extends EventEmitter {
 
   onEnd(draggable) {
     if (this.changedDuringIteration) {
-      this.emit('list:change')
+      this.emitListEvent('change', draggable)
       this.changedDuringIteration = false
 
       if (this.options.reorderOnChange && this.options.container) {
@@ -124,7 +125,15 @@ export default class List extends EventEmitter {
     }
 
     this.draggables.forEach((d) => d.startPositioning())
-    this.emit('list:reordered')
+    this.emitListEvent('reordered', movedDraggable)
+  }
+
+  emitListEvent(type, draggable) {
+    this.emit(`list:${type}`)
+
+    if (this.domEvents) {
+      dispatchDomEvent(draggable.element, `dragee:list-${type}`, { list: this, draggable })
+    }
   }
 
   getCurrentPinnedPositions() {
@@ -201,6 +210,10 @@ export default class List extends EventEmitter {
 
   get distanceFunc() {
     return this.options.getDistance || getDistance
+  }
+
+  get domEvents() {
+    return this.options.domEvents !== false
   }
 
   get positions() {

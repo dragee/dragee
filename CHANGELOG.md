@@ -1,5 +1,9 @@
 ## [Unreleased]
 - `on()` and `prependOn()` return a function that removes the listener; add `off()` and `once()`. `unsubscribe()` is an alias for `off()`
+- bubbling DOM events (disable with the `domEvents: false` option):
+  - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element, `event.detail` = `{ draggable }`
+  - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element, `event.detail` = `{ list, draggable }`
+  - `Target`: `dragee:target-before-add` / `dragee:target-add` / `dragee:target-remove` from the target element, `event.detail` = `{ target, draggable }`
 - fix `unsubscribe()` removing the last listener when the given one was not subscribed
 - fix listeners being skipped when a listener unsubscribes while an event is being emitted
 - fix `List.remove()` wiping user `drag:move` / `drag:end` listeners and leaving the `BubblingList` `drag:start` listener attached

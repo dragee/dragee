@@ -29,6 +29,16 @@ describe('BubblingList', () => {
       expect(second.pinnedPosition.y).toBe(0)
     })
 
+    it('should dispatch a bubbling dragee:list-change DOM event with the list and the dragged item', () => {
+      const { list, draggables: [first] } = createBubblingSetup()
+      const domEvents = []
+      document.body.addEventListener('dragee:list-change', (e) => domEvents.push(e.detail))
+
+      dragBy(first, new Point(0, 45))
+
+      expect(domEvents).toEqual([{ list, draggable: first }])
+    })
+
     it('should not swap items when swappingDisabled is true', () => {
       const { list, draggables: [first, second] } = createBubblingSetup()
       list.swappingDisabled = true
