@@ -3,6 +3,7 @@
 - fix `unsubscribe()` removing the last listener when the given one was not subscribed
 - fix listeners being skipped when a listener unsubscribes while an event is being emitted
 - fix `List.remove()` wiping user `drag:move` / `drag:end` listeners and leaving the `BubblingList` `drag:start` listener attached
+- fix `Target` keeping a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener. A target now watches each of its draggables, including ones added with `add()`, until `destroy()`, and keeps its own copy of the `draggables` array, so `add()` doesn't leak a draggable into other targets sharing that array
 - fix `BubblingList.remove()` detecting the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
 - add horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
 - add the `gap` option for `BubblingList`; `verticalGap` is an alias for it. An explicit `0` gap is now respected instead of triggering auto-detection

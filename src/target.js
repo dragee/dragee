@@ -15,7 +15,6 @@ const addToDefaultScope = function(target) {
 export default class Target extends EventEmitter {
   constructor(element, draggables, options = {}) {
     super(options)
-    const target = this
 
     this.options = Object.assign({
       timeEnd: 200,
@@ -32,8 +31,9 @@ export default class Target extends EventEmitter {
     )
 
     this.element = element
-    draggables.forEach((draggable) => draggable.targets.push(target))
-    this.draggables = draggables
+    this.draggables = []
+    this.unsubscribes = []
+    draggables.forEach((draggable) => this.watchDraggable(draggable))
 
     Target.emitter.emit('target:create', this)
 
@@ -102,6 +102,7 @@ export default class Target extends EventEmitter {
   }
 
   destroy() {
+    this.unsubscribes.forEach((unsubscribe) => unsubscribe())
     scopes.forEach((scope) => removeItem(scope.targets, this))
   }
 
@@ -130,7 +131,7 @@ export default class Target extends EventEmitter {
 
     this.setPosition(rectangles, newDraggablesIndex)
     if (this.innerDraggables.indexOf(draggable) !== -1) {
-      this.addRemoveOnMove(draggable)
+      this.emit('target:add', draggable)
     }
     return true
   }
@@ -155,6 +156,7 @@ export default class Target extends EventEmitter {
 
     this.emit('target:beforeAdd', draggable)
 
+    this.watchDraggable(draggable)
     this.pushInnerDraggable(draggable)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
       return draggable.getRectangle()
@@ -162,7 +164,7 @@ export default class Target extends EventEmitter {
 
     this.setPosition(rectangles, [newDraggablesIndex], time || 0)
     if (this.innerDraggables.indexOf(draggable) !== -1) {
-      this.addRemoveOnMove(draggable)
+      this.emit('target:add', draggable)
     }
   }
 
@@ -172,17 +174,15 @@ export default class Target extends EventEmitter {
     }
   }
 
-  addRemoveOnMove(draggable) {
-    draggable.on('drag:move', this.removeHandler = () => {
-      this.remove(draggable)
-    })
+  watchDraggable(draggable) {
+    if (this.draggables.includes(draggable)) return
 
-    this.emit('target:add', draggable)
+    this.draggables.push(draggable)
+    draggable.targets.push(this)
+    this.unsubscribes.push(draggable.on('drag:move', () => this.remove(draggable)))
   }
 
   remove(draggable) {
-    draggable.unsubscribe('drag:move', this.removeHandler)
-
     const index = this.innerDraggables.indexOf(draggable)
     if (index === -1) {
       return
