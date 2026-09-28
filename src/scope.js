@@ -69,7 +69,7 @@ class Scope extends EventEmitter {
       draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
     }
 
-    this.emit('scope:change')
+    this.emit('scope:change', { scope: this, draggable })
   }
 
   reset() {

@@ -513,10 +513,11 @@ export default class Draggable extends EventEmitter {
   }
 
   emitDragEvent(type) {
-    this.emit(`drag:${type}`)
+    const detail = { draggable: this }
+    this.emit(`drag:${type}`, detail)
 
     if (this.domEvents) {
-      dispatchDomEvent(this.element, `dragee:${type}`, { draggable: this })
+      dispatchDomEvent(this.element, `dragee:${type}`, detail)
     }
   }
 
@@ -547,7 +548,6 @@ export default class Draggable extends EventEmitter {
     document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
     document.removeEventListener('drop', this._nativeDrop)
     scopes.forEach((scope) => scope.releaseDraggable(this))
-    this.resetEmitter()
 
     const index = draggables.indexOf(this)
     if (index > -1) {

@@ -96,13 +96,18 @@ describe('draggable/drag lifecycle', () => {
     draggable.on('drag:move', moveFn)
     draggable.on('drag:end', endFn)
 
+    const detailOf = (fn) => fn.mock.calls[0][0].detail
+
     simulateDrag(draggable, new Point(10, 10), new Point(50, 50))
     expect(startFn).toHaveBeenCalledTimes(1)
+    expect(detailOf(startFn)).toEqual({ draggable })
     expect(moveFn).toHaveBeenCalledTimes(1)
+    expect(detailOf(moveFn)).toEqual({ draggable })
     expect(draggable.isDragging).toBe(true)
 
     endDrag(new Point(50, 50))
     expect(endFn).toHaveBeenCalledTimes(1)
+    expect(detailOf(endFn)).toEqual({ draggable })
     expect(draggable.isDragging).toBe(false)
   })
 

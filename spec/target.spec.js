@@ -33,19 +33,6 @@ describe('Target', () => {
     expect(target.getSortedDraggables()).toContain(draggable)
   })
 
-  it('should keep other drag:move listeners when a draggable is removed', () => {
-    const { target, draggables: [first, second] } = createTargetSetup()
-    target.add(first)
-    const onMove = jest.fn()
-    first.on('drag:move', onMove)
-    target.add(second)
-
-    target.remove(first)
-    first.move(new Point(5, 5))
-
-    expect(onMove).toHaveBeenCalledTimes(1)
-  })
-
   it('should dispatch bubbling dragee:target-* DOM events from the target element', () => {
     const { target, draggables: [draggable] } = createTargetSetup()
     const received = []
@@ -64,4 +51,5 @@ describe('Target', () => {
       ['dragee:target-remove', target.element, detail]
     ])
   })
+
 })

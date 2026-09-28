@@ -29,7 +29,7 @@ export default class Target extends EventEmitter {
 
     this.element = element
     this.draggables = []
-    this.unsubscribes = []
+    this.listeners = new AbortController()
     draggables.forEach((draggable) => this.accept(draggable))
 
     const scope = options.scope || currentScope()
@@ -100,7 +100,7 @@ export default class Target extends EventEmitter {
   }
 
   destroy() {
-    this.unsubscribes.forEach((unsubscribe) => unsubscribe())
+    this.listeners.abort()
     scopes.forEach((scope) => removeItem(scope.targets, this))
   }
 
@@ -177,7 +177,7 @@ export default class Target extends EventEmitter {
 
     this.draggables.push(draggable)
     draggable.targets.push(this)
-    this.unsubscribes.push(draggable.on('drag:move', () => this.remove(draggable)))
+    draggable.addEventListener('drag:move', () => this.remove(draggable), { signal: this.listeners.signal })
   }
 
   remove(draggable) {
@@ -209,11 +209,12 @@ export default class Target extends EventEmitter {
   }
 
   emitTargetEvent(type, draggable) {
-    this.emit(`target:${type}`, draggable)
+    const detail = { target: this, draggable }
+    this.emit(`target:${type}`, detail)
 
     if (this.domEvents) {
       const domType = type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
-      dispatchDomEvent(this.element, `dragee:target-${domType}`, { target: this, draggable })
+      dispatchDomEvent(this.element, `dragee:target-${domType}`, detail)
     }
   }
 

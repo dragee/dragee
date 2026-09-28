@@ -1,14 +1,21 @@
 ## [Unreleased]
 
 ### Breaking
-- remove `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
+- all instances (`Draggable`, `List`, `BubblingList`, `Target`, `Scope`) are standard `EventTarget`s. Listeners receive a `CustomEvent` with the payload in `event.detail` instead of positional arguments:
+  - `drag:start` / `drag:move` / `drag:end`: `{ draggable }`
+  - `list:change` / `list:reordered`: `{ list, draggable }`
+  - `target:beforeAdd` / `target:add` / `target:remove`: `{ target, draggable }`
+  - `scope:change`: `{ scope, draggable }`
+- listener semantics follow `EventTarget`: the same function added twice is registered once, and an exception in one listener no longer stops the others
+- requires Chrome / Edge 90+, Firefox 86+, Safari 15+ (`EventTarget` subclassing and the `signal` listener option)
+- remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
 
 ### Added
-- `on()` and `prependOn()` return a function that removes the listener; add `off()` and `once()`. `unsubscribe()` is an alias for `off()`
-- bubbling DOM events (disable with the `domEvents: false` option):
-  - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element, `event.detail` = `{ draggable }`
-  - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element, `event.detail` = `{ list, draggable }`
-  - `Target`: `dragee:target-before-add` / `dragee:target-add` / `dragee:target-remove` from the target element, `event.detail` = `{ target, draggable }`
+- `on()` returns a function that removes the listener; add `off()` and `once()`. Standard listener options such as `{ signal }` are supported. `unsubscribe()` is an alias for `off()`
+- bubbling DOM events (disable with the `domEvents: false` option), with the same `event.detail` as the instance events:
+  - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element
+  - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element
+  - `Target`: `dragee:target-before-add` / `dragee:target-add` / `dragee:target-remove` from the target element
 - horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
 - the `gap` option for `BubblingList`; `verticalGap` is an alias for it. An explicit `0` gap is now respected instead of triggering auto-detection
 - the `scope` option for `Draggable` and `Target` to join a given scope, e.g. for instances created after `scope()` has returned
@@ -16,8 +23,6 @@
 
 ### Fixed
 - `Scope.addDraggable()` / `addTarget()` left the instance in its previous scope as well (e.g. `defaultScope`)
-- `unsubscribe()` removed the last listener when the given one was not subscribed
-- listeners were skipped when a listener unsubscribed while an event was being emitted
 - `List.remove()` wiped user `drag:move` / `drag:end` listeners and left the `BubblingList` `drag:start` listener attached
 - `Target` kept a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener. A target now watches each of its draggables, including ones added with `add()`, until `destroy()`, and keeps its own copy of the `draggables` array, so `add()` doesn't leak a draggable into other targets sharing that array
 - targets created inside `scope()` were added to the default scope too

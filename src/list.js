@@ -21,7 +21,7 @@ export default class List extends EventEmitter {
     this.container = options.container
     this.draggables = draggables
     this.changedDuringIteration = false
-    this.unsubscribes = new Map()
+    this.controllers = new Map()
 
     this.resizeObserver = new ResizeObserver(debounce(this.onResize.bind(this), 100))
 
@@ -57,16 +57,20 @@ export default class List extends EventEmitter {
   }
 
   listenTo(draggable, eventName, handler) {
-    if (!this.unsubscribes.has(draggable)) {
-      this.unsubscribes.set(draggable, [])
+    draggable.addEventListener(eventName, handler, { signal: this.signalFor(draggable) })
+  }
+
+  signalFor(draggable) {
+    if (!this.controllers.has(draggable)) {
+      this.controllers.set(draggable, new AbortController())
     }
-    this.unsubscribes.get(draggable).push(draggable.on(eventName, handler))
+    return this.controllers.get(draggable).signal
   }
 
   releaseDraggable(draggable) {
     this.resizeObserver.unobserve(draggable.element)
-    this.unsubscribes.get(draggable)?.forEach((unsubscribe) => unsubscribe())
-    this.unsubscribes.delete(draggable)
+    this.controllers.get(draggable)?.abort()
+    this.controllers.delete(draggable)
     removeItem(this.draggables, draggable)
   }
 
@@ -129,10 +133,11 @@ export default class List extends EventEmitter {
   }
 
   emitListEvent(type, draggable) {
-    this.emit(`list:${type}`)
+    const detail = { list: this, draggable }
+    this.emit(`list:${type}`, detail)
 
     if (this.domEvents) {
-      dispatchDomEvent(draggable.element, `dragee:list-${type}`, { list: this, draggable })
+      dispatchDomEvent(draggable.element, `dragee:list-${type}`, detail)
     }
   }
 

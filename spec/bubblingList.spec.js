@@ -29,13 +29,16 @@ describe('BubblingList', () => {
       expect(second.pinnedPosition.y).toBe(0)
     })
 
-    it('should dispatch a bubbling dragee:list-change DOM event with the list and the dragged item', () => {
+    it('should report the change with the dragged item, also as a bubbling DOM event', () => {
       const { list, draggables: [first] } = createBubblingSetup()
+      const onChange = jest.fn()
       const domEvents = []
+      list.on('list:change', onChange)
       document.body.addEventListener('dragee:list-change', (e) => domEvents.push(e.detail))
 
       dragBy(first, new Point(0, 45))
 
+      expect(onChange.mock.calls.map(([event]) => event.detail)).toEqual([{ list, draggable: first }])
       expect(domEvents).toEqual([{ list, draggable: first }])
     })
 

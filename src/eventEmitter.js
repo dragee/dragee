@@ -1,73 +1,30 @@
-export default class EventEmitter {
+export default class EventEmitter extends EventTarget {
   constructor (options = {}) {
-    this.events = {}
+    super()
 
     if (options && options.on) {
-      for (const [eventName, fn] of Object.entries(options.on)) {
-        this.on(eventName, fn)
-      }
+      Object.entries(options.on).forEach(([eventName, fn]) => this.on(eventName, fn))
     }
   }
 
-  emit(eventName, ...args) {
-    this.interrupted = false
-
-    if (!this.events[eventName]) return
-
-    // Iterate over a copy so listeners can unsubscribe while the event is being emitted
-    for (const func of this.events[eventName].slice()) {
-      func(...args)
-      if (this.interrupted) {
-        return
-      }
-    }
+  emit(eventName, detail, { cancelable = false } = {}) {
+    return this.dispatchEvent(new CustomEvent(eventName, { detail, cancelable }))
   }
 
-  interrupt() {
-    this.interrupted = true
-  }
-
-  on(eventName, fn) {
-    this.listeners(eventName).push(fn)
-    return () => this.off(eventName, fn)
-  }
-
-  prependOn(eventName, fn) {
-    this.listeners(eventName).unshift(fn)
+  on(eventName, fn, options) {
+    this.addEventListener(eventName, fn, options)
     return () => this.off(eventName, fn)
   }
 
   once(eventName, fn) {
-    const wrapper = (...args) => {
-      this.off(eventName, wrapper)
-      fn(...args)
-    }
-    wrapper.listener = fn
-    return this.on(eventName, wrapper)
+    return this.on(eventName, fn, { once: true })
   }
 
   off(eventName, fn) {
-    if (!this.events[eventName]) return
-
-    const index = this.events[eventName].findIndex((listener) => listener === fn || listener.listener === fn)
-    if (index !== -1) {
-      this.events[eventName].splice(index, 1)
-    }
+    this.removeEventListener(eventName, fn)
   }
 
   unsubscribe(eventName, fn) {
     this.off(eventName, fn)
-  }
-
-  listeners(eventName) {
-    return (this.events[eventName] ||= [])
-  }
-
-  resetEmitter () {
-    this.events = {}
-  }
-
-  resetOn(eventName) {
-    this.events[eventName] = []
   }
 }
