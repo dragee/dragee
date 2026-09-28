@@ -4,7 +4,6 @@ import { createDraggables, simulateDrag, endDrag, cleanup } from './testing-sdk'
 
 afterEach(cleanup)
 
-// Items are laid out along `axis` every 50px; in jsdom their size is 0
 function createBubblingSetup(options = {}, { count = 3, crossPosition = 0 } = {}) {
   const { container, draggables } = createDraggables(count, (i) => ({
     position: options.axis === 'x' ? new Point(i * 50, crossPosition) : new Point(crossPosition, i * 50)
@@ -79,7 +78,7 @@ describe('BubblingList', () => {
       expect(last.pinnedPosition.y).toBe(7)
     })
 
-    it('should support the deprecated verticalGap option', () => {
+    it('should support the verticalGap option', () => {
       const { list, draggables: [, middle, last] } = createBubblingSetup({ verticalGap: 10 })
 
       list.remove(middle)

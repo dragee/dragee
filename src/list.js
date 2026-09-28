@@ -20,6 +20,7 @@ export default class List extends EventEmitter {
     this.container = options.container
     this.draggables = draggables
     this.changedDuringIteration = false
+    this.unsubscribes = new Map()
 
     this.resizeObserver = new ResizeObserver(debounce(this.onResize.bind(this), 100))
 
@@ -46,7 +47,7 @@ export default class List extends EventEmitter {
 
   initDraggable(draggable) {
     draggable.enable = this._enable
-    draggable.on('drag:move', () => this.onMove(draggable))
+    this.listenTo(draggable, 'drag:move', () => this.onMove(draggable))
     draggable.dragEndAction = () => {
       draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
       this.onEnd(draggable)
@@ -54,10 +55,17 @@ export default class List extends EventEmitter {
     this.resizeObserver.observe(draggable.element)
   }
 
+  listenTo(draggable, eventName, handler) {
+    if (!this.unsubscribes.has(draggable)) {
+      this.unsubscribes.set(draggable, [])
+    }
+    this.unsubscribes.get(draggable).push(draggable.on(eventName, handler))
+  }
+
   releaseDraggable(draggable) {
     this.resizeObserver.unobserve(draggable.element)
-    draggable.resetOn('drag:end')
-    draggable.resetOn('drag:move')
+    this.unsubscribes.get(draggable)?.forEach((unsubscribe) => unsubscribe())
+    this.unsubscribes.delete(draggable)
     removeItem(this.draggables, draggable)
   }
 

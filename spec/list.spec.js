@@ -194,3 +194,15 @@ describe('list/reset', () => {
   })
 })
 
+describe('list/remove listeners', () => {
+  it('should keep listeners added by the user on a removed draggable', () => {
+    const { list, draggables: [draggable] } = createListSetup(3)
+    const onMove = jest.fn()
+    draggable.on('drag:move', onMove)
+
+    list.remove(draggable)
+    draggable.move(new Point(5, 5))
+
+    expect(onMove).toHaveBeenCalledTimes(1)
+  })
+})

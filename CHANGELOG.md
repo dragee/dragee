@@ -2,9 +2,10 @@
 - `on()` and `prependOn()` return a function that removes the listener; add `off()` and `once()`. `unsubscribe()` is an alias for `off()`
 - fix `unsubscribe()` removing the last listener when the given one was not subscribed
 - fix listeners being skipped when a listener unsubscribes while an event is being emitted
+- fix `List.remove()` wiping user `drag:move` / `drag:end` listeners and leaving the `BubblingList` `drag:start` listener attached
 - fix `BubblingList.remove()` detecting the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
 - add horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
-- add the `gap` option for `BubblingList`; `verticalGap` is kept as a deprecated alias. An explicit `0` gap is now respected instead of triggering auto-detection
+- add the `gap` option for `BubblingList`; `verticalGap` is an alias for it. An explicit `0` gap is now respected instead of triggering auto-detection
 - fix swapped `leftDirection` / `rightDirection` flags in `Draggable` (moving right used to set `leftDirection`)
 
 ## 1.3.1

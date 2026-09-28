@@ -264,7 +264,7 @@ new BubblingList(draggables, { container, axis: 'x', gap: 8, reorderOnChange: tr
 | --- | --- | --- | --- |
 | `axis` | `'y' \| 'x'` | `'y'` | List direction: `'y'` — vertical, `'x'` — horizontal |
 | `gap` | `number` | auto-detected | Gap between items along the axis (detected from the first two items if not set; `0` is respected) |
-| `verticalGap` | `number` | — | Deprecated alias for `gap` |
+| `verticalGap` | `number` | — | Alias for `gap` |
 
 #### Additional Properties
 
