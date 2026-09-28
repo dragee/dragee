@@ -554,13 +554,14 @@ indexOfNearestPoint(pointArray, target, radius, distanceFn?)
 
 All dragee classes extend EventEmitter. Available on any instance:
 
-```javascript
-draggable.on('drag:start', handler)
-draggable.unsubscribe('drag:start', handler)
-draggable.prependOn('drag:start', firstHandler)
-draggable.resetOn('drag:start')
-draggable.resetEmitter()
-```
+| Method | Description |
+| --- | --- |
+| `on(eventName, fn)` | Add a listener; returns a function that removes it |
+| `off(eventName, fn)` / `unsubscribe(eventName, fn)` | Remove a listener |
+| `once(eventName, fn)` | Add a listener called only for the next event |
+| `prependOn(eventName, fn)` | Add a listener before the others; returns a function that removes it |
+| `resetOn(eventName)` | Remove all listeners of the event |
+| `resetEmitter()` | Remove all listeners |
 
 Constructor shorthand with the `on` option:
 

@@ -1,4 +1,7 @@
 ## [Unreleased]
+- `on()` and `prependOn()` return a function that removes the listener; add `off()` and `once()`. `unsubscribe()` is an alias for `off()`
+- fix `unsubscribe()` removing the last listener when the given one was not subscribed
+- fix listeners being skipped when a listener unsubscribes while an event is being emitted
 - fix `BubblingList.remove()` detecting the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
 - add horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
 - add the `gap` option for `BubblingList`; `verticalGap` is kept as a deprecated alias. An explicit `0` gap is now respected instead of triggering auto-detection
