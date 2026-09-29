@@ -170,6 +170,28 @@ describe('draggable/drag lifecycle', () => {
   })
 })
 
+describe('draggable/canceling drag start', () => {
+  it.each([
+    ['a drag:start listener', {}, (draggable) => draggable.on('drag:start', (e) => e.cancel())],
+    ['a delegated dragee:start listener', {}, () => document.body.addEventListener('dragee:start', (e) => e.preventDefault())],
+    ['a drag:start listener with dragStartThreshold', { dragStartThreshold: 5 }, (draggable) => draggable.on('drag:start', (e) => e.cancel())]
+  ])('should not drag when %s cancels it', (_name, options, prevent) => {
+    const draggable = createDraggable(options)
+    const onMove = jest.fn()
+    const onEnd = jest.fn()
+    draggable.on('drag:move', onMove)
+    draggable.on('drag:end', onEnd)
+    prevent(draggable)
+
+    simulateDrag(draggable, new Point(0, 0), new Point(50, 50))
+    endDrag(new Point(50, 50))
+
+    expect(onMove).not.toHaveBeenCalled()
+    expect(onEnd).not.toHaveBeenCalled()
+    expect(draggable.element.style.transform).toEqual('translate3d(0px, 0px, 0px)')
+  })
+})
+
 describe('draggable/enable', () => {
   it('should toggle dragee-disable class with enable state', () => {
     const draggable = createDraggable()

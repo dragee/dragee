@@ -3,4 +3,12 @@ export default class DrageeEvent extends CustomEvent {
     super(type, { ...options, detail })
     Object.assign(this, detail)
   }
+
+  cancel() {
+    this.preventDefault()
+  }
+
+  get canceled() {
+    return this.defaultPrevented
+  }
 }

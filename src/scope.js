@@ -63,9 +63,9 @@ class Scope extends EventEmitter {
       return a.getRectangle().getSquare() - b.getRectangle().getSquare()
     })
 
-    if (shotTrays.length) {
-      shotTrays[0].onEnd(draggable)
-    } else if (draggable.trays.length) {
+    const isAccepted = shotTrays.length > 0 && shotTrays[0].onEnd(draggable)
+
+    if (!isAccepted && draggable.trays.length) {
       draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
     }
 

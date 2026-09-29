@@ -4,7 +4,6 @@ import Rectangle from './geometry/rectangle'
 import { scopes, currentScope } from './scope'
 import throttle from './utils/throttle'
 import getParentsChain from './utils/get-parents-chain'
-import dispatchDomEvent from './utils/dispatch-dom-event'
 
 const throttledDragOver = (callback, duration) => {
   const throttledCallback = throttle((event) => callback(event), duration)
@@ -259,6 +258,14 @@ export default class Draggable extends EventEmitter {
       event.target.focus()
     }
 
+    this._dragStartPending = !this.shouldUseNativeDragAndDrop() && this.dragStartThreshold > 0
+    if (!this._dragStartPending) {
+      const startEvent = this.emitDragEvent('start', { cancelable: true })
+      if (startEvent.canceled) {
+        return
+      }
+    }
+
     if (this.shouldUseNativeDragAndDrop()) {
       if (this.isTouchEvent && this.emulateNativeDragAndDropOnTouch) {
         this._startParentsScrollOffset = this.parentsScrollOffset
@@ -293,12 +300,6 @@ export default class Draggable extends EventEmitter {
 
     window.addEventListener('scroll', this._scroll)
     this.scrollElements.forEach((p) => p.addEventListener('scroll', this._scroll))
-
-    if (!this.shouldUseNativeDragAndDrop() && this.dragStartThreshold > 0) {
-      this._dragStartPending = true
-    } else {
-      this.emitDragEvent('start')
-    }
   }
 
   dragMove(event) {
@@ -330,7 +331,11 @@ export default class Draggable extends EventEmitter {
         return
       }
       this._dragStartPending = false
-      this.emitDragEvent('start')
+      const startEvent = this.emitDragEvent('start', { cancelable: true })
+      if (startEvent.canceled) {
+        this.cancelDragging()
+        return
+      }
     }
 
     this.isDragging = true
@@ -512,13 +517,8 @@ export default class Draggable extends EventEmitter {
     event.preventDefault()
   }
 
-  emitDragEvent(type) {
-    const detail = { draggable: this }
-    this.emit(`drag:${type}`, detail)
-
-    if (this.domEvents) {
-      dispatchDomEvent(this.element, `dragee:${type}`, detail)
-    }
+  emitDragEvent(type, options) {
+    return this.emitWithDomEvent(this.element, `drag:${type}`, `dragee:${type}`, { draggable: this }, options)
   }
 
   dragEndAction() {
@@ -577,10 +577,6 @@ export default class Draggable extends EventEmitter {
 
   get nativeDragAndDrop() {
     return this.options.nativeDragAndDrop || false
-  }
-
-  get domEvents() {
-    return this.options.domEvents !== false
   }
 
   get emulateNativeDragAndDropOnTouch() {

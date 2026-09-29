@@ -84,7 +84,7 @@ const draggable = new Draggable(element, {
 
 | Event | Event data | DOM event | Description |
 | --- | --- | --- | --- |
-| `drag:start` | `{ draggable }` | `dragee:start` | Drag begins (after threshold is met) |
+| `drag:start` | `{ draggable }` | `dragee:start` | Drag begins (after threshold is met). **Cancelable** |
 | `drag:move` | `{ draggable }` | `dragee:move` | Position updates during dragging |
 | `drag:end` | `{ draggable }` | `dragee:end` | Drag finishes |
 
@@ -93,6 +93,14 @@ Each event is also dispatched as a bubbling DOM `CustomEvent` on the element. Th
 ```javascript
 container.addEventListener('dragee:end', ({ draggable }) => {
   console.log('dropped', draggable.element)
+})
+```
+
+Calling `event.cancel()` on `drag:start` (or on `dragee:start`) cancels the drag:
+
+```javascript
+draggable.on('drag:start', (event) => {
+  if (isLocked) event.cancel()
 })
 ```
 
@@ -335,9 +343,17 @@ tray.on('tray:remove', ({ draggable }) => console.log('removed', draggable.eleme
 
 | Event | Event data | DOM event | Description |
 | --- | --- | --- | --- |
-| `tray:beforeAdd` | `{ tray, draggable }` | `dragee:tray-before-add` | Before a draggable is added |
+| `tray:beforeAdd` | `{ tray, draggable }` | `dragee:tray-before-add` | Before a draggable is added. **Cancelable** |
 | `tray:add` | `{ tray, draggable }` | `dragee:tray-add` | After a draggable is added |
 | `tray:remove` | `{ tray, draggable }` | `dragee:tray-remove` | After a draggable is removed |
+
+Calling `event.cancel()` on `tray:beforeAdd` refuses the draggable: a dropped one returns to its initial position, and `add()` does nothing. For example, to limit a column to 5 cards:
+
+```javascript
+tray.on('tray:beforeAdd', (event) => {
+  if (tray.innerDraggables.length >= 5) event.cancel()
+})
+```
 
 DOM events are dispatched from the tray element and bubble. For example, one listener on a kanban board can track all its columns:
 
@@ -579,7 +595,7 @@ indexOfNearestPoint(pointArray, target, radius, distanceFn?)
 
 ## Events
 
-Every dragee instance (`Draggable`, `List`, `BubblingList`, `Tray`, `Scope`) is a standard [`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget). Listeners receive a `CustomEvent` that carries the payload as its own properties, so handlers can destructure it, e.g. `({ draggable }) => {}`; the same data is also in `event.detail`. Keep the event itself when you need `event.preventDefault()`.
+Every dragee instance (`Draggable`, `List`, `BubblingList`, `Tray`, `Scope`) is a standard [`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget). Listeners receive a `CustomEvent` that carries the payload as its own properties, so handlers can destructure it, e.g. `({ draggable }) => {}`; the same data is also in `event.detail`. Cancelable events are canceled with `event.cancel()` (`event.preventDefault()` works too); call it on the event itself, since a destructured method loses its `this`.
 
 ```javascript
 draggable.addEventListener('drag:end', ({ draggable }) => console.log(draggable))
@@ -621,6 +637,8 @@ new Draggable(el, {
 - **`Target` is renamed to `Tray`**, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data.
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.
+- **Canceling a drag start:** call `event.cancel()` in a `drag:start` listener. Calling `cancelDragging()` or `destroy()` there no longer stops the drag, because `drag:start` now fires before the drag listeners are attached.
+- **A drop refused by a tray** (`tray:beforeAdd` prevented, or a custom `catchDraggable` accepting a draggable whose center is outside) returns the draggable to its initial position.
 
 ---
 

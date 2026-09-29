@@ -1,4 +1,5 @@
 import DrageeEvent from './utils/dragee-event'
+import dispatchDomEvent from './utils/dispatch-dom-event'
 
 export default class EventEmitter extends EventTarget {
   constructor (options = {}) {
@@ -10,7 +11,17 @@ export default class EventEmitter extends EventTarget {
   }
 
   emit(eventName, detail, { cancelable = false } = {}) {
-    return this.dispatchEvent(new DrageeEvent(eventName, detail, { cancelable }))
+    const event = new DrageeEvent(eventName, detail, { cancelable })
+    this.dispatchEvent(event)
+    return event
+  }
+
+  emitWithDomEvent(element, eventName, domEventName, detail, { cancelable = false } = {}) {
+    const event = this.emit(eventName, detail, { cancelable })
+    if (this.domEvents && dispatchDomEvent(element, domEventName, detail, { cancelable }).canceled) {
+      event.cancel()
+    }
+    return event
   }
 
   on(eventName, fn, options) {
@@ -28,5 +39,9 @@ export default class EventEmitter extends EventTarget {
 
   unsubscribe(eventName, fn) {
     this.off(eventName, fn)
+  }
+
+  get domEvents() {
+    return !this.options || this.options.domEvents !== false
   }
 }

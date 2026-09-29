@@ -1,6 +1,6 @@
 import Tray from '../src/tray'
 import Point from '../src/geometry/point'
-import { createContainer, createDraggables, cleanup } from './testing-sdk'
+import { createContainer, createDraggable, createDraggables, simulateDrag, endDrag, cleanup } from './testing-sdk'
 
 afterEach(cleanup)
 
@@ -52,4 +52,29 @@ describe('Tray', () => {
     ])
   })
 
+  describe('refusing a draggable in tray:beforeAdd', () => {
+    it('should not add it programmatically', () => {
+      const { tray, draggables: [draggable] } = createTargetSetup()
+      tray.on('tray:beforeAdd', (e) => e.cancel())
+
+      tray.add(draggable)
+
+      expect(tray.getSortedDraggables()).not.toContain(draggable)
+    })
+
+    it('should send a dropped draggable back to its initial position', () => {
+      const draggable = createDraggable({ position: new Point(100, 100) })
+      const trayElement = document.createElement('div')
+      createContainer().appendChild(trayElement)
+      const tray = new Tray(trayElement, [draggable], { catchDraggable: () => true })
+      trayElement.addEventListener('dragee:tray-before-add', (e) => e.preventDefault())
+
+      simulateDrag(draggable, new Point(100, 100), new Point(0, 0))
+      endDrag(new Point(0, 0))
+
+      expect(tray.getSortedDraggables()).not.toContain(draggable)
+      expect(draggable.position).toEqual(new Point(100, 100))
+      tray.destroy()
+    })
+  })
 })

@@ -1,7 +1,6 @@
 import range from './utils/range.js'
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
-import dispatchDomEvent from './utils/dispatch-dom-event'
 import Rectangle from './geometry/rectangle'
 import { transformedSpaceDistanceFactory } from './geometry/distances'
 import { scopes, currentScope } from './scope'
@@ -114,13 +113,16 @@ export default class Tray extends EventEmitter {
   onEnd(draggable) {
     const newDraggablesIndex = []
 
-    if (this.getRectangle().includePoint(draggable.getCenter())) {
-      draggable.position = this.bound(draggable.position, draggable.getSize())
-    } else {
+    if (!this.getRectangle().includePoint(draggable.getCenter())) {
       return false
     }
 
-    this.emitTrayEvent('beforeAdd', draggable)
+    const beforeAddEvent = this.emitTrayEvent('beforeAdd', draggable, { cancelable: true })
+    if (beforeAddEvent.canceled) {
+      return false
+    }
+
+    draggable.position = this.bound(draggable.position, draggable.getSize())
 
     this.innerDraggables = this.sorting(this.innerDraggables, [draggable], newDraggablesIndex)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
@@ -152,7 +154,10 @@ export default class Tray extends EventEmitter {
   add(draggable, time) {
     const newDraggablesIndex = this.innerDraggables.length
 
-    this.emitTrayEvent('beforeAdd', draggable)
+    const beforeAddEvent = this.emitTrayEvent('beforeAdd', draggable, { cancelable: true })
+    if (beforeAddEvent.canceled) {
+      return
+    }
 
     this.accept(draggable)
     this.pushInnerDraggable(draggable)
@@ -208,22 +213,13 @@ export default class Tray extends EventEmitter {
     return this.innerDraggables.slice()
   }
 
-  emitTrayEvent(type, draggable) {
-    const detail = { tray: this, draggable }
-    this.emit(`tray:${type}`, detail)
-
-    if (this.domEvents) {
-      const domType = type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
-      dispatchDomEvent(this.element, `dragee:tray-${domType}`, detail)
-    }
+  emitTrayEvent(type, draggable, options) {
+    const domType = type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
+    return this.emitWithDomEvent(this.element, `tray:${type}`, `dragee:tray-${domType}`, { tray: this, draggable }, options)
   }
 
   get container() {
     return (this._container = this._container || this.options.container || this.options.parent || this.element.offsetParent)
-  }
-
-  get domEvents() {
-    return this.options.domEvents !== false
   }
 }
 

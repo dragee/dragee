@@ -10,9 +10,13 @@
 - rename `Target` to `Tray`, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data
 - requires Chrome / Edge 90+, Firefox 86+, Safari 15+ (`EventTarget` subclassing and the `signal` listener option)
 - remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
+- `drag:start` fires before the drag listeners are attached, so calling `cancelDragging()` or `destroy()` from a `drag:start` listener no longer stops the drag; call `event.cancel()` instead
+- a drop refused by a tray returns the draggable to its initial position (previously it stayed where it was dropped)
 
 ### Added
 - `on()` returns a function that removes the listener; add `off()` and `once()`. Standard listener options such as `{ signal }` are supported. `unsubscribe()` is an alias for `off()`
+- cancelable events: `event.cancel()` on `drag:start` cancels the drag; on `tray:beforeAdd` it refuses the draggable
+- `event.cancel()` / `event.canceled` on dragee events as clearer names for `preventDefault()` / `defaultPrevented` (both keep working); `emit()` returns the dispatched event
 - bubbling DOM events (disable with the `domEvents: false` option), with the same event data as the instance events:
   - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element
   - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element

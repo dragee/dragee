@@ -1,7 +1,6 @@
 import debounce from './utils/debounce'
 import removeItem from './utils/remove-array-item'
 import EventEmitter from './eventEmitter'
-import dispatchDomEvent from './utils/dispatch-dom-event'
 import {
   getDistance,
   indexOfNearestPoint
@@ -133,12 +132,7 @@ export default class List extends EventEmitter {
   }
 
   emitListEvent(type, draggable) {
-    const detail = { list: this, draggable }
-    this.emit(`list:${type}`, detail)
-
-    if (this.domEvents) {
-      dispatchDomEvent(draggable.element, `dragee:list-${type}`, detail)
-    }
+    this.emitWithDomEvent(draggable.element, `list:${type}`, `dragee:list-${type}`, { list: this, draggable })
   }
 
   getCurrentPinnedPositions() {
@@ -215,10 +209,6 @@ export default class List extends EventEmitter {
 
   get distanceFunc() {
     return this.options.getDistance || getDistance
-  }
-
-  get domEvents() {
-    return this.options.domEvents !== false
   }
 
   get positions() {
