@@ -66,7 +66,7 @@ function copyStyles(source, destination) {
 export default class Draggable extends EventEmitter {
   constructor(element, options={}) {
     super(options)
-    this.targets = []
+    this.trays = []
     this.options = options
     this.element = element
     preventDoubleInit(this)

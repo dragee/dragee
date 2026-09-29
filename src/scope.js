@@ -5,20 +5,20 @@ const scopes = []
 const scopeStack = []
 
 class Scope extends EventEmitter {
-  constructor(draggables, targets, options={}) {
+  constructor(draggables, trays, options={}) {
     super(options)
     scopes.forEach((scope) => {
       if (draggables) {
         draggables.forEach((draggable) => scope.releaseDraggable(draggable))
       }
 
-      if (targets) {
-        targets.forEach((target) => scope.releaseTarget(target))
+      if (trays) {
+        trays.forEach((tray) => scope.releaseTray(tray))
       }
     })
 
     this.draggables = draggables || []
-    this.targets = targets || []
+    this.trays = trays || []
     scopes.push(this)
     this.options = {
       timeEnd: (options.timeEnd) || 400
@@ -45,27 +45,27 @@ class Scope extends EventEmitter {
     removeItem(this.draggables, draggable)
   }
 
-  addTarget(target) {
-    scopes.forEach((scope) => scope.releaseTarget(target))
-    this.targets.push(target)
+  addTray(tray) {
+    scopes.forEach((scope) => scope.releaseTray(tray))
+    this.trays.push(tray)
   }
 
-  releaseTarget(target) {
-    removeItem(this.targets, target)
+  releaseTray(tray) {
+    removeItem(this.trays, tray)
   }
 
   onEnd(draggable) {
-    const shotTargets = this.targets.filter((target) => {
-      return target.draggables.indexOf(draggable) !== -1
-    }).filter((target) => {
-      return target.catchDraggable(draggable)
+    const shotTrays = this.trays.filter((tray) => {
+      return tray.draggables.indexOf(draggable) !== -1
+    }).filter((tray) => {
+      return tray.catchDraggable(draggable)
     }).sort((a, b) => {
       return a.getRectangle().getSquare() - b.getRectangle().getSquare()
     })
 
-    if (shotTargets.length) {
-      shotTargets[0].onEnd(draggable)
-    } else if (draggable.targets.length) {
+    if (shotTrays.length) {
+      shotTrays[0].onEnd(draggable)
+    } else if (draggable.trays.length) {
       draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
     }
 
@@ -73,28 +73,28 @@ class Scope extends EventEmitter {
   }
 
   reset() {
-    this.targets.forEach((target) => target.reset())
+    this.trays.forEach((tray) => tray.reset())
   }
 
   refresh() {
     this.draggables.forEach((draggable) => draggable.refresh())
-    this.targets.forEach((target) => target.refresh())
+    this.trays.forEach((tray) => tray.refresh())
   }
 
   get positions() {
-    return this.targets.map((target) => {
-      return target.innerDraggables.map((draggable) => this.draggables.indexOf(draggable))
+    return this.trays.map((tray) => {
+      return tray.innerDraggables.map((draggable) => this.draggables.indexOf(draggable))
     })
   }
 
   set positions(positions) {
     const message = 'wrong array length'
-    if (positions.length === this.targets.length) {
-      this.targets.forEach((target) => target.reset())
+    if (positions.length === this.trays.length) {
+      this.trays.forEach((tray) => tray.reset())
 
-      positions.forEach((targetIndexes, i) => {
-        targetIndexes.forEach((index) => {
-          this.targets[i].add(this.draggables[index])
+      positions.forEach((trayIndexes, i) => {
+        trayIndexes.forEach((index) => {
+          this.trays[i].add(this.draggables[index])
         })
       })
     } else {

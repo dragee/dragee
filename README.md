@@ -122,7 +122,7 @@ container.addEventListener('dragee:end', ({ detail: { draggable } }) => {
 | `pinnedPosition` | `Point` | Last pinned (rest) position |
 | `initialPosition` | `Point` | Position from construction |
 | `isDragging` | `boolean` | Whether currently being dragged |
-| `targets` | `Target[]` | Targets this draggable belongs to |
+| `trays` | `Tray[]` | Trays this draggable belongs to |
 | `enable` | `boolean` | Get/set to enable or disable dragging |
 
 ---
@@ -289,22 +289,22 @@ Uses `getYDifference` (or `getXDifference` when `axis: 'x'`) as the default dist
 
 ---
 
-## Target
+## Tray
 
-Drop zone container that accepts draggable elements and positions them using a strategy.
+A container that draggables are dropped into: it accepts them, lays them out with a positioning strategy and releases a draggable as soon as it is dragged away.
 
 ```javascript
-import { Target, Draggable, FloatLeftStrategy, transformedSpaceDistanceFactory } from 'dragee'
+import { Tray, Draggable, FloatLeftStrategy, transformedSpaceDistanceFactory } from 'dragee'
 
-const targetEl = document.querySelector('.drop-zone')
+const trayEl = document.querySelector('.drop-zone')
 const draggables = [/* array of Draggable instances */]
 
-const target = new Target(targetEl, draggables, {
+const tray = new Tray(trayEl, draggables, {
   timeEnd: 200,
   timeExcange: 400,
   container: parentElement,
   strategy: new FloatLeftStrategy(
-    () => target.getRectangle(),
+    () => tray.getRectangle(),
     {
       radius: 80,
       getDistance: transformedSpaceDistanceFactory({ x: 1, y: 4 }),
@@ -313,8 +313,8 @@ const target = new Target(targetEl, draggables, {
   )
 })
 
-target.on('target:add', ({ detail: { draggable } }) => console.log('added', draggable.element))
-target.on('target:remove', ({ detail: { draggable } }) => console.log('removed', draggable.element))
+tray.on('tray:add', ({ detail: { draggable } }) => console.log('added', draggable.element))
+tray.on('tray:remove', ({ detail: { draggable } }) => console.log('removed', draggable.element))
 ```
 
 ### Options
@@ -325,7 +325,7 @@ target.on('target:remove', ({ detail: { draggable } }) => console.log('removed',
 | `timeExcange` | `number` | `400` | Animation ms for repositioning existing items |
 | `strategy` | `Strategy` | `FloatLeftStrategy` | Positioning strategy instance |
 | `bound` | `(point, size) => Point` | `BoundToElement` | Post-drop constraint |
-| `catchDraggable` | `(target, draggable) => boolean` | center inclusion | Custom hit-test for accepting drops |
+| `catchDraggable` | `(tray, draggable) => boolean` | center inclusion | Custom hit-test for accepting drops |
 | `container` / `parent` | `Element` | `element.offsetParent` | Coordinate space |
 | `domEvents` | `boolean` | `true` | Dispatch `dragee:*` DOM events (see Events) |
 | `scope` | `Scope` | current scope | Scope to join instead of the one `scope()` is running or `defaultScope` |
@@ -335,15 +335,15 @@ target.on('target:remove', ({ detail: { draggable } }) => console.log('removed',
 
 | Event | `event.detail` | DOM event | Description |
 | --- | --- | --- | --- |
-| `target:beforeAdd` | `{ target, draggable }` | `dragee:target-before-add` | Before a draggable is added |
-| `target:add` | `{ target, draggable }` | `dragee:target-add` | After a draggable is added |
-| `target:remove` | `{ target, draggable }` | `dragee:target-remove` | After a draggable is removed |
+| `tray:beforeAdd` | `{ tray, draggable }` | `dragee:tray-before-add` | Before a draggable is added |
+| `tray:add` | `{ tray, draggable }` | `dragee:tray-add` | After a draggable is added |
+| `tray:remove` | `{ tray, draggable }` | `dragee:tray-remove` | After a draggable is removed |
 
-DOM events are dispatched from the target element and bubble. For example, one listener on a kanban board can track all its columns:
+DOM events are dispatched from the tray element and bubble. For example, one listener on a kanban board can track all its columns:
 
 ```javascript
-board.addEventListener('dragee:target-add', ({ detail: { target, draggable } }) => {
-  console.log(draggable.element, 'moved to', target.element)
+board.addEventListener('dragee:tray-add', ({ detail: { tray, draggable } }) => {
+  console.log(draggable.element, 'moved to', tray.element)
 })
 ```
 
@@ -352,23 +352,23 @@ board.addEventListener('dragee:target-add', ({ detail: { target, draggable } }) 
 | Method | Signature | Description |
 | --- | --- | --- |
 | `add` | `(draggable, time?)` | Programmatically add a draggable |
-| `accept` | `(draggable)` | Let a draggable be dropped into this target without placing it there |
-| `remove` | `(draggable)` | Remove a draggable from the target |
+| `accept` | `(draggable)` | Let a draggable be dropped into this tray without placing it there |
+| `remove` | `(draggable)` | Remove a draggable from the tray |
 | `reset` | `()` | Remove all draggables, reset to initial state |
 | `refresh` | `()` | Recalculate positions for all inner draggables |
-| `destroy` | `()` | Remove target from all scopes |
-| `getRectangle` | `()` → `Rectangle` | Get target's Rectangle |
-| `getPosition` | `()` → `Point` | Get target's position |
-| `getSize` | `()` → `Point` | Get target's size |
+| `destroy` | `()` | Remove tray from all scopes |
+| `getRectangle` | `()` → `Rectangle` | Get tray's Rectangle |
+| `getPosition` | `()` → `Point` | Get tray's position |
+| `getSize` | `()` → `Point` | Get tray's size |
 | `getSortedDraggables` | `()` → `Draggable[]` | Get inner draggables in order |
 
 ### Properties
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `element` | `Element` | The target DOM element |
-| `innerDraggables` | `Draggable[]` | Draggables currently inside the target |
-| `draggables` | `Draggable[]` | All draggables associated with this target |
+| `element` | `Element` | The tray DOM element |
+| `innerDraggables` | `Draggable[]` | Draggables currently inside the tray |
+| `draggables` | `Draggable[]` | All draggables associated with this tray |
 | `container` | `Element` | Coordinate space element |
 
 ---
@@ -384,7 +384,7 @@ Positions items top-to-bottom, left-aligned. Items that overflow the bottom are 
 ```javascript
 import { FloatLeftStrategy, transformedSpaceDistanceFactory } from 'dragee'
 
-new FloatLeftStrategy(() => target.getRectangle(), {
+new FloatLeftStrategy(() => tray.getRectangle(), {
   radius: 80,
   paddingTopLeft: new Point(10, 10),
   paddingBottomRight: new Point(10, 10),
@@ -411,7 +411,7 @@ Positions items top-to-bottom, right-aligned. Extends `FloatLeftStrategy`.
 ```javascript
 import { FloatRightStrategy } from 'dragee'
 
-new FloatRightStrategy(() => target.getRectangle(), {
+new FloatRightStrategy(() => tray.getRectangle(), {
   paddingTopRight: new Point(5, 5),
   paddingBottomLeft: new Point(0, 0),
   yGapBetweenDraggables: 5
@@ -426,30 +426,30 @@ new FloatRightStrategy(() => target.getRectangle(), {
 
 ### NotCrossingStrategy
 
-Free-form positioning that prevents draggables from overlapping. Items can be placed anywhere within the target but will not intersect.
+Free-form positioning that prevents draggables from overlapping. Items can be placed anywhere within the tray but will not intersect.
 
 ```javascript
 import { NotCrossingStrategy } from 'dragee'
 
-new NotCrossingStrategy(() => target.getRectangle())
+new NotCrossingStrategy(() => tray.getRectangle())
 ```
 
 ---
 
 ## Scope
 
-Scope groups draggables and targets together, managing which draggables can interact with which targets. Without explicit scoping, all instances share a single `defaultScope`.
+Scope groups draggables and trays together, managing which draggables can interact with which trays. Without explicit scoping, all instances share a single `defaultScope`.
 
 ### scope() Helper
 
 The simplest way to create an isolated scope. Everything created inside the callback automatically belongs to the same scope. `scope()` calls can be nested: instances join the innermost one.
 
 ```javascript
-import { scope, Draggable, Target } from 'dragee'
+import { scope, Draggable, Tray } from 'dragee'
 
 const kanbanScope = scope(() => {
   const cards = items.map(el => new Draggable(el))
-  const columns = columnEls.map(el => new Target(el, cards))
+  const columns = columnEls.map(el => new Tray(el, cards))
 })
 
 kanbanScope.on('scope:change', ({ detail: { draggable } }) => {
@@ -457,7 +457,7 @@ kanbanScope.on('scope:change', ({ detail: { draggable } }) => {
 })
 ```
 
-Only instances created while the callback runs join the scope. For ones created later, for example after an `await` or from an "Add card" button, pass the scope explicitly and let the targets accept them:
+Only instances created while the callback runs join the scope. For ones created later, for example after an `await` or from an "Add card" button, pass the scope explicitly and let the trays accept them:
 
 ```javascript
 const card = new Draggable(el, { scope: kanbanScope })
@@ -469,7 +469,7 @@ columns.forEach((column) => column.accept(card))
 ```javascript
 import { Scope } from 'dragee'
 
-const myScope = new Scope(draggables, targets, { timeEnd: 400 })
+const myScope = new Scope(draggables, trays, { timeEnd: 400 })
 ```
 
 #### Options
@@ -483,17 +483,17 @@ const myScope = new Scope(draggables, targets, { timeEnd: 400 })
 | Method | Signature | Description |
 | --- | --- | --- |
 | `addDraggable` | `(draggable)` | Move a draggable into this scope (it leaves its previous scope) |
-| `addTarget` | `(target)` | Move a target into this scope (it leaves its previous scope) |
-| `reset` | `()` | Reset all targets to initial state |
-| `refresh` | `()` | Refresh all draggables and targets |
+| `addTray` | `(tray)` | Move a tray into this scope (it leaves its previous scope) |
+| `reset` | `()` | Reset all trays to initial state |
+| `refresh` | `()` | Refresh all draggables and trays |
 
 #### Properties
 
 | Property | Type | Description |
 | --- | --- | --- |
 | `draggables` | `Draggable[]` | All draggables in scope |
-| `targets` | `Target[]` | All targets in scope |
-| `positions` | `number[][]` | Get/set draggable indexes per target |
+| `trays` | `Tray[]` | All trays in scope |
+| `positions` | `number[][]` | Get/set draggable indexes per tray |
 
 #### Events
 
@@ -579,7 +579,7 @@ indexOfNearestPoint(pointArray, target, radius, distanceFn?)
 
 ## Events
 
-Every dragee instance (`Draggable`, `List`, `BubblingList`, `Target`, `Scope`) is a standard [`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget). Listeners receive a `CustomEvent`; the payload is in `event.detail`.
+Every dragee instance (`Draggable`, `List`, `BubblingList`, `Tray`, `Scope`) is a standard [`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget). Listeners receive a `CustomEvent`; the payload is in `event.detail`.
 
 ```javascript
 draggable.addEventListener('drag:end', (event) => console.log(event.detail.draggable))
@@ -610,14 +610,15 @@ new Draggable(el, {
 })
 ```
 
-`Draggable`, `List` and `Target` also dispatch bubbling `dragee:*` DOM events (see their Events tables); disable them with the `domEvents: false` option.
+`Draggable`, `List` and `Tray` also dispatch bubbling `dragee:*` DOM events (see their Events tables); disable them with the `domEvents: false` option.
 
 ---
 
 ## Migrating from 1.x
 
 - **Browser support:** Chrome / Edge 90+, Firefox 86+, Safari 15+ are required (see [Browser support](#browser-support)).
-- **Listeners receive an `Event`.** Read the payload from `event.detail`: `target.on('target:add', ({ detail: { draggable } }) => {})` instead of `target.on('target:add', (draggable) => {})`.
+- **Listeners receive an `Event`.** Read the payload from `event.detail`: `tray.on('tray:add', ({ detail: { draggable } }) => {})` instead of `target.on('target:add', (draggable) => {})`.
+- **`Target` is renamed to `Tray`**, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data.
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.
 

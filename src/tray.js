@@ -9,7 +9,7 @@ import { scopes, currentScope } from './scope'
 import { FloatLeftStrategy } from './positioning'
 import { BoundToElement } from './bounding'
 
-export default class Target extends EventEmitter {
+export default class Tray extends EventEmitter {
   constructor(element, draggables, options = {}) {
     super(options)
 
@@ -33,7 +33,7 @@ export default class Target extends EventEmitter {
     draggables.forEach((draggable) => this.accept(draggable))
 
     const scope = options.scope || currentScope()
-    scope.addTarget(this)
+    scope.addTray(this)
 
     this.startBounding()
     this.init()
@@ -71,7 +71,7 @@ export default class Target extends EventEmitter {
         return draggable.getRectangle()
       }), indexesOfNew)
       this.setPosition(rectangles, indexesOfNew)
-      this.innerDraggables.forEach((draggable) => this.emitTargetEvent('add', draggable))
+      this.innerDraggables.forEach((draggable) => this.emitTrayEvent('add', draggable))
     }
   }
 
@@ -83,11 +83,11 @@ export default class Target extends EventEmitter {
     if (this.options.catchDraggable) {
       return this.options.catchDraggable(this, draggable)
     } else {
-      const targetRectangle = this.getRectangle()
+      const trayRectangle = this.getRectangle()
       const draggableSquare = draggable.getRectangle().getSquare()
 
-      return draggableSquare < targetRectangle.getSquare()
-              && targetRectangle.includePoint(draggable.getCenter())
+      return draggableSquare < trayRectangle.getSquare()
+              && trayRectangle.includePoint(draggable.getCenter())
     }
   }
 
@@ -101,7 +101,7 @@ export default class Target extends EventEmitter {
 
   destroy() {
     this.listeners.abort()
-    scopes.forEach((scope) => removeItem(scope.targets, this))
+    scopes.forEach((scope) => removeItem(scope.trays, this))
   }
 
   refresh() {
@@ -120,7 +120,7 @@ export default class Target extends EventEmitter {
       return false
     }
 
-    this.emitTargetEvent('beforeAdd', draggable)
+    this.emitTrayEvent('beforeAdd', draggable)
 
     this.innerDraggables = this.sorting(this.innerDraggables, [draggable], newDraggablesIndex)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
@@ -129,7 +129,7 @@ export default class Target extends EventEmitter {
 
     this.setPosition(rectangles, newDraggablesIndex)
     if (this.innerDraggables.indexOf(draggable) !== -1) {
-      this.emitTargetEvent('add', draggable)
+      this.emitTrayEvent('add', draggable)
     }
     return true
   }
@@ -142,7 +142,7 @@ export default class Target extends EventEmitter {
       if (rect.removable) {
         draggable.move(draggable.initialPosition, timeEnd, true, true)
         removeItem(this.innerDraggables, draggable)
-        this.emitTargetEvent('remove', draggable)
+        this.emitTrayEvent('remove', draggable)
       } else {
         draggable.move(rect.position, timeEnd, true, true)
       }
@@ -152,7 +152,7 @@ export default class Target extends EventEmitter {
   add(draggable, time) {
     const newDraggablesIndex = this.innerDraggables.length
 
-    this.emitTargetEvent('beforeAdd', draggable)
+    this.emitTrayEvent('beforeAdd', draggable)
 
     this.accept(draggable)
     this.pushInnerDraggable(draggable)
@@ -162,7 +162,7 @@ export default class Target extends EventEmitter {
 
     this.setPosition(rectangles, [newDraggablesIndex], time || 0)
     if (this.innerDraggables.indexOf(draggable) !== -1) {
-      this.emitTargetEvent('add', draggable)
+      this.emitTrayEvent('add', draggable)
     }
   }
 
@@ -176,7 +176,7 @@ export default class Target extends EventEmitter {
     if (this.draggables.includes(draggable)) return
 
     this.draggables.push(draggable)
-    draggable.targets.push(this)
+    draggable.trays.push(this)
     draggable.addEventListener('drag:move', () => this.remove(draggable), { signal: this.listeners.signal })
   }
 
@@ -193,13 +193,13 @@ export default class Target extends EventEmitter {
     }), [])
 
     this.setPosition(rectangles, [])
-    this.emitTargetEvent('remove', draggable)
+    this.emitTrayEvent('remove', draggable)
   }
 
   reset() {
     this.innerDraggables.forEach((draggable) => {
       draggable.move(draggable.initialPosition, 0, true, true)
-      this.emitTargetEvent('remove', draggable)
+      this.emitTrayEvent('remove', draggable)
     })
     this.innerDraggables = []
   }
@@ -208,13 +208,13 @@ export default class Target extends EventEmitter {
     return this.innerDraggables.slice()
   }
 
-  emitTargetEvent(type, draggable) {
-    const detail = { target: this, draggable }
-    this.emit(`target:${type}`, detail)
+  emitTrayEvent(type, draggable) {
+    const detail = { tray: this, draggable }
+    this.emit(`tray:${type}`, detail)
 
     if (this.domEvents) {
       const domType = type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
-      dispatchDomEvent(this.element, `dragee:target-${domType}`, detail)
+      dispatchDomEvent(this.element, `dragee:tray-${domType}`, detail)
     }
   }
 

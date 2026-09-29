@@ -1003,24 +1003,24 @@
                 <script>
                     window.addEventListener("load", function(){
                         const root = document.getElementById("DemoTargetA"),
-                              targetAreaElement = root.getElementsByClassName("area-a")[0],
-                              targetElements = targetAreaElement.getElementsByClassName("target"),
-                              draggableElements = targetAreaElement.getElementsByClassName("draggable"),
+                              trayAreaElement = root.getElementsByClassName("area-a")[0],
+                              trayElements = trayAreaElement.getElementsByClassName("target"),
+                              draggableElements = trayAreaElement.getElementsByClassName("draggable"),
                               classForTargets = ["green", "red", "blue"];
                               strategies = [Dragee.FloatLeftStrategy, Dragee.FloatLeftStrategy, Dragee.FloatRightStrategy]
 
                         draggables = [...draggableElements].map((element, i) => {
                             return new Dragee.Draggable(element, {
-                              container: targetAreaElement
+                              container: trayAreaElement
                             })
                           }
                         )
 
-                        targets = [...targetElements].map((element, i) => {
-                            const target = new Dragee.Target(element, draggables, {
-                              container: targetAreaElement,
+                        trays = [...trayElements].map((element, i) => {
+                            const tray = new Dragee.Tray(element, draggables, {
+                              container: trayAreaElement,
                               strategy: new strategies[i](
-                                () => target.getRectangle(),
+                                () => tray.getRectangle(),
                                 {
                                   radius: 80,
                                   getDistance: Dragee.transformedSpaceDistanceFactory({ x: 1, y: 4 }),
@@ -1030,10 +1030,10 @@
                                 }
                               ),
                               on: {
-                                'target:add': ({ detail: { draggable } }) => {
+                                'tray:add': ({ detail: { draggable } }) => {
                                   draggable.element.classList.add(classForTargets[i]);
                                 },
-                                'target:remove': ({ detail: { draggable } }) => {
+                                'tray:remove': ({ detail: { draggable } }) => {
                                   draggable.element.classList.remove(classForTargets[i]);
                                 }
                               }
@@ -1193,34 +1193,34 @@
                 </style>
                 <script>
                     window.addEventListener("load", function(){
-                        var targetManger, draggables, targets,
+                        var draggables, trays,
                             root = document.getElementById("DemoTargetB"),
-                            targetAreaElement = root.getElementsByClassName("area-a")[0],
-                            targetElements = targetAreaElement.getElementsByClassName("target"),
-                            draggableElements = targetAreaElement.getElementsByClassName("draggable");
+                            trayAreaElement = root.getElementsByClassName("area-a")[0],
+                            trayElements = trayAreaElement.getElementsByClassName("target"),
+                            draggableElements = trayAreaElement.getElementsByClassName("draggable");
 
                         draggables = Array.prototype.slice.call(draggableElements).map(function(element, i){
                             return new Dragee.Draggable(element, {
-                              container: targetAreaElement
+                              container: trayAreaElement
                             });
                         });
 
-                        targets = Array.prototype.slice.call(targetElements).map(function(element, i){
-                            var target = new Dragee.Target(element, draggables, {
-                                container: targetAreaElement,
+                        trays = Array.prototype.slice.call(trayElements).map(function(element, i){
+                            var tray = new Dragee.Tray(element, draggables, {
+                                container: trayAreaElement,
                                 strategy: new Dragee.NotCrossingStrategy(function(){
-                                  return target.getRectangle();
+                                  return tray.getRectangle();
                                 }),
                                 on: {
-                                  'target:add': function({ detail: { draggable } }) {
+                                  'tray:add': function({ detail: { draggable } }) {
                                     draggable.element.classList.add("ontarget")
                                   },
-                                  'target:remove': function({ detail: { draggable } }) {
+                                  'tray:remove': function({ detail: { draggable } }) {
                                     draggable.element.classList.remove("ontarget")
                                   }
                                 }
                             });
-                            return target;
+                            return tray;
                         });
                     });
                 </script>

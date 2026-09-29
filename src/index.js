@@ -3,7 +3,7 @@ import Rectangle from './geometry/rectangle'
 import Draggable from './draggable'
 import List from './list'
 import BubblingList from './bubblingList'
-import Target from './target'
+import Tray from './tray'
 import { scopes, defaultScope, Scope, scope } from './scope'
 import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './positioning'
 
@@ -31,7 +31,7 @@ export {
   Point, Rectangle,
   List,
   BubblingList,
-  Target,
+  Tray,
   scopes, defaultScope, Scope, scope,
   NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy,
   Bound, BoundToRectangle, BoundToElement,
