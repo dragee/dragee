@@ -85,18 +85,32 @@ export default class Draggable extends EventEmitter {
 
   startPositioning() {
     this._setDefaultTransition()
-    this.offset = this.isConsiderTransformOffset
-      ? Point.elementBoundingOffset(this.element, this.container)
-      : Point.elementOffset(this.element, this.container)
+    this.offset = this.measureOffset()
     this.pinnedPosition = this.offset
     this.position = this.offset
     this.initialPosition = this.options.position || this.offset
 
     this.pinPosition(this.initialPosition)
+    this.refresh()
+  }
 
-    if (this.bounding.refresh) {
-      this.bounding.refresh()
+  remeasure() {
+    const isAtInitialPosition = this.position.compare(this.initialPosition)
+    this.offset = this.measureOffset()
+    this.initialPosition = this.options.position || this.offset
+
+    if (isAtInitialPosition) {
+      this.pinPosition(this.initialPosition)
+    } else {
+      this.setPosition(this.position)
     }
+    this.refresh()
+  }
+
+  measureOffset() {
+    return this.isConsiderTransformOffset
+      ? Point.elementBoundingOffset(this.element, this.container).sub(this._transformPosition || new Point(0, 0))
+      : Point.elementOffset(this.element, this.container)
   }
 
   startListening() {

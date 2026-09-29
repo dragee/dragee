@@ -1,12 +1,22 @@
 import Draggable from '../src/draggable'
 
 // jsdom doesn't ship ResizeObserver; mock it so List/BubblingList can be constructed
+const resizeObservers = []
+
 class MockResizeObserver {
+  constructor(callback) {
+    this.callback = callback
+    resizeObservers.push(this)
+  }
   observe() {}
   unobserve() {}
   disconnect() {}
 }
 window.ResizeObserver = MockResizeObserver
+
+export function triggerResize() {
+  resizeObservers.forEach((observer) => observer.callback([]))
+}
 
 // Track every draggable created via this SDK so `cleanup()` can destroy them all
 const tracked = []
@@ -77,5 +87,6 @@ export const endDrag = mouseUp
 export function cleanup() {
   tracked.forEach((d) => d.destroy())
   tracked.length = 0
+  resizeObservers.length = 0
   document.body.innerHTML = ''
 }

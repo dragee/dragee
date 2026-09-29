@@ -1,5 +1,6 @@
 import range from './utils/range.js'
 import removeItem from './utils/remove-array-item.js'
+import debounce from './utils/debounce.js'
 import EventEmitter from './eventEmitter.js'
 import Rectangle from './geometry/rectangle.js'
 import { transformedSpaceDistanceFactory } from './geometry/distances.js'
@@ -36,6 +37,23 @@ export default class Tray extends EventEmitter {
 
     this.startBounding()
     this.init()
+
+    this.lastPosition = this.getPosition()
+    this.resizeObserver = new ResizeObserver(debounce(() => this.onResize(), 100))
+    this.resizeObserver.observe(this.element)
+    if (this.container) {
+      this.resizeObserver.observe(this.container)
+    }
+  }
+
+  onResize() {
+    const position = this.getPosition()
+    const shift = position.sub(this.lastPosition)
+    this.lastPosition = position
+
+    this.draggables.filter((draggable) => !draggable.isDragging).forEach((draggable) => draggable.remeasure())
+    this.innerDraggables.forEach((draggable) => draggable.setPosition(draggable.position.add(shift)))
+    this.refresh()
   }
 
   startBounding() {
@@ -100,6 +118,7 @@ export default class Tray extends EventEmitter {
 
   destroy() {
     this.listeners.abort()
+    this.resizeObserver.disconnect()
     scopes.forEach((scope) => removeItem(scope.trays, this))
   }
 
@@ -163,7 +182,7 @@ export default class Tray extends EventEmitter {
     this.pushInnerDraggable(draggable)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
       return draggable.getRectangle()
-    }), newDraggablesIndex, draggable)
+    }), [newDraggablesIndex])
 
     this.setPosition(rectangles, [newDraggablesIndex], time || 0)
     if (this.innerDraggables.indexOf(draggable) !== -1) {

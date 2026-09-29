@@ -27,6 +27,7 @@
 - the `gap` option for `BubblingList`; `verticalGap` is an alias for it. An explicit `0` gap is now respected instead of triggering auto-detection
 - the `scope` option for `Draggable` and `Tray` to join a given scope, e.g. for instances created after `scope()` has returned
 - `Tray.accept(draggable)` lets a draggable be dropped into a tray without placing it there, e.g. for draggables created after the tray
+- `Draggable.remeasure()` re-reads the element's place in the layout; a draggable at its initial position moves to the new one, others keep their position
 
 ### Fixed
 - `Scope.addDraggable()` / `addTarget()` left the instance in its previous scope as well (e.g. `defaultScope`)
@@ -36,6 +37,8 @@
 - a draggable outside lists and targets did not update its `pinnedPosition` on drop
 - targets created inside `scope()` were added to the default scope too
 - `Draggable.destroy()` did not remove the draggable from its scope (this also leaked the clone used for touch drag emulation)
+- `Tray` (`Target` in 1.x) did not react to layout changes such as window resize: its draggables kept stale offsets and positions. It now re-measures them and lays them out again
+- `Tray.add()` crashed with `NotCrossingStrategy` (the index of the new draggable was passed as a number instead of an array)
 - `BubblingList.remove()` detected the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
 - swapped `leftDirection` / `rightDirection` flags in `Draggable` (moving right used to set `leftDirection`)
 

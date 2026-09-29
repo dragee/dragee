@@ -125,6 +125,7 @@ Lists and scopes place their draggables through the same event and leave the dro
 | `setPosition` | `(point)` | Set position instantly, no animation |
 | `resetPositionToInitial` | `()` | Return to the initial position |
 | `refreshPosition` | `()` | Re-read and re-apply current position |
+| `remeasure` | `()` | Re-read the element's place in the layout after it changed; a draggable at its initial position moves to the new one, others keep their position |
 | `getPosition` | `()` → `Point` | Get current position |
 | `getCenter` | `()` → `Point` | Get center point of element |
 | `getSize` | `()` → `Point` | Get element dimensions (width, height) |
@@ -311,7 +312,7 @@ Uses `getYDifference` (or `getXDifference` when `axis: 'x'`) as the default dist
 
 ## Tray
 
-A container that draggables are dropped into: it accepts them, lays them out with a positioning strategy and releases a draggable as soon as it is dragged away.
+A container that draggables are dropped into: it accepts them, lays them out with a positioning strategy and releases a draggable as soon as it is dragged away. When the layout changes, for example on window resize, a tray re-measures its draggables and lays them out again.
 
 ```javascript
 import { Tray, Draggable, FloatLeftStrategy, transformedSpaceDistanceFactory } from 'dragee'

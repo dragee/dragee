@@ -1,6 +1,7 @@
 import Tray from '../src/tray'
 import Point from '../src/geometry/point'
-import { createContainer, createDraggable, createDraggables, simulateDrag, endDrag, cleanup } from './testing-sdk'
+import { FloatLeftStrategy, NotCrossingStrategy } from '../src/positioning'
+import { createContainer, createDraggable, createDraggables, simulateDrag, endDrag, triggerResize, cleanup } from './testing-sdk'
 
 afterEach(cleanup)
 
@@ -93,6 +94,78 @@ describe('Tray', () => {
 
     expect(tray.getSortedDraggables()).not.toContain(draggable)
     expect(draggable.position).toEqual(new Point(0, 0))
+    tray.destroy()
+  })
+})
+
+describe('Tray on page resize', () => {
+  let layout
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+    layout = { trayLeft: 0, trayWidth: 300, cardLeft: 0 }
+  })
+
+  afterEach(() => jest.useRealTimers())
+
+  function createResizableSetup(createStrategy, cardCount = 1) {
+    const container = createContainer()
+    const trayElement = document.createElement('div')
+    container.appendChild(trayElement)
+    trayElement.getBoundingClientRect = () => ({ left: layout.trayLeft, top: 0, width: layout.trayWidth, height: 200 })
+
+    const cards = Array.from({ length: cardCount }, () => {
+      const element = document.createElement('div')
+      container.appendChild(element)
+      element.getBoundingClientRect = () => ({ left: 0, top: 0, width: 100, height: 30 })
+      Object.defineProperty(element, 'offsetLeft', { get: () => layout.cardLeft })
+      return createDraggable({ element, container })
+    })
+    const tray = new Tray(trayElement, cards, {
+      container,
+      strategy: createStrategy && createStrategy(() => tray.getRectangle())
+    })
+    return { tray, cards }
+  }
+
+  function resize(changes) {
+    Object.assign(layout, changes)
+    triggerResize()
+    jest.advanceTimersByTime(100)
+  }
+
+  it('should lay out its draggables again to fit the resized tray', () => {
+    const { tray, cards: [first, second] } = createResizableSetup((rectangle) => new FloatLeftStrategy(rectangle, { paddingTopLeft: new Point(10, 10) }), 2)
+    tray.add(first)
+    tray.add(second)
+    expect(second.position.y).toBe(first.position.y)
+
+    resize({ trayLeft: 100, trayWidth: 150, cardLeft: 50 })
+
+    expect(first.position).toEqual(new Point(110, 10))
+    expect(first.element.style.transform).toBe('translate3d(60px, 10px, 0px)')
+    expect(second.position.y).toBeGreaterThan(first.position.y)
+    tray.destroy()
+  })
+
+  it('should keep draggables where they lie inside a tray that moved', () => {
+    const { tray, cards: [card] } = createResizableSetup((rectangle) => new NotCrossingStrategy(rectangle))
+    card.setPosition(new Point(20, 20))
+    tray.add(card)
+
+    resize({ trayLeft: 100 })
+
+    expect(card.position).toEqual(new Point(120, 20))
+    tray.destroy()
+  })
+
+  it('should move a draggable lying outside the tray to its new place in the layout', () => {
+    const { tray, cards: [card] } = createResizableSetup()
+
+    resize({ cardLeft: 30 })
+
+    expect(card.position).toEqual(new Point(30, 0))
+    expect(card.element.style.transform).toBe('translate3d(0px, 0px, 0px)')
     tray.destroy()
   })
 })
