@@ -1,4 +1,4 @@
-import Point from './point'
+import Point from './point.js'
 
 export default class Rectangle {
   constructor(position, size) {

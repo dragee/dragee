@@ -1,12 +1,12 @@
 import range from './utils/range.js'
-import removeItem from './utils/remove-array-item'
-import EventEmitter from './eventEmitter'
-import Rectangle from './geometry/rectangle'
-import { transformedSpaceDistanceFactory } from './geometry/distances'
-import { scopes, currentScope } from './scope'
+import removeItem from './utils/remove-array-item.js'
+import EventEmitter from './eventEmitter.js'
+import Rectangle from './geometry/rectangle.js'
+import { transformedSpaceDistanceFactory } from './geometry/distances.js'
+import { scopes, currentScope } from './scope.js'
 
-import { FloatLeftStrategy } from './positioning'
-import { BoundToElement } from './bounding'
+import { FloatLeftStrategy } from './positioning.js'
+import { BoundToElement } from './bounding.js'
 
 export default class Tray extends EventEmitter {
   constructor(element, draggables, options = {}) {

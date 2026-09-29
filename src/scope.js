@@ -1,5 +1,5 @@
-import removeItem from './utils/remove-array-item'
-import EventEmitter from './eventEmitter'
+import removeItem from './utils/remove-array-item.js'
+import EventEmitter from './eventEmitter.js'
 
 const scopes = []
 const scopeStack = []

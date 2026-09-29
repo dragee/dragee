@@ -1,5 +1,5 @@
-import Point from './point'
-import { getDistance } from './distances'
+import Point from './point.js'
+import { getDistance } from './distances.js'
 
 export function clamp(min, max, val) {
   return Math.max(min, Math.min(max, val))

@@ -1,12 +1,12 @@
-import debounce from './utils/debounce'
-import removeItem from './utils/remove-array-item'
-import EventEmitter from './eventEmitter'
+import debounce from './utils/debounce.js'
+import removeItem from './utils/remove-array-item.js'
+import EventEmitter from './eventEmitter.js'
 import {
   getDistance,
   indexOfNearestPoint
-} from './geometry/distances'
+} from './geometry/distances.js'
 
-import Draggable from './draggable'
+import Draggable from './draggable.js'
 
 export default class List extends EventEmitter {
   constructor(draggables, options={}) {

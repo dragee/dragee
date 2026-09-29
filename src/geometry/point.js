@@ -1,4 +1,4 @@
-import getParentsChain from '../utils/get-parents-chain'
+import getParentsChain from '../utils/get-parents-chain.js'
 
 /** Class representing a point. */
 export default class Point {

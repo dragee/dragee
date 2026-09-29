@@ -106,13 +106,15 @@
                         background-color: #ffc40d;
                     }
                 </style>
-                <script>
-                    window.addEventListener("load", function(){
-                        const root = document.getElementById("DemoDraggable");
-                        root.querySelectorAll(".draggable").forEach((draggableElement) => {
-                            new Dragee.Draggable(draggableElement, {
-                              shouldRemoveZeroTranslate: true,
-                              bounding: new Dragee.BoundToElement(draggableElement.offsetParent, draggableElement.offsetParent)
+                <script type="module">
+                    import { Draggable, BoundToElement } from '../src/index.js'
+
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoDraggable')
+                        root.querySelectorAll('.draggable').forEach((draggableElement) => {
+                            new Draggable(draggableElement, {
+                                shouldRemoveZeroTranslate: true,
+                                bounding: new BoundToElement(draggableElement.offsetParent, draggableElement.offsetParent)
                             })
                         })
                     })
@@ -163,29 +165,28 @@
                         color: #222;
                     }
                 </style>
-                <script>
-                    window.addEventListener("load", function(){
-                        const root = document.getElementById("DemoDraggableThreshold")
-                        const el = root.querySelector(".draggable")
-                        const status = root.querySelector(".threshold-status span")
+                <script type="module">
+                    import { Draggable, BoundToElement } from '../src/index.js'
 
-                        const draggable = new Dragee.Draggable(el, {
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoDraggableThreshold')
+                        const element = root.querySelector('.draggable')
+                        const status = root.querySelector('.threshold-status span')
+
+                        const draggable = new Draggable(element, {
                             dragStartThreshold: 10,
                             shouldRemoveZeroTranslate: true,
-                            bounding: new Dragee.BoundToElement(el.offsetParent, el.offsetParent)
+                            bounding: new BoundToElement(element.offsetParent, element.offsetParent)
                         })
 
-                        draggable.on('drag:start', function(){ status.textContent = 'drag started' })
-                        draggable.on('drag:end',   function(){ status.textContent = 'drag ended' })
-                        el.addEventListener('click', function(){ status.textContent = 'click (below threshold)' })
+                        draggable.on('drag:start', () => { status.textContent = 'drag started' })
+                        draggable.on('drag:end', () => { status.textContent = 'drag ended' })
+                        element.addEventListener('click', () => { status.textContent = 'click (below threshold)' })
                     })
                 </script>
             </div>
             <div class="span6 demo-span">
-                <pre class="prettyprint lang-js">const draggable = new Dragee.Draggable(element, {
-    // drag only activates after the pointer
-    // travels this many pixels — a small jiggle
-    // is treated as a click, not a drag
+                <pre class="prettyprint lang-js">const draggable = new Draggable(element, {
     dragStartThreshold: 10
 })</pre>
             </div>
@@ -257,31 +258,33 @@
                         color: #222;
                     }
                 </style>
-                <script>
-                    window.addEventListener("load", function(){
-                        const root = document.getElementById("DemoCancelDragStart")
-                        const board = root.querySelector(".board")
-                        const readOnly = root.querySelector(".read-only")
-                        const status = root.querySelector(".status span")
+                <script type="module">
+                    import { Draggable, BoundToElement } from '../src/index.js'
+
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoCancelDragStart')
+                        const board = root.querySelector('.board')
+                        const readOnly = root.querySelector('.read-only')
+                        const status = root.querySelector('.status span')
                         let cardCount = board.children.length
 
-                        const withThreshold = root.querySelector(".with-threshold")
-                        const native = root.querySelector(".native")
+                        const withThreshold = root.querySelector('.with-threshold')
+                        const native = root.querySelector('.native')
                         let draggables = []
 
                         const makeDraggable = (element) => {
-                          draggables.push(new Dragee.Draggable(element, {
-                            container: board,
-                            bounding: new Dragee.BoundToElement(board, board),
-                            dragStartThreshold: withThreshold.checked ? 10 : 0,
-                            nativeDragAndDrop: native.checked
-                          }))
+                            draggables.push(new Draggable(element, {
+                                container: board,
+                                bounding: new BoundToElement(board, board),
+                                dragStartThreshold: withThreshold.checked ? 10 : 0,
+                                nativeDragAndDrop: native.checked
+                            }))
                         }
 
                         const makeDraggables = () => {
-                          draggables.forEach((draggable) => draggable.destroy())
-                          draggables = []
-                          board.querySelectorAll(".draggable").forEach(makeDraggable)
+                            draggables.forEach((draggable) => draggable.destroy())
+                            draggables = []
+                            board.querySelectorAll('.draggable').forEach(makeDraggable)
                         }
 
                         makeDraggables()
@@ -289,25 +292,25 @@
                         native.addEventListener('change', makeDraggables)
 
                         board.addEventListener('dragee:start', (event) => {
-                          const cardName = event.draggable.element.textContent
-                          if (readOnly.checked) {
-                            event.cancel()
-                            status.textContent = 'read-only, dragging ' + cardName + ' was canceled'
-                          } else {
-                            status.textContent = 'dragging ' + cardName
-                          }
+                            const cardName = event.draggable.element.textContent
+                            if (readOnly.checked) {
+                                event.cancel()
+                                status.textContent = 'read-only, dragging ' + cardName + ' was canceled'
+                            } else {
+                                status.textContent = 'dragging ' + cardName
+                            }
                         })
 
                         readOnly.addEventListener('change', () => {
-                          board.classList.toggle('read-only', readOnly.checked)
+                            board.classList.toggle('read-only', readOnly.checked)
                         })
 
-                        root.querySelector(".add-card").addEventListener('click', () => {
-                          const card = document.createElement('div')
-                          card.className = 'draggable'
-                          card.textContent = 'Card ' + (++cardCount)
-                          board.appendChild(card)
-                          makeDraggable(card)
+                        root.querySelector('.add-card').addEventListener('click', () => {
+                            const card = document.createElement('div')
+                            card.className = 'draggable'
+                            card.textContent = 'Card ' + (++cardCount)
+                            board.appendChild(card)
+                            makeDraggable(card)
                         })
                     })
                 </script>
@@ -379,52 +382,51 @@
                   z-index: 2;
                 }
               </style>
-              <script>
-                  window.addEventListener("load", function(){
-                      var draggableArea = document.querySelector(".draggable-area"),
-                          draggableAElement = draggableArea.querySelector(".draggable-a"),
-                          draggableBElement = draggableArea.querySelector(".draggable-b"),
-                          draggableRadius = 25;
+              <script type="module">
+                  import { Draggable, BoundToCircle, Point } from '../src/index.js'
 
-                      new Dragee.Draggable(draggableAElement, {
-                          bound: Dragee.BoundToCircle.bounding(new Dragee.Point(100, 90), 80),
-                          position: new Dragee.Point(100, 10)
-                      });
+                  window.addEventListener('load', () => {
+                      const draggableArea = document.querySelector('.draggable-area')
+                      const draggableAElement = draggableArea.querySelector('.draggable-a')
+                      const draggableBElement = draggableArea.querySelector('.draggable-b')
+                      const draggableRadius = 25
 
-                      function calculusFx(x) {
-                          x = x/100;
-                          return x * Math.sin(x * x) * 10 + 80;
+                      const calculusFx = (x) => {
+                          x = x / 100
+                          return x * Math.sin(x * x) * 10 + 80
                       }
 
-                      new Dragee.Draggable(draggableBElement, {
-                          bound(point, size) {
-                            var retPoint = point.clone()
-                            retPoint.y = calculusFx(point.x)
-                            return retPoint;
+                      new Draggable(draggableAElement, {
+                          bound: BoundToCircle.bounding(new Point(100, 90), 80),
+                          position: new Point(100, 10)
+                      })
+
+                      new Draggable(draggableBElement, {
+                          bound(point) {
+                              const boundPoint = point.clone()
+                              boundPoint.y = calculusFx(point.x)
+                              return boundPoint
                           },
-                          position: new Dragee.Point(210, calculusFx(210))
-                      });
+                          position: new Point(210, calculusFx(210))
+                      })
 
-                      var canvas = document.getElementById("myCanvas");
-                      var context = canvas.getContext("2d");
+                      const context = document.getElementById('myCanvas').getContext('2d')
 
-                      context.lineWidth = 2;
-                      context.strokeStyle = '#55bb55';
-                      context.beginPath();
-                      context.arc(100 + draggableRadius, 90 + draggableRadius, 80, 0, 2 * Math.PI);
-                      context.stroke();
+                      context.lineWidth = 2
+                      context.strokeStyle = '#55bb55'
+                      context.beginPath()
+                      context.arc(100 + draggableRadius, 90 + draggableRadius, 80, 0, 2 * Math.PI)
+                      context.stroke()
                       context.closePath()
-                      context.moveTo(-1, 0);
+                      context.moveTo(-1, 0)
 
-                      context.strokeStyle = '#ffbb55';
-                      context.beginPath();
-                      var x, y;
-                      for(x=-26; x<=726; x+=1){
-                       y = calculusFx(x) + draggableRadius;
-                       context.lineTo(x + draggableRadius, y);
-                      }
-                      context.stroke();
-                  });
+                      context.strokeStyle = '#ffbb55'
+                      context.beginPath()
+                      Array.from({ length: 753 }, (_, i) => i - 26).forEach((x) => {
+                          context.lineTo(x + draggableRadius, calculusFx(x) + draggableRadius)
+                      })
+                      context.stroke()
+                  })
               </script>
           </div>
           <div class="span7 demo-span">
@@ -476,69 +478,56 @@
                   box-sizing: border-box;
                 }
               </style>
-              <script>
-                  window.addEventListener("load", function(){
-                      var draggableArea = document.querySelector(".chess-desk"),
-                          draggableAElement = draggableArea.querySelector(".draggable-a")
+              <script type="module">
+                  import { Draggable, BoundToRectangle, Point, Rectangle } from '../src/index.js'
 
-                      const Point = Dragee.Point
-                      const Rectangle = Dragee.Rectangle
+                  window.addEventListener('load', () => {
+                      const draggableAElement = document.querySelector('.chess-desk .draggable-a')
 
                       const settings = {
-                        cellSize: 60,
-                        rowNumber: 8,
-                        colNumber: 8
+                          cellSize: 60,
+                          rowNumber: 8,
+                          colNumber: 8
                       }
 
-                      class BoundToCells extends Dragee.BoundToRectangle {
+                      const boardRectangle = ({ cellSize, rowNumber, colNumber }) => new Rectangle(
+                          new Point(0, 0),
+                          new Point(cellSize * rowNumber, cellSize * colNumber)
+                      )
+
+                      class BoundToCells extends BoundToRectangle {
                           constructor(settings) {
-                              const rectangle = new Rectangle(
-                                  new Point(0, 0),
-                                  new Point(
-                                      settings.cellSize * settings.rowNumber,
-                                      settings.cellSize * settings.colNumber
-                                  )
-                              )
-                              super(rectangle)
+                              super(boardRectangle(settings))
                               this.settings = settings
                           }
 
-                          bound (point, size) {
-                              point = new Dragee.Point(
-                                Math.round(point.x / this.settings.cellSize) * this.settings.cellSize,
-                                Math.round(point.y / this.settings.cellSize) * this.settings.cellSize
+                          bound(point, size) {
+                              const { cellSize } = this.settings
+                              const cellPoint = new Point(
+                                  Math.round(point.x / cellSize) * cellSize,
+                                  Math.round(point.y / cellSize) * cellSize
                               )
-                              return super.bound(point, size)
+                              return super.bound(cellPoint, size)
                           }
 
-                          refresh () {
-                            this.rectangle = new Rectangle(
-                              new Point(0, 0),
-                              new Point(
-                                this.settings.cellSize * this.settings.rowNumber,
-                                this.settings.cellSize * this.settings.colNumber
-                              )
-                            )
+                          refresh() {
+                              this.rectangle = boardRectangle(this.settings)
                           }
                       }
 
-                      new Dragee.Draggable(draggableAElement, {
-                          position: new Dragee.Point(180, 0),
+                      new Draggable(draggableAElement, {
+                          position: new Point(180, 0),
                           bound: BoundToCells.bounding(settings)
                       })
 
-                      var canvas = document.getElementById("chessCanvas")
-                      var context = canvas.getContext("2d")
+                      const context = document.getElementById('chessCanvas').getContext('2d')
+                      const cells = Array.from({ length: 8 }, (_, index) => index)
 
-                      for (var i = 0; i < 8; i++) {
-                          for (var j = 0; j < 8; j++) {
-                              context.beginPath();
-                              context.fillStyle = ["#eeeed2", "#630"][(i + j) % 2];
-                              context.fillRect(j * 60, i * 60, 60, 60);
-                              context.closePath();
-                          }
-                      }
-                  });
+                      cells.forEach((row) => cells.forEach((col) => {
+                          context.fillStyle = ['#eeeed2', '#630'][(row + col) % 2]
+                          context.fillRect(col * 60, row * 60, 60, 60)
+                      }))
+                  })
               </script>
           </div>
       </div>
@@ -689,77 +678,62 @@
                       cursor: pointer;
                     }
                 </style>
-                <script>
-                    window.addEventListener("load", function(){
-                        var root = document.getElementById("DemoList"),
-                            listAParentElement = root.getElementsByClassName("list-a")[0],
-                            listAElements = listAParentElement.getElementsByTagName("li"),
-                            listBParentElement = root.getElementsByClassName("list-b")[0],
-                            listBElements = listBParentElement.getElementsByTagName("li"),
-                            listCParentElement = root.getElementsByClassName("list-c")[0],
-                            listCElements = listCParentElement.getElementsByTagName("li");
+                <script type="module">
+                    import { Draggable, List, BubblingList } from '../src/index.js'
 
-                        const listA = new Dragee.BubblingList(Array.from(listAElements).map((element) => {
-                          return new Dragee.Draggable(element, {
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoList')
+                        const listAParentElement = root.querySelector('.list-a')
+                        const listBParentElement = root.querySelector('.list-b')
+                        const listCParentElement = root.querySelector('.list-c')
+
+                        const listA = new BubblingList(Array.from(listAParentElement.querySelectorAll('li'), (element) => new Draggable(element, {
                             handler: '.handler',
                             nativeDragAndDrop: true,
                             emulateNativeDragAndDropOnTouch: true,
                             container: document.body
-                          })
-                        }), { radius: 10 })
+                        })), { radius: 10 })
 
-                        const listB = new Dragee.List(Array.from(listBElements).map((element) => {
-                          return new Dragee.Draggable(element)
-                        }))
+                        new List(Array.from(listBParentElement.querySelectorAll('li'), (element) => new Draggable(element)))
 
-                        listA.on('list:change', () => console.log("List changed"))
+                        listA.on('list:change', () => console.log('List changed'))
 
-                        // List C Example
-
-                        const initListItem = (listItem) => {
-                          const removeButton = listItem.querySelector('.remove')
-
-                          listItem.addEventListener('click', (event) => {
-                            if(!listItem.classList.contains('dragee-active')) {
-                              listItem.classList.toggle('expanded')
-                            }
-                          })
-
-                          removeButton.addEventListener('click', (event) => {
-                            draggable = listC.draggables.find((d) => d.element == listItem)
-                            listCParentElement.removeChild(listItem)
-                            listC.remove(draggable)
-                          })
-                        }
-
-                        [...listCElements].forEach((listItem) => initListItem(listItem))
-
-                        const listC = new Dragee.BubblingList(Array.from(listCElements).map((element) => {
-                          return new Dragee.Draggable(element, {
+                        const listC = new BubblingList(Array.from(listCParentElement.querySelectorAll('li'), (element) => new Draggable(element, {
                             container: listCParentElement,
                             nativeDragAndDrop: true
-                          })
-                        }), { reorderOnChange: true })
+                        })), { reorderOnChange: true })
 
-                        const addButton = document.querySelector(".list-c-add-tem")
+                        const initListItem = (listItem) => {
+                            listItem.addEventListener('click', () => {
+                                if (!listItem.classList.contains('dragee-active')) {
+                                    listItem.classList.toggle('expanded')
+                                }
+                            })
+
+                            listItem.querySelector('.remove').addEventListener('click', () => {
+                                const draggable = listC.draggables.find((d) => d.element === listItem)
+                                listCParentElement.removeChild(listItem)
+                                listC.remove(draggable)
+                            })
+                        }
+
+                        listCParentElement.querySelectorAll('li').forEach(initListItem)
+
                         let itemCount = 5
 
-                        addButton.addEventListener('click', (event) => {
-                          listItem = document.createElement('li')
-                          listItem.classList.add('list-item')
-                          listItem.innerHTML = `<div>
-                            <span class="expand">Expand</span> ⇔ ${itemCount++} <span class="remove">x</span>
-                          </div>
-                          <div class="list-item-content" style="height: ${itemCount * 10}px;">`
-                          listCParentElement.appendChild(listItem)
-                          initListItem(listItem)
+                        root.querySelector('.list-c-add-tem').addEventListener('click', () => {
+                            const listItem = document.createElement('li')
+                            listItem.classList.add('list-item')
+                            listItem.innerHTML = `<div>
+                                <span class="expand">Expand</span> ⇔ ${itemCount++} <span class="remove">x</span>
+                            </div>
+                            <div class="list-item-content" style="height: ${itemCount * 10}px;">`
+                            listCParentElement.appendChild(listItem)
+                            initListItem(listItem)
 
-                          listC.add(new Dragee.Draggable(listItem, {
-                            // nativeDragAndDrop: true,
-                            container: listCParentElement
-                          }))
+                            listC.add(new Draggable(listItem, { container: listCParentElement }))
                         })
-                    });
+                    })
                 </script>
             </div>
         </div>
@@ -833,29 +807,24 @@
                       margin: 0 auto;
                     }
                 </style>
-                <script>
-                    window.addEventListener("load", function(){
-                        var listA, listB,
-                            root = document.getElementById("DemoNestingList"),
-                            listAParentElement = root.getElementsByClassName("list-a")[0],
-                            listAElements = listAParentElement.querySelectorAll(".list-a-items"),
-                            listBParentElement = root.getElementsByClassName("list-b")[0],
-                            listBElements = listBParentElement.getElementsByTagName("li");
+                <script type="module">
+                    import { Draggable, List, BubblingList } from '../src/index.js'
 
-                        listA = new Dragee.BubblingList(Array.from(listAElements).map((element) => {
-                          return new Dragee.Draggable(element, {
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoNestingList')
+                        const listAParentElement = root.querySelector('.list-a')
+                        const listBParentElement = root.querySelector('.list-b')
+
+                        new BubblingList(Array.from(listAParentElement.querySelectorAll('.list-a-items'), (element) => new Draggable(element, {
                             container: listAParentElement,
                             nativeDragAndDrop: true
-                          })
-                        }), { radius: 10 });
+                        })), { radius: 10 })
 
-                        listB = new Dragee.List(Array.from(listBElements).map((element) => {
-                          return new Dragee.Draggable(element, {
+                        new List(Array.from(listBParentElement.querySelectorAll('li'), (element) => new Draggable(element, {
                             container: listBParentElement,
                             nativeDragAndDrop: true
-                          })
-                        }, { radius: 10 }))
-                    });
+                        })), { radius: 10 })
+                    })
                 </script>
             </div>
         </div>
@@ -942,42 +911,45 @@
                       cursor: pointer;
                     }
                 </style>
-                <script>
-                    window.addEventListener("load", function(){
-                        const root = document.getElementById("DemoHorizontalList")
+                <script type="module">
+                    import { Draggable, BubblingList } from '../src/index.js'
+
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoHorizontalList')
 
                         const initHorizontalList = (demoElement, draggableOptions) => {
-                          const listElement = demoElement.querySelector("ul.list"),
-                                orderElement = demoElement.querySelector(".order")
+                            const listElement = demoElement.querySelector('ul.list')
+                            const orderElement = demoElement.querySelector('.order')
 
-                          const list = new Dragee.BubblingList(Array.from(listElement.children).map((element) => {
-                            return new Dragee.Draggable(element, { container: listElement, ...draggableOptions })
-                          }), { axis: 'x', container: listElement, reorderOnChange: true })
+                            const list = new BubblingList(Array.from(listElement.children, (element) => new Draggable(element, {
+                                container: listElement,
+                                ...draggableOptions
+                            })), { axis: 'x', container: listElement, reorderOnChange: true })
 
-                          const renderOrder = () => {
-                            orderElement.textContent = 'Order: ' + list.getSortedDraggables()
-                              .map((d) => d.element.firstChild.textContent.trim())
-                              .join(', ')
-                          }
+                            const renderOrder = () => {
+                                orderElement.textContent = 'Order: ' + list.getSortedDraggables()
+                                    .map((d) => d.element.firstChild.textContent.trim())
+                                    .join(', ')
+                            }
 
-                          list.draggables.forEach((draggable) => {
-                            draggable.element.querySelector('.remove').addEventListener('click', () => {
-                              listElement.removeChild(draggable.element)
-                              list.remove(draggable)
-                              renderOrder()
+                            list.draggables.forEach((draggable) => {
+                                draggable.element.querySelector('.remove').addEventListener('click', () => {
+                                    listElement.removeChild(draggable.element)
+                                    list.remove(draggable)
+                                    renderOrder()
+                                })
                             })
-                          })
 
-                          list.on('list:reordered', renderOrder)
-                          renderOrder()
+                            list.on('list:reordered', renderOrder)
+                            renderOrder()
                         }
 
-                        initHorizontalList(root.querySelector(".horizontal-demo-plain"))
-                        initHorizontalList(root.querySelector(".horizontal-demo-native"), {
-                          nativeDragAndDrop: true,
-                          emulateNativeDragAndDropOnTouch: true
+                        initHorizontalList(root.querySelector('.horizontal-demo-plain'))
+                        initHorizontalList(root.querySelector('.horizontal-demo-native'), {
+                            nativeDragAndDrop: true,
+                            emulateNativeDragAndDropOnTouch: true
                         })
-                    });
+                    })
                 </script>
             </div>
         </div>
@@ -1128,43 +1100,33 @@
                       background: #049cdb;
                     }
                 </style>
-                <script>
-                    window.addEventListener("load", function(){
-                        const root = document.getElementById("DemoTargetA"),
-                              trayAreaElement = root.getElementsByClassName("area-a")[0],
-                              trayElements = trayAreaElement.getElementsByClassName("target"),
-                              draggableElements = trayAreaElement.getElementsByClassName("draggable"),
-                              classForTargets = ["green", "red", "blue"];
-                              strategies = [Dragee.FloatLeftStrategy, Dragee.FloatLeftStrategy, Dragee.FloatRightStrategy]
+                <script type="module">
+                    import { Draggable, Tray, Point, FloatLeftStrategy, FloatRightStrategy, transformedSpaceDistanceFactory } from '../src/index.js'
 
-                        draggables = [...draggableElements].map((element, i) => {
-                            return new Dragee.Draggable(element, {
-                              container: trayAreaElement
-                            })
-                          }
-                        )
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoTargetA')
+                        const trayAreaElement = root.querySelector('.area-a')
+                        const classForTrays = ['green', 'red', 'blue']
+                        const strategies = [FloatLeftStrategy, FloatLeftStrategy, FloatRightStrategy]
 
-                        trays = [...trayElements].map((element, i) => {
-                            const tray = new Dragee.Tray(element, draggables, {
-                              container: trayAreaElement,
-                              strategy: new strategies[i](
-                                () => tray.getRectangle(),
-                                {
-                                  radius: 80,
-                                  getDistance: Dragee.transformedSpaceDistanceFactory({ x: 1, y: 4 }),
-                                  removable: true,
-                                  paddingTopLeft: new Dragee.Point(5, 5),
-                                  yGapBetweenDraggables: 5
+                        const draggables = Array.from(trayAreaElement.querySelectorAll('.draggable'), (element) => new Draggable(element, {
+                            container: trayAreaElement
+                        }))
+
+                        trayAreaElement.querySelectorAll('.target').forEach((element, i) => {
+                            const tray = new Tray(element, draggables, {
+                                container: trayAreaElement,
+                                strategy: new strategies[i](() => tray.getRectangle(), {
+                                    radius: 80,
+                                    getDistance: transformedSpaceDistanceFactory({ x: 1, y: 4 }),
+                                    removable: true,
+                                    paddingTopLeft: new Point(5, 5),
+                                    yGapBetweenDraggables: 5
+                                }),
+                                on: {
+                                    'tray:add': ({ draggable }) => draggable.element.classList.add(classForTrays[i]),
+                                    'tray:remove': ({ draggable }) => draggable.element.classList.remove(classForTrays[i])
                                 }
-                              ),
-                              on: {
-                                'tray:add': ({ draggable }) => {
-                                  draggable.element.classList.add(classForTargets[i]);
-                                },
-                                'tray:remove': ({ draggable }) => {
-                                  draggable.element.classList.remove(classForTargets[i]);
-                                }
-                              }
                             })
                         })
                     })
@@ -1319,38 +1281,28 @@
                       background: #ee5f5b;
                     }
                 </style>
-                <script>
-                    window.addEventListener("load", function(){
-                        var draggables, trays,
-                            root = document.getElementById("DemoTargetB"),
-                            trayAreaElement = root.getElementsByClassName("area-a")[0],
-                            trayElements = trayAreaElement.getElementsByClassName("target"),
-                            draggableElements = trayAreaElement.getElementsByClassName("draggable");
+                <script type="module">
+                    import { Draggable, Tray, NotCrossingStrategy } from '../src/index.js'
 
-                        draggables = Array.prototype.slice.call(draggableElements).map(function(element, i){
-                            return new Dragee.Draggable(element, {
-                              container: trayAreaElement
-                            });
-                        });
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoTargetB')
+                        const trayAreaElement = root.querySelector('.area-a')
 
-                        trays = Array.prototype.slice.call(trayElements).map(function(element, i){
-                            var tray = new Dragee.Tray(element, draggables, {
+                        const draggables = Array.from(trayAreaElement.querySelectorAll('.draggable'), (element) => new Draggable(element, {
+                            container: trayAreaElement
+                        }))
+
+                        trayAreaElement.querySelectorAll('.target').forEach((element) => {
+                            const tray = new Tray(element, draggables, {
                                 container: trayAreaElement,
-                                strategy: new Dragee.NotCrossingStrategy(function(){
-                                  return tray.getRectangle();
-                                }),
+                                strategy: new NotCrossingStrategy(() => tray.getRectangle()),
                                 on: {
-                                  'tray:add': function({ draggable }) {
-                                    draggable.element.classList.add("ontarget")
-                                  },
-                                  'tray:remove': function({ draggable }) {
-                                    draggable.element.classList.remove("ontarget")
-                                  }
+                                    'tray:add': ({ draggable }) => draggable.element.classList.add('ontarget'),
+                                    'tray:remove': ({ draggable }) => draggable.element.classList.remove('ontarget')
                                 }
-                            });
-                            return tray;
-                        });
-                    });
+                            })
+                        })
+                    })
                 </script>
             </div>
         </div>
@@ -1428,50 +1380,50 @@
                         color: #222;
                     }
                 </style>
-                <script>
-                    window.addEventListener("load", function(){
-                        const root = document.getElementById("DemoTargetLimit")
-                        const area = root.querySelector(".area")
-                        const trayElement = root.querySelector(".target")
-                        const status = root.querySelector(".status span")
+                <script type="module">
+                    import { Draggable, Tray, Point, FloatLeftStrategy, scope } from '../src/index.js'
+
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoTargetLimit')
+                        const area = root.querySelector('.area')
+                        const trayElement = root.querySelector('.target')
+                        const status = root.querySelector('.status span')
                         const maxCards = 2
                         let tray
 
-                        Dragee.scope(() => {
-                          const draggables = [...area.querySelectorAll(".draggable")].map((element) => {
-                            return new Dragee.Draggable(element, { container: area })
-                          })
+                        scope(() => {
+                            const draggables = Array.from(area.querySelectorAll('.draggable'), (element) => new Draggable(element, { container: area }))
 
-                          tray = new Dragee.Tray(trayElement, draggables, {
-                            container: area,
-                            strategy: new Dragee.FloatLeftStrategy(() => tray.getRectangle(), {
-                              radius: 80,
-                              removable: true,
-                              paddingTopLeft: new Dragee.Point(5, 5),
-                              yGapBetweenDraggables: 5
+                            tray = new Tray(trayElement, draggables, {
+                                container: area,
+                                strategy: new FloatLeftStrategy(() => tray.getRectangle(), {
+                                    radius: 80,
+                                    removable: true,
+                                    paddingTopLeft: new Point(5, 5),
+                                    yGapBetweenDraggables: 5
+                                })
                             })
-                          })
                         })
 
                         const renderStatus = () => {
-                          const count = tray.innerDraggables.length
-                          trayElement.classList.toggle('full', count >= maxCards)
-                          status.textContent = count + ' of ' + maxCards + ' cards in the column'
+                            const count = tray.innerDraggables.length
+                            trayElement.classList.toggle('full', count >= maxCards)
+                            status.textContent = count + ' of ' + maxCards + ' cards in the column'
                         }
 
                         tray.on('tray:beforeAdd', (event) => {
-                          if (tray.innerDraggables.length >= maxCards) {
-                            event.cancel()
-                            status.textContent = 'the column is full, the card went back'
-                          }
+                            if (tray.innerDraggables.length >= maxCards) {
+                                event.cancel()
+                                status.textContent = 'the column is full, the card went back'
+                            }
                         })
                         tray.on('tray:add', ({ draggable }) => {
-                          draggable.element.classList.add('in-target')
-                          renderStatus()
+                            draggable.element.classList.add('in-target')
+                            renderStatus()
                         })
                         tray.on('tray:remove', ({ draggable }) => {
-                          draggable.element.classList.remove('in-target')
-                          renderStatus()
+                            draggable.element.classList.remove('in-target')
+                            renderStatus()
                         })
                     })
                 </script>
@@ -1505,7 +1457,6 @@
 <script src="bootstrap/js/bootstrap-typeahead.js"></script>
 
 <!-- Dragee -->
-<script src="../dist/index.dev.js"></script>
 
 </body>
 </html>

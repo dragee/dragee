@@ -1,10 +1,10 @@
-import Point from './geometry/point'
-import { addPointToBoundPoints } from './geometry/bounds'
+import Point from './geometry/point.js'
+import { addPointToBoundPoints } from './geometry/bounds.js'
 
 import {
   indexOfNearestPoint,
   getDistance
-} from './geometry/distances'
+} from './geometry/distances.js'
 
 class BasicStrategy {
   constructor(rectangle, options={}) {

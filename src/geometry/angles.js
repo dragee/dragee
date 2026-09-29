@@ -1,4 +1,4 @@
-import Point from './point'
+import Point from './point.js'
 
 export function getAngleDiff(alpha, beta) {
   const minAngle = Math.min(alpha, beta)

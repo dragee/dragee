@@ -1,9 +1,9 @@
-import EventEmitter from './eventEmitter'
-import Point from './geometry/point'
-import Rectangle from './geometry/rectangle'
-import { scopes, currentScope } from './scope'
-import throttle from './utils/throttle'
-import getParentsChain from './utils/get-parents-chain'
+import EventEmitter from './eventEmitter.js'
+import Point from './geometry/point.js'
+import Rectangle from './geometry/rectangle.js'
+import { scopes, currentScope } from './scope.js'
+import throttle from './utils/throttle.js'
+import getParentsChain from './utils/get-parents-chain.js'
 
 const throttledDragOver = (callback, duration) => {
   const throttledCallback = throttle((event) => callback(event), duration)

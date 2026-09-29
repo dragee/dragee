@@ -6,3 +6,4 @@ coverage/*
 .DS_Store
 yarn-error.log
 dist/index.esm.dev.js
+dist/index.dev.js

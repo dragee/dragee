@@ -1,5 +1,5 @@
-import DrageeEvent from './utils/dragee-event'
-import dispatchDomEvent from './utils/dispatch-dom-event'
+import DrageeEvent from './utils/dragee-event.js'
+import dispatchDomEvent from './utils/dispatch-dom-event.js'
 
 export default class EventEmitter extends EventTarget {
   constructor (options = {}) {

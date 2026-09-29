@@ -1,17 +1,17 @@
-import Point from './geometry/point'
-import Rectangle from './geometry/rectangle'
+import Point from './geometry/point.js'
+import Rectangle from './geometry/rectangle.js'
 import {
   getPointOnLineByLenght,
   directCrossing,
   boundToLine
-} from './geometry/bounds'
+} from './geometry/bounds.js'
 
 import {
   getAngle,
   normalizeAngle,
   boundAngle,
   getPointFromRadialSystem
-} from './geometry/angles'
+} from './geometry/angles.js'
 
 export class Bound {
   constructor () {}

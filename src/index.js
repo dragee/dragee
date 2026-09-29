@@ -1,11 +1,11 @@
-import Point from './geometry/point'
-import Rectangle from './geometry/rectangle'
-import Draggable from './draggable'
-import List from './list'
-import BubblingList from './bubblingList'
-import Tray from './tray'
-import { scopes, defaultScope, Scope, scope } from './scope'
-import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './positioning'
+import Point from './geometry/point.js'
+import Rectangle from './geometry/rectangle.js'
+import Draggable from './draggable.js'
+import List from './list.js'
+import BubblingList from './bubblingList.js'
+import Tray from './tray.js'
+import { scopes, defaultScope, Scope, scope } from './scope.js'
+import { NotCrossingStrategy, FloatLeftStrategy, FloatRightStrategy } from './positioning.js'
 
 import {
   getDistance,
@@ -13,7 +13,7 @@ import {
   getYDifference,
   transformedSpaceDistanceFactory,
   indexOfNearestPoint
-} from './geometry/distances'
+} from './geometry/distances.js'
 
 import {
   Bound,
@@ -24,7 +24,7 @@ import {
   BoundToLine,
   BoundToCircle,
   BoundToArc
-} from './bounding'
+} from './bounding.js'
 
 export {
   Draggable,

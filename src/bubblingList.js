@@ -1,7 +1,7 @@
-import List from './list'
-import { indexOfNearestPoint, getXDifference, getYDifference } from './geometry/distances'
+import List from './list.js'
+import { indexOfNearestPoint, getXDifference, getYDifference } from './geometry/distances.js'
 
-import Draggable from './draggable'
+import Draggable from './draggable.js'
 
 const arrayMove = (array, from, to) => {
   array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0])
