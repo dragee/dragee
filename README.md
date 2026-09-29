@@ -73,6 +73,7 @@ const draggable = new Draggable(element, {
 | `stopPropagationOnDragStart` | `boolean` | `false` | Stop event propagation on drag start |
 | `copyStyles` | `function` | — | Custom function to copy styles during touch DnD emulation |
 | `domEvents` | `boolean` | `true` | Dispatch `dragee:*` DOM events on the element |
+| `scope` | `Scope` | current scope | Scope to join instead of the one `scope()` is running or `defaultScope` |
 | `on` | `object` | — | Event listeners: `{ 'drag:start': fn, ... }` |
 
 ### Events
@@ -323,6 +324,7 @@ target.on('target:remove', (draggable) => console.log('removed', draggable.eleme
 | `catchDraggable` | `(target, draggable) => boolean` | center inclusion | Custom hit-test for accepting drops |
 | `container` / `parent` | `Element` | `element.offsetParent` | Coordinate space |
 | `domEvents` | `boolean` | `true` | Dispatch `dragee:*` DOM events (see Events) |
+| `scope` | `Scope` | current scope | Scope to join instead of the one `scope()` is running or `defaultScope` |
 | `on` | `object` | — | Event listeners |
 
 ### Events
@@ -347,6 +349,7 @@ board.addEventListener('dragee:target-add', (event) => {
 | Method | Signature | Description |
 | --- | --- | --- |
 | `add` | `(draggable, time?)` | Programmatically add a draggable |
+| `accept` | `(draggable)` | Let a draggable be dropped into this target without placing it there |
 | `remove` | `(draggable)` | Remove a draggable from the target |
 | `reset` | `()` | Remove all draggables, reset to initial state |
 | `refresh` | `()` | Recalculate positions for all inner draggables |
@@ -451,6 +454,13 @@ kanbanScope.on('scope:change', () => {
 })
 ```
 
+Only instances created while the callback runs join the scope. For ones created later, for example after an `await` or from an "Add card" button, pass the scope explicitly and let the targets accept them:
+
+```javascript
+const card = new Draggable(el, { scope: kanbanScope })
+columns.forEach((column) => column.accept(card))
+```
+
 ### Scope Class
 
 ```javascript
@@ -469,8 +479,8 @@ const myScope = new Scope(draggables, targets, { timeEnd: 400 })
 
 | Method | Signature | Description |
 | --- | --- | --- |
-| `addDraggable` | `(draggable)` | Add a draggable to this scope |
-| `addTarget` | `(target)` | Add a target to this scope |
+| `addDraggable` | `(draggable)` | Move a draggable into this scope (it leaves its previous scope) |
+| `addTarget` | `(target)` | Move a target into this scope (it leaves its previous scope) |
 | `reset` | `()` | Reset all targets to initial state |
 | `refresh` | `()` | Refresh all draggables and targets |
 

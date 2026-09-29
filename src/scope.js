@@ -13,9 +13,7 @@ class Scope extends EventEmitter {
       }
 
       if (targets) {
-        targets.forEach((target) => {
-          removeItem(scope.targets, target)
-        })
+        targets.forEach((target) => scope.releaseTarget(target))
       }
     })
 
@@ -34,6 +32,7 @@ class Scope extends EventEmitter {
   }
 
   addDraggable(draggable) {
+    scopes.forEach((scope) => scope.releaseDraggable(draggable))
     this.draggables.push(draggable)
     this.initDraggable(draggable)
   }
@@ -47,7 +46,12 @@ class Scope extends EventEmitter {
   }
 
   addTarget(target) {
+    scopes.forEach((scope) => scope.releaseTarget(target))
     this.targets.push(target)
+  }
+
+  releaseTarget(target) {
+    removeItem(this.targets, target)
   }
 
   onEnd(draggable) {

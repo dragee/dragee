@@ -30,9 +30,10 @@ export default class Target extends EventEmitter {
     this.element = element
     this.draggables = []
     this.unsubscribes = []
-    draggables.forEach((draggable) => this.watchDraggable(draggable))
+    draggables.forEach((draggable) => this.accept(draggable))
 
-    currentScope().addTarget(this)
+    const scope = options.scope || currentScope()
+    scope.addTarget(this)
 
     this.startBounding()
     this.init()
@@ -153,7 +154,7 @@ export default class Target extends EventEmitter {
 
     this.emitTargetEvent('beforeAdd', draggable)
 
-    this.watchDraggable(draggable)
+    this.accept(draggable)
     this.pushInnerDraggable(draggable)
     const rectangles = this.positioning(this.innerDraggables.map((draggable) => {
       return draggable.getRectangle()
@@ -171,7 +172,7 @@ export default class Target extends EventEmitter {
     }
   }
 
-  watchDraggable(draggable) {
+  accept(draggable) {
     if (this.draggables.includes(draggable)) return
 
     this.draggables.push(draggable)

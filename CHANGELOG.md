@@ -11,8 +11,11 @@
   - `Target`: `dragee:target-before-add` / `dragee:target-add` / `dragee:target-remove` from the target element, `event.detail` = `{ target, draggable }`
 - horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
 - the `gap` option for `BubblingList`; `verticalGap` is an alias for it. An explicit `0` gap is now respected instead of triggering auto-detection
+- the `scope` option for `Draggable` and `Target` to join a given scope, e.g. for instances created after `scope()` has returned
+- `Target.accept(draggable)` lets a draggable be dropped into a target without placing it there, e.g. for draggables created after the target
 
 ### Fixed
+- `Scope.addDraggable()` / `addTarget()` left the instance in its previous scope as well (e.g. `defaultScope`)
 - `unsubscribe()` removed the last listener when the given one was not subscribed
 - listeners were skipped when a listener unsubscribed while an event was being emitted
 - `List.remove()` wiped user `drag:move` / `drag:end` listeners and left the `BubblingList` `drag:start` listener attached

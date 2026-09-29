@@ -70,7 +70,8 @@ export default class Draggable extends EventEmitter {
     this.options = options
     this.element = element
     preventDoubleInit(this)
-    currentScope().addDraggable(this)
+    const scope = options.scope || currentScope()
+    scope.addDraggable(this)
     this._enable = true
     this.startBounding()
     this.startPositioning()
