@@ -74,7 +74,25 @@ describe('Tray', () => {
 
       expect(tray.getSortedDraggables()).not.toContain(draggable)
       expect(draggable.position).toEqual(new Point(100, 100))
+      expect(draggable.element.style.transition).toContain('transform 400ms')
       tray.destroy()
     })
+  })
+
+  it('should leave a drop canceled by a drag:release listener of the draggable to that listener', () => {
+    const draggable = createDraggable({
+      position: new Point(100, 100),
+      on: { 'drag:release': (event) => event.cancel() }
+    })
+    const trayElement = document.createElement('div')
+    createContainer().appendChild(trayElement)
+    const tray = new Tray(trayElement, [draggable], { catchDraggable: () => true })
+
+    simulateDrag(draggable, new Point(100, 100), new Point(0, 0))
+    endDrag(new Point(0, 0))
+
+    expect(tray.getSortedDraggables()).not.toContain(draggable)
+    expect(draggable.position).toEqual(new Point(0, 0))
+    tray.destroy()
   })
 })

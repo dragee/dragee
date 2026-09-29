@@ -12,13 +12,14 @@
 - remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
 - `drag:start` fires before the drag listeners are attached, so calling `cancelDragging()` or `destroy()` from a `drag:start` listener no longer stops the drag; call `event.cancel()` instead
 - a drop refused by a tray returns the draggable to its initial position (previously it stayed where it was dropped)
+- replace the overridable `dragEndAction()` with the cancelable `drag:release` event; `List` and `Scope` place their draggables through it. `scope:change` is emitted only for draggables that belong to trays
 
 ### Added
 - `on()` returns a function that removes the listener; add `off()` and `once()`. Standard listener options such as `{ signal }` are supported. `unsubscribe()` is an alias for `off()`
-- cancelable events: `event.cancel()` on `drag:start` cancels the drag; on `tray:beforeAdd` it refuses the draggable
+- cancelable events: `event.cancel()` on `drag:start` cancels the drag; on `drag:release` it skips the default placement; on `tray:beforeAdd` it refuses the draggable
 - `event.cancel()` / `event.canceled` on dragee events as clearer names for `preventDefault()` / `defaultPrevented` (both keep working); `emit()` returns the dispatched event
 - bubbling DOM events (disable with the `domEvents: false` option), with the same event data as the instance events:
-  - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element
+  - `Draggable`: `dragee:start` / `dragee:move` / `dragee:release` / `dragee:end` from its element
   - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element
   - `Tray`: `dragee:tray-before-add` / `dragee:tray-add` / `dragee:tray-remove` from the tray element
 - horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
@@ -30,6 +31,8 @@
 - `Scope.addDraggable()` / `addTarget()` left the instance in its previous scope as well (e.g. `defaultScope`)
 - `List.remove()` wiped user `drag:move` / `drag:end` listeners and left the `BubblingList` `drag:start` listener attached
 - `Target` kept a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener. A target now watches each of its draggables, including ones added with `add()`, until `destroy()`, and keeps its own copy of the `draggables` array, so `add()` doesn't leak a draggable into other targets sharing that array
+- a draggable released from a `List` or `Scope` was still handled by it on drop
+- a draggable outside lists and targets did not update its `pinnedPosition` on drop
 - targets created inside `scope()` were added to the default scope too
 - `Draggable.destroy()` did not remove the draggable from its scope (this also leaked the clone used for touch drag emulation)
 - `BubblingList.remove()` detected the gap and start position after removal (measured across the hole, so remaining items were not reflowed)

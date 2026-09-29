@@ -48,10 +48,13 @@ export default class List extends EventEmitter {
   initDraggable(draggable) {
     draggable.enable = this._enable
     this.listenTo(draggable, 'drag:move', () => this.onMove(draggable))
-    draggable.dragEndAction = () => {
+    this.listenTo(draggable, 'drag:release', (event) => {
+      if (event.canceled) return
+
+      event.cancel()
       draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
-      this.onEnd(draggable)
-    }
+      this.onRelease(draggable)
+    })
     this.resizeObserver.observe(draggable.element)
   }
 
@@ -103,7 +106,7 @@ export default class List extends EventEmitter {
     }
   }
 
-  onEnd(draggable) {
+  onRelease(draggable) {
     if (this.changedDuringIteration) {
       this.emitListEvent('change', draggable)
       this.changedDuringIteration = false

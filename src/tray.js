@@ -110,7 +110,7 @@ export default class Tray extends EventEmitter {
     this.setPosition(rectangles, [], 0)
   }
 
-  onEnd(draggable) {
+  drop(draggable) {
     const newDraggablesIndex = []
 
     if (!this.getRectangle().includePoint(draggable.getCenter())) {

@@ -19,6 +19,7 @@ class Scope extends EventEmitter {
 
     this.draggables = draggables || []
     this.trays = trays || []
+    this.unsubscribes = new Map()
     scopes.push(this)
     this.options = {
       timeEnd: (options.timeEnd) || 400
@@ -38,10 +39,16 @@ class Scope extends EventEmitter {
   }
 
   initDraggable(draggable) {
-    draggable.dragEndAction = () => this.onEnd(draggable)
+    this.unsubscribes.set(draggable, draggable.on('drag:release', (event) => {
+      if (!event.canceled && this.onRelease(draggable)) {
+        event.cancel()
+      }
+    }))
   }
 
   releaseDraggable(draggable) {
+    this.unsubscribes.get(draggable)?.()
+    this.unsubscribes.delete(draggable)
     removeItem(this.draggables, draggable)
   }
 
@@ -54,7 +61,9 @@ class Scope extends EventEmitter {
     removeItem(this.trays, tray)
   }
 
-  onEnd(draggable) {
+  onRelease(draggable) {
+    if (!draggable.trays.length) return false
+
     const shotTrays = this.trays.filter((tray) => {
       return tray.draggables.indexOf(draggable) !== -1
     }).filter((tray) => {
@@ -63,13 +72,14 @@ class Scope extends EventEmitter {
       return a.getRectangle().getSquare() - b.getRectangle().getSquare()
     })
 
-    const isAccepted = shotTrays.length > 0 && shotTrays[0].onEnd(draggable)
+    const isAccepted = shotTrays.length > 0 && shotTrays[0].drop(draggable)
 
-    if (!isAccepted && draggable.trays.length) {
+    if (!isAccepted) {
       draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
     }
 
     this.emit('scope:change', { scope: this, draggable })
+    return true
   }
 
   reset() {

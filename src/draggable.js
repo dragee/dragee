@@ -371,7 +371,7 @@ export default class Draggable extends EventEmitter {
       event.preventDefault()
     }
 
-    this.dragEndAction()
+    this.release()
     this.emitDragEvent('end')
     this.cancelDragging()
 
@@ -419,7 +419,7 @@ export default class Draggable extends EventEmitter {
 
   nativeDragEnd(_event) {
     this.element.classList.remove('dragee-placeholder')
-    this.dragEndAction()
+    this.release()
     this.emitDragEvent('end')
     document.removeEventListener('dragover', this._nativeDragOver)
     document.removeEventListener('dragend', this._nativeDragEnd)
@@ -497,7 +497,7 @@ export default class Draggable extends EventEmitter {
           this.element.classList.remove('dragee-placeholder')
           this.element.classList.remove('dragee-active')
 
-          this.dragEndAction()
+          this.release()
           this.emitDragEvent('end')
           this.cancelDragging()
         }
@@ -521,8 +521,11 @@ export default class Draggable extends EventEmitter {
     return this.emitWithDomEvent(this.element, `drag:${type}`, `dragee:${type}`, { draggable: this }, options)
   }
 
-  dragEndAction() {
-    this.pinPosition(this.position)
+  release() {
+    const releaseEvent = this.emitDragEvent('release', { cancelable: true })
+    if (!releaseEvent.canceled) {
+      this.pinPosition(this.position)
+    }
   }
 
   getRectangle() {

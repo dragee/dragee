@@ -156,7 +156,7 @@ describe('list/enable', () => {
   })
 })
 
-describe('list/onEnd', () => {
+describe('list/onRelease', () => {
   it('should emit list:change when items were swapped', () => {
     const { list, draggables } = createListSetup(2)
     const changeFn = jest.fn()
@@ -164,7 +164,7 @@ describe('list/onEnd', () => {
 
     // Simulate a change happened during drag
     list.changedDuringIteration = true
-    list.onEnd(draggables[0])
+    list.onRelease(draggables[0])
     expect(changeFn).toHaveBeenCalledTimes(1)
     expect(list.changedDuringIteration).toBe(false)
   })
@@ -174,7 +174,7 @@ describe('list/onEnd', () => {
     const changeFn = jest.fn()
     list.on('list:change', changeFn)
 
-    list.onEnd(draggables[0])
+    list.onRelease(draggables[0])
     expect(changeFn).not.toHaveBeenCalled()
   })
 })
@@ -204,5 +204,39 @@ describe('list/remove listeners', () => {
     draggable.move(new Point(5, 5))
 
     expect(onMove).toHaveBeenCalledTimes(1)
+  })
+
+  it('should stop controlling where a removed draggable is dropped', () => {
+    const { list, draggables: [draggable] } = createListSetup(3)
+
+    list.remove(draggable)
+    simulateDrag(draggable, new Point(0, 0), new Point(0, 45))
+    endDrag(new Point(0, 45))
+
+    expect(draggable.position.y).toBe(45)
+  })
+})
+
+describe('list/release', () => {
+  it('should animate a dropped item back to its slot', () => {
+    const { draggables: [draggable] } = createListSetup(3, { timeEnd: 200 })
+
+    simulateDrag(draggable, new Point(0, 0), new Point(0, 45))
+    endDrag(new Point(0, 45))
+
+    expect(draggable.position).toEqual(new Point(0, 0))
+    expect(draggable.element.style.transition).toContain('transform 200ms')
+  })
+
+  it('should leave the drop to a drag:release listener registered before the list', () => {
+    const { container, draggables } = createDraggables(3, (i) => ({ position: new Point(i * 10, 0) }))
+    const [draggable] = draggables
+    draggable.on('drag:release', (event) => event.cancel())
+    new List(draggables, { container })
+
+    simulateDrag(draggable, new Point(0, 0), new Point(0, 45))
+    endDrag(new Point(0, 45))
+
+    expect(draggable.position).toEqual(new Point(0, 45))
   })
 })

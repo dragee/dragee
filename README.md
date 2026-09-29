@@ -86,6 +86,7 @@ const draggable = new Draggable(element, {
 | --- | --- | --- | --- |
 | `drag:start` | `{ draggable }` | `dragee:start` | Drag begins (after threshold is met). **Cancelable** |
 | `drag:move` | `{ draggable }` | `dragee:move` | Position updates during dragging |
+| `drag:release` | `{ draggable }` | `dragee:release` | Draggable is released, before it is placed. **Cancelable** |
 | `drag:end` | `{ draggable }` | `dragee:end` | Drag finishes |
 
 Each event is also dispatched as a bubbling DOM `CustomEvent` on the element. That makes it possible to listen on a common ancestor instead of every draggable:
@@ -103,6 +104,17 @@ draggable.on('drag:start', (event) => {
   if (isLocked) event.cancel()
 })
 ```
+
+By default a released draggable is pinned where it was dropped. Calling `event.cancel()` on `drag:release` skips that, so the draggable can be placed differently:
+
+```javascript
+draggable.on('drag:release', (event) => {
+  event.cancel()
+  draggable.pinPosition(snapToGrid(draggable.position), 200)
+})
+```
+
+Lists and scopes place their draggables through the same event and leave the drop alone when an earlier listener has already called `cancel()`.
 
 ### Methods
 
@@ -515,7 +527,7 @@ const myScope = new Scope(draggables, trays, { timeEnd: 400 })
 
 | Event | Event data | Description |
 | --- | --- | --- |
-| `scope:change` | `{ scope, draggable }` | A draggable was dropped |
+| `scope:change` | `{ scope, draggable }` | A draggable that belongs to trays was dropped |
 
 ### Exported Utilities
 
@@ -637,6 +649,7 @@ new Draggable(el, {
 - **`Target` is renamed to `Tray`**, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data.
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.
+- **`dragEndAction` can no longer be overridden.** Listen to `drag:release` and call `event.cancel()` to place a dropped draggable yourself.
 - **Canceling a drag start:** call `event.cancel()` in a `drag:start` listener. Calling `cancelDragging()` or `destroy()` there no longer stops the drag, because `drag:start` now fires before the drag listeners are attached.
 - **A drop refused by a tray** (`tray:beforeAdd` prevented, or a custom `catchDraggable` accepting a draggable whose center is outside) returns the draggable to its initial position.
 
