@@ -1,7 +1,7 @@
 ## [Unreleased]
 
 ### Breaking
-- all instances (`Draggable`, `List`, `BubblingList`, `Tray`, `Scope`) are standard `EventTarget`s. Listeners receive a `CustomEvent` with the payload in `event.detail` instead of positional arguments:
+- all instances (`Draggable`, `List`, `BubblingList`, `Tray`, `Scope`) are standard `EventTarget`s. Listeners receive an event that carries the payload as its own properties (also in `event.detail`) instead of positional arguments:
   - `drag:start` / `drag:move` / `drag:end`: `{ draggable }`
   - `list:change` / `list:reordered`: `{ list, draggable }`
   - `tray:beforeAdd` / `tray:add` / `tray:remove`: `{ tray, draggable }`
@@ -13,7 +13,7 @@
 
 ### Added
 - `on()` returns a function that removes the listener; add `off()` and `once()`. Standard listener options such as `{ signal }` are supported. `unsubscribe()` is an alias for `off()`
-- bubbling DOM events (disable with the `domEvents: false` option), with the same `event.detail` as the instance events:
+- bubbling DOM events (disable with the `domEvents: false` option), with the same event data as the instance events:
   - `Draggable`: `dragee:start` / `dragee:move` / `dragee:end` from its element
   - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element
   - `Tray`: `dragee:tray-before-add` / `dragee:tray-add` / `dragee:tray-remove` from the tray element

@@ -1,3 +1,5 @@
+import DrageeEvent from './utils/dragee-event'
+
 export default class EventEmitter extends EventTarget {
   constructor (options = {}) {
     super()
@@ -8,7 +10,7 @@ export default class EventEmitter extends EventTarget {
   }
 
   emit(eventName, detail, { cancelable = false } = {}) {
-    return this.dispatchEvent(new CustomEvent(eventName, { detail, cancelable }))
+    return this.dispatchEvent(new DrageeEvent(eventName, detail, { cancelable }))
   }
 
   on(eventName, fn, options) {

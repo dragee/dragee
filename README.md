@@ -51,7 +51,7 @@ const draggable = new Draggable(element, {
   handler: '.drag-handle',
   nativeDragAndDrop: true,
   on: {
-    'drag:start': ({ detail: { draggable } }) => console.log('started', draggable),
+    'drag:start': ({ draggable }) => console.log('started', draggable),
     'drag:end': () => console.log('ended')
   }
 })
@@ -82,7 +82,7 @@ const draggable = new Draggable(element, {
 
 ### Events
 
-| Event | `event.detail` | DOM event | Description |
+| Event | Event data | DOM event | Description |
 | --- | --- | --- | --- |
 | `drag:start` | `{ draggable }` | `dragee:start` | Drag begins (after threshold is met) |
 | `drag:move` | `{ draggable }` | `dragee:move` | Position updates during dragging |
@@ -91,7 +91,7 @@ const draggable = new Draggable(element, {
 Each event is also dispatched as a bubbling DOM `CustomEvent` on the element. That makes it possible to listen on a common ancestor instead of every draggable:
 
 ```javascript
-container.addEventListener('dragee:end', ({ detail: { draggable } }) => {
+container.addEventListener('dragee:end', ({ draggable }) => {
   console.log('dropped', draggable.element)
 })
 ```
@@ -196,7 +196,7 @@ const list = new List(draggables, {
   container
 })
 
-list.on('list:change', ({ detail: { draggable } }) => console.log('order changed by', draggable.element))
+list.on('list:change', ({ draggable }) => console.log('order changed by', draggable.element))
 ```
 
 #### Options
@@ -215,12 +215,12 @@ list.on('list:change', ({ detail: { draggable } }) => console.log('order changed
 
 #### Events
 
-| Event | `event.detail` | DOM event | Description |
+| Event | Event data | DOM event | Description |
 | --- | --- | --- | --- |
 | `list:change` | `{ list, draggable }` | `dragee:list-change` | List order changed (items swapped); `draggable` is the dragged item |
 | `list:reordered` | `{ list, draggable }` | `dragee:list-reordered` | DOM elements reordered (when `reorderOnChange: true`); `draggable` is the moved item |
 
-DOM events are dispatched from the dragged item's element and bubble, so they reach the list container and any ancestor even without the `container` option. With nested lists use `event.detail.list` to tell them apart.
+DOM events are dispatched from the dragged item's element and bubble, so they reach the list container and any ancestor even without the `container` option. With nested lists use `event.list` to tell them apart.
 
 #### Methods
 
@@ -313,8 +313,8 @@ const tray = new Tray(trayEl, draggables, {
   )
 })
 
-tray.on('tray:add', ({ detail: { draggable } }) => console.log('added', draggable.element))
-tray.on('tray:remove', ({ detail: { draggable } }) => console.log('removed', draggable.element))
+tray.on('tray:add', ({ draggable }) => console.log('added', draggable.element))
+tray.on('tray:remove', ({ draggable }) => console.log('removed', draggable.element))
 ```
 
 ### Options
@@ -333,7 +333,7 @@ tray.on('tray:remove', ({ detail: { draggable } }) => console.log('removed', dra
 
 ### Events
 
-| Event | `event.detail` | DOM event | Description |
+| Event | Event data | DOM event | Description |
 | --- | --- | --- | --- |
 | `tray:beforeAdd` | `{ tray, draggable }` | `dragee:tray-before-add` | Before a draggable is added |
 | `tray:add` | `{ tray, draggable }` | `dragee:tray-add` | After a draggable is added |
@@ -342,7 +342,7 @@ tray.on('tray:remove', ({ detail: { draggable } }) => console.log('removed', dra
 DOM events are dispatched from the tray element and bubble. For example, one listener on a kanban board can track all its columns:
 
 ```javascript
-board.addEventListener('dragee:tray-add', ({ detail: { tray, draggable } }) => {
+board.addEventListener('dragee:tray-add', ({ tray, draggable }) => {
   console.log(draggable.element, 'moved to', tray.element)
 })
 ```
@@ -452,7 +452,7 @@ const kanbanScope = scope(() => {
   const columns = columnEls.map(el => new Tray(el, cards))
 })
 
-kanbanScope.on('scope:change', ({ detail: { draggable } }) => {
+kanbanScope.on('scope:change', ({ draggable }) => {
   console.log('dropped', draggable.element, 'positions:', kanbanScope.positions)
 })
 ```
@@ -497,7 +497,7 @@ const myScope = new Scope(draggables, trays, { timeEnd: 400 })
 
 #### Events
 
-| Event | `event.detail` | Description |
+| Event | Event data | Description |
 | --- | --- | --- |
 | `scope:change` | `{ scope, draggable }` | A draggable was dropped |
 
@@ -579,10 +579,10 @@ indexOfNearestPoint(pointArray, target, radius, distanceFn?)
 
 ## Events
 
-Every dragee instance (`Draggable`, `List`, `BubblingList`, `Tray`, `Scope`) is a standard [`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget). Listeners receive a `CustomEvent`; the payload is in `event.detail`.
+Every dragee instance (`Draggable`, `List`, `BubblingList`, `Tray`, `Scope`) is a standard [`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget). Listeners receive a `CustomEvent` that carries the payload as its own properties, so handlers can destructure it, e.g. `({ draggable }) => {}`; the same data is also in `event.detail`. Keep the event itself when you need `event.preventDefault()`.
 
 ```javascript
-draggable.addEventListener('drag:end', (event) => console.log(event.detail.draggable))
+draggable.addEventListener('drag:end', ({ draggable }) => console.log(draggable))
 ```
 
 | Method | Description |
@@ -617,7 +617,7 @@ new Draggable(el, {
 ## Migrating from 1.x
 
 - **Browser support:** Chrome / Edge 90+, Firefox 86+, Safari 15+ are required (see [Browser support](#browser-support)).
-- **Listeners receive an `Event`.** Read the payload from `event.detail`: `tray.on('tray:add', ({ detail: { draggable } }) => {})` instead of `target.on('target:add', (draggable) => {})`.
+- **Listeners receive an `Event`** that carries the payload: `tray.on('tray:add', ({ draggable }) => {})` instead of `target.on('target:add', (draggable) => {})`.
 - **`Target` is renamed to `Tray`**, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data.
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.

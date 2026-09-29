@@ -21,6 +21,15 @@ describe('EventEmitter', () => {
       ])
     })
 
+    it('should put the event data on the event itself', () => {
+      const received = []
+      emitter.on('test', ({ value, detail }) => received.push([value, detail]))
+
+      emitter.emit('test', { value: 42 })
+
+      expect(received).toEqual([[42, { value: 42 }]])
+    })
+
     it('should register initial listeners from the on option', () => {
       const fn = jest.fn()
       const em = new EventEmitter({ on: { 'init': fn } })

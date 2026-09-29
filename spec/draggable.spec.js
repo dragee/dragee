@@ -114,9 +114,9 @@ describe('draggable/drag lifecycle', () => {
   it('should dispatch bubbling dragee:* DOM events that can be delegated to an ancestor', () => {
     const draggable = createDraggable()
     const received = []
-    document.body.addEventListener('dragee:start', (e) => received.push([e.type, e.detail.draggable]))
-    document.body.addEventListener('dragee:move', (e) => received.push([e.type, e.detail.draggable]))
-    document.body.addEventListener('dragee:end', (e) => received.push([e.type, e.detail.draggable]))
+    document.body.addEventListener('dragee:start', ({ type, draggable }) => received.push([type, draggable]))
+    document.body.addEventListener('dragee:move', ({ type, draggable }) => received.push([type, draggable]))
+    document.body.addEventListener('dragee:end', ({ type, draggable }) => received.push([type, draggable]))
 
     simulateDrag(draggable, new Point(10, 10), new Point(50, 50))
     endDrag(new Point(50, 50))

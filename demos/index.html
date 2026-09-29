@@ -1030,10 +1030,10 @@
                                 }
                               ),
                               on: {
-                                'tray:add': ({ detail: { draggable } }) => {
+                                'tray:add': ({ draggable }) => {
                                   draggable.element.classList.add(classForTargets[i]);
                                 },
-                                'tray:remove': ({ detail: { draggable } }) => {
+                                'tray:remove': ({ draggable }) => {
                                   draggable.element.classList.remove(classForTargets[i]);
                                 }
                               }
@@ -1212,10 +1212,10 @@
                                   return tray.getRectangle();
                                 }),
                                 on: {
-                                  'tray:add': function({ detail: { draggable } }) {
+                                  'tray:add': function({ draggable }) {
                                     draggable.element.classList.add("ontarget")
                                   },
-                                  'tray:remove': function({ detail: { draggable } }) {
+                                  'tray:remove': function({ draggable }) {
                                     draggable.element.classList.remove("ontarget")
                                   }
                                 }
