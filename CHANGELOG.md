@@ -39,6 +39,7 @@
 - `Draggable.destroy()` did not remove the draggable from its scope (this also leaked the clone used for touch drag emulation)
 - `Tray` (`Target` in 1.x) did not react to layout changes such as window resize: its draggables kept stale offsets and positions. It now re-measures them and lays them out again
 - `Tray.add()` crashed with `NotCrossingStrategy` (the index of the new draggable was passed as a number instead of an array)
+- `reorderOnChange` did nothing unless the list had the `container` option; it now reorders the elements within their parent. Without it, a later resize (e.g. expanding an item) reset the items to their old DOM order
 - `BubblingList.remove()` detected the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
 - swapped `leftDirection` / `rightDirection` flags in `Draggable` (moving right used to set `leftDirection`)
 

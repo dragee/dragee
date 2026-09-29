@@ -99,4 +99,19 @@ describe('BubblingList', () => {
       expect(last.pinnedPosition.y).toBe(10)
     })
   })
+
+  describe('reorderOnChange', () => {
+    it.each([
+      ['next to its new neighbours', new Point(0, 45), [1, 0, 2]],
+      ['at the end', new Point(0, 95), [1, 2, 0]]
+    ])('should move the dropped element %s in the DOM without the container option', (_name, delta, expectedOrder) => {
+      const { container, draggables } = createDraggables(3, (i) => ({ position: new Point(0, i * 50) }))
+      const elements = draggables.map((draggable) => draggable.element)
+      new BubblingList(draggables, { reorderOnChange: true })
+
+      dragBy(draggables[0], delta)
+
+      expect([...container.children]).toEqual(expectedOrder.map((i) => elements[i]))
+    })
+  })
 })

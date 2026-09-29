@@ -228,7 +228,7 @@ list.on('list:change', ({ draggable }) => console.log('order changed by', dragga
 | `timeExchange` | `number` | `400` | Animation ms for swapping items |
 | `radius` | `number` | `30` | Distance threshold for nearest slot detection |
 | `container` | `Element` | — | Container for resize observation |
-| `reorderOnChange` | `boolean` | `false` | Reorder DOM elements on swap |
+| `reorderOnChange` | `boolean` | `false` | Reorder DOM elements on swap (within their parent element; `container` is not required) |
 | `sorting` | `(a, b) => number` | by y, then x | Custom sort comparator |
 | `getDistance` | `(p1, p2) => number` | Euclidean | Custom distance function |
 | `domEvents` | `boolean` | `true` | Dispatch `dragee:*` DOM events (see Events) |

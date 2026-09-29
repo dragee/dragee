@@ -111,7 +111,7 @@ export default class List extends EventEmitter {
       this.emitListEvent('change', draggable)
       this.changedDuringIteration = false
 
-      if (this.options.reorderOnChange && this.options.container) {
+      if (this.options.reorderOnChange) {
         this.reorderElements(draggable)
       }
     }
@@ -121,13 +121,14 @@ export default class List extends EventEmitter {
     const sortedDraggables = this.getSortedDraggables()
     const index = sortedDraggables.indexOf(movedDraggable)
     const next = sortedDraggables[index + 1]
+    const previous = sortedDraggables[index - 1]
 
     this.reset()
 
     if (next) {
-      this.container.insertBefore(movedDraggable.element, next.element)
-    } else {
-      this.container.appendChild(movedDraggable.element)
+      next.element.before(movedDraggable.element)
+    } else if (previous) {
+      previous.element.after(movedDraggable.element)
     }
 
     this.draggables.forEach((d) => d.startPositioning())
