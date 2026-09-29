@@ -13,7 +13,7 @@ export default class List extends EventEmitter {
     super(options)
     this.options = Object.assign({
       timeEnd: 200,
-      timeExcange: 400,
+      timeExchange: 400,
       radius: 30
     }, options)
 
@@ -88,11 +88,11 @@ export default class List extends EventEmitter {
     if (targetIndex !== -1 && currentIndex !== targetIndex) {
       if (targetIndex < currentIndex) {
         for (let i=targetIndex; i<currentIndex; i++) {
-          sortedDraggables[i].pinPosition(pinnedPositions[i+1], this.options.timeExcange)
+          sortedDraggables[i].pinPosition(pinnedPositions[i+1], this.options.timeExchange)
         }
       } else {
         for (let i=currentIndex; i<targetIndex; i++) {
-          sortedDraggables[i+1].pinPosition(pinnedPositions[i], this.options.timeExcange)
+          sortedDraggables[i+1].pinPosition(pinnedPositions[i], this.options.timeExchange)
         }
       }
 
@@ -177,7 +177,7 @@ export default class List extends EventEmitter {
     sortedDraggables.forEach((draggable) => {
       if (this.draggables.indexOf(draggable) !== -1) {
         if (draggable.pinnedPosition !== initialPositions[j]) {
-          draggable.pinPosition(initialPositions[j], this.options.timeExcange)
+          draggable.pinPosition(initialPositions[j], this.options.timeExchange)
         }
         draggable.initialPosition = initialPositions[j]
         j++

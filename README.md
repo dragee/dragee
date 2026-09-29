@@ -224,7 +224,7 @@ list.on('list:change', ({ draggable }) => console.log('order changed by', dragga
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `timeEnd` | `number` | `200` | Animation ms when dropped |
-| `timeExcange` | `number` | `400` | Animation ms for swapping items |
+| `timeExchange` | `number` | `400` | Animation ms for swapping items |
 | `radius` | `number` | `30` | Distance threshold for nearest slot detection |
 | `container` | `Element` | — | Container for resize observation |
 | `reorderOnChange` | `boolean` | `false` | Reorder DOM elements on swap |
@@ -321,7 +321,7 @@ const draggables = [/* array of Draggable instances */]
 
 const tray = new Tray(trayEl, draggables, {
   timeEnd: 200,
-  timeExcange: 400,
+  timeExchange: 400,
   container: parentElement,
   strategy: new FloatLeftStrategy(
     () => tray.getRectangle(),
@@ -342,7 +342,7 @@ tray.on('tray:remove', ({ draggable }) => console.log('removed', draggable.eleme
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `timeEnd` | `number` | `200` | Animation ms for new items entering |
-| `timeExcange` | `number` | `400` | Animation ms for repositioning existing items |
+| `timeExchange` | `number` | `400` | Animation ms for repositioning existing items |
 | `strategy` | `Strategy` | `FloatLeftStrategy` | Positioning strategy instance |
 | `bound` | `(point, size) => Point` | `BoundToElement` | Post-drop constraint |
 | `catchDraggable` | `(tray, draggable) => boolean` | center inclusion | Custom hit-test for accepting drops |
@@ -647,6 +647,7 @@ new Draggable(el, {
 - **Browser support:** Chrome / Edge 90+, Firefox 86+, Safari 15+ are required (see [Browser support](#browser-support)).
 - **Listeners receive an `Event`** that carries the payload: `tray.on('tray:add', ({ draggable }) => {})` instead of `target.on('target:add', (draggable) => {})`.
 - **`Target` is renamed to `Tray`**, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data.
+- **`timeExcange` is renamed to `timeExchange`** in `List`, `BubblingList` and `Tray`. The old name is ignored.
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.
 - **`dragEndAction` can no longer be overridden.** Listen to `drag:release` and call `event.cancel()` to place a dropped draggable yourself.

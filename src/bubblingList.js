@@ -61,7 +61,7 @@ export default class BubblingList extends List {
         }
         const prevNewPosition = this.nextPosition(draggable.pinnedPosition, draggable)
         prevNewPosition[this.crossAxis] = currentPosition[this.crossAxis]
-        prevDraggable.pinPosition(prevNewPosition, this.options.timeExcange)
+        prevDraggable.pinPosition(prevNewPosition, this.options.timeExchange)
         arrayMove(this.cachedSortedDraggables, this.indexOfActiveDraggable--, this.indexOfActiveDraggable)
         this.onMove(draggable)
         this.changedDuringIteration = true
@@ -71,7 +71,7 @@ export default class BubblingList extends List {
       targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc)
 
       if(targetIndex === 1) {
-        nextDraggable.pinPosition(draggable.pinnedPosition, this.options.timeExcange)
+        nextDraggable.pinPosition(draggable.pinnedPosition, this.options.timeExchange)
         const draggableNewPosition = this.nextPosition(nextDraggable.pinnedPosition, nextDraggable)
         if(draggable.shouldUseNativeDragAndDrop()) {
           draggable.pinPosition(draggableNewPosition)
@@ -94,7 +94,7 @@ export default class BubblingList extends List {
         if (draggable === currentDraggable && !currentDraggable.shouldUseNativeDragAndDrop()) {
           draggable.pinnedPosition = currentPosition.clone()
         } else {
-          draggable.pinPosition(currentPosition, (draggable === currentDraggable) ? 0 : this.options.timeExcange)
+          draggable.pinPosition(currentPosition, (draggable === currentDraggable) ? 0 : this.options.timeExchange)
         }
       }
 

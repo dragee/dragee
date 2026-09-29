@@ -14,7 +14,7 @@ export default class Tray extends EventEmitter {
 
     this.options = Object.assign({
       timeEnd: 200,
-      timeExcange: 400
+      timeExchange: 400
     }, options)
 
     this.positioningStrategy = options.strategy || new FloatLeftStrategy(
@@ -139,7 +139,7 @@ export default class Tray extends EventEmitter {
   setPosition(rectangles, indexesOfNew, time) {
     this.innerDraggables.slice(0).forEach((draggable, i) => {
       const rect = rectangles[i],
-        timeEnd = time || time === 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExcange
+        timeEnd = time || time === 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExchange
 
       if (rect.removable) {
         draggable.move(draggable.initialPosition, timeEnd, true, true)
