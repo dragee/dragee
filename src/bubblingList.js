@@ -21,7 +21,7 @@ export default class BubblingList extends List {
 
   autoDetectStartPosition() {
     if (this.draggables.length >= 1 && !this.startPosition) {
-      this.startPosition = this.draggables[0].pinnedPosition
+      this.startPosition = this.getSortedDraggables()[0].pinnedPosition
     }
   }
 

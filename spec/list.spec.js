@@ -90,6 +90,61 @@ describe('list/add', () => {
   })
 })
 
+describe('list/order of draggables', () => {
+  function createColumn() {
+    const { container, draggables } = createDraggables(3, (i) => ({ position: new Point(0, i * 50) }))
+    const list = new List(draggables, { container })
+    return { list, draggables }
+  }
+
+  function dragBy(draggable, delta) {
+    const from = draggable.pinnedPosition
+    simulateDrag(draggable, from, from.add(delta))
+    endDrag(from.add(delta))
+  }
+
+  it('should keep list.draggables in the given order after drags reorder the items', () => {
+    const { list, draggables } = createColumn()
+    const given = draggables.slice()
+
+    dragBy(given[0], new Point(0, 50))
+    dragBy(given[2], new Point(0, 5))
+
+    expect(list.draggables.map((d) => given.indexOf(d))).toEqual([0, 1, 2])
+  })
+
+  it('should restore the layout from positions saved before the drags', () => {
+    const { list, draggables: [first, second, third] } = createColumn()
+    const saved = list.positions
+
+    dragBy(first, new Point(0, 50))
+    dragBy(third, new Point(0, 5))
+    list.positions = saved
+
+    expect([first, second, third].map((d) => d.pinnedPosition.y)).toEqual([0, 50, 100])
+  })
+
+  it('should close the hole from the topmost slot when draggables are given in another order', () => {
+    const { container, draggables } = createDraggables(3, (i) => ({ position: new Point(0, (2 - i) * 50) }))
+    const [bottom, middle, top] = draggables
+    const list = new List(draggables, { container })
+
+    list.remove(middle)
+
+    expect([top, bottom].map((d) => d.pinnedPosition.y)).toEqual([0, 50])
+  })
+
+  it('should close the hole in the current order when an item is removed after drags', () => {
+    const { list, draggables: [first, second, third] } = createColumn()
+
+    dragBy(first, new Point(0, 50))
+    dragBy(third, new Point(0, 5))
+    list.remove(second)
+
+    expect([first, third].map((d) => d.pinnedPosition.y)).toEqual([0, 50])
+  })
+})
+
 describe('list/remove', () => {
   it('should remove a draggable from the list', () => {
     const { list, draggables } = createListSetup(3)

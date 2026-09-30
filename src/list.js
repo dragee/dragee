@@ -142,7 +142,7 @@ export default class List extends EventEmitter {
   }
 
   getSortedDraggables() {
-    return this.draggables.sort(this.sorting.bind(this))
+    return this.draggables.slice().sort(this.sorting.bind(this))
   }
 
   reset() {
@@ -162,28 +162,21 @@ export default class List extends EventEmitter {
   }
 
   remove(draggables) {
-    const initialPositions = this.draggables.map((draggable) => draggable.initialPosition)
-    const list = []
-    const sortedDraggables = this.getSortedDraggables()
-
     if (!(draggables instanceof Array)) {
       draggables = [draggables]
     }
 
+    const sortedDraggables = this.getSortedDraggables()
+    const slots = sortedDraggables.map((draggable) => draggable.pinnedPosition)
+
     draggables.forEach((draggable) => this.releaseDraggable(draggable))
 
-    let j = 0
-    sortedDraggables.forEach((draggable) => {
-      if (this.draggables.indexOf(draggable) !== -1) {
-        if (draggable.pinnedPosition !== initialPositions[j]) {
-          draggable.pinPosition(initialPositions[j], { duration: this.options.timeExchange })
-        }
-        draggable.initialPosition = initialPositions[j]
-        j++
-        list.push(draggable)
+    sortedDraggables.filter((draggable) => this.draggables.includes(draggable)).forEach((draggable, i) => {
+      if (!draggable.pinnedPosition.compare(slots[i])) {
+        draggable.pinPosition(slots[i], { duration: this.options.timeExchange })
       }
+      draggable.initialPosition = slots[i]
     })
-    this.draggables = list
   }
 
   clear() {

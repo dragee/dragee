@@ -91,6 +91,16 @@ describe('BubblingList', () => {
       expect(last.pinnedPosition.y).toBe(7)
     })
 
+    it('should close the hole from the topmost item when draggables are given in another order', () => {
+      const { container, draggables } = createDraggables(3, (i) => ({ position: new Point(0, (2 - i) * 50) }))
+      const [bottom, middle, top] = draggables
+      const list = new BubblingList(draggables, { container })
+
+      list.remove(middle)
+
+      expect([top, bottom].map((d) => d.pinnedPosition.y)).toEqual([0, 50])
+    })
+
     it('should support the verticalGap option', () => {
       const { list, draggables: [, middle, last] } = createBubblingSetup({ verticalGap: 10 })
 
