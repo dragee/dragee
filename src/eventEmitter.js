@@ -4,6 +4,7 @@ import dispatchDomEvent from './utils/dispatch-dom-event.js'
 export default class EventEmitter extends EventTarget {
   constructor (options = {}) {
     super()
+    this.options = options
 
     if (options && options.on) {
       Object.entries(options.on).forEach(([eventName, fn]) => this.on(eventName, fn))
@@ -42,6 +43,6 @@ export default class EventEmitter extends EventTarget {
   }
 
   get domEvents() {
-    return !this.options || this.options.domEvents !== false
+    return this.options?.domEvents !== false
   }
 }

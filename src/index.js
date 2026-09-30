@@ -1,3 +1,5 @@
+import EventEmitter from './eventEmitter.js'
+import DrageeEvent from './utils/dragee-event.js'
 import Point from './geometry/point.js'
 import Rectangle from './geometry/rectangle.js'
 import Draggable from './draggable.js'
@@ -27,6 +29,7 @@ import {
 } from './bounding.js'
 
 export {
+  EventEmitter, DrageeEvent,
   Draggable,
   Point, Rectangle,
   List,

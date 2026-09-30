@@ -1,4 +1,5 @@
 import EventEmitter from '../src/eventEmitter'
+import * as Root from '../src/index'
 
 describe('EventEmitter', () => {
   let emitter
@@ -57,5 +58,51 @@ describe('EventEmitter', () => {
       expect(fn).toHaveBeenCalledTimes(1)
       expect(fn.mock.calls[0][0].detail).toBe(1)
     })
+  })
+})
+
+describe('EventEmitter subclass from the package root', () => {
+  class Widget extends Root.EventEmitter {
+    constructor(element, options = {}) {
+      super(options)
+      this.element = element
+    }
+
+    change(value) {
+      return this.emitWithDomEvent(this.element, 'widget:change', 'widget-change', { widget: this, value }, { cancelable: true })
+    }
+  }
+
+  function createWidget(options) {
+    const element = document.createElement('div')
+    document.body.appendChild(element)
+    return new Widget(element, options)
+  }
+
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it.each([
+    [{}, 1],
+    [{ domEvents: false }, 0]
+  ])('should dispatch the DOM event depending on the options %p', (options, domEventCount) => {
+    const widget = createWidget(options)
+    const onDomChange = jest.fn()
+    document.body.addEventListener('widget-change', onDomChange)
+
+    widget.change(5)
+
+    expect(onDomChange).toHaveBeenCalledTimes(domEventCount)
+  })
+
+  it.each([
+    ['a listener', (widget) => widget.on('widget:change', (event) => event.cancel())],
+    ['a DOM listener', () => document.body.addEventListener('widget-change', (event) => event.preventDefault())]
+  ])('should return the event as canceled when %s cancels it', (_name, cancel) => {
+    const widget = createWidget()
+    cancel(widget)
+
+    expect(widget.change(5).canceled).toBe(true)
   })
 })
