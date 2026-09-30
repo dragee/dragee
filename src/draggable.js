@@ -13,7 +13,6 @@ const throttledDragOver = (callback, duration) => {
   }
 }
 
-const passiveFalse = { passive: false }
 const formFieldSelector = 'input, textarea, select, [contenteditable]:not([contenteditable="false"])'
 
 const isTouch = navigator.maxTouchPoints > 0
@@ -115,17 +114,11 @@ export default class Draggable extends EventEmitter {
   }
 
   startListening() {
-    this._dragStart = (event) => this.dragStart(event)
-    this._dragMove = (event) => this.dragMove(event)
-    this._dragEnd = (event) => this.dragEnd(event)
-    this._nativeDragStart = (event) => this.nativeDragStart(event)
-    this._nativeDragOver = throttledDragOver((event) => this.nativeDragOver(event), this.dragOverThrottleDuration)
-    this._nativeDragEnd = (event) => this.nativeDragEnd(event)
-    this._nativeDrop = (event) => this.nativeDrop(event)
-    this._scroll = (event) => this.onScroll(event)
+    this.listeners = new AbortController()
+    const options = { passive: false, signal: this.listeners.signal }
 
-    this.handler.addEventListener(touchEvents.start, this._dragStart, passiveFalse)
-    this.handler.addEventListener(mouseEvents.start, this._dragStart, passiveFalse)
+    this.handler.addEventListener(touchEvents.start, (event) => this.dragStart(event), options)
+    this.handler.addEventListener(mouseEvents.start, (event) => this.dragStart(event), options)
   }
 
   getSize() {
@@ -232,7 +225,7 @@ export default class Draggable extends EventEmitter {
   }
 
   isFormField(target) {
-    const field = target instanceof Element && target.closest(formFieldSelector)
+    const field = target instanceof window.Element && target.closest(formFieldSelector)
     return Boolean(field) && this.element.contains(field)
   }
 
@@ -274,10 +267,14 @@ export default class Draggable extends EventEmitter {
     this._startWindowScrollPoint = this.windowScrollPoint
     this._startScrollElementsOffset = this.scrollElementsOffset
 
+    this.dragListeners?.abort()
+    const { signal } = this.dragListeners = new AbortController()
+    const options = { passive: false, signal }
+
     this._dragStartPending = !this.shouldUseNativeDragAndDrop() && this.dragStartThreshold > 0
     if (!this._dragStartPending) {
       const startEvent = this.emitDragEvent('start', { cancelable: true })
-      if (startEvent.canceled) {
+      if (startEvent.canceled || signal.aborted) {
         return
       }
     }
@@ -299,23 +296,25 @@ export default class Draggable extends EventEmitter {
           document.removeEventListener(touchEvents.end, cancelEmulation)
         }
 
-        document.addEventListener(touchEvents.move, emulateOnFirstMove, passiveFalse)
-        document.addEventListener(touchEvents.end, cancelEmulation, passiveFalse)
+        document.addEventListener(touchEvents.move, emulateOnFirstMove, options)
+        document.addEventListener(touchEvents.end, cancelEmulation, options)
       } else {
-        this.element.addEventListener('dragstart', this._nativeDragStart)
+        this.element.addEventListener('dragstart', (event) => this.nativeDragStart(event), { signal })
         this.element.draggable = true
-        document.addEventListener(mouseEvents.end, this._nativeDragEnd, passiveFalse)
+        document.addEventListener(mouseEvents.end, (event) => this.nativeDragEnd(event), options)
       }
     } else {
-      document.addEventListener(touchEvents.move, this._dragMove, passiveFalse)
-      document.addEventListener(mouseEvents.move, this._dragMove, passiveFalse)
-
-      document.addEventListener(touchEvents.end, this._dragEnd, passiveFalse)
-      document.addEventListener(mouseEvents.end, this._dragEnd, passiveFalse)
+      const dragMove = (event) => this.dragMove(event)
+      const dragEnd = (event) => this.dragEnd(event)
+      document.addEventListener(touchEvents.move, dragMove, options)
+      document.addEventListener(mouseEvents.move, dragMove, options)
+      document.addEventListener(touchEvents.end, dragEnd, options)
+      document.addEventListener(mouseEvents.end, dragEnd, options)
     }
 
-    window.addEventListener('scroll', this._scroll)
-    this.scrollElements.forEach((p) => p.addEventListener('scroll', this._scroll))
+    const onScroll = (event) => this.onScroll(event)
+    window.addEventListener('scroll', onScroll, { signal })
+    this.scrollElements.forEach((p) => p.addEventListener('scroll', onScroll, { signal }))
   }
 
   dragMove(event) {
@@ -348,7 +347,7 @@ export default class Draggable extends EventEmitter {
       }
       this._dragStartPending = false
       const startEvent = this.emitDragEvent('start', { cancelable: true })
-      if (startEvent.canceled) {
+      if (startEvent.canceled || this.dragListeners.signal.aborted) {
         this.cancelDragging()
         return
       }
@@ -410,9 +409,11 @@ export default class Draggable extends EventEmitter {
     event.stopPropagation()
     event.dataTransfer.setData('text', 'FireFox fix')
     event.dataTransfer.effectAllowed = 'move'
-    document.addEventListener('dragover', this._nativeDragOver)
-    document.addEventListener('dragend', this._nativeDragEnd)
-    document.addEventListener('drop', this._nativeDrop)
+
+    const { signal } = this.dragListeners
+    document.addEventListener('dragover', throttledDragOver((event) => this.nativeDragOver(event), this.dragOverThrottleDuration), { signal })
+    document.addEventListener('dragend', (event) => this.nativeDragEnd(event), { signal })
+    document.addEventListener('drop', (event) => this.nativeDrop(event), { signal })
   }
 
   nativeDragOver(event) {
@@ -437,15 +438,9 @@ export default class Draggable extends EventEmitter {
     this.element.classList.remove('dragee-placeholder')
     this.release()
     this.emitDragEvent('end')
-    document.removeEventListener('dragover', this._nativeDragOver)
-    document.removeEventListener('dragend', this._nativeDragEnd)
-    document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
-    document.removeEventListener('drop', this._nativeDrop)
-    window.removeEventListener('scroll', this._scroll)
-    this.scrollElements.forEach((p) => p.removeEventListener('scroll', this._scroll))
+    this.dragListeners.abort()
     this.isDragging = false
     this.element.removeAttribute('draggable')
-    this.element.removeEventListener('dragstart', this._nativeDragStart)
     this.element.classList.remove('dragee-active')
   }
 
@@ -455,21 +450,10 @@ export default class Draggable extends EventEmitter {
   }
 
   cancelDragging () {
-    document.removeEventListener(touchEvents.move, this._dragMove)
-    document.removeEventListener(mouseEvents.move, this._dragMove)
-
-    document.removeEventListener(touchEvents.end, this._dragEnd)
-    document.removeEventListener(mouseEvents.end, this._dragEnd)
-
-    document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
-
-    window.removeEventListener('scroll', this._scroll)
-    this.scrollElements.forEach((p) => p.removeEventListener('scroll', this._scroll))
-
+    this.dragListeners?.abort()
     this.isDragging = false
     this._previousDirectionPosition = null
     this.element.removeAttribute('draggable')
-    this.element.removeEventListener('dragstart', this._nativeDragStart)
   }
 
   copyStyles(source, destination) {
@@ -555,18 +539,10 @@ export default class Draggable extends EventEmitter {
   }
 
   destroy() {
-    this.handler.removeEventListener(touchEvents.start, this._dragStart)
-    this.handler.removeEventListener(mouseEvents.start, this._dragStart)
-    this.element.removeEventListener('dragstart', this._nativeDragStart)
-    document.removeEventListener(touchEvents.move, this._dragMove)
-    document.removeEventListener(mouseEvents.move, this._dragMove)
-    document.removeEventListener(touchEvents.end, this._dragEnd)
-    document.removeEventListener(mouseEvents.end, this._dragEnd)
-    document.removeEventListener('dragover', this._nativeDragOver)
-    document.removeEventListener('dragend', this._nativeDragEnd)
-    document.removeEventListener(mouseEvents.end, this._nativeDragEnd)
-    document.removeEventListener('drop', this._nativeDrop)
+    this.listeners.abort()
+    this.dragListeners?.abort()
     scopes.forEach((scope) => scope.releaseDraggable(this))
+    this.trays.slice().forEach((tray) => tray.releaseDraggable(this))
 
     const index = draggables.indexOf(this)
     if (index > -1) {

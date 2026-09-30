@@ -98,6 +98,27 @@ describe('Tray', () => {
   })
 })
 
+describe('Tray and destroyed draggables', () => {
+  it('should forget a draggable that is destroyed', () => {
+    const { tray, draggables: [draggable, other] } = createTargetSetup()
+    tray.add(draggable)
+    tray.add(other)
+
+    draggable.destroy()
+
+    expect(tray.draggables).not.toContain(draggable)
+    expect(tray.getSortedDraggables()).toEqual([other])
+  })
+
+  it('should no longer be listed in the trays of its draggables after destroy', () => {
+    const { tray, draggables: [draggable] } = createTargetSetup()
+
+    tray.destroy()
+
+    expect(draggable.trays).not.toContain(tray)
+  })
+})
+
 describe('Tray on page resize', () => {
   let layout
 

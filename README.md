@@ -132,7 +132,7 @@ Lists and scopes place their draggables through the same event and leave the dro
 | `getRectangle` | `()` → `Rectangle` | Get Rectangle from position + size |
 | `cancelDragging` | `()` | Cancel active drag, remove move/end listeners |
 | `refresh` | `()` | Refresh bounding constraints |
-| `destroy` | `()` | Remove all listeners, clean up |
+| `destroy` | `()` | Remove all listeners, including those of a drag in progress, and remove the draggable from its scope and trays |
 
 ### Properties
 
@@ -383,9 +383,10 @@ board.addEventListener('dragee:tray-add', ({ tray, draggable }) => {
 | `add` | `(draggable, time?)` | Programmatically add a draggable |
 | `accept` | `(draggable)` | Let a draggable be dropped into this tray without placing it there |
 | `remove` | `(draggable)` | Remove a draggable from the tray |
+| `releaseDraggable` | `(draggable)` | Stop accepting a draggable (the reverse of `accept`); `draggable.destroy()` calls it for each of its trays |
 | `reset` | `()` | Remove all draggables, reset to initial state |
 | `refresh` | `()` | Recalculate positions for all inner draggables |
-| `destroy` | `()` | Remove tray from all scopes |
+| `destroy` | `()` | Stop watching its draggables and remove the tray from all scopes |
 | `getRectangle` | `()` → `Rectangle` | Get tray's Rectangle |
 | `getPosition` | `()` → `Point` | Get tray's position |
 | `getSize` | `()` → `Point` | Get tray's size |
@@ -656,7 +657,6 @@ new Draggable(el, {
 - **Errors are `Error` objects** instead of strings: a second `Draggable` for the same element throws an `Error`, and setting `positions` of the wrong length on a `List` or `Scope` throws a `RangeError`.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.
 - **`dragEndAction` can no longer be overridden.** Listen to `drag:release` and call `event.cancel()` to place a dropped draggable yourself.
-- **Canceling a drag start:** call `event.cancel()` in a `drag:start` listener. Calling `cancelDragging()` or `destroy()` there no longer stops the drag, because `drag:start` now fires before the drag listeners are attached.
 - **A drop refused by a tray** (`tray:beforeAdd` prevented, or a custom `catchDraggable` accepting a draggable whose center is outside) returns the draggable to its initial position.
 
 ---

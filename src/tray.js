@@ -29,7 +29,7 @@ export default class Tray extends EventEmitter {
 
     this.element = element
     this.draggables = []
-    this.listeners = new AbortController()
+    this.controllers = new Map()
     draggables.forEach((draggable) => this.accept(draggable))
 
     const scope = options.scope || currentScope()
@@ -117,7 +117,9 @@ export default class Tray extends EventEmitter {
   }
 
   destroy() {
-    this.listeners.abort()
+    this.controllers.forEach((controller) => controller.abort())
+    this.controllers.clear()
+    this.draggables.forEach((draggable) => removeItem(draggable.trays, this))
     this.resizeObserver.disconnect()
     scopes.forEach((scope) => removeItem(scope.trays, this))
   }
@@ -201,7 +203,18 @@ export default class Tray extends EventEmitter {
 
     this.draggables.push(draggable)
     draggable.trays.push(this)
-    draggable.addEventListener('drag:move', () => this.remove(draggable), { signal: this.listeners.signal })
+
+    const controller = new AbortController()
+    this.controllers.set(draggable, controller)
+    draggable.addEventListener('drag:move', () => this.remove(draggable), { signal: controller.signal })
+  }
+
+  releaseDraggable(draggable) {
+    this.remove(draggable)
+    this.controllers.get(draggable)?.abort()
+    this.controllers.delete(draggable)
+    removeItem(this.draggables, draggable)
+    removeItem(draggable.trays, this)
   }
 
   remove(draggable) {

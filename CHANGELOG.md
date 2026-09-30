@@ -15,7 +15,6 @@
 - errors are thrown as `Error` objects instead of strings: `Error` for a second `Draggable` on the same element, `RangeError` for `positions` of the wrong length on `List` / `Scope`
 - rename the `timeExcange` option to `timeExchange` (`List`, `BubblingList`, `Tray`); the old name is ignored
 - remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
-- `drag:start` fires before the drag listeners are attached, so calling `cancelDragging()` or `destroy()` from a `drag:start` listener no longer stops the drag; call `event.cancel()` instead
 - a drop refused by a tray returns the draggable to its initial position (previously it stayed where it was dropped)
 - replace the overridable `dragEndAction()` with the cancelable `drag:release` event; `List` and `Scope` place their draggables through it. `scope:change` is emitted only for draggables that belong to trays
 
@@ -31,9 +30,12 @@
 - the `gap` option for `BubblingList`; `verticalGap` is an alias for it. An explicit `0` gap is now respected instead of triggering auto-detection
 - the `scope` option for `Draggable` and `Tray` to join a given scope, e.g. for instances created after `scope()` has returned
 - `Tray.accept(draggable)` lets a draggable be dropped into a tray without placing it there, e.g. for draggables created after the tray
+- `Tray.releaseDraggable(draggable)`, the reverse of `accept()`
 - `Draggable.remeasure()` re-reads the element's place in the layout; a draggable at its initial position moves to the new one, others keep their position
 
 ### Fixed
+- `Draggable.destroy()` during a drag left its `scroll` listeners attached, so the destroyed draggable kept moving on page scroll; it also stayed in its trays. Its listeners now live on `AbortController`s and are all removed, and each tray forgets it (`Tray.releaseDraggable()`)
+- `Tray.destroy()` stayed listed in `draggable.trays` of its draggables
 - pressing a draggable nested in another one started a drag for both: the outer one got `drag:start`, became `draggable` and, with `nativeDragAndDrop`, waited for a `mouseup` that never came, finishing its "drag" on the next click anywhere. Only the innermost enabled draggable starts now
 - `List.getSortedDraggables()` sorted `list.draggables` in place, so after drags its order (and `list.positions`) no longer matched the draggables as given: restoring saved `positions` put items in the wrong places, and `remove()` could close the hole into the wrong slots
 - `Scope.addDraggable()` / `addTarget()` left the instance in its previous scope as well (e.g. `defaultScope`)

@@ -205,7 +205,10 @@ describe('draggable/canceling drag start', () => {
   it.each([
     ['a drag:start listener', {}, (draggable) => draggable.on('drag:start', (e) => e.cancel())],
     ['a delegated dragee:start listener', {}, (draggable) => draggable.element.parentElement.addEventListener('dragee:start', (e) => e.preventDefault())],
-    ['a drag:start listener with dragStartThreshold', { dragStartThreshold: 5 }, (draggable) => draggable.on('drag:start', (e) => e.cancel())]
+    ['a drag:start listener with dragStartThreshold', { dragStartThreshold: 5 }, (draggable) => draggable.on('drag:start', (e) => e.cancel())],
+    ['cancelDragging() in a drag:start listener', {}, (draggable) => draggable.on('drag:start', () => draggable.cancelDragging())],
+    ['cancelDragging() in a drag:start listener with dragStartThreshold', { dragStartThreshold: 5 }, (draggable) => draggable.on('drag:start', () => draggable.cancelDragging())],
+    ['destroy() in a drag:start listener', {}, (draggable) => draggable.on('drag:start', () => draggable.destroy())]
   ])('should not drag when %s cancels it', (_name, options, prevent) => {
     const draggable = createDraggable(options)
     const onMove = jest.fn()
@@ -220,6 +223,20 @@ describe('draggable/canceling drag start', () => {
     expect(onMove).not.toHaveBeenCalled()
     expect(onEnd).not.toHaveBeenCalled()
     expect(draggable.element.style.transform).toEqual('translate3d(0px, 0px, 0px)')
+  })
+})
+
+describe('draggable/canceling a native drag start', () => {
+  it.each([
+    ['event.cancel()', (draggable) => draggable.on('drag:start', (e) => e.cancel())],
+    ['cancelDragging()', (draggable) => draggable.on('drag:start', () => draggable.cancelDragging())]
+  ])('should not make the element natively draggable when a drag:start listener calls %s', (_name, prevent) => {
+    const draggable = createDraggable({ nativeDragAndDrop: true })
+    prevent(draggable)
+
+    mouseDown(draggable.element, new Point(0, 0))
+
+    expect(draggable.element.hasAttribute('draggable')).toBe(false)
   })
 })
 
@@ -351,6 +368,32 @@ describe('draggable/destroy', () => {
   it('should throw when creating two draggables on same element', () => {
     const draggable = createDraggable()
     expect(() => new Draggable(draggable.element)).toThrow(Error)
+  })
+})
+
+describe('draggable/destroy during a drag', () => {
+  it('should stop following page scroll', () => {
+    const draggable = createDraggable()
+    const onMove = jest.fn()
+    simulateDrag(draggable, new Point(0, 0), new Point(10, 10))
+    draggable.on('drag:move', onMove)
+
+    draggable.destroy()
+    window.dispatchEvent(new Event('scroll'))
+
+    expect(onMove).not.toHaveBeenCalled()
+  })
+
+  it('should stop following the pointer', () => {
+    const draggable = createDraggable()
+    const onMove = jest.fn()
+    simulateDrag(draggable, new Point(0, 0), new Point(10, 10))
+    draggable.on('drag:move', onMove)
+
+    draggable.destroy()
+    mouseMove(new Point(30, 30))
+
+    expect(onMove).not.toHaveBeenCalled()
   })
 })
 
