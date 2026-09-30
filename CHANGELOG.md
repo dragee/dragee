@@ -1,4 +1,4 @@
-## [Unreleased]
+## 2.0.0
 
 ### Breaking
 - requires Chrome / Edge 90+, Firefox 86+, Safari 15+
