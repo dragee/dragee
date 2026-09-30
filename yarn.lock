@@ -527,7 +527,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.29.7"
 
-"@babel/plugin-transform-for-of@^7.26.9", "@babel/plugin-transform-for-of@^7.29.7":
+"@babel/plugin-transform-for-of@^7.29.7":
   version "7.29.7"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-for-of/-/plugin-transform-for-of-7.29.7.tgz#c65a678592117717aacdb10c1b73a9cb85e830be"
   integrity sha512-zeSIHh0+E1Um1WJRXCFlHQYu2ieJNdivLLjlBEp+dIBu3S51n+SZZmIXjxnItw6pz56Cn+KvK68BIBVsxq2JiQ==
