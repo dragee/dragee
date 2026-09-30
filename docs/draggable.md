@@ -25,12 +25,12 @@ new Draggable(element, {
 ```
 
 ### container
-DOM element that define Cartesian coordinates system. It's upper left corner is taken as the origin. By default we calculate container automatically by finding first `parentNode` that have non `static` positioning
+DOM element that positions are measured from; the outer edge of its border is the origin. Defaults to `element.offsetParent`, the nearest positioned ancestor. Any ancestor can be passed, including one with `position: static`.
 
 
 ### bounding
 Bounding conception can help us to restrict `draggable` movements. We can set to move it insite rectangle, by circle, by line, etc.
-By default we will resctrict movements inside `container`
+By default movements are not restricted.
 
 ```javascript
 new Draggable(element, {

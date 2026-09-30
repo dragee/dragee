@@ -1,3 +1,11 @@
+## 2.0.1
+
+### Added
+- `EventEmitter` and `DrageeEvent` are exported, for classes with the same event API as `Draggable`, `List` and `Tray`
+
+### Fixed
+- a `container` that is not the element's `offsetParent`, such as one with `position: static`, gave a wrong offset in `Point.elementOffset()`, and so in `Draggable`, `Rectangle.fromElement()` and `BoundToElement`
+
 ## 2.0.0
 
 ### Breaking

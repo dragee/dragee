@@ -1,11 +1,78 @@
-function getParentsChain(childElement, rootElement) {
-  const chain = [];
-  let element = childElement;
-  while (element.parentNode && element !== rootElement) {
-    chain.unshift(element.parentNode);
-    element = element.parentNode;
+class DrageeEvent extends CustomEvent {
+  constructor(type, detail, options = {}) {
+    super(type, {
+      ...options,
+      detail
+    });
+    Object.assign(this, detail);
   }
-  return chain;
+  cancel() {
+    this.preventDefault();
+  }
+  get canceled() {
+    return this.defaultPrevented;
+  }
+}
+
+function dispatchDomEvent(element, eventName, detail, {
+  cancelable = false
+} = {}) {
+  const event = new DrageeEvent(eventName, detail, {
+    bubbles: true,
+    cancelable
+  });
+  element.dispatchEvent(event);
+  return event;
+}
+
+class EventEmitter extends EventTarget {
+  constructor(options = {}) {
+    super();
+    this.options = options;
+    if (options && options.on) {
+      Object.entries(options.on).forEach(([eventName, fn]) => this.on(eventName, fn));
+    }
+  }
+  emit(eventName, detail, {
+    cancelable = false
+  } = {}) {
+    const event = new DrageeEvent(eventName, detail, {
+      cancelable
+    });
+    this.dispatchEvent(event);
+    return event;
+  }
+  emitWithDomEvent(element, eventName, domEventName, detail, {
+    cancelable = false
+  } = {}) {
+    const event = this.emit(eventName, detail, {
+      cancelable
+    });
+    if (this.domEvents && dispatchDomEvent(element, domEventName, detail, {
+      cancelable
+    }).canceled) {
+      event.cancel();
+    }
+    return event;
+  }
+  on(eventName, fn, options) {
+    this.addEventListener(eventName, fn, options);
+    return () => this.off(eventName, fn);
+  }
+  once(eventName, fn) {
+    return this.on(eventName, fn, {
+      once: true
+    });
+  }
+  off(eventName, fn) {
+    this.removeEventListener(eventName, fn);
+  }
+  unsubscribe(eventName, fn) {
+    this.off(eventName, fn);
+  }
+  get domEvents() {
+    return this.options?.domEvents !== false;
+  }
 }
 
 /** Class representing a point. */
@@ -42,14 +109,7 @@ class Point {
   }
   static elementOffset(element, parent) {
     parent = parent || element.parentNode;
-    if (parent === element) {
-      return new Point(0, 0);
-    } else if (parent === element.offsetParent) {
-      return new Point(element.offsetLeft + parent.clientLeft, element.offsetTop + parent.clientTop);
-    } else {
-      const considerOffsetElements = [element, getParentsChain(element, parent).pop()];
-      return new Point(considerOffsetElements.reduce((sum, p) => sum + p.offsetLeft, 0) + parent.clientLeft, considerOffsetElements.reduce((sum, p) => sum + p.offsetTop, 0) + parent.clientTop);
-    }
+    return layoutPosition(element).sub(layoutPosition(parent));
   }
   static elementBoundingOffset(element, parent) {
     parent = parent || element.parentNode;
@@ -61,6 +121,11 @@ class Point {
     const elementRect = element.getBoundingClientRect();
     return new Point(elementRect.width, elementRect.height);
   }
+}
+function layoutPosition(element) {
+  const position = new Point(element.offsetLeft, element.offsetTop);
+  const offsetParent = element.offsetParent;
+  return offsetParent ? position.add(new Point(offsetParent.clientLeft, offsetParent.clientTop)).add(layoutPosition(offsetParent)) : position;
 }
 
 class Rectangle {
@@ -141,82 +206,6 @@ class Rectangle {
     const position = isConsiderTranslate ? Point.elementBoundingOffset(element, parent) : Point.elementOffset(element, parent);
     const size = Point.elementSize(element);
     return new Rectangle(position, size);
-  }
-}
-
-class DrageeEvent extends CustomEvent {
-  constructor(type, detail, options = {}) {
-    super(type, {
-      ...options,
-      detail
-    });
-    Object.assign(this, detail);
-  }
-  cancel() {
-    this.preventDefault();
-  }
-  get canceled() {
-    return this.defaultPrevented;
-  }
-}
-
-function dispatchDomEvent(element, eventName, detail, {
-  cancelable = false
-} = {}) {
-  const event = new DrageeEvent(eventName, detail, {
-    bubbles: true,
-    cancelable
-  });
-  element.dispatchEvent(event);
-  return event;
-}
-
-class EventEmitter extends EventTarget {
-  constructor(options = {}) {
-    super();
-    if (options && options.on) {
-      Object.entries(options.on).forEach(([eventName, fn]) => this.on(eventName, fn));
-    }
-  }
-  emit(eventName, detail, {
-    cancelable = false
-  } = {}) {
-    const event = new DrageeEvent(eventName, detail, {
-      cancelable
-    });
-    this.dispatchEvent(event);
-    return event;
-  }
-  emitWithDomEvent(element, eventName, domEventName, detail, {
-    cancelable = false
-  } = {}) {
-    const event = this.emit(eventName, detail, {
-      cancelable
-    });
-    if (this.domEvents && dispatchDomEvent(element, domEventName, detail, {
-      cancelable
-    }).canceled) {
-      event.cancel();
-    }
-    return event;
-  }
-  on(eventName, fn, options) {
-    this.addEventListener(eventName, fn, options);
-    return () => this.off(eventName, fn);
-  }
-  once(eventName, fn) {
-    return this.on(eventName, fn, {
-      once: true
-    });
-  }
-  off(eventName, fn) {
-    this.removeEventListener(eventName, fn);
-  }
-  unsubscribe(eventName, fn) {
-    this.off(eventName, fn);
-  }
-  get domEvents() {
-    return !this.options || this.options.domEvents !== false;
   }
 }
 
@@ -351,6 +340,16 @@ function throttle(func, wait) {
       lastTime = now;
     }
   };
+}
+
+function getParentsChain(childElement, rootElement) {
+  const chain = [];
+  let element = childElement;
+  while (element.parentNode && element !== rootElement) {
+    chain.unshift(element.parentNode);
+    element = element.parentNode;
+  }
+  return chain;
 }
 
 const throttledDragOver = (callback, duration) => {
@@ -1887,4 +1886,4 @@ class Tray extends EventEmitter {
   }
 }
 
-export { Bound, BoundToArc, BoundToCircle, BoundToElement, BoundToLine, BoundToLineX, BoundToLineY, BoundToRectangle, BubblingList, Draggable, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Rectangle, Scope, Tray, defaultScope, getDistance, getXDifference, getYDifference, indexOfNearestPoint, scope, scopes, transformedSpaceDistanceFactory };
+export { Bound, BoundToArc, BoundToCircle, BoundToElement, BoundToLine, BoundToLineX, BoundToLineY, BoundToRectangle, BubblingList, DrageeEvent, Draggable, EventEmitter, FloatLeftStrategy, FloatRightStrategy, List, NotCrossingStrategy, Point, Rectangle, Scope, Tray, defaultScope, getDistance, getXDifference, getYDifference, indexOfNearestPoint, scope, scopes, transformedSpaceDistanceFactory };

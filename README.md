@@ -57,7 +57,7 @@ const draggable = new Draggable(element, {
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `container` / `parent` | `Element` | `element.offsetParent` | Element that positions are measured from |
+| `container` / `parent` | `Element` | `element.offsetParent` | Element that positions are measured from, from its outer border edge. Any ancestor works, including one with `position: static` |
 | `position` | `Point` | current place | Initial position |
 | `bound` | `(point, size) => Point` | none | Function that limits where the element can move (see [Bounding](#bounding)) |
 | `bounding` | `Bound` | none | The same as `bound`, as a `Bound` instance |
@@ -292,7 +292,7 @@ tray.on('tray:add', ({ draggable }) => console.log('added', draggable.element))
 | `bound` | `(point, size) => Point` | inside the tray | Where a dropped draggable may land |
 | `timeEnd` | `number` | `200` | Animation ms of a dropped draggable moving into place |
 | `timeExchange` | `number` | `400` | Animation ms of the other draggables moving aside |
-| `container` / `parent` | `Element` | `element.offsetParent` | Element that positions are measured from |
+| `container` / `parent` | `Element` | `element.offsetParent` | Element that positions are measured from, from its outer border edge. Any ancestor works, including one with `position: static` |
 | `domEvents` | `boolean` | `true` | Dispatch bubbling `dragee:*` DOM events |
 | `scope` | `Scope` | current scope | Scope to join |
 | `on` | `object` | — | Listeners |
@@ -455,7 +455,7 @@ A 2D point or vector: `new Point(x, y)`.
 | `negative()` | The point with both coordinates negated |
 | `compare(p)` | Whether both coordinates are equal |
 | `clone()` | A copy |
-| `Point.elementOffset(element, parent?)` | Position of an element relative to `parent` |
+| `Point.elementOffset(element, parent?)` | Position of an element relative to the outer border edge of an ancestor `parent`, without transforms |
 | `Point.elementBoundingOffset(element, parent?)` | The same, from `getBoundingClientRect` (includes transforms) |
 | `Point.elementSize(element)` | Width and height of an element |
 
@@ -502,6 +502,37 @@ controller.abort()
 ```
 
 Constructors take listeners in the `on` option: `new Draggable(el, { on: { 'drag:end': fn } })`.
+
+### EventEmitter and DrageeEvent
+
+`EventEmitter` is the base class of all dragee classes. A subclass gets the same event API:
+
+```javascript
+import { EventEmitter } from 'dragee'
+
+class Slider extends EventEmitter {
+  constructor(element, options = {}) {
+    super(options)
+    this.element = element
+  }
+
+  setValue(value) {
+    const event = this.emitWithDomEvent(this.element, 'slider:change', 'slider-change', { slider: this, value }, { cancelable: true })
+    if (!event.canceled) this.value = value
+  }
+}
+
+const slider = new Slider(element, { on: { 'slider:change': ({ value }) => console.log(value) } })
+```
+
+| Method | Description |
+| --- | --- |
+| `emit(name, data?, { cancelable? })` | Dispatch a `DrageeEvent`; returns it |
+| `emitWithDomEvent(element, name, domName, data?, { cancelable? })` | Also dispatch a bubbling DOM event `domName` from `element`, unless the `domEvents` option is `false`. Canceling either event cancels the returned one |
+
+The constructor stores `options` as `this.options` and adds the listeners of its `on` option.
+
+`DrageeEvent` is a `CustomEvent` with the data in `event.detail` and as event properties, so data keys must not be `Event` properties such as `type` or `target`. `event.cancel()` and `event.canceled` stand for `preventDefault()` and `defaultPrevented`.
 
 ---
 
