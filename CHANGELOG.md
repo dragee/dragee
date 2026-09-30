@@ -34,6 +34,7 @@
 - `Draggable.remeasure()` re-reads the element's place in the layout; a draggable at its initial position moves to the new one, others keep their position
 
 ### Fixed
+- pressing a draggable nested in another one started a drag for both: the outer one got `drag:start`, became `draggable` and, with `nativeDragAndDrop`, waited for a `mouseup` that never came, finishing its "drag" on the next click anywhere. Only the innermost enabled draggable starts now
 - `List.getSortedDraggables()` sorted `list.draggables` in place, so after drags its order (and `list.positions`) no longer matched the draggables as given: restoring saved `positions` put items in the wrong places, and `remove()` could close the hole into the wrong slots
 - `Scope.addDraggable()` / `addTarget()` left the instance in its previous scope as well (e.g. `defaultScope`)
 - `List.remove()` wiped user `drag:move` / `drag:end` listeners and left the `BubblingList` `drag:start` listener attached

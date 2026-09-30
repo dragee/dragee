@@ -28,6 +28,7 @@ const touchEvents = {
   end: 'touchend'
 }
 const draggables = []
+const startEvents = new WeakSet()
 const transformProperty = 'transform'
 const transitionProperty = 'transition'
 
@@ -248,9 +249,10 @@ export default class Draggable extends EventEmitter {
   }
 
   dragStart(event) {
-    if (!this._enable || this.isFormField(event.target)) {
+    if (!this._enable || this.isFormField(event.target) || startEvents.has(event)) {
       return
     }
+    startEvents.add(event)
 
     if (this.stopPropagationOnDragStart) {
       event.stopPropagation()

@@ -421,3 +421,46 @@ describe('draggable/form fields', () => {
     expect(mousedown.defaultPrevented).toBe(false)
   })
 })
+
+describe('draggable/nested draggables', () => {
+  function createNested() {
+    const outer = createDraggable()
+    const innerElement = document.createElement('div')
+    outer.element.appendChild(innerElement)
+    const inner = track(new Draggable(innerElement, { container: outer.element }))
+    return { outer, inner }
+  }
+
+  it('should start only the innermost draggable pressed', () => {
+    const { outer, inner } = createNested()
+    const outerStart = jest.fn()
+    const innerStart = jest.fn()
+    outer.on('drag:start', outerStart)
+    inner.on('drag:start', innerStart)
+
+    mouseDown(inner.element, new Point(10, 10))
+    mouseMove(new Point(50, 50))
+
+    expect(innerStart).toHaveBeenCalledTimes(1)
+    expect(outerStart).not.toHaveBeenCalled()
+    expect(outer.position).toEqual(new Point(0, 0))
+  })
+
+  it('should start the outer draggable pressed outside the inner one', () => {
+    const { outer } = createNested()
+
+    simulateDrag(outer, new Point(10, 10), new Point(50, 50))
+
+    expect(outer.isDragging).toBe(true)
+  })
+
+  it('should start the outer draggable when the inner one is disabled', () => {
+    const { outer, inner } = createNested()
+    inner.enable = false
+
+    mouseDown(inner.element, new Point(10, 10))
+    mouseMove(new Point(50, 50))
+
+    expect(outer.isDragging).toBe(true)
+  })
+})
