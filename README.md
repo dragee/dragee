@@ -5,7 +5,7 @@
 [![bundle size](https://img.shields.io/bundlephobia/minzip/dragee)](https://bundlephobia.com/package/dragee)
 [![license](https://img.shields.io/npm/l/dragee)](https://www.npmjs.com/package/dragee)
 
-Drag-and-drop for JavaScript with precise movement constraints. No dependencies. Includes 7 geometric bounds, sortable lists (vertical and horizontal), trays to drop into, scopes to keep groups apart, and bubbling DOM events for framework integration.
+Drag-and-drop with movement constraints, sortable lists, drop trays and scopes. No dependencies.
 
 [Documentation & Demos](https://dragee.github.io/) | [GitHub](https://github.com/dragee/dragee)
 
@@ -19,11 +19,11 @@ npm install dragee
 import { Draggable, Point } from 'dragee'
 ```
 
-CommonJS works too: `const { Draggable } = require('dragee')`.
+CommonJS: `const { Draggable } = require('dragee')`.
 
 ## Browser support
 
-Chrome / Edge 90+, Firefox 86+, Safari 15+ (iOS 15+). Dragee 2 extends [`EventTarget`](https://caniuse.com/mdn-api_eventtarget_eventtarget) and uses the [`signal` listener option](https://caniuse.com/mdn-api_eventtarget_addeventlistener_options_parameter_options_signal_parameter). For older browsers use dragee 1.x.
+Chrome / Edge 90+, Firefox 86+, Safari 15+ (iOS 15+), required for subclassing [`EventTarget`](https://caniuse.com/mdn-api_eventtarget_eventtarget) and the [`signal` listener option](https://caniuse.com/mdn-api_eventtarget_addeventlistener_options_parameter_options_signal_parameter). Older browsers: dragee 1.x.
 
 ## Quick Start
 
@@ -33,7 +33,7 @@ import { Draggable } from 'dragee'
 new Draggable(document.getElementById('my-element'))
 ```
 
-The element can now be dragged. Positions are measured relative to its offset parent.
+Positions are measured relative to the element's offset parent.
 
 ## Draggable
 
@@ -62,8 +62,8 @@ const draggable = new Draggable(element, {
 | `bound` | `(point, size) => Point` | none | Function that limits where the element can move (see [Bounding](#bounding)) |
 | `bounding` | `Bound` | none | The same as `bound`, as a `Bound` instance |
 | `handler` | `Element` \| `string` | the element | Part of the element (or a CSS selector) the drag starts from |
-| `dragStartThreshold` | `number` | `0` | Pixels the pointer must move before the drag starts, so a click stays a click |
-| `touchDraggingThreshold` | `number` | `0` | Milliseconds after touch start; a touch that moves earlier is treated as scrolling |
+| `dragStartThreshold` | `number` | `0` | Pixels the pointer must move before the drag starts |
+| `touchDraggingThreshold` | `number` | `0` | A touch that moves within this many milliseconds is treated as scrolling |
 | `nativeDragAndDrop` | `boolean` | `false` | Use the HTML5 Drag and Drop API |
 | `emulateNativeDragAndDropOnTouch` | `boolean` | `false` | Emulate native drag and drop on touch devices with a moving copy of the element |
 | `copyStyles` | `(source, copy) => void` | copies computed styles | How the touch emulation copy gets its styles |
@@ -76,7 +76,7 @@ const draggable = new Draggable(element, {
 | `scope` | `Scope` | current scope | Scope to join (see [Scope](#scope)) |
 | `on` | `object` | — | Listeners, e.g. `{ 'drag:start': fn }` |
 
-Pressing an `input`, `textarea`, `select` or `contenteditable` element inside a draggable never starts a drag, so these fields stay editable. With nested draggables only the innermost one starts dragging.
+An `input`, `textarea`, `select` or `contenteditable` element inside a draggable does not start a drag. Of nested draggables only the innermost one starts.
 
 ### Events
 
@@ -87,7 +87,7 @@ Pressing an `input`, `textarea`, `select` or `contenteditable` element inside a 
 | `drag:release` | `{ draggable }` | `dragee:release` | The draggable is released, before it is placed. **Cancelable** |
 | `drag:end` | `{ draggable }` | `dragee:end` | The drag is over |
 
-DOM events are dispatched from the element and bubble, so one listener on a common ancestor covers all draggables:
+DOM events bubble from the element:
 
 ```javascript
 container.addEventListener('dragee:end', ({ draggable }) => {
@@ -95,7 +95,7 @@ container.addEventListener('dragee:end', ({ draggable }) => {
 })
 ```
 
-Canceling `drag:start` stops the drag:
+`event.cancel()` on `drag:start` cancels the drag:
 
 ```javascript
 draggable.on('drag:start', (event) => {
@@ -103,7 +103,7 @@ draggable.on('drag:start', (event) => {
 })
 ```
 
-A released draggable stays where it was dropped. Canceling `drag:release` lets you place it yourself:
+`event.cancel()` on `drag:release` skips pinning the draggable at the drop position:
 
 ```javascript
 draggable.on('drag:release', (event) => {
@@ -112,7 +112,7 @@ draggable.on('drag:release', (event) => {
 })
 ```
 
-Lists and scopes place their draggables through the same event and skip a draggable that an earlier listener has already placed.
+`List` and `Scope` place their draggables in a `drag:release` listener and skip an already canceled event.
 
 ### Methods
 
@@ -129,7 +129,7 @@ Lists and scopes place their draggables through the same event and skip a dragga
 | `getSize` | `()` → `Point` | Width and height |
 | `getRectangle` | `()` → `Rectangle` | Position and size |
 | `cancelDragging` | `()` | Stop the current drag |
-| `refresh` | `()` | Re-read the bounding (e.g. the size of a `BoundToElement` element) |
+| `refresh` | `()` | Re-read the bounding, e.g. the size of a `BoundToElement` element |
 | `destroy` | `()` | Remove all listeners and leave its scope and trays |
 
 ### Properties
@@ -148,7 +148,7 @@ Lists and scopes place their draggables through the same event and skip a dragga
 
 ## Bounding
 
-Bounds limit where a draggable can move. Pass a `Bound` instance as `bounding`, or a function as `bound`. Every class also has a static `.bounding(...args)` that creates an instance and returns its `bound` function.
+A bound limits where a draggable can move. Pass a `Bound` instance as `bounding` or a function as `bound`. The static `.bounding(...args)` returns the `bound` function of a new instance.
 
 ```javascript
 import { Draggable, BoundToElement, BoundToCircle, Point } from 'dragee'
@@ -173,7 +173,7 @@ new Draggable(el, {
 | `BoundToCircle` | `(center, radius)` | on a circle |
 | `BoundToArc` | `(center, radius, startAngle, endAngle)` | on an arc; the angles can be functions |
 
-A custom `bound` function receives the wanted position and the element size, and returns the allowed position:
+A `bound` function takes the requested position and the element size and returns the allowed position:
 
 ```javascript
 new Draggable(el, {
@@ -187,7 +187,7 @@ new Draggable(el, {
 
 ### List
 
-A sortable list or grid: a dragged item swaps with the slot it comes within `radius` of.
+Sortable list or grid. A dragged item takes the slot within `radius`.
 
 ```javascript
 import { Draggable, List } from 'dragee'
@@ -221,7 +221,7 @@ list.on('list:change', ({ draggable }) => console.log('order changed by', dragga
 | `list:change` | `{ list, draggable }` | `dragee:list-change` | A drop changed the order; `draggable` is the dragged item |
 | `list:reordered` | `{ list, draggable }` | `dragee:list-reordered` | The DOM elements were reordered (with `reorderOnChange`) |
 
-DOM events are dispatched from the dragged item's element and bubble. With nested lists, `event.list` tells them apart.
+DOM events bubble from the dragged item's element; `event.list` is the list.
 
 #### Methods
 
@@ -247,7 +247,7 @@ DOM events are dispatched from the dragged item's element and bubble. With neste
 
 ### BubblingList
 
-A list along one axis whose items can have different sizes: they are laid out one after another from the first item. Extends `List` and supports its options, methods, events and properties; `radius` is not used.
+Sortable list along one axis. Items may differ in size and are laid out one after another from the first item. Extends `List`; `radius` is not used.
 
 ```javascript
 import { Draggable, BubblingList } from 'dragee'
@@ -265,13 +265,13 @@ new BubblingList(horizontalDraggables, { axis: 'x', gap: 8 })
 | `gap` | `number` | detected | Space between items; detected from the first two items if not set |
 | `verticalGap` | `number` | — | Alias for `gap` |
 
-The `gap` property reads and changes the gap.
+The `gap` property gets and sets the gap.
 
 ---
 
 ## Tray
 
-An area that draggables are dropped into. It lays them out with a positioning strategy and lets a draggable go as soon as it is dragged away. It re-lays them out when the page layout changes.
+Drop area that lays out its draggables with a positioning strategy. A draggable leaves the tray when it is dragged. The layout is updated when the page layout changes.
 
 ```javascript
 import { Tray, FloatLeftStrategy } from 'dragee'
@@ -305,7 +305,7 @@ tray.on('tray:add', ({ draggable }) => console.log('added', draggable.element))
 | `tray:add` | `{ tray, draggable }` | `dragee:tray-add` | A draggable was added |
 | `tray:remove` | `{ tray, draggable }` | `dragee:tray-remove` | A draggable left the tray |
 
-Canceling `tray:beforeAdd` refuses the draggable: a dropped one goes back to its initial position. For example, a column that holds at most 5 cards:
+`event.cancel()` on `tray:beforeAdd` refuses the draggable; a dropped one returns to its initial position:
 
 ```javascript
 tray.on('tray:beforeAdd', (event) => {
@@ -313,7 +313,7 @@ tray.on('tray:beforeAdd', (event) => {
 })
 ```
 
-DOM events are dispatched from the tray element and bubble, so one listener on a board covers all its columns:
+DOM events bubble from the tray element:
 
 ```javascript
 board.addEventListener('dragee:tray-add', ({ tray, draggable }) => {
@@ -327,7 +327,7 @@ board.addEventListener('dragee:tray-add', ({ tray, draggable }) => {
 | --- | --- | --- |
 | `add` | `(draggable, { duration? })` | Put a draggable into the tray, animated over `duration` ms (default `0`) |
 | `remove` | `(draggable)` | Take a draggable out of the tray |
-| `accept` | `(draggable)` | Let a draggable be dropped into the tray, e.g. one created later |
+| `accept` | `(draggable)` | Allow a draggable to be dropped into the tray |
 | `releaseDraggable` | `(draggable)` | Stop accepting a draggable |
 | `reset` | `()` | Take all draggables out |
 | `refresh` | `()` | Lay out the draggables again |
@@ -348,11 +348,11 @@ board.addEventListener('dragee:tray-add', ({ tray, draggable }) => {
 
 ## Positioning Strategies
 
-A strategy decides where the draggables in a tray go. Each takes the tray's rectangle (or a function returning it) and options.
+A strategy positions the draggables of a tray. Constructor: `(rectangle, options)`, where `rectangle` is a `Rectangle` or a function returning one.
 
 ### FloatLeftStrategy
 
-Places draggables like CSS `float: left`: side by side from the top-left corner, wrapping to the next row.
+Places draggables like CSS `float: left`: in rows from the top-left corner.
 
 ```javascript
 new FloatLeftStrategy(() => tray.getRectangle(), {
@@ -378,7 +378,7 @@ Like `float: right`, from the top-right corner. Extends `FloatLeftStrategy`; ins
 
 ### NotCrossingStrategy
 
-Leaves draggables where they are dropped, but doesn't let them overlap.
+Keeps draggables at their drop position without overlapping.
 
 ```javascript
 new NotCrossingStrategy(() => tray.getRectangle())
@@ -388,11 +388,11 @@ new NotCrossingStrategy(() => tray.getRectangle())
 
 ## Scope
 
-A scope decides which trays a draggable can be dropped into: only the trays of its own scope. Without scopes all instances share `defaultScope`.
+A draggable can be dropped only into trays of its scope. Instances belong to `defaultScope` unless created inside `scope()` or given the `scope` option.
 
 ### scope()
 
-Instances created inside the callback join the new scope. Calls can be nested; instances join the innermost scope.
+Instances created inside the callback join the returned scope. Nested calls use the innermost scope.
 
 ```javascript
 import { scope, Draggable, Tray } from 'dragee'
@@ -406,7 +406,7 @@ const board = scope(() => {
 board.on('scope:change', () => console.log(board.positions))
 ```
 
-Instances created later, for example after an `await` or by an "Add card" button, join with the `scope` option, and trays have to accept them:
+Instances created after the callback returns join with the `scope` option; trays must `accept()` them:
 
 ```javascript
 const card = new Draggable(el, { scope: board })
@@ -438,7 +438,7 @@ columns.forEach((column) => column.accept(card))
 | --- | --- | --- |
 | `scope:change` | `{ scope, draggable }` | A draggable that belongs to trays was dropped |
 
-`defaultScope` and `scopes` (all scopes) are exported too.
+Also exported: `defaultScope` and `scopes` (all scopes).
 
 ---
 
@@ -478,14 +478,14 @@ A 2D point or vector: `new Point(x, y)`.
 | --- | --- |
 | `getDistance(p1, p2)` | Euclidean distance |
 | `getXDifference(p1, p2)` / `getYDifference(p1, p2)` | Distance along one axis |
-| `transformedSpaceDistanceFactory({ x, y })` | A distance function that weights the axes, e.g. `{ x: 1, y: 4 }` for wide items |
+| `transformedSpaceDistanceFactory({ x, y })` | A distance function with weighted axes |
 | `indexOfNearestPoint(points, point, radius, getDistance?)` | Index of the nearest point within `radius`, or `-1` |
 
 ---
 
 ## Events
 
-`Draggable`, `List`, `BubblingList`, `Tray` and `Scope` are standard [`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget)s. A listener receives an event that carries its data as properties, so it can be destructured: `({ draggable }) => {}`. The data is also in `event.detail`. Cancel a cancelable event with `event.cancel()` (or `event.preventDefault()`), called on the event itself.
+`Draggable`, `List`, `BubblingList`, `Tray` and `Scope` are [`EventTarget`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget)s. Event data is available as event properties, e.g. `({ draggable }) => {}`, and in `event.detail`. Cancelable events are canceled with `event.cancel()` or `event.preventDefault()`.
 
 | Method | Description |
 | --- | --- |
@@ -493,7 +493,7 @@ A 2D point or vector: `new Point(x, y)`.
 | `off(name, fn)` | Remove a listener (`unsubscribe` is an alias) |
 | `once(name, fn)` | Add a listener for the next event only |
 
-`addEventListener` works as well, and so do its options, for example removing several listeners at once with an `AbortController`:
+`addEventListener` and its options work too:
 
 ```javascript
 const controller = new AbortController()
@@ -501,7 +501,7 @@ draggable.on('drag:move', onMove, { signal: controller.signal })
 controller.abort()
 ```
 
-The `on` option of every constructor adds listeners too: `new Draggable(el, { on: { 'drag:end': fn } })`.
+Constructors take listeners in the `on` option: `new Draggable(el, { on: { 'drag:end': fn } })`.
 
 ---
 
@@ -523,10 +523,10 @@ The `on` option of every constructor adds listeners too: `new Draggable(el, { on
 - **`Target` is now `Tray`**, also in `draggable.trays`, `scope.trays`, `scope.addTray()` and the `tray:*` / `dragee:tray-*` events.
 - **Options objects:** `pinPosition(point, { duration: 200 })`, `move(point, { silent: true })` and `tray.add(draggable, { duration: 200 })` instead of positional arguments.
 - **`timeExcange` is now `timeExchange`.** The old name is ignored.
-- **`dragEndAction` is gone.** To place a dropped draggable yourself, cancel `drag:release`.
-- **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. Create instances inside `scope()` or pass the `scope` option.
+- **`dragEndAction` is removed.** Cancel `drag:release` instead.
+- **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. Use `scope()` or the `scope` option.
 - **Listeners work like `addEventListener`:** the same function added twice is called once, and an error in one listener doesn't stop the others.
-- **A draggable refused by a tray** goes back to its initial position.
+- **A draggable refused by a tray** returns to its initial position.
 - **Form fields inside a draggable** (`input`, `textarea`, `select`, `contenteditable`) no longer start a drag.
 - **Errors are `Error` objects** (`RangeError` for `positions` of the wrong length) instead of strings.
 - **Import from `dragee` only:** deep imports such as `dragee/src/…` or `dragee/dist/…` fail.

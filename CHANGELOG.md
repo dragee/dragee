@@ -23,14 +23,14 @@
 - `on()` returns a function that removes the listener; new `off()` and `once()`; listener options such as `{ signal }` work. `unsubscribe()` is an alias for `off()`
 - cancelable events, canceled with `event.cancel()` (or `preventDefault()`):
   - `drag:start`: the drag doesn't start
-  - `drag:release`: the draggable isn't placed, so a listener can place it itself
+  - `drag:release`: the draggable isn't pinned at the drop position
   - `tray:beforeAdd`: the tray refuses the draggable
-- bubbling DOM events with the same data, for listening on a common ancestor: `dragee:start` / `move` / `release` / `end`, `dragee:list-change` / `list-reordered`, `dragee:tray-before-add` / `tray-add` / `tray-remove`. Turn them off with `domEvents: false`
+- bubbling DOM events with the same data: `dragee:start` / `move` / `release` / `end`, `dragee:list-change` / `list-reordered`, `dragee:tray-before-add` / `tray-add` / `tray-remove`. Turn them off with `domEvents: false`
 - horizontal `BubblingList` with `axis: 'x'`
 - the `gap` option for `BubblingList` (`verticalGap` is an alias); `gap: 0` is respected
-- nested `scope()` calls, and the `scope` option for `Draggable` and `Tray` to join a scope after `scope()` has returned
-- `Tray.accept()` and `Tray.releaseDraggable()` to let a draggable be dropped into a tray or stop that
-- `Draggable.remeasure()` to re-read the element's place after the layout changed
+- nested `scope()` calls and the `scope` option for `Draggable` and `Tray`
+- `Tray.accept()` and `Tray.releaseDraggable()`
+- `Draggable.remeasure()`: re-reads the element's place after a layout change
 
 ### Fixed
 - nested draggables: pressing the inner one also started a drag of the outer one
