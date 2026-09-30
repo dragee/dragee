@@ -238,7 +238,7 @@ export default class Tray extends EventEmitter {
   }
 
   get container() {
-    return (this._container = this._container || this.options.container || this.options.parent || this.element.offsetParent)
+    return (this._container = this._container || this.options.container || this.element.offsetParent)
   }
 }
 
