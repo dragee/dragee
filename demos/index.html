@@ -848,6 +848,105 @@
         </div>
     </section>
 
+    <section id="NestedDraggables" >
+        <div class="row demo-row">
+            <div class="span6 demo-span">
+                <div id="DemoNestedDraggables" class="demo-html">
+                    <div class="area">
+                        <div class="card">
+                            <i class="icon-move"></i> Card
+                            <div class="chip">Chip</div>
+                        </div>
+                    </div>
+                    <p class="nested-log">Events: <span>—</span></p>
+                </div>
+                <style>
+                    #DemoNestedDraggables .area{
+                        position: relative;
+                        height: 260px;
+                        overflow: hidden;
+                        border: 1px dashed #333;
+                        border-radius: 6px;
+                        background-color: rgba(225, 225, 225, 0.4);
+                    }
+                    #DemoNestedDraggables .card{
+                        position: absolute;
+                        top: 20px;
+                        left: 20px;
+                        width: 220px;
+                        height: 130px;
+                        padding: 9px 14px;
+                        cursor: move;
+                        user-select: none;
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        background: #f5f5f5;
+                    }
+                    #DemoNestedDraggables .chip{
+                        position: absolute;
+                        top: 50px;
+                        left: 20px;
+                        padding: 6px 12px;
+                        cursor: move;
+                        border: 1px solid #333;
+                        border-radius: 15px;
+                        background: #fff;
+                    }
+                    #DemoNestedDraggables .dragee-active{
+                        background-color: #ffc40d;
+                    }
+                    #DemoNestedDraggables .nested-log{
+                        margin-top: 10px;
+                        color: #555;
+                    }
+                </style>
+                <script type="module">
+                    import { Draggable, BoundToElement } from '../src/index.js'
+
+                    window.addEventListener('load', () => {
+                        const root = document.getElementById('DemoNestedDraggables')
+                        const area = root.querySelector('.area')
+                        const cardElement = root.querySelector('.card')
+                        const chipElement = root.querySelector('.chip')
+                        const log = root.querySelector('.nested-log span')
+                        let events = []
+
+                        const card = new Draggable(cardElement, {
+                            container: area,
+                            bounding: new BoundToElement(area, area)
+                        })
+                        const chip = new Draggable(chipElement, {
+                            container: cardElement,
+                            bounding: new BoundToElement(cardElement, cardElement)
+                        })
+
+                        const clear = () => { events = [] }
+                        area.addEventListener('mousedown', clear, true)
+                        area.addEventListener('touchstart', clear, true)
+
+                        const show = (name, type) => {
+                            events.push(`${name} ${type}`)
+                            log.textContent = events.join(', ')
+                        }
+
+                        ;['start', 'end'].forEach((type) => {
+                            card.on(`drag:${type}`, () => show('card', type))
+                            chip.on(`drag:${type}`, () => show('chip', type))
+                        })
+                    })
+                </script>
+            </div>
+            <div class="span6 demo-span">
+                <pre class="prettyprint lang-js">const card = new Draggable(cardElement, {
+    container: area
+})
+const chip = new Draggable(chipElement, {
+    container: cardElement
+})</pre>
+                <p>Dragging the chip moves only the chip; dragging the card elsewhere moves the card with the chip.</p>
+            </div>
+        </div>
+    </section>
     <section id="HorizontalList" >
         <div class="row demo-row">
             <div class="span12 demo-span">
