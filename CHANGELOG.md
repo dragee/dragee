@@ -33,6 +33,7 @@
 - `Draggable.remeasure()` re-reads the element's place in the layout; a draggable at its initial position moves to the new one, others keep their position
 
 ### Fixed
+- a drag started on an `<input>` inside a draggable focused it right away (on touch devices this opened the on-screen keyboard). Form fields now get focus from the browser as usual; the explicit `focus()` call was left over from when `mousedown` was prevented
 - `Scope.addDraggable()` / `addTarget()` left the instance in its previous scope as well (e.g. `defaultScope`)
 - `List.remove()` wiped user `drag:move` / `drag:end` listeners and left the `BubblingList` `drag:start` listener attached
 - `Target` kept a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener. A target now watches each of its draggables, including ones added with `add()`, until `destroy()`, and keeps its own copy of the `draggables` array, so `add()` doesn't leak a draggable into other targets sharing that array

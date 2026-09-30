@@ -266,11 +266,6 @@ export default class Draggable extends EventEmitter {
     this._startWindowScrollPoint = this.windowScrollPoint
     this._startScrollElementsOffset = this.scrollElementsOffset
 
-    if (event.target instanceof window.HTMLInputElement ||
-          event.target instanceof window.HTMLInputElement) {
-      event.target.focus()
-    }
-
     this._dragStartPending = !this.shouldUseNativeDragAndDrop() && this.dragStartThreshold > 0
     if (!this._dragStartPending) {
       const startEvent = this.emitDragEvent('start', { cancelable: true })

@@ -364,3 +364,16 @@ describe('draggable/refresh', () => {
     expect(refreshFn).toHaveBeenCalled()
   })
 })
+
+describe('draggable/form fields', () => {
+  it.each(['input', 'textarea'])('should leave mousedown on a nested %s to the browser so it can take focus', (tagName) => {
+    const draggable = createDraggable()
+    const field = document.createElement(tagName)
+    draggable.element.appendChild(field)
+    const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+
+    field.dispatchEvent(mousedown)
+
+    expect(mousedown.defaultPrevented).toBe(false)
+  })
+})
