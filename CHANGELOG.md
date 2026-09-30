@@ -11,6 +11,7 @@
 - requires Chrome / Edge 90+, Firefox 86+, Safari 15+ (`EventTarget` subclassing and the `signal` listener option)
 - `move()` and `pinPosition()` take an options object `{ duration, silent }` instead of positional `time` / `silent` arguments
 - `package.json` declares `exports`: only `dragee` (and `dragee/package.json`) can be imported, deep imports such as `dragee/src/…` or `dragee/dist/…` fail. The npm package ships only the built bundles, README and CHANGELOG
+- pressing an `input`, `textarea`, `select` or `contenteditable` inside a draggable no longer starts a drag, so the field can be focused, edited and have its text selected. Previously a drag started from an `<input>` also focused it right away, which on touch devices opened the on-screen keyboard
 - errors are thrown as `Error` objects instead of strings: `Error` for a second `Draggable` on the same element, `RangeError` for `positions` of the wrong length on `List` / `Scope`
 - rename the `timeExcange` option to `timeExchange` (`List`, `BubblingList`, `Tray`); the old name is ignored
 - remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
@@ -33,7 +34,6 @@
 - `Draggable.remeasure()` re-reads the element's place in the layout; a draggable at its initial position moves to the new one, others keep their position
 
 ### Fixed
-- a drag started on an `<input>` inside a draggable focused it right away (on touch devices this opened the on-screen keyboard). Form fields now get focus from the browser as usual; the explicit `focus()` call was left over from when `mousedown` was prevented
 - `Scope.addDraggable()` / `addTarget()` left the instance in its previous scope as well (e.g. `defaultScope`)
 - `List.remove()` wiped user `drag:move` / `drag:end` listeners and left the `BubblingList` `drag:start` listener attached
 - `Target` kept a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener. A target now watches each of its draggables, including ones added with `add()`, until `destroy()`, and keeps its own copy of the `draggables` array, so `add()` doesn't leak a draggable into other targets sharing that array

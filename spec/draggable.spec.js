@@ -204,7 +204,7 @@ describe('draggable/release', () => {
 describe('draggable/canceling drag start', () => {
   it.each([
     ['a drag:start listener', {}, (draggable) => draggable.on('drag:start', (e) => e.cancel())],
-    ['a delegated dragee:start listener', {}, () => document.body.addEventListener('dragee:start', (e) => e.preventDefault())],
+    ['a delegated dragee:start listener', {}, (draggable) => draggable.element.parentElement.addEventListener('dragee:start', (e) => e.preventDefault())],
     ['a drag:start listener with dragStartThreshold', { dragStartThreshold: 5 }, (draggable) => draggable.on('drag:start', (e) => e.cancel())]
   ])('should not drag when %s cancels it', (_name, options, prevent) => {
     const draggable = createDraggable(options)
@@ -366,9 +366,53 @@ describe('draggable/refresh', () => {
 })
 
 describe('draggable/form fields', () => {
-  it.each(['input', 'textarea'])('should leave mousedown on a nested %s to the browser so it can take focus', (tagName) => {
+  const createField = (tagName) => {
+    if (tagName === 'contenteditable') {
+      const field = document.createElement('div')
+      field.setAttribute('contenteditable', 'true')
+      return field
+    }
+    return document.createElement(tagName)
+  }
+
+  it.each(['input', 'textarea', 'select', 'contenteditable'])('should not start a drag pressed on a nested %s', (tagName) => {
     const draggable = createDraggable()
-    const field = document.createElement(tagName)
+    const field = createField(tagName)
+    draggable.element.appendChild(field)
+    const startFn = jest.fn()
+    draggable.on('drag:start', startFn)
+
+    mouseDown(field, new Point(10, 10))
+    mouseMove(new Point(50, 50))
+
+    expect(startFn).not.toHaveBeenCalled()
+    expect(draggable.position).toEqual(new Point(0, 0))
+  })
+
+  it('should start a drag pressed elsewhere on an element that contains a field', () => {
+    const draggable = createDraggable()
+    draggable.element.appendChild(document.createElement('input'))
+
+    simulateDrag(draggable, new Point(10, 10), new Point(50, 50))
+
+    expect(draggable.isDragging).toBe(true)
+  })
+
+  it('should start a drag when the draggable itself is inside a contenteditable', () => {
+    const editor = document.createElement('div')
+    editor.setAttribute('contenteditable', 'true')
+    document.body.appendChild(editor)
+    const draggable = createDraggable()
+    editor.appendChild(draggable.element)
+
+    simulateDrag(draggable, new Point(10, 10), new Point(50, 50))
+
+    expect(draggable.isDragging).toBe(true)
+  })
+
+  it('should leave mousedown on a nested field to the browser so it can take focus', () => {
+    const draggable = createDraggable()
+    const field = document.createElement('input')
     draggable.element.appendChild(field)
     const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
 

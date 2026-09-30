@@ -14,6 +14,7 @@ const throttledDragOver = (callback, duration) => {
 }
 
 const passiveFalse = { passive: false }
+const formFieldSelector = 'input, textarea, select, [contenteditable]:not([contenteditable="false"])'
 
 const isTouch = navigator.maxTouchPoints > 0
 const mouseEvents = {
@@ -229,6 +230,11 @@ export default class Draggable extends EventEmitter {
     this._previousDirectionPosition = point
   }
 
+  isFormField(target) {
+    const field = target instanceof Element && target.closest(formFieldSelector)
+    return Boolean(field) && this.element.contains(field)
+  }
+
   seemsScrolling() {
     return (+new Date() - this._startTouchTimestamp) < this.touchDraggingThreshold
   }
@@ -242,7 +248,7 @@ export default class Draggable extends EventEmitter {
   }
 
   dragStart(event) {
-    if (!this._enable) {
+    if (!this._enable || this.isFormField(event.target)) {
       return
     }
 

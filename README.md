@@ -65,7 +65,7 @@ const draggable = new Draggable(element, {
 | `parent` | `Element` | — | Alias for `container` |
 | `position` | `Point` | current offset | Initial position |
 | `bound` / `bounding` | `(point, size) => Point` or `Bound` | identity | Movement constraint function or Bound instance |
-| `handler` | `Element` \| `string` | `element` | Sub-element (or CSS selector) that starts the drag |
+| `handler` | `Element` \| `string` | `element` | Sub-element (or CSS selector) that starts the drag. Pressing an `input`, `textarea`, `select` or `contenteditable` inside the draggable never starts one, so these fields can be focused and edited |
 | `dragStartThreshold` | `number` | `0` | Pixels the pointer must travel before drag activates |
 | `touchDraggingThreshold` | `number` | `0` | Milliseconds to distinguish touch scroll from drag |
 | `dragOverThrottleDuration` | `number` | `16` | Throttle duration (ms) for native drag-over events |
@@ -652,6 +652,7 @@ new Draggable(el, {
 - **`timeExcange` is renamed to `timeExchange`** in `List`, `BubblingList` and `Tray`. The old name is ignored.
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Only the package entry point can be imported:** `package.json` now has `exports`, so deep imports such as `dragee/src/…` or `dragee/dist/…` fail; import from `dragee`.
+- **Form fields inside a draggable don't start a drag:** pressing an `input`, `textarea`, `select` or `contenteditable` element lets the user edit it instead.
 - **Errors are `Error` objects** instead of strings: a second `Draggable` for the same element throws an `Error`, and setting `positions` of the wrong length on a `List` or `Scope` throws a `RangeError`.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.
 - **`dragEndAction` can no longer be overridden.** Listen to `drag:release` and call `event.cancel()` to place a dropped draggable yourself.
