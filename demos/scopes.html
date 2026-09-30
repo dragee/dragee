@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Dragee scopes</title>
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .boards {
+            display: flex;
+            gap: 20px;
+        }
+        .board {
+            flex: 1;
+            padding: 10px;
+            border: 1px dashed #333;
+            border-radius: 6px;
+            background: rgba(225, 225, 225, 0.4);
+        }
+        .board h3 {
+            margin: 0 0 10px;
+        }
+        .area {
+            position: relative;
+            overflow: hidden;
+        }
+        .column {
+            width: 42%;
+            min-height: 160px;
+            margin: 0 2% 10px 0;
+            padding: 5px;
+            float: left;
+            border: 1px dashed #333;
+            border-radius: 6px;
+            background: #fff;
+        }
+        .pool {
+            clear: both;
+            min-height: 50px;
+            margin: 0;
+            padding: 5px;
+            list-style: none;
+            border: 1px dotted #999;
+            border-radius: 6px;
+        }
+        .card {
+            display: inline-block;
+            width: 70px;
+            margin: 3px;
+            padding: 6px 0;
+            text-align: center;
+            cursor: move;
+            user-select: none;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background: #f5f5f5;
+            position: relative;
+        }
+        .card.dragee-active {
+            z-index: 2;
+            background: #ffc40d;
+        }
+        .card.in-tray {
+            background: #62c462;
+        }
+        .card.late {
+            border-style: dashed;
+        }
+        .owners, .log {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .log {
+            max-height: 200px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h2>Scopes</h2>
+    <p>Each board is created inside its own <code>scope()</code>: its cards should drop only into its own columns. <b>Add card</b> creates a card after <code>scope()</code> has returned and moves it with <code>board.addDraggable(card)</code> and lets every column of the board accept it with <code>column.accept(card)</code>.</p>
+
+    <div class="boards">
+        <div class="board" data-name="A">
+            <h3>Board A <button type="button" class="btn btn-small add-card">Add card</button></h3>
+            <div class="area">
+                <div class="column">A1</div>
+                <div class="column">A2</div>
+                <ul class="pool">
+                    <li class="card">A-1</li>
+                    <li class="card">A-2</li>
+                    <li class="card">A-3</li>
+                </ul>
+            </div>
+        </div>
+        <div class="board" data-name="B">
+            <h3>Board B <button type="button" class="btn btn-small add-card">Add card</button></h3>
+            <div class="area">
+                <div class="column">B1</div>
+                <div class="column">B2</div>
+                <ul class="pool">
+                    <li class="card">B-1</li>
+                    <li class="card">B-2</li>
+                    <li class="card">B-3</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="owners"></div>
+    <div class="log"></div>
+
+    <script type="module">
+        import { Draggable, Tray, FloatLeftStrategy, Point, scope, defaultScope } from '../src/index.js'
+
+        const ownersElement = document.querySelector('.owners')
+        const logElement = document.querySelector('.log')
+        const boards = []
+
+        const log = (message) => {
+            const line = document.createElement('div')
+            line.textContent = new Date().toLocaleTimeString() + '  ' + message
+            logElement.prepend(line)
+        }
+
+        const names = (scopeInstance) => scopeInstance.draggables.map((d) => d.element.textContent).join(', ') || '—'
+
+        const renderOwners = () => {
+            ownersElement.innerHTML = ''
+            const rows = [...boards.map((board) => ['scope ' + board.name, board.scope]), ['defaultScope', defaultScope]]
+            rows.forEach(([label, scopeInstance]) => {
+                const row = document.createElement('div')
+                row.textContent = label + ': ' + names(scopeInstance)
+                ownersElement.appendChild(row)
+            })
+        }
+
+        const makeCard = (area) => new Draggable(area.querySelector('.pool').lastElementChild, { container: area })
+
+        const makeColumn = (element, area, draggables) => {
+            const column = new Tray(element, draggables, {
+                container: area,
+                strategy: new FloatLeftStrategy(() => column.getRectangle(), {
+                    radius: 80,
+                    removable: true,
+                    paddingTopLeft: new Point(5, 25),
+                    yGapBetweenDraggables: 5
+                })
+            })
+            column.on('tray:add', ({ draggable }) => {
+                draggable.element.classList.add('in-tray')
+                log(draggable.element.textContent + ' added to column ' + element.firstChild.textContent.trim())
+                renderOwners()
+            })
+            column.on('tray:remove', ({ draggable }) => {
+                draggable.element.classList.remove('in-tray')
+                renderOwners()
+            })
+            return column
+        }
+
+        document.querySelectorAll('.board').forEach((boardElement) => {
+            const name = boardElement.dataset.name
+            const area = boardElement.querySelector('.area')
+            let cards, columns
+
+            const boardScope = scope(() => {
+                cards = [...area.querySelectorAll('.card')].map((element) => new Draggable(element, { container: area }))
+                columns = [...area.querySelectorAll('.column')].map((element) => makeColumn(element, area, cards))
+            })
+
+            boardScope.on('scope:change', ({ draggable }) => {
+                log('scope ' + name + ': ' + draggable.element.textContent + ' dropped')
+                renderOwners()
+            })
+
+            let lateCount = 0
+            boardElement.querySelector('.add-card').addEventListener('click', () => {
+                const element = document.createElement('li')
+                element.className = 'card late'
+                element.textContent = name + '-new' + (++lateCount)
+                area.querySelector('.pool').appendChild(element)
+
+                const card = makeCard(area)
+                log(element.textContent + ' created after scope() returned')
+                boardScope.addDraggable(card)
+                columns.forEach((column) => column.accept(card))
+                renderOwners()
+            })
+
+            boards.push({ name, scope: boardScope, cards, columns })
+        })
+
+        renderOwners()
+        log('ready')
+    </script>
+</body>
+</html>
