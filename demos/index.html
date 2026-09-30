@@ -563,6 +563,11 @@
                         <li>⇔ 8</li>
                         <li>⇔ 9</li>
                       </ul>
+                      <ul class="list list-fields">
+                        <li>⇔ Name <input type="text" placeholder="Click to type"></li>
+                        <li>⇔ Note <textarea rows="2" placeholder="Click to type"></textarea></li>
+                        <li>⇔ No field</li>
+                      </ul>
                       <ul class="list list-c">
                         <li class="list-item">
                           <div>
@@ -658,6 +663,14 @@
                       display: inline-block;
                     }
 
+                    #DemoList ul.list-fields input,
+                    #DemoList ul.list-fields textarea {
+                      display: block;
+                      width: 90%;
+                      margin: 6px 0 0;
+                      cursor: text;
+                    }
+
                     .list-item .list-item-content {
                       max-height: 0;
                       margin: 5px 0;
@@ -686,6 +699,7 @@
                         const listAParentElement = root.querySelector('.list-a')
                         const listBParentElement = root.querySelector('.list-b')
                         const listCParentElement = root.querySelector('.list-c')
+                        const listFieldsParentElement = root.querySelector('.list-fields')
 
                         const listA = new BubblingList(Array.from(listAParentElement.querySelectorAll('li'), (element) => new Draggable(element, {
                             handler: '.handler',
@@ -695,6 +709,10 @@
                         })), { radius: 10 })
 
                         new List(Array.from(listBParentElement.querySelectorAll('li'), (element) => new Draggable(element)))
+
+                        new BubblingList(Array.from(listFieldsParentElement.querySelectorAll('li'), (element) => new Draggable(element, {
+                            container: listFieldsParentElement
+                        })))
 
                         listA.on('list:change', () => console.log('List changed'))
 
