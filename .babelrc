@@ -1,23 +1,14 @@
 {
   "presets": [
-    "@babel/env"
+    ["@babel/env", {
+      "targets": "> 0.25%, not dead"
+    }]
   ],
   "env": {
-    "development": {
-      "presets": [
-        [
-          "@babel/env", {
-            targets: { browsers: "> 0.25%, not dead" }
-          }
-        ]
-      ]
-    },
     "test": {
       "presets": [
         ["@babel/env", {
-          targets: {
-            node: "current"
-          }
+          "targets": { "node": "current" }
         }]
       ]
     }
