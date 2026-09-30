@@ -5,7 +5,7 @@
 [![bundle size](https://img.shields.io/bundlephobia/minzip/dragee)](https://bundlephobia.com/package/dragee)
 [![license](https://img.shields.io/npm/l/dragee)](https://github.com/dragee/dragee/blob/master/LICENSE)
 
-Precise, constraint-based drag-and-drop for JavaScript. Zero dependencies. 7 geometric bounds. Sortable lists (vertical and horizontal). Multi-target scoping. Bubbling DOM events for easy framework integration.
+Precise, constraint-based drag-and-drop for JavaScript. Zero dependencies. 7 geometric bounds. Sortable lists (vertical and horizontal). Multi-tray scoping. Bubbling DOM events for easy framework integration.
 
 [Documentation & Demos](https://dragee.github.io/) | [GitHub](https://github.com/dragee/dragee)
 
