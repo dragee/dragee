@@ -1,55 +1,52 @@
 ## [Unreleased]
 
 ### Breaking
-- all instances (`Draggable`, `List`, `BubblingList`, `Tray`, `Scope`) are standard `EventTarget`s. Listeners receive an event that carries the payload as its own properties (also in `event.detail`) instead of positional arguments:
-  - `drag:start` / `drag:move` / `drag:end`: `{ draggable }`
+- requires Chrome / Edge 90+, Firefox 86+, Safari 15+
+- `Draggable`, `List`, `BubblingList`, `Tray` and `Scope` are standard `EventTarget`s. A listener receives an event with the data as its properties (and in `event.detail`) instead of positional arguments:
+  - `drag:start` / `drag:move` / `drag:release` / `drag:end`: `{ draggable }`
   - `list:change` / `list:reordered`: `{ list, draggable }`
   - `tray:beforeAdd` / `tray:add` / `tray:remove`: `{ tray, draggable }`
   - `scope:change`: `{ scope, draggable }`
-- listener semantics follow `EventTarget`: the same function added twice is registered once, and an exception in one listener no longer stops the others
-- rename `Target` to `Tray`, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data
-- requires Chrome / Edge 90+, Firefox 86+, Safari 15+ (`EventTarget` subclassing and the `signal` listener option)
-- `move()` and `pinPosition()` take an options object `{ duration, silent }` instead of positional `time` / `silent` arguments, and `Tray.add()` takes `{ duration }` instead of `time`
-- `package.json` declares `exports`: only `dragee` (and `dragee/package.json`) can be imported, deep imports such as `dragee/src/…` or `dragee/dist/…` fail. The npm package ships only the built bundles, README and CHANGELOG
-- pressing an `input`, `textarea`, `select` or `contenteditable` inside a draggable no longer starts a drag, so the field can be focused, edited and have its text selected. Previously a drag started from an `<input>` also focused it right away, which on touch devices opened the on-screen keyboard
-- errors are thrown as `Error` objects instead of strings: `Error` for a second `Draggable` on the same element, `RangeError` for `positions` of the wrong length on `List` / `Scope`
-- rename the `timeExcange` option to `timeExchange` (`List`, `BubblingList`, `Tray`); the old name is ignored
-- remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
-- a drop refused by a tray returns the draggable to its initial position (previously it stayed where it was dropped)
-- replace the overridable `dragEndAction()` with the cancelable `drag:release` event; `List` and `Scope` place their draggables through it. `scope:change` is emitted only for draggables that belong to trays
+- listeners behave like `addEventListener`: the same function added twice is called once, and an error in one listener doesn't stop the others
+- `Target` is renamed to `Tray`: `draggable.trays`, `scope.trays`, `scope.addTray()`, the `tray:*` and `dragee:tray-*` events
+- the overridable `dragEndAction()` is replaced by the cancelable `drag:release` event
+- removed `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`; `scope()` no longer needs them
+- `move()`, `pinPosition()` and `Tray.add()` take an options object: `{ duration, silent }` instead of positional arguments
+- the `timeExcange` option is renamed to `timeExchange`
+- a draggable refused by a tray (`tray:beforeAdd` canceled, or a custom `catchDraggable`) returns to its initial position instead of staying where it was dropped
+- `scope:change` fires only for draggables that belong to trays
+- pressing an `input`, `textarea`, `select` or `contenteditable` inside a draggable no longer starts a drag
+- errors are `Error` objects instead of strings (`RangeError` for `positions` of the wrong length)
+- only `dragee` itself can be imported (`package.json` `exports`); the npm package contains just the bundles, README and CHANGELOG
 
 ### Added
-- `on()` returns a function that removes the listener; add `off()` and `once()`. Standard listener options such as `{ signal }` are supported. `unsubscribe()` is an alias for `off()`
-- cancelable events: `event.cancel()` on `drag:start` cancels the drag; on `drag:release` it skips the default placement; on `tray:beforeAdd` it refuses the draggable
-- `event.cancel()` / `event.canceled` on dragee events as clearer names for `preventDefault()` / `defaultPrevented` (both keep working); `emit()` returns the dispatched event
-- bubbling DOM events (disable with the `domEvents: false` option), with the same event data as the instance events:
-  - `Draggable`: `dragee:start` / `dragee:move` / `dragee:release` / `dragee:end` from its element
-  - `List` / `BubblingList`: `dragee:list-change` / `dragee:list-reordered` from the dragged item's element
-  - `Tray`: `dragee:tray-before-add` / `dragee:tray-add` / `dragee:tray-remove` from the tray element
-- horizontal mode for `BubblingList` via the `axis: 'x'` option (default `'y'`)
-- the `gap` option for `BubblingList`; `verticalGap` is an alias for it. An explicit `0` gap is now respected instead of triggering auto-detection
-- the `scope` option for `Draggable` and `Tray` to join a given scope, e.g. for instances created after `scope()` has returned
-- `Tray.accept(draggable)` lets a draggable be dropped into a tray without placing it there, e.g. for draggables created after the tray
-- `Tray.releaseDraggable(draggable)`, the reverse of `accept()`
-- `Draggable.remeasure()` re-reads the element's place in the layout; a draggable at its initial position moves to the new one, others keep their position
+- `on()` returns a function that removes the listener; new `off()` and `once()`; listener options such as `{ signal }` work. `unsubscribe()` is an alias for `off()`
+- cancelable events, canceled with `event.cancel()` (or `preventDefault()`):
+  - `drag:start`: the drag doesn't start
+  - `drag:release`: the draggable isn't placed, so a listener can place it itself
+  - `tray:beforeAdd`: the tray refuses the draggable
+- bubbling DOM events with the same data, for listening on a common ancestor: `dragee:start` / `move` / `release` / `end`, `dragee:list-change` / `list-reordered`, `dragee:tray-before-add` / `tray-add` / `tray-remove`. Turn them off with `domEvents: false`
+- horizontal `BubblingList` with `axis: 'x'`
+- the `gap` option for `BubblingList` (`verticalGap` is an alias); `gap: 0` is respected
+- nested `scope()` calls, and the `scope` option for `Draggable` and `Tray` to join a scope after `scope()` has returned
+- `Tray.accept()` and `Tray.releaseDraggable()` to let a draggable be dropped into a tray or stop that
+- `Draggable.remeasure()` to re-read the element's place after the layout changed
 
 ### Fixed
-- `Draggable.destroy()` during a drag left its `scroll` listeners attached, so the destroyed draggable kept moving on page scroll; it also stayed in its trays. Its listeners now live on `AbortController`s and are all removed, and each tray forgets it (`Tray.releaseDraggable()`)
-- `Tray.destroy()` stayed listed in `draggable.trays` of its draggables
-- pressing a draggable nested in another one started a drag for both: the outer one got `drag:start`, became `draggable` and, with `nativeDragAndDrop`, waited for a `mouseup` that never came, finishing its "drag" on the next click anywhere. Only the innermost enabled draggable starts now
-- `List.getSortedDraggables()` sorted `list.draggables` in place, so after drags its order (and `list.positions`) no longer matched the draggables as given: restoring saved `positions` put items in the wrong places, and `remove()` could close the hole into the wrong slots
-- `Scope.addDraggable()` / `addTarget()` left the instance in its previous scope as well (e.g. `defaultScope`)
-- `List.remove()` wiped user `drag:move` / `drag:end` listeners and left the `BubblingList` `drag:start` listener attached
-- `Target` kept a single `drag:move` handler for all its draggables, so removing one draggable could unsubscribe another listener. A target now watches each of its draggables, including ones added with `add()`, until `destroy()`, and keeps its own copy of the `draggables` array, so `add()` doesn't leak a draggable into other targets sharing that array
-- a draggable released from a `List` or `Scope` was still handled by it on drop
-- a draggable outside lists and targets did not update its `pinnedPosition` on drop
-- targets created inside `scope()` were added to the default scope too
-- `Draggable.destroy()` did not remove the draggable from its scope (this also leaked the clone used for touch drag emulation)
-- `Tray` (`Target` in 1.x) did not react to layout changes such as window resize: its draggables kept stale offsets and positions. It now re-measures them and lays them out again
-- `Tray.add()` crashed with `NotCrossingStrategy` (the index of the new draggable was passed as a number instead of an array)
-- `reorderOnChange` did nothing unless the list had the `container` option; it now reorders the elements within their parent. Without it, a later resize (e.g. expanding an item) reset the items to their old DOM order
-- `BubblingList.remove()` detected the gap and start position after removal (measured across the hole, so remaining items were not reflowed)
-- swapped `leftDirection` / `rightDirection` flags in `Draggable` (moving right used to set `leftDirection`)
+- nested draggables: pressing the inner one also started a drag of the outer one
+- `Tray` did not react to layout changes such as a window resize
+- `reorderOnChange` did nothing without the `container` option
+- `List.getSortedDraggables()` reordered `list.draggables`, so saved `positions` were restored to the wrong items and `remove()` could fill the wrong slots
+- `List.remove()` removed the user's `drag:move` / `drag:end` listeners of the removed draggable
+- `BubblingList.remove()` did not close the gap left by the removed item
+- `Draggable.destroy()` left the draggable in its scope and trays, and during a drag kept following page scroll
+- `Tray.destroy()` stayed in `draggable.trays`
+- removing one draggable from a tray could unsubscribe the tray from another one; `add()` could leak a draggable into other trays that shared the same array
+- `Scope.addDraggable()` / `addTray()` left the instance in its previous scope too, and trays created inside `scope()` also joined the default scope
+- a draggable removed from a `List` or `Scope` was still handled by it on drop
+- a draggable outside lists and trays didn't update `pinnedPosition` on drop
+- `Tray.add()` crashed with `NotCrossingStrategy`
+- `leftDirection` and `rightDirection` were swapped
 
 ## 1.3.1
 - add `dragStartThreshold` option for `Draggable`. It can be helpful to prevent accidental drags when the user just wants to click — drag activates only after the pointer travels this distance
