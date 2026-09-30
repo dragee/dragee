@@ -1,5 +1,3 @@
-import getParentsChain from '../utils/get-parents-chain.js'
-
 /** Class representing a point. */
 export default class Point {
   /**
@@ -42,20 +40,7 @@ export default class Point {
 
   static elementOffset(element, parent) {
     parent = parent || element.parentNode
-    if (parent === element) {
-      return new Point(0, 0)
-    } else if (parent === element.offsetParent) {
-      return new Point(
-        element.offsetLeft + parent.clientLeft,
-        element.offsetTop + parent.clientTop
-      )
-    } else {
-      const considerOffsetElements = [element, getParentsChain(element, parent).pop()]
-      return new Point(
-        considerOffsetElements.reduce((sum, p) => sum + p.offsetLeft, 0) + parent.clientLeft,
-        considerOffsetElements.reduce((sum, p) => sum + p.offsetTop, 0) + parent.clientTop
-      )
-    }
+    return layoutPosition(element).sub(layoutPosition(parent))
   }
 
   static elementBoundingOffset(element, parent) {
@@ -75,4 +60,12 @@ export default class Point {
       elementRect.height
     )
   }
+}
+
+function layoutPosition(element) {
+  const position = new Point(element.offsetLeft, element.offsetTop)
+  const offsetParent = element.offsetParent
+  return offsetParent
+    ? position.add(new Point(offsetParent.clientLeft, offsetParent.clientTop)).add(layoutPosition(offsetParent))
+    : position
 }

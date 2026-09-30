@@ -56,6 +56,15 @@ export function track(draggable) {
   return draggable
 }
 
+export function setLayout(element, { offsetParent = null, left = 0, top = 0, clientLeft = 0, clientTop = 0 } = {}) {
+  Object.defineProperty(element, 'offsetParent', { get: () => offsetParent })
+  Object.defineProperty(element, 'offsetLeft', { get: () => left })
+  Object.defineProperty(element, 'offsetTop', { get: () => top })
+  Object.defineProperty(element, 'clientLeft', { get: () => clientLeft })
+  Object.defineProperty(element, 'clientTop', { get: () => clientTop })
+  return element
+}
+
 // Low-level event dispatchers
 export function mouseDown(element, point) {
   element.dispatchEvent(new MouseEvent('mousedown', {

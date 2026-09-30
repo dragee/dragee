@@ -8,7 +8,8 @@ import {
   mouseMove,
   simulateDrag,
   endDrag,
-  cleanup
+  cleanup,
+  setLayout
 } from './testing-sdk'
 
 afterEach(cleanup)
@@ -394,6 +395,32 @@ describe('draggable/destroy during a drag', () => {
     mouseMove(new Point(30, 30))
 
     expect(onMove).not.toHaveBeenCalled()
+  })
+})
+
+describe('draggable/static container', () => {
+  function createInStaticContainer() {
+    const root = setLayout(createContainer(), { clientLeft: 7, clientTop: 7 })
+    const container = setLayout(document.createElement('div'), { offsetParent: root, left: 184, top: 10 })
+    const element = setLayout(document.createElement('div'), { offsetParent: root, left: 200, top: 30 })
+    root.appendChild(container)
+    container.appendChild(element)
+    return track(new Draggable(element, { container }))
+  }
+
+  it('should measure its offset from a container that is not its offset parent', () => {
+    const draggable = createInStaticContainer()
+
+    expect(draggable.offset).toEqual(new Point(16, 20))
+    expect(draggable.position).toEqual(new Point(16, 20))
+  })
+
+  it('should translate by the move relative to that offset', () => {
+    const draggable = createInStaticContainer()
+
+    draggable.move(new Point(50, 60))
+
+    expect(draggable.element.style.transform).toBe('translate3d(34px, 40px, 0px)')
   })
 })
 
