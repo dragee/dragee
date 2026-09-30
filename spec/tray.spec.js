@@ -98,6 +98,26 @@ describe('Tray', () => {
   })
 })
 
+describe('Tray.add', () => {
+  it('should animate the added draggable over the given duration', () => {
+    const { tray } = createTargetSetup(0)
+    const { draggables: [draggable] } = createDraggables(1)
+
+    tray.add(draggable, { duration: 250 })
+
+    expect(draggable.element.style.transition).toContain('transform 250ms')
+  })
+
+  it('should place the added draggable without animation by default', () => {
+    const { tray } = createTargetSetup(0)
+    const { draggables: [draggable] } = createDraggables(1)
+
+    tray.add(draggable)
+
+    expect(draggable.element.style.transition).toContain('transform 0ms')
+  })
+})
+
 describe('Tray and destroyed draggables', () => {
   it('should forget a draggable that is destroyed', () => {
     const { tray, draggables: [draggable, other] } = createTargetSetup()

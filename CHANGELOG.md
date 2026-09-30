@@ -9,7 +9,7 @@
 - listener semantics follow `EventTarget`: the same function added twice is registered once, and an exception in one listener no longer stops the others
 - rename `Target` to `Tray`, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data
 - requires Chrome / Edge 90+, Firefox 86+, Safari 15+ (`EventTarget` subclassing and the `signal` listener option)
-- `move()` and `pinPosition()` take an options object `{ duration, silent }` instead of positional `time` / `silent` arguments
+- `move()` and `pinPosition()` take an options object `{ duration, silent }` instead of positional `time` / `silent` arguments, and `Tray.add()` takes `{ duration }` instead of `time`
 - `package.json` declares `exports`: only `dragee` (and `dragee/package.json`) can be imported, deep imports such as `dragee/src/…` or `dragee/dist/…` fail. The npm package ships only the built bundles, README and CHANGELOG
 - pressing an `input`, `textarea`, `select` or `contenteditable` inside a draggable no longer starts a drag, so the field can be focused, edited and have its text selected. Previously a drag started from an `<input>` also focused it right away, which on touch devices opened the on-screen keyboard
 - errors are thrown as `Error` objects instead of strings: `Error` for a second `Draggable` on the same element, `RangeError` for `positions` of the wrong length on `List` / `Scope`

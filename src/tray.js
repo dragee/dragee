@@ -172,7 +172,7 @@ export default class Tray extends EventEmitter {
     })
   }
 
-  add(draggable, time) {
+  add(draggable, { duration = 0 } = {}) {
     const newDraggablesIndex = this.innerDraggables.length
 
     const beforeAddEvent = this.emitTrayEvent('beforeAdd', draggable, { cancelable: true })
@@ -186,7 +186,7 @@ export default class Tray extends EventEmitter {
       return draggable.getRectangle()
     }), [newDraggablesIndex])
 
-    this.setPosition(rectangles, [newDraggablesIndex], time || 0)
+    this.setPosition(rectangles, [newDraggablesIndex], duration)
     if (this.innerDraggables.indexOf(draggable) !== -1) {
       this.emitTrayEvent('add', draggable)
     }

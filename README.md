@@ -380,7 +380,7 @@ board.addEventListener('dragee:tray-add', ({ tray, draggable }) => {
 
 | Method | Signature | Description |
 | --- | --- | --- |
-| `add` | `(draggable, time?)` | Programmatically add a draggable |
+| `add` | `(draggable, { duration? })` | Programmatically add a draggable, animated over `duration` ms (default `0`) |
 | `accept` | `(draggable)` | Let a draggable be dropped into this tray without placing it there |
 | `remove` | `(draggable)` | Remove a draggable from the tray |
 | `releaseDraggable` | `(draggable)` | Stop accepting a draggable (the reverse of `accept`); `draggable.destroy()` calls it for each of its trays |
@@ -649,7 +649,7 @@ new Draggable(el, {
 - **Browser support:** Chrome / Edge 90+, Firefox 86+, Safari 15+ are required (see [Browser support](#browser-support)).
 - **Listeners receive an `Event`** that carries the payload: `tray.on('tray:add', ({ draggable }) => {})` instead of `target.on('target:add', (draggable) => {})`.
 - **`Target` is renamed to `Tray`**, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data.
-- **`move()` and `pinPosition()` take an options object:** `pinPosition(point, { duration: 200 })` instead of `pinPosition(point, 200)`, `move(point, { silent: true })` instead of `move(point, 0, true)`.
+- **`move()`, `pinPosition()` and `Tray.add()` take an options object:** `pinPosition(point, { duration: 200 })` instead of `pinPosition(point, 200)`, `move(point, { silent: true })` instead of `move(point, 0, true)`, `tray.add(draggable, { duration: 200 })` instead of `tray.add(draggable, 200)`.
 - **`timeExcange` is renamed to `timeExchange`** in `List`, `BubblingList` and `Tray`. The old name is ignored.
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Only the package entry point can be imported:** `package.json` now has `exports`, so deep imports such as `dragee/src/…` or `dragee/dist/…` fail; import from `dragee`.
