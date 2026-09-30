@@ -10,6 +10,7 @@
 - rename `Target` to `Tray`, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data
 - requires Chrome / Edge 90+, Firefox 86+, Safari 15+ (`EventTarget` subclassing and the `signal` listener option)
 - `move()` and `pinPosition()` take an options object `{ duration, silent }` instead of positional `time` / `silent` arguments
+- `package.json` declares `exports`: only `dragee` (and `dragee/package.json`) can be imported, deep imports such as `dragee/src/…` or `dragee/dist/…` fail. The npm package ships only the built bundles, README and CHANGELOG
 - errors are thrown as `Error` objects instead of strings: `Error` for a second `Draggable` on the same element, `RangeError` for `positions` of the wrong length on `List` / `Scope`
 - rename the `timeExcange` option to `timeExchange` (`List`, `BubblingList`, `Tray`); the old name is ignored
 - remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
