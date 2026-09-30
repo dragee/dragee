@@ -6,8 +6,6 @@ import {
   indexOfNearestPoint
 } from './geometry/distances.js'
 
-import Draggable from './draggable.js'
-
 export default class List extends EventEmitter {
   constructor(draggables, options={}) {
     super(options)
@@ -34,7 +32,7 @@ export default class List extends EventEmitter {
   onResize() {
     if (this.options.reorderOnChange) this.reset()
     this.draggables.forEach((draggable) => {
-      if(!draggable.isDragging) {
+      if (!draggable.isDragging) {
         draggable.startPositioning()
       }
     })

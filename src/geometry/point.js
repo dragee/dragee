@@ -43,7 +43,7 @@ export default class Point {
   static elementOffset(element, parent) {
     parent = parent || element.parentNode
     if (parent === element) {
-      return new Point(0, 0);
+      return new Point(0, 0)
     } else if (parent === element.offsetParent) {
       return new Point(
         element.offsetLeft + parent.clientLeft,

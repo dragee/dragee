@@ -32,7 +32,7 @@ describe('EventEmitter', () => {
 
     it('should register initial listeners from the on option', () => {
       const fn = jest.fn()
-      const em = new EventEmitter({ on: { 'init': fn } })
+      const em = new EventEmitter({ on: { init: fn } })
       em.emit('init')
       expect(fn).toHaveBeenCalledTimes(1)
     })

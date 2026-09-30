@@ -1,7 +1,7 @@
 import Draggable from '../src/draggable'
 import List from '../src/list'
 import Point from '../src/geometry/point'
-import { createContainer, createDraggables, track, simulateDrag, endDrag, cleanup } from './testing-sdk'
+import { createDraggables, track, simulateDrag, endDrag, cleanup } from './testing-sdk'
 
 afterEach(cleanup)
 

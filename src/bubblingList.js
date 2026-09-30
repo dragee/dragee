@@ -1,8 +1,6 @@
 import List from './list.js'
 import { indexOfNearestPoint, getXDifference, getYDifference } from './geometry/distances.js'
 
-import Draggable from './draggable.js'
-
 const arrayMove = (array, from, to) => {
   array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0])
 }
@@ -49,12 +47,12 @@ export default class BubblingList extends List {
     let currentOrder
     let targetIndex
 
-    if(this.isMovingBackward(draggable) && prevDraggable) {
+    if (this.isMovingBackward(draggable) && prevDraggable) {
       currentOrder = [prevDraggable, draggable].map((d) => d.pinnedPosition)
       targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc)
 
       if (targetIndex === 0) {
-        if(draggable.shouldUseNativeDragAndDrop()) {
+        if (draggable.shouldUseNativeDragAndDrop()) {
           draggable.pinPosition(prevDraggable.pinnedPosition)
         } else {
           draggable.pinnedPosition = prevDraggable.pinnedPosition.clone()
@@ -66,14 +64,14 @@ export default class BubblingList extends List {
         this.onMove(draggable)
         this.changedDuringIteration = true
       }
-    } else if(this.isMovingForward(draggable) && nextDraggable) {
+    } else if (this.isMovingForward(draggable) && nextDraggable) {
       currentOrder = [draggable, nextDraggable].map((d) => d.pinnedPosition)
       targetIndex = indexOfNearestPoint(currentOrder, draggable.position, 10000, this.distanceFunc)
 
-      if(targetIndex === 1) {
+      if (targetIndex === 1) {
         nextDraggable.pinPosition(draggable.pinnedPosition, { duration: this.options.timeExchange })
         const draggableNewPosition = this.nextPosition(nextDraggable.pinnedPosition, nextDraggable)
-        if(draggable.shouldUseNativeDragAndDrop()) {
+        if (draggable.shouldUseNativeDragAndDrop()) {
           draggable.pinPosition(draggableNewPosition)
         } else {
           draggable.pinnedPosition = draggableNewPosition
@@ -116,7 +114,7 @@ export default class BubblingList extends List {
 
     this.draggables.forEach((d) => d.startPositioning())
 
-    if(this.draggables.length > 0) {
+    if (this.draggables.length > 0) {
       this.bubbling()
     }
   }

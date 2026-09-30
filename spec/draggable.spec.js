@@ -1,6 +1,5 @@
 import Draggable from '../src/draggable'
 import Point from '../src/geometry/point'
-import Rectangle from '../src/geometry/rectangle'
 import {
   createContainer,
   createDraggable,
