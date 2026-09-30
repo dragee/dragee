@@ -40,9 +40,8 @@ function getTouchByID(element, touchId) {
 }
 
 function preventDoubleInit(draggable) {
-  const message = "for this element Dragee.Draggable is already exist, don't create it twice "
   if (draggables.some((existing) => draggable.element === existing.element)) {
-    throw message
+    throw new Error('A Draggable already exists for this element')
   }
   draggables.push(draggable)
 }

@@ -351,7 +351,7 @@ describe('draggable/destroy', () => {
 
   it('should throw when creating two draggables on same element', () => {
     const draggable = createDraggable()
-    expect(() => new Draggable(draggable.element)).toThrow()
+    expect(() => new Draggable(draggable.element)).toThrow(Error)
   })
 })
 

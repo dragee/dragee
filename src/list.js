@@ -220,13 +220,12 @@ export default class List extends EventEmitter {
   }
 
   set positions(positions) {
-    const message = 'wrong array length'
     if (positions.length === this.draggables.length) {
       positions.forEach((point, i) => {
         this.draggables[i].pinPosition(point)
       })
     } else {
-      throw message
+      throw new RangeError(`Expected ${this.draggables.length} positions, got ${positions.length}`)
     }
   }
 

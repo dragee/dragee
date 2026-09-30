@@ -142,7 +142,7 @@ describe('list/positions', () => {
     const { list } = createListSetup(3)
     expect(() => {
       list.positions = [new Point(0, 0)]
-    }).toThrow()
+    }).toThrow(RangeError)
   })
 })
 

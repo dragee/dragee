@@ -261,7 +261,7 @@ DOM events are dispatched from the dragged item's element and bubble, so they re
 | Property | Type | Description |
 | --- | --- | --- |
 | `draggables` | `Draggable[]` | All draggables in the list |
-| `positions` | `Point[]` | Get/set all pinned positions |
+| `positions` | `Point[]` | Get/set all pinned positions; setting an array of the wrong length throws a `RangeError` |
 | `enable` | `boolean` | Get/set to enable/disable all dragging |
 | `swappingDisabled` | `boolean` | Get/set to disable item swapping during drag |
 
@@ -522,7 +522,7 @@ const myScope = new Scope(draggables, trays, { timeEnd: 400 })
 | --- | --- | --- |
 | `draggables` | `Draggable[]` | All draggables in scope |
 | `trays` | `Tray[]` | All trays in scope |
-| `positions` | `number[][]` | Get/set draggable indexes per tray |
+| `positions` | `number[][]` | Get/set draggable indexes per tray; setting an array of the wrong length throws a `RangeError` |
 
 #### Events
 
@@ -651,6 +651,7 @@ new Draggable(el, {
 - **`move()` and `pinPosition()` take an options object:** `pinPosition(point, { duration: 200 })` instead of `pinPosition(point, 200)`, `move(point, { silent: true })` instead of `move(point, 0, true)`.
 - **`timeExcange` is renamed to `timeExchange`** in `List`, `BubblingList` and `Tray`. The old name is ignored.
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
+- **Errors are `Error` objects** instead of strings: a second `Draggable` for the same element throws an `Error`, and setting `positions` of the wrong length on a `List` or `Scope` throws a `RangeError`.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.
 - **`dragEndAction` can no longer be overridden.** Listen to `drag:release` and call `event.cancel()` to place a dropped draggable yourself.
 - **Canceling a drag start:** call `event.cancel()` in a `drag:start` listener. Calling `cancelDragging()` or `destroy()` there no longer stops the drag, because `drag:start` now fires before the drag listeners are attached.

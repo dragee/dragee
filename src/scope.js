@@ -98,7 +98,6 @@ class Scope extends EventEmitter {
   }
 
   set positions(positions) {
-    const message = 'wrong array length'
     if (positions.length === this.trays.length) {
       this.trays.forEach((tray) => tray.reset())
 
@@ -108,7 +107,7 @@ class Scope extends EventEmitter {
         })
       })
     } else {
-      throw message
+      throw new RangeError(`Expected ${this.trays.length} positions, got ${positions.length}`)
     }
   }
 }

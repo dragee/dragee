@@ -131,3 +131,16 @@ describe('Draggable.destroy', () => {
     expect(currentScope.draggables).not.toContain(draggable)
   })
 })
+
+describe('Scope positions', () => {
+  it('should throw a RangeError when the number of positions does not match the trays', () => {
+    const { container, elements: [trayElement] } = createElements(1)
+    let tray
+    const board = scope(() => {
+      tray = new Tray(trayElement, [], { container })
+    })
+
+    expect(() => { board.positions = [[], []] }).toThrow(RangeError)
+    tray.destroy()
+  })
+})
