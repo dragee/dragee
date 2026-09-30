@@ -161,11 +161,11 @@ export default class Tray extends EventEmitter {
         timeEnd = time || time === 0 ? time : indexesOfNew.indexOf(i) !== -1 ? this.options.timeEnd : this.options.timeExchange
 
       if (rect.removable) {
-        draggable.move(draggable.initialPosition, timeEnd, true, true)
+        draggable.move(draggable.initialPosition, { duration: timeEnd, silent: true })
         removeItem(this.innerDraggables, draggable)
         this.emitTrayEvent('remove', draggable)
       } else {
-        draggable.move(rect.position, timeEnd, true, true)
+        draggable.move(rect.position, { duration: timeEnd, silent: true })
       }
     })
   }
@@ -222,7 +222,7 @@ export default class Tray extends EventEmitter {
 
   reset() {
     this.innerDraggables.forEach((draggable) => {
-      draggable.move(draggable.initialPosition, 0, true, true)
+      draggable.move(draggable.initialPosition, { silent: true })
       this.emitTrayEvent('remove', draggable)
     })
     this.innerDraggables = []

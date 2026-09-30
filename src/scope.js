@@ -75,7 +75,7 @@ class Scope extends EventEmitter {
     const isAccepted = shotTrays.length > 0 && shotTrays[0].drop(draggable)
 
     if (!isAccepted) {
-      draggable.pinPosition(draggable.initialPosition, this.options.timeEnd)
+      draggable.pinPosition(draggable.initialPosition, { duration: this.options.timeEnd })
     }
 
     this.emit('scope:change', { scope: this, draggable })

@@ -110,7 +110,7 @@ By default a released draggable is pinned where it was dropped. Calling `event.c
 ```javascript
 draggable.on('drag:release', (event) => {
   event.cancel()
-  draggable.pinPosition(snapToGrid(draggable.position), 200)
+  draggable.pinPosition(snapToGrid(draggable.position), { duration: 200 })
 })
 ```
 
@@ -120,8 +120,8 @@ Lists and scopes place their draggables through the same event and leave the dro
 
 | Method | Signature | Description |
 | --- | --- | --- |
-| `move` | `(point, time?, isSilent?)` | Move to point with optional animation (ms) |
-| `pinPosition` | `(point, time?, silent?)` | Move and remember as the pinned (rest) position |
+| `move` | `(point, { duration?, silent? })` | Move to point, animated over `duration` ms (default `0`); `silent: true` skips `drag:move` |
+| `pinPosition` | `(point, { duration?, silent? })` | Move and remember as the pinned (rest) position; silent by default |
 | `setPosition` | `(point)` | Set position instantly, no animation |
 | `resetPositionToInitial` | `()` | Return to the initial position |
 | `refreshPosition` | `()` | Re-read and re-apply current position |
@@ -648,6 +648,7 @@ new Draggable(el, {
 - **Browser support:** Chrome / Edge 90+, Firefox 86+, Safari 15+ are required (see [Browser support](#browser-support)).
 - **Listeners receive an `Event`** that carries the payload: `tray.on('tray:add', ({ draggable }) => {})` instead of `target.on('target:add', (draggable) => {})`.
 - **`Target` is renamed to `Tray`**, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data.
+- **`move()` and `pinPosition()` take an options object:** `pinPosition(point, { duration: 200 })` instead of `pinPosition(point, 200)`, `move(point, { silent: true })` instead of `move(point, 0, true)`.
 - **`timeExcange` is renamed to `timeExchange`** in `List`, `BubblingList` and `Tray`. The old name is ignored.
 - **Removed:** `prependOn`, `resetOn`, `resetEmitter`, `interrupt`, `Draggable.emitter` and `Target.emitter`. `scope()` no longer needs them; to react to new instances, create them inside `scope()` or add them to a scope explicitly.
 - **Listener semantics follow `EventTarget`:** the same function added twice is registered once, and an exception in one listener no longer stops the others.

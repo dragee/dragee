@@ -9,6 +9,7 @@
 - listener semantics follow `EventTarget`: the same function added twice is registered once, and an exception in one listener no longer stops the others
 - rename `Target` to `Tray`, together with `draggable.trays`, `scope.trays` / `scope.addTray()`, the `tray:*` / `dragee:tray-*` events and the `{ tray, draggable }` event data
 - requires Chrome / Edge 90+, Firefox 86+, Safari 15+ (`EventTarget` subclassing and the `signal` listener option)
+- `move()` and `pinPosition()` take an options object `{ duration, silent }` instead of positional `time` / `silent` arguments
 - rename the `timeExcange` option to `timeExchange` (`List`, `BubblingList`, `Tray`); the old name is ignored
 - remove `prependOn()`, `resetOn()`, `resetEmitter()`, `interrupt()`, `Draggable.emitter` and `Target.emitter`. `scope()` tracks new instances itself and can be nested
 - `drag:start` fires before the drag listeners are attached, so calling `cancelDragging()` or `destroy()` from a `drag:start` listener no longer stops the drag; call `event.cancel()` instead

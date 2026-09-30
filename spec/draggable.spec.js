@@ -55,7 +55,7 @@ describe('draggable/move', () => {
     draggable.move(new Point(10, 10))
     expect(fn).toHaveBeenCalledTimes(1)
 
-    draggable.move(new Point(20, 20), 0, true)
+    draggable.move(new Point(20, 20), { silent: true })
     expect(fn).toHaveBeenCalledTimes(1)
   })
 })
@@ -72,6 +72,17 @@ describe('draggable/position management', () => {
     draggable.resetPositionToInitial()
     expect(draggable.pinnedPosition.x).toBe(20)
     expect(draggable.pinnedPosition.y).toBe(30)
+  })
+
+  it('should animate pinPosition over the given duration without emitting drag:move', () => {
+    const draggable = createDraggable()
+    const fn = jest.fn()
+    draggable.on('drag:move', fn)
+
+    draggable.pinPosition(new Point(50, 60), { duration: 250 })
+
+    expect(draggable.element.style.transition).toContain('transform 250ms')
+    expect(fn).not.toHaveBeenCalled()
   })
 
   it('should set and get position correctly', () => {

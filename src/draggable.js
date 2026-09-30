@@ -187,21 +187,21 @@ export default class Draggable extends EventEmitter {
     }
   }
 
-  move(point, time=0, isSilent=false) {
+  move(point, { duration = 0, silent = false } = {}) {
     point = point.clone()
     this.position = point
 
-    this._setTransition(time)
+    this._setTransition(duration)
     this._setTranslate(point.sub(this.offset))
 
-    if (!isSilent) {
+    if (!silent) {
       this.emitDragEvent('move')
     }
   }
 
-  pinPosition(point, time=0, silent=true) {
+  pinPosition(point, { duration = 0, silent = true } = {}) {
     this.pinnedPosition = point.clone()
-    this.move(this.pinnedPosition, time, silent)
+    this.move(this.pinnedPosition, { duration, silent })
   }
 
   resetPositionToInitial () {

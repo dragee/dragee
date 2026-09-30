@@ -52,7 +52,7 @@ export default class List extends EventEmitter {
       if (event.canceled) return
 
       event.cancel()
-      draggable.pinPosition(draggable.pinnedPosition, this.options.timeEnd)
+      draggable.pinPosition(draggable.pinnedPosition, { duration: this.options.timeEnd })
       this.onRelease(draggable)
     })
     this.resizeObserver.observe(draggable.element)
@@ -88,11 +88,11 @@ export default class List extends EventEmitter {
     if (targetIndex !== -1 && currentIndex !== targetIndex) {
       if (targetIndex < currentIndex) {
         for (let i=targetIndex; i<currentIndex; i++) {
-          sortedDraggables[i].pinPosition(pinnedPositions[i+1], this.options.timeExchange)
+          sortedDraggables[i].pinPosition(pinnedPositions[i+1], { duration: this.options.timeExchange })
         }
       } else {
         for (let i=currentIndex; i<targetIndex; i++) {
-          sortedDraggables[i+1].pinPosition(pinnedPositions[i], this.options.timeExchange)
+          sortedDraggables[i+1].pinPosition(pinnedPositions[i], { duration: this.options.timeExchange })
         }
       }
 
@@ -178,7 +178,7 @@ export default class List extends EventEmitter {
     sortedDraggables.forEach((draggable) => {
       if (this.draggables.indexOf(draggable) !== -1) {
         if (draggable.pinnedPosition !== initialPositions[j]) {
-          draggable.pinPosition(initialPositions[j], this.options.timeExchange)
+          draggable.pinPosition(initialPositions[j], { duration: this.options.timeExchange })
         }
         draggable.initialPosition = initialPositions[j]
         j++
